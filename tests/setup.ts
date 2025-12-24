@@ -15,6 +15,18 @@ vi.mock('phaser', () => ({
         container: vi.fn().mockReturnThis(),
         sprite: vi.fn().mockReturnThis(),
       };
+      physics = {
+        add: {
+          sprite: vi.fn().mockReturnValue({
+            setScale: vi.fn().mockReturnThis(),
+            setCollideWorldBounds: vi.fn().mockReturnThis(),
+            setDepth: vi.fn().mockReturnThis(),
+            setVelocity: vi.fn().mockReturnThis(),
+            body: { setSize: vi.fn() },
+            y: 0,
+          }),
+        },
+      };
       load = {
         image: vi.fn(),
         audio: vi.fn(),
@@ -31,6 +43,18 @@ vi.mock('phaser', () => ({
         on: vi.fn(),
         keyboard: {
           on: vi.fn(),
+          createCursorKeys: vi.fn().mockReturnValue({
+            left: { isDown: false },
+            right: { isDown: false },
+            up: { isDown: false },
+            down: { isDown: false },
+          }),
+          addKeys: vi.fn().mockReturnValue({
+            w: { isDown: false },
+            a: { isDown: false },
+            s: { isDown: false },
+            d: { isDown: false },
+          }),
         },
       };
       time = {

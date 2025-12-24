@@ -85,7 +85,8 @@ export class SceneAssembler {
 
     // 通用属性
     if (typeof obj.scale === 'number') display.setScale(obj.scale);
-    if (typeof obj.depth === 'number') display.setDepth(obj.depth);
+    // 俯视角常用：y-sort（按 y 值排序遮挡）。若显式给 depth，则以 depth 为准。
+    display.setDepth(typeof obj.depth === 'number' ? obj.depth : obj.y);
     if (typeof obj.alpha === 'number') display.setAlpha(obj.alpha);
     if (typeof obj.rotation === 'number') display.setRotation(obj.rotation);
     if (obj.origin) display.setOrigin(obj.origin[0], obj.origin[1]);
@@ -112,7 +113,12 @@ export class SceneAssembler {
       const label = this._scene.add
         .text(obj.x + dx, obj.y + dy, obj.label, { ...TEXT_STYLES.MUTED, fontSize: '12px' })
         .setOrigin(0.5, 0.5);
-      if (typeof obj.depth === 'number') label.setDepth(obj.depth + 1);
+      // label 默认跟随 display 的 depth；若显式 depth，则放到上一层
+      if (typeof obj.depth === 'number') {
+        label.setDepth(obj.depth + 1);
+      } else {
+        label.setDepth(obj.y + 1);
+      }
       created.push(label);
     }
 

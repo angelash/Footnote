@@ -21,8 +21,13 @@ export class GameScene extends Phaser.Scene {
   private _sceneAssembler!: SceneAssembler;
 
   // 游戏对象
-  private _player!: Phaser.GameObjects.Sprite;
+  private _player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   private _interactables: Phaser.GameObjects.Container[] = [];
+
+  // 输入
+  private _cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private _moveKeys!: { w: Phaser.Input.Keyboard.Key; a: Phaser.Input.Keyboard.Key; s: Phaser.Input.Keyboard.Key; d: Phaser.Input.Keyboard.Key };
+  private _moveSpeed: number = 260;
 
   // UI元素
   private _zoneTitle!: Phaser.GameObjects.Text;
@@ -67,10 +72,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
-    // 开发阶段：让玩家占位符做轻微呼吸，避免 noUnusedParameters/noUnusedLocals
-    if (this._player) {
-      this._player.y = this.scale.height * 0.7 + Math.sin(time / 600) * 2;
-    }
+    this._updatePlayerMovement();
+    // y-sort：玩家随 y 值更新遮挡层级
+    this._player.setDepth(this._player.y);
+    void time;
     void delta;
   }
 
@@ -82,9 +87,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   private _createPlayer(width: number, height: number): void {
-    // 临时使用占位图形
-    this._player = this.add.sprite(width / 2, height * 0.7, 'placeholder_char')
+    // 俯视角：使用 Arcade Physics 的动态体，便于移动/碰撞扩展
+    this._player = this.physics.add
+      .sprite(width / 2, height * 0.7, 'placeholder_char')
       .setScale(1.5);
+
+    this._player.setCollideWorldBounds(true);
+    // 简单缩小碰撞盒（避免占位图过“胖”）
+    this._player.body.setSize(32, 32, true);
+    this._player.setDepth(this._player.y);
   }
 
   private _createUI(width: number, height: number): void {
@@ -303,12 +314,43 @@ export class GameScene extends Phaser.Scene {
   }
 
   private _setupInput(): void {
+    // 方向键 + WASD
+    this._cursors = this.input.keyboard!.createCursorKeys();
+    this._moveKeys = this.input.keyboard!.addKeys('W,A,S,D') as unknown as {
+      w: Phaser.Input.Keyboard.Key;
+      a: Phaser.Input.Keyboard.Key;
+      s: Phaser.Input.Keyboard.Key;
+      d: Phaser.Input.Keyboard.Key;
+    };
+
     // 点击空白处关闭对话
     this.input.on('pointerdown', () => {
       if (this._dialogueBox.visible) {
         this._hideDialogue();
       }
     });
+  }
+
+  private _updatePlayerMovement(): void {
+    const left = this._cursors.left?.isDown || this._moveKeys.a.isDown;
+    const right = this._cursors.right?.isDown || this._moveKeys.d.isDown;
+    const up = this._cursors.up?.isDown || this._moveKeys.w.isDown;
+    const down = this._cursors.down?.isDown || this._moveKeys.s.isDown;
+
+    let vx = 0;
+    let vy = 0;
+    if (left) vx -= 1;
+    if (right) vx += 1;
+    if (up) vy -= 1;
+    if (down) vy += 1;
+
+    // 对角线归一化，保证速度一致
+    if (vx !== 0 && vy !== 0) {
+      vx *= Math.SQRT1_2;
+      vy *= Math.SQRT1_2;
+    }
+
+    this._player.setVelocity(vx * this._moveSpeed, vy * this._moveSpeed);
   }
 
   private _showDialogue(dialogue: { speaker: string; text: string }): void {

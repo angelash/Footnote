@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 可爱幽灵 -->
+  <defs>
+    <linearGradient id="ghostBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF"/>
+      <stop offset="100%" style="stop-color:#E0E0E0"/>
+    </linearGradient>
+    <radialGradient id="ghostGlow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" style="stop-color:#FFFFFF" stop-opacity="0.8"/>
+      <stop offset="100%" style="stop-color:#B3E5FC" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="ghostShadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#4FC3F7" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  
+  <!-- 外发光 -->
+  <ellipse cx="32" cy="36" rx="28" ry="26" fill="url(#ghostGlow)"/>
+  
+  <!-- 身体主体 -->
+  <path d="M12 36 
+           Q12 14 32 14 
+           Q52 14 52 36 
+           L52 52 
+           Q48 48 44 52 
+           Q40 48 36 52 
+           Q32 48 28 52 
+           Q24 48 20 52 
+           Q16 48 12 52 
+           Z" 
+        fill="url(#ghostBody)" filter="url(#ghostShadow)"/>
+  
+  <!-- 腮红 -->
+  <ellipse cx="18" cy="36" rx="5" ry="3" fill="#FFCDD2" opacity="0.6"/>
+  <ellipse cx="46" cy="36" rx="5" ry="3" fill="#FFCDD2" opacity="0.6"/>
+  
+  <!-- 眼睛 -->
+  <ellipse cx="24" cy="30" rx="6" ry="7" fill="#263238"/>
+  <ellipse cx="40" cy="30" rx="6" ry="7" fill="#263238"/>
+  
+  <!-- 眼睛高光 -->
+  <circle cx="26" cy="28" r="2.5" fill="#FFFFFF"/>
+  <circle cx="42" cy="28" r="2.5" fill="#FFFFFF"/>
+  <circle cx="23" cy="32" r="1.5" fill="#FFFFFF" opacity="0.5"/>
+  <circle cx="39" cy="32" r="1.5" fill="#FFFFFF" opacity="0.5"/>
+  
+  <!-- 小嘴 -->
+  <ellipse cx="32" cy="40" rx="3" ry="2" fill="#FF8A80"/>
+</svg>
+

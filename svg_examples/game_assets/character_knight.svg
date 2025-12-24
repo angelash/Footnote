@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Q版骑士角色 -->
+  <defs>
+    <linearGradient id="armor" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#90A4AE"/>
+      <stop offset="50%" style="stop-color:#607D8B"/>
+      <stop offset="100%" style="stop-color:#455A64"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD54F"/>
+      <stop offset="100%" style="stop-color:#FF8F00"/>
+    </linearGradient>
+    <linearGradient id="cape" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E53935"/>
+      <stop offset="100%" style="stop-color:#B71C1C"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 披风 -->
+  <path d="M20 28 Q16 45 22 58 L42 58 Q48 45 44 28 Z" fill="url(#cape)"/>
+  
+  <!-- 身体/盔甲 -->
+  <rect x="22" y="32" width="20" height="20" rx="4" fill="url(#armor)"/>
+  
+  <!-- 腿 -->
+  <rect x="24" y="50" width="6" height="10" rx="2" fill="url(#armor)"/>
+  <rect x="34" y="50" width="6" height="10" rx="2" fill="url(#armor)"/>
+  
+  <!-- 手臂 -->
+  <rect x="16" y="34" width="6" height="14" rx="3" fill="url(#armor)"/>
+  <rect x="42" y="34" width="6" height="14" rx="3" fill="url(#armor)"/>
+  
+  <!-- 头盔 -->
+  <rect x="20" y="10" width="24" height="24" rx="6" fill="url(#armor)"/>
+  
+  <!-- 头盔装饰 -->
+  <rect x="30" y="4" width="4" height="12" rx="2" fill="url(#gold)"/>
+  <ellipse cx="32" cy="4" rx="4" ry="2" fill="url(#gold)"/>
+  
+  <!-- 面罩开口 -->
+  <rect x="24" y="18" width="16" height="10" rx="2" fill="#263238"/>
+  
+  <!-- 眼睛（在面罩后面发光） -->
+  <circle cx="28" cy="23" r="2" fill="#4FC3F7"/>
+  <circle cx="36" cy="23" r="2" fill="#4FC3F7"/>
+  
+  <!-- 盔甲细节 -->
+  <line x1="32" y1="34" x2="32" y2="50" stroke="#455A64" stroke-width="2"/>
+  <circle cx="32" cy="38" r="3" fill="url(#gold)"/>
+</svg>
+

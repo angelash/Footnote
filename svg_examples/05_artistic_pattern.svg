@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- 艺术性装饰图案 -->
+  <defs>
+    <!-- 渐变背景 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A237E"/>
+      <stop offset="50%" style="stop-color:#311B92"/>
+      <stop offset="100%" style="stop-color:#4A148C"/>
+    </linearGradient>
+    
+    <!-- 发光效果 -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- 几何图案 -->
+    <pattern id="dots" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="10" cy="10" r="1.5" fill="rgba(255,255,255,0.1)"/>
+    </pattern>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="400" height="300" fill="url(#bgGrad)"/>
+  <rect width="400" height="300" fill="url(#dots)"/>
+  
+  <!-- 装饰性圆环 -->
+  <g filter="url(#glow)">
+    <circle cx="200" cy="150" r="80" fill="none" stroke="#7C4DFF" stroke-width="2" opacity="0.8"/>
+    <circle cx="200" cy="150" r="60" fill="none" stroke="#E040FB" stroke-width="1.5" opacity="0.6"/>
+    <circle cx="200" cy="150" r="100" fill="none" stroke="#448AFF" stroke-width="1" opacity="0.4"/>
+  </g>
+  
+  <!-- 几何线条 -->
+  <g stroke="#00E5FF" stroke-width="1" opacity="0.5" fill="none">
+    <path d="M50,150 L150,80 L250,120 L350,50"/>
+    <path d="M50,200 L150,250 L250,180 L350,220"/>
+    <polygon points="200,90 240,150 200,210 160,150" stroke-width="1.5"/>
+  </g>
+  
+  <!-- 散落的小元素 -->
+  <g fill="#FF4081" opacity="0.7">
+    <circle cx="80" cy="60" r="4"/>
+    <circle cx="320" cy="80" r="3"/>
+    <circle cx="100" cy="240" r="5"/>
+    <circle cx="340" cy="200" r="4"/>
+    <rect x="60" y="180" width="8" height="8" transform="rotate(45 64 184)"/>
+    <rect x="300" cy="260" width="6" height="6" transform="rotate(30 303 263)"/>
+  </g>
+  
+  <!-- 标题文字 -->
+  <text x="200" y="155" font-family="Georgia, serif" font-size="28" font-weight="bold" 
+        text-anchor="middle" fill="#FFFFFF" filter="url(#glow)">
+    SVG Art
+  </text>
+  <text x="200" y="175" font-family="Arial" font-size="12" text-anchor="middle" fill="#B388FF">
+    矢量图形的艺术
+  </text>
+</svg>
+

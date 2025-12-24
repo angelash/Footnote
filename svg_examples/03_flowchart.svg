@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+  <!-- 流程图示例 -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD"/>
+      <stop offset="100%" style="stop-color:#BBDEFB"/>
+    </linearGradient>
+    <linearGradient id="decisionGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF3E0"/>
+      <stop offset="100%" style="stop-color:#FFE0B2"/>
+    </linearGradient>
+  </defs>
+  
+  <style>
+    .box { fill: url(#boxGrad); stroke: #1976D2; stroke-width: 2; rx: 8; }
+    .decision { fill: url(#decisionGrad); stroke: #F57C00; stroke-width: 2; }
+    .arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    .label { font-family: "Microsoft YaHei", Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+    .small { font-size: 10px; fill: #666; }
+  </style>
+  
+  <!-- 开始 -->
+  <ellipse cx="200" cy="30" rx="40" ry="20" fill="#C8E6C9" stroke="#388E3C" stroke-width="2"/>
+  <text x="200" y="35" class="label">开始</text>
+  
+  <!-- 箭头 1 -->
+  <line x1="200" y1="50" x2="200" y2="70" class="arrow"/>
+  
+  <!-- 步骤 1 -->
+  <rect x="130" y="75" width="140" height="40" class="box"/>
+  <text x="200" y="100" class="label">收集需求</text>
+  
+  <!-- 箭头 2 -->
+  <line x1="200" y1="115" x2="200" y2="135" class="arrow"/>
+  
+  <!-- 判断 -->
+  <polygon points="200,140 260,170 200,200 140,170" class="decision"/>
+  <text x="200" y="175" class="label">需求明确?</text>
+  
+  <!-- 是 - 向下 -->
+  <line x1="200" y1="200" x2="200" y2="220" class="arrow"/>
+  <text x="210" y="215" class="small">是</text>
+  
+  <!-- 否 - 向右再向上 -->
+  <path d="M260,170 L320,170 L320,95 L275,95" class="arrow"/>
+  <text x="295" y="165" class="small">否</text>
+  
+  <!-- 步骤 2 -->
+  <rect x="130" y="225" width="140" height="40" class="box"/>
+  <text x="200" y="250" class="label">开发实现</text>
+  
+  <!-- 箭头 3 -->
+  <line x1="200" y1="265" x2="200" y2="280" class="arrow"/>
+  
+  <!-- 结束 -->
+  <ellipse cx="200" cy="290" rx="40" ry="15" fill="#FFCDD2" stroke="#D32F2F" stroke-width="2"/>
+  <text x="200" y="294" class="label">结束</text>
+</svg>
+

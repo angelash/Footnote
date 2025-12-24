@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 64" width="256" height="64">
+  <!-- 游戏道具合集：金币、药水、宝箱、宝石 -->
+  <defs>
+    <!-- 金色渐变 -->
+    <linearGradient id="coinGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD54F"/>
+      <stop offset="50%" style="stop-color:#FFC107"/>
+      <stop offset="100%" style="stop-color:#FF8F00"/>
+    </linearGradient>
+    
+    <!-- 药水渐变 -->
+    <linearGradient id="potionRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF5252"/>
+      <stop offset="100%" style="stop-color:#D50000"/>
+    </linearGradient>
+    <linearGradient id="potionGlass" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="50%" style="stop-color:#FFFFFF" stop-opacity="0"/>
+      <stop offset="100%" style="stop-color:#FFFFFF" stop-opacity="0.2"/>
+    </linearGradient>
+    
+    <!-- 宝箱渐变 -->
+    <linearGradient id="chestWood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8D6E63"/>
+      <stop offset="100%" style="stop-color:#5D4037"/>
+    </linearGradient>
+    
+    <!-- 宝石渐变 -->
+    <linearGradient id="gemBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4FC3F7"/>
+      <stop offset="30%" style="stop-color:#0288D1"/>
+      <stop offset="100%" style="stop-color:#01579B"/>
+    </linearGradient>
+    
+    <filter id="itemShadow">
+      <feDropShadow dx="1" dy="2" stdDeviation="1" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- === 金币 (0-64) === -->
+  <g transform="translate(0, 0)" filter="url(#itemShadow)">
+    <circle cx="32" cy="32" r="22" fill="url(#coinGold)" stroke="#FF6F00" stroke-width="2"/>
+    <circle cx="32" cy="32" r="16" fill="none" stroke="#FFE082" stroke-width="2"/>
+    <text x="32" y="40" font-family="Arial Black" font-size="20" text-anchor="middle" fill="#FF6F00">$</text>
+  </g>
+  
+  <!-- === 药水 (64-128) === -->
+  <g transform="translate(64, 0)" filter="url(#itemShadow)">
+    <!-- 瓶身 -->
+    <path d="M24 20 L24 16 Q24 12 28 12 L36 12 Q40 12 40 16 L40 20 L44 28 Q46 32 46 36 L46 52 Q46 56 42 56 L22 56 Q18 56 18 52 L18 36 Q18 32 20 28 Z" 
+          fill="url(#potionRed)"/>
+    <!-- 玻璃高光 -->
+    <path d="M24 20 L24 16 Q24 12 28 12 L36 12 Q40 12 40 16 L40 20 L44 28 Q46 32 46 36 L46 52 Q46 56 42 56 L22 56 Q18 56 18 52 L18 36 Q18 32 20 28 Z" 
+          fill="url(#potionGlass)"/>
+    <!-- 瓶塞 -->
+    <rect x="26" y="8" width="12" height="6" rx="2" fill="#8D6E63"/>
+    <!-- 气泡 -->
+    <circle cx="28" cy="42" r="3" fill="#FFFFFF" opacity="0.4"/>
+    <circle cx="36" cy="48" r="2" fill="#FFFFFF" opacity="0.3"/>
+    <circle cx="32" cy="36" r="1.5" fill="#FFFFFF" opacity="0.5"/>
+  </g>
+  
+  <!-- === 宝箱 (128-192) === -->
+  <g transform="translate(128, 0)" filter="url(#itemShadow)">
+    <!-- 箱体 -->
+    <rect x="12" y="32" width="40" height="24" rx="2" fill="url(#chestWood)" stroke="#3E2723" stroke-width="1"/>
+    <!-- 箱盖 -->
+    <path d="M12 32 Q12 18 32 18 Q52 18 52 32 Z" fill="url(#chestWood)" stroke="#3E2723" stroke-width="1"/>
+    <!-- 金属条 -->
+    <rect x="10" y="30" width="44" height="4" fill="url(#coinGold)"/>
+    <rect x="28" y="18" width="8" height="38" fill="url(#coinGold)"/>
+    <!-- 锁 -->
+    <circle cx="32" cy="38" r="5" fill="url(#coinGold)" stroke="#FF6F00" stroke-width="1"/>
+    <rect x="30" y="38" width="4" height="6" fill="#3E2723"/>
+  </g>
+  
+  <!-- === 宝石 (192-256) === -->
+  <g transform="translate(192, 0)" filter="url(#itemShadow)">
+    <!-- 宝石主体 -->
+    <polygon points="32,10 48,24 44,54 20,54 16,24" fill="url(#gemBlue)" stroke="#01579B" stroke-width="1"/>
+    <!-- 切面 -->
+    <polygon points="32,10 40,24 32,20 24,24" fill="#4FC3F7"/>
+    <polygon points="32,20 40,24 38,40 32,36" fill="#0288D1"/>
+    <polygon points="32,20 24,24 26,40 32,36" fill="#039BE5"/>
+    <!-- 高光 -->
+    <polygon points="32,14 36,20 32,18 28,20" fill="#FFFFFF" opacity="0.6"/>
+    <line x1="24" y1="26" x2="28" y2="34" stroke="#FFFFFF" stroke-width="1.5" opacity="0.4"/>
+  </g>
+</svg>
+

@@ -1,0 +1,155 @@
+# 角色图片审核记录
+# 日期: 2025-12-24
+# 审核人: AI自动审核
+
+batches:
+  - id: batch_001
+    timestamp: "2025-12-24T09:05:00"
+    character: 顾临 (Gulin)
+    prompt_version: 1
+    prompt_summary: "中年中国男性，短发整洁，深色西装，严肃表情，正面站姿"
+    images:
+      - file: gulin_pixel_1.webp
+        status: approved
+        score: 9.0
+        issues: []
+        check_results:
+          facing: ✅ 正面对称
+          clothing: ✅ 深色西装符合
+          expression: ✅ 严肃表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: approved/gulin_pixel_1.webp
+        
+      - file: gulin_pixel_2.webp
+        status: approved
+        score: 8.5
+        issues: []
+        check_results:
+          facing: ✅ 正面对称
+          clothing: ✅ 深色西装符合
+          expression: ✅ 严肃表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: approved/gulin_pixel_2.webp
+        
+      - file: gulin_pixel_3.webp
+        status: approved
+        score: 9.0
+        issues: []
+        check_results:
+          facing: ✅ 正面对称
+          clothing: ✅ 深色西装符合
+          expression: ✅ 严肃表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: approved/gulin_pixel_3.webp
+        
+      - file: gulin_pixel_4.webp
+        status: rejected
+        score: 6.0
+        issues:
+          - "❌ 朝向不正确：头部微微向右侧倾斜"
+        check_results:
+          facing: ❌ 不是纯正面
+          clothing: ✅ 深色西装符合
+          expression: ✅ 严肃表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: rejected/gulin_pixel_4.webp
+        
+    summary:
+      total: 4
+      approved: 3
+      rejected: 1
+      pass_rate: 75%
+      retry_needed: false
+      
+  - id: batch_002
+    timestamp: "2025-12-24T09:07:00"
+    character: 宋岚 (Songlan)
+    prompt_version: 1
+    prompt_summary: "年轻中国女性，长发扎马尾，工装外套，温和表情，正面站姿"
+    images:
+      - file: songlan_pixel_1.webp
+        status: rejected
+        score: 5.5
+        issues:
+          - "❌ 朝向不正确：身体明显向右侧转"
+          - "⚠️ 姿态：不是标准站姿"
+        check_results:
+          facing: ❌ 身体侧转
+          clothing: ✅ 工装外套符合
+          expression: ✅ 温和表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: rejected/songlan_pixel_1.webp
+        
+      - file: songlan_pixel_2.webp
+        status: rejected
+        score: 6.0
+        issues:
+          - "❌ 朝向不正确：头部向左侧偏转"
+        check_results:
+          facing: ❌ 头部侧偏
+          clothing: ✅ 工装外套符合
+          expression: ✅ 温和表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: rejected/songlan_pixel_2.webp
+        
+      - file: songlan_pixel_3.webp
+        status: approved
+        score: 8.5
+        issues: []
+        check_results:
+          facing: ✅ 基本正面
+          clothing: ✅ 工装外套符合
+          expression: ✅ 温和表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: approved/songlan_pixel_3.webp
+        
+      - file: songlan_pixel_4.webp
+        status: approved
+        score: 8.0
+        issues: []
+        check_results:
+          facing: ✅ 基本正面
+          clothing: ✅ 工装外套符合
+          expression: ✅ 温和表情
+          transparent_bg: ✅ 透明背景
+          completeness: ✅ 角色完整
+        moved_to: approved/songlan_pixel_4.webp
+        
+    summary:
+      total: 4
+      approved: 2
+      rejected: 2
+      pass_rate: 50%
+      retry_needed: false  # 已达到最低要求(≥1张通过)
+
+# 总体统计
+overall_summary:
+  date: "2025-12-24"
+  total_generated: 8
+  total_approved: 5
+  total_rejected: 3
+  overall_pass_rate: 62.5%
+  characters_completed:
+    - 顾临: 3张可用
+    - 宋岚: 2张可用
+  characters_pending:
+    - 岑回
+    - 许澄
+    - 阿棠
+    - 牧平
+    - 栖蓝
+    - 陈匠
+
+# 下次生成建议
+next_generation_notes:
+  - "宋岚角色通过率较低(50%)，建议加强提示词中的朝向约束"
+  - "建议添加: facing camera directly, perfect front view, mirror symmetry"
+  - "可考虑减少单次生成数量，提高单张质量"
+

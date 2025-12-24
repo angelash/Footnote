@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 泛黄旧照片
+  尺寸: 32×32px
+  来源: 多个Zone
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- 照片底框 -->
+  <rect x="3" y="5" width="26" height="22" rx="1" fill="#E8E0D0" stroke="#C8B898" stroke-width="1"/>
+  
+  <!-- 照片内容区（暗） -->
+  <rect x="5" y="7" width="22" height="16" fill="#3a3530"/>
+  
+  <!-- 模糊人影 -->
+  <ellipse cx="12" cy="16" rx="4" ry="7" fill="#4a4540" opacity="0.8"/>
+  <ellipse cx="20" cy="16" rx="4" ry="7" fill="#4a4540" opacity="0.6"/>
+  
+  <!-- 泛黄效果 -->
+  <rect x="5" y="7" width="22" height="16" fill="#E8D4A0" opacity="0.15"/>
+  
+  <!-- 磨损边角 -->
+  <path d="M3 5 L6 5 L3 8 Z" fill="#C8B080"/>
+  <path d="M29 27 L26 27 L29 24 Z" fill="#C8B080"/>
+  
+  <!-- 时间腐蚀痕迹 -->
+  <line x1="8" y1="10" x2="15" y2="10" stroke="#6a6050" stroke-width="0.5" opacity="0.4"/>
+</svg>
+

@@ -1,0 +1,239 @@
+﻿# 銆婂娉?/ Footnote銆嬫父鎴忛煶鏁堥厤缃?
+# 鏍煎紡: YAML
+# 鐘舵€? 寰呯敓鎴愰煶棰戞枃浠讹紙閰嶇疆鍏堣锛?
+
+# ==========================================
+# 娓告垙闊虫晥鍒楄〃 (20涓?
+# ==========================================
+
+sfx_game:
+  # ------------------------------------------
+  # 鑳藉姏绯荤粺
+  # ------------------------------------------
+  - id: sfx_depth_perception_activate
+    name: "娣卞害鎰熺煡婵€娲?
+    file: assets/audio/sfx/game/sfx_depth_perception_activate.mp3
+    description: |
+      娣卞害鎰熺煡鑳藉姏寮€鍚?
+      椋庢牸: 鐢靛瓙鏅朵綋闊?+ 绌洪棿灞曞紑鎰?
+    duration: 0.8
+    volume: 0.6
+    tags: [ability, depth, perception]
+    
+  - id: sfx_depth_perception_deactivate
+    name: "娣卞害鎰熺煡鍏抽棴"
+    file: assets/audio/sfx/game/sfx_depth_perception_deactivate.mp3
+    description: "娣卞害鎰熺煡鑳藉姏鍏抽棴"
+    duration: 0.5
+    volume: 0.5
+    tags: [ability, depth, perception]
+    
+  - id: sfx_depth_intervention
+    name: "娣卞害浠嬪叆"
+    file: assets/audio/sfx/game/sfx_depth_intervention.mp3
+    description: |
+      娣卞害浠嬪叆鑳藉姏浣跨敤
+      椋庢牸: 缁撴瀯鎾曡 + 鑳介噺閲婃斁
+    duration: 1.2
+    volume: 0.7
+    tags: [ability, depth, intervention]
+    
+  - id: sfx_scar_create
+    name: "浼ょ棔浜х敓"
+    file: assets/audio/sfx/game/sfx_scar_create.mp3
+    description: "娣卞害浠嬪叆鍚庣暀涓嬩激鐥?
+    duration: 0.6
+    volume: 0.55
+    tags: [scar, damage, consequence]
+    
+  - id: sfx_time_intervention
+    name: "鏃堕棿骞查"
+    file: assets/audio/sfx/game/sfx_time_intervention.mp3
+    description: |
+      鏃堕棿骞查鑳藉姏浣跨敤
+      椋庢牸: 鍊掓斁 + 鏃堕挓榻胯疆 + 鎵洸
+    duration: 1.5
+    volume: 0.7
+    tags: [ability, time, intervention]
+    
+  - id: sfx_time_contamination
+    name: "鏃堕棿姹℃煋"
+    file: assets/audio/sfx/game/sfx_time_contamination.mp3
+    description: "鏃堕棿骞查鍚庝骇鐢熸薄鏌?
+    duration: 0.8
+    volume: 0.6
+    tags: [time, contamination, consequence]
+    
+  # ------------------------------------------
+  # 绯荤粺鍙嶉
+  # ------------------------------------------
+  - id: sfx_system_correct
+    name: "绯荤粺鏇存"
+    file: assets/audio/sfx/game/sfx_system_correct.mp3
+    description: |
+      鏀舵暃杩愯鏃舵洿姝?
+      椋庢牸: 鏁版嵁澶勭悊 + 杞诲井鐢垫祦
+    duration: 0.4
+    volume: 0.45
+    tags: [system, correct, align]
+    
+  - id: sfx_system_align
+    name: "瀵归綈瀹屾垚"
+    file: assets/audio/sfx/game/sfx_system_align.mp3
+    description: "绯荤粺瀹屾垚瀵归綈鎿嶄綔"
+    duration: 0.5
+    volume: 0.5
+    tags: [system, align]
+    
+  - id: sfx_system_warning
+    name: "绯荤粺璀﹀憡"
+    file: assets/audio/sfx/game/sfx_system_warning.mp3
+    description: "绯荤粺鍙戝嚭璀﹀憡淇″彿"
+    duration: 0.6
+    volume: 0.6
+    tags: [system, warning]
+    
+  - id: sfx_field_new
+    name: "鏂板瓧娈靛嚭鐜?
+    file: assets/audio/sfx/game/sfx_field_new.mp3
+    description: |
+      缁堝眬鏃舵柊瀛楁琚垱寤?
+      椋庢牸: 绁炵 + 绐佺牬鎰?
+    duration: 1.0
+    volume: 0.7
+    tags: [field, new, breakthrough]
+    
+  # ------------------------------------------
+  # 浜や簰闊虫晥
+  # ------------------------------------------
+  - id: sfx_interact
+    name: "浜や簰"
+    file: assets/audio/sfx/game/sfx_interact.mp3
+    description: "涓庣墿浣?NPC浜や簰"
+    duration: 0.2
+    volume: 0.4
+    tags: [interact, object]
+    
+  - id: sfx_door_open
+    name: "闂ㄦ墦寮€"
+    file: assets/audio/sfx/game/sfx_door_open.mp3
+    description: "鎵撳紑闂?
+    duration: 0.5
+    volume: 0.5
+    tags: [door, open]
+    
+  - id: sfx_zone_enter
+    name: "杩涘叆鍖哄煙"
+    file: assets/audio/sfx/game/sfx_zone_enter.mp3
+    description: "鍒囨崲鍒版柊Zone"
+    duration: 0.6
+    volume: 0.5
+    tags: [zone, enter, transition]
+    
+  - id: sfx_item_pickup
+    name: "鎷惧彇鐗╁搧"
+    file: assets/audio/sfx/game/sfx_item_pickup.mp3
+    description: "鑾峰緱閬撳叿"
+    duration: 0.3
+    volume: 0.5
+    tags: [item, pickup]
+    
+  # ------------------------------------------
+  # 婕傜Щ/寮傚父
+  # ------------------------------------------
+  - id: sfx_drift
+    name: "婕傜Щ鍙戠敓"
+    file: assets/audio/sfx/game/sfx_drift.mp3
+    description: |
+      璁板繂/鐘舵€佹紓绉?
+      椋庢牸: 澶辩湡 + 纰庣墖鍖?
+    duration: 0.7
+    volume: 0.55
+    tags: [drift, anomaly]
+    
+  - id: sfx_memory_fragment
+    name: "璁板繂纰庣墖"
+    file: assets/audio/sfx/game/sfx_memory_fragment.mp3
+    description: "鑾峰緱鎴栬Е鍙戣蹇嗙鐗?
+    duration: 0.8
+    volume: 0.5
+    tags: [memory, fragment]
+    
+  # ------------------------------------------
+  # 鐜浜や簰
+  # ------------------------------------------
+  - id: sfx_crack
+    name: "瑁傜紳"
+    file: assets/audio/sfx/game/sfx_crack.mp3
+    description: "缁撴瀯瑁傜紳鍙戝０"
+    duration: 0.4
+    volume: 0.45
+    tags: [crack, structure]
+    
+  - id: sfx_collapse
+    name: "鍧嶅"
+    file: assets/audio/sfx/game/sfx_collapse.mp3
+    description: "缁撴瀯鍧嶅"
+    duration: 1.0
+    volume: 0.7
+    tags: [collapse, danger]
+    
+  # ------------------------------------------
+  # 鐗规畩闊虫晥
+  # ------------------------------------------
+  - id: sfx_foreshadow_trigger
+    name: "浼忕瑪瑙﹀彂"
+    file: assets/audio/sfx/game/sfx_foreshadow_trigger.mp3
+    description: |
+      浼忕瑪琚縺娲?鍥炴敹
+      椋庢牸: 寰鐨勮鐭ユ彁绀?
+    duration: 0.5
+    volume: 0.4
+    tags: [foreshadow, trigger]
+    
+  - id: sfx_r_increment
+    name: "R鍊煎鍔?
+    file: assets/audio/sfx/game/sfx_r_increment.mp3
+    description: |
+      鏃犳敹鐩婃畫宸疮绉?
+      椋庢牸: 寰急浣嗗潥瀹氱殑闊宠皟
+    duration: 0.3
+    volume: 0.3
+    tags: [counter, r, increment]
+
+# ==========================================
+# 闊虫晥缁勯厤缃?
+# ==========================================
+
+groups:
+  ability:
+    - sfx_depth_perception_activate
+    - sfx_depth_perception_deactivate
+    - sfx_depth_intervention
+    - sfx_scar_create
+    - sfx_time_intervention
+    - sfx_time_contamination
+    
+  system:
+    - sfx_system_correct
+    - sfx_system_align
+    - sfx_system_warning
+    - sfx_field_new
+    
+  interaction:
+    - sfx_interact
+    - sfx_door_open
+    - sfx_zone_enter
+    - sfx_item_pickup
+    
+  anomaly:
+    - sfx_drift
+    - sfx_memory_fragment
+    - sfx_crack
+    - sfx_collapse
+    
+  special:
+    - sfx_foreshadow_trigger
+    - sfx_r_increment
+
+

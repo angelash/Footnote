@@ -1,0 +1,208 @@
+﻿# 銆婂娉?/ Footnote銆婤GM闊抽閰嶇疆
+# 鏍煎紡: YAML
+# 鐘舵€? 寰呯敓鎴愰煶棰戞枃浠讹紙閰嶇疆鍏堣锛?
+
+# ==========================================
+# BGM鍒楄〃 (8棣?
+# ==========================================
+
+bgm:
+  # ------------------------------------------
+  # 1. 涓昏彍鍗?鏍囬
+  # ------------------------------------------
+  - id: bgm_title
+    name: "琛ㄥ眰娑熸吉"
+    file: assets/audio/bgm/bgm_title.mp3
+    description: |
+      涓昏彍鍗曡儗鏅煶涔?
+      椋庢牸: 鐜鐢靛瓙 + 閽㈢惔
+      鎯呯华: 绁炵銆佸钩闈欍€佺暐甯﹀咖閮?
+      鏃堕暱: 2:30 寰幆
+    bpm: 72
+    key: Am
+    loop: true
+    volume: 0.7
+    fadeIn: 2000
+    fadeOut: 1500
+    tags: [menu, title, ambient]
+    
+  # ------------------------------------------
+  # 2. 搴忕珷/鏃ュ父宸℃
+  # ------------------------------------------
+  - id: bgm_prologue
+    name: "渚嬭鍋忓樊"
+    file: assets/audio/bgm/bgm_prologue.mp3
+    description: |
+      搴忕珷鍜屾棩甯稿贰妫€鍦烘櫙
+      椋庢牸: Lo-fi + 杞荤數瀛?
+      鎯呯华: 鏃ュ父銆佺暐寰満姊般€侀殣钘忎笉瀹?
+      鏃堕暱: 3:00 寰幆
+    bpm: 85
+    key: Dm
+    loop: true
+    volume: 0.6
+    fadeIn: 1500
+    fadeOut: 1000
+    tags: [prologue, daily, patrol]
+    
+  # ------------------------------------------
+  # 3. 妗ｆ瀹?璋冩煡
+  # ------------------------------------------
+  - id: bgm_archive
+    name: "绾搁〉娣卞"
+    file: assets/audio/bgm/bgm_archive.mp3
+    description: |
+      妗ｆ瀹ゃ€佽褰曡€呯浉鍏冲満鏅?
+      椋庢牸: 鐜闊充箰 + 绾稿紶娌欐矙澹伴噰鏍?
+      鎯呯华: 涓撴敞銆佺绉樸€佸彂鐜版劅
+      鏃堕暱: 3:30 寰幆
+    bpm: 65
+    key: Em
+    loop: true
+    volume: 0.55
+    fadeIn: 2000
+    fadeOut: 1500
+    tags: [archive, investigation, songlan]
+    
+  # ------------------------------------------
+  # 4. 寮傚父鍖哄煙/绱у紶
+  # ------------------------------------------
+  - id: bgm_anomaly
+    name: "缁撴瀯瑁傞殭"
+    file: assets/audio/bgm/bgm_anomaly.mp3
+    description: |
+      缁撴瀯寮傚父鍖恒€佸嵄闄╁尯鍩?
+      椋庢牸: 鏆楃幆澧?+ 澶辩湡闊虫晥 + 浣庨鑴夊啿
+      鎯呯华: 绱у紶銆佷笉瀹夈€佸嵄鏈烘劅
+      鏃堕暱: 2:45 寰幆
+    bpm: 95
+    key: Cm
+    loop: true
+    volume: 0.65
+    fadeIn: 1000
+    fadeOut: 800
+    tags: [anomaly, danger, tension]
+    
+  # ------------------------------------------
+  # 5. 娣卞害鎰熺煡婵€娲?
+  # ------------------------------------------
+  - id: bgm_depth_perception
+    name: "閫忚涔嬬溂"
+    file: assets/audio/bgm/bgm_depth_perception.mp3
+    description: |
+      娣卞害鎰熺煡鑳藉姏婵€娲绘椂
+      椋庢牸: 绌虹伒鐢靛瓙 + 鏅朵綋闊宠壊
+      鎯呯华: 瓒呯劧銆佺湅閫忚〃璞°€佽鐭ユ墿灞?
+      鏃堕暱: 2:00 寰幆
+    bpm: 78
+    key: Gm
+    loop: true
+    volume: 0.6
+    fadeIn: 500
+    fadeOut: 500
+    tags: [ability, depth, perception]
+    
+  # ------------------------------------------
+  # 6. 婕傜Щ鑰?闃挎涓婚
+  # ------------------------------------------
+  - id: bgm_drifter
+    name: "閿欎綅璁板繂"
+    file: assets/audio/bgm/bgm_drifter.mp3
+    description: |
+      婕傜Щ鑰呯浉鍏冲満鏅€侀樋妫犱富棰?
+      椋庢牸: 鐮寸鐢靛瓙 + 浜哄０閲囨牱锛堟ā绯婏級
+      鎯呯华: 杩峰け銆佹偛浼ゃ€佺鐗囧寲
+      鏃堕暱: 3:15 寰幆
+    bpm: 70
+    key: Fm
+    loop: true
+    volume: 0.55
+    fadeIn: 2500
+    fadeOut: 2000
+    tags: [drifter, atang, memory, sad]
+    
+  # ------------------------------------------
+  # 7. 缁堝眬/鎶夋嫨
+  # ------------------------------------------
+  - id: bgm_finale
+    name: "鏀舵暃杈圭晫"
+    file: assets/audio/bgm/bgm_finale.mp3
+    description: |
+      缁堢珷銆侀噸澶ф妷鎷╁満鏅?
+      椋庢牸: 鍙茶瘲鐜 + 绠″鸡鍏冪礌
+      鎯呯华: 搴勯噸銆佸懡杩愭劅銆佽秴瓒?
+      鏃堕暱: 4:00 寰幆
+    bpm: 60
+    key: Bm
+    loop: true
+    volume: 0.7
+    fadeIn: 3000
+    fadeOut: 2000
+    tags: [finale, choice, epic]
+    
+  # ------------------------------------------
+  # 8. 缁撳眬/鐗囧熬
+  # ------------------------------------------
+  - id: bgm_ending
+    name: "浣欐尝"
+    file: assets/audio/bgm/bgm_ending.mp3
+    description: |
+      缁撳眬鎾斁銆佸埗浣滀汉鍛樺悕鍗?
+      椋庢牸: 閽㈢惔涓诲 + 寮︿箰閾哄灚
+      鎯呯华: 鍥為【銆侀噴鐒躲€佷綑闊?
+      鏃堕暱: 4:30 (涓嶅惊鐜?
+    bpm: 68
+    key: Am
+    loop: false
+    volume: 0.75
+    fadeIn: 2000
+    fadeOut: 4000
+    tags: [ending, credits, emotional]
+
+# ==========================================
+# 鍦烘櫙-BGM鏄犲皠
+# ==========================================
+
+scene_mapping:
+  MenuScene: bgm_title
+  
+  # 搴忕珷
+  C0-Z1: bgm_prologue
+  C0-Z2: bgm_prologue
+  C0-Z3: bgm_prologue
+  C0-Z4: bgm_drifter
+  
+  # 绗竴绔?
+  C1-Z1: bgm_archive
+  C1-Z2: bgm_archive
+  C1-Z3: bgm_prologue
+  C1-Z4: bgm_drifter
+  C1-Z5: bgm_archive
+  C1-Z6: bgm_anomaly
+  
+  # 绗簩绔?
+  C2-Z1: bgm_depth_perception
+  C2-Z2: bgm_depth_perception
+  # ... 鍏朵粬Zone
+  
+  # 缁堢珷
+  CF-Z1: bgm_finale
+  CF-Z2: bgm_finale
+  CF-Z3: bgm_finale
+  
+  # 缁撳眬
+  EndingA: bgm_ending
+  EndingB: bgm_ending
+  EndingC: bgm_ending
+
+# ==========================================
+# 鎾斁鎺у埗鍙傛暟
+# ==========================================
+
+playback:
+  crossfade_duration: 2000  # 鍒囨崲BGM鏃剁殑浜ゅ弶娣″寲鏃堕暱(ms)
+  pause_on_dialogue: false  # 瀵硅瘽鏃舵槸鍚︽殏鍋淏GM
+  lower_volume_on_dialogue: true
+  dialogue_volume_multiplier: 0.5  # 瀵硅瘽鏃禕GM闊抽噺鍊嶆暟
+
+

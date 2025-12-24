@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 墙壁裂痕样本
+  尺寸: 32×32px
+  来源: C0-Z2 薄墙
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- 墙面背景 -->
+  <rect x="4" y="4" width="24" height="24" rx="2" fill="#3a3a40" stroke="#4a4a50" stroke-width="1"/>
+  
+  <!-- 墙面纹理 -->
+  <g stroke="#4a4a50" stroke-width="0.5" opacity="0.3">
+    <line x1="4" y1="12" x2="28" y2="12"/>
+    <line x1="4" y1="20" x2="28" y2="20"/>
+    <line x1="12" y1="4" x2="12" y2="12"/>
+    <line x1="20" y1="12" x2="20" y2="20"/>
+    <line x1="16" y1="20" x2="16" y2="28"/>
+  </g>
+  
+  <!-- 主裂缝 -->
+  <path d="M10 6 L12 10 L10 14 L14 18 L12 24 L14 28" fill="none" stroke="#00FFAA" stroke-width="1.5" opacity="0.8"/>
+  
+  <!-- 分支裂缝 -->
+  <path d="M12 10 L16 12 L18 10" fill="none" stroke="#00FFAA" stroke-width="1" opacity="0.5"/>
+  <path d="M14 18 L18 20 L20 18" fill="none" stroke="#00FFAA" stroke-width="1" opacity="0.5"/>
+  
+  <!-- 深度透视 -->
+  <path d="M10 14 L8 16" fill="none" stroke="#00FFAA" stroke-width="0.8" opacity="0.3"/>
+</svg>
+

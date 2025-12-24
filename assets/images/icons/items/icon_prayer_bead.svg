@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 祷文念珠
+  尺寸: 32×32px
+  来源: 牧平/平面信徒
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="beadGrad" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#E8D4A0"/>
+      <stop offset="100%" style="stop-color:#8B7355"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- 念珠串 -->
+  <path d="M8 16 Q8 8, 16 6 Q24 8, 24 16 Q24 24, 16 26 Q8 24, 8 16" fill="none" stroke="#8B7355" stroke-width="1.5"/>
+  
+  <!-- 念珠 -->
+  <circle cx="16" cy="6" r="3" fill="url(#beadGrad)"/>
+  <circle cx="22" cy="9" r="2.5" fill="url(#beadGrad)"/>
+  <circle cx="24" cy="16" r="3" fill="url(#beadGrad)"/>
+  <circle cx="22" cy="23" r="2.5" fill="url(#beadGrad)"/>
+  <circle cx="16" cy="26" r="3" fill="url(#beadGrad)"/>
+  <circle cx="10" cy="23" r="2.5" fill="url(#beadGrad)"/>
+  <circle cx="8" cy="16" r="3" fill="url(#beadGrad)"/>
+  <circle cx="10" cy="9" r="2.5" fill="url(#beadGrad)"/>
+  
+  <!-- 中央吊坠 -->
+  <rect x="14" y="14" width="4" height="6" rx="1" fill="#C8B080" stroke="#8B7355" stroke-width="0.5"/>
+  <text x="16" y="18" font-family="serif" font-size="4" fill="#6B5345" text-anchor="middle">平</text>
+</svg>
+

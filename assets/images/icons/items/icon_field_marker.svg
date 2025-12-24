@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 字段标记
+  尺寸: 32×32px
+  来源: 终局/新字段
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="fieldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- 外框（不完整） -->
+  <path d="M8 4 L24 4 L24 12" fill="none" stroke="#4A9EFF" stroke-width="1.5"/>
+  <path d="M28 16 L28 28 L16 28" fill="none" stroke="#4A9EFF" stroke-width="1.5"/>
+  <path d="M8 28 L4 28 L4 16" fill="none" stroke="#4A9EFF" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <path d="M4 8 L4 4 L8 4" fill="none" stroke="#4A9EFF" stroke-width="1.5" stroke-dasharray="4 2"/>
+  
+  <!-- 中心符号（空字段） -->
+  <g filter="url(#fieldGlow)">
+    <circle cx="12" cy="16" r="2.5" fill="none" stroke="#00FFAA" stroke-width="1.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="20" cy="16" r="2.5" fill="none" stroke="#00FFAA" stroke-width="1.5">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+    </circle>
+    <text x="16" y="18" font-family="monospace" font-size="6" fill="#00FFAA" text-anchor="middle" opacity="0.8">?</text>
+  </g>
+  
+  <!-- 缺失角标 -->
+  <polygon points="24,4 28,4 28,8 24,4" fill="#FF4444" opacity="0.5"/>
+</svg>
+

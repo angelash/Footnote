@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 账本页面
+  尺寸: 32×32px
+  来源: 因果账本
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- 纸张 -->
+  <rect x="4" y="3" width="24" height="26" rx="1" fill="#E8E6E3" stroke="#C8C6C0" stroke-width="0.5"/>
+  
+  <!-- 表格线 -->
+  <g stroke="#C8C6C0" stroke-width="0.5">
+    <!-- 横线 -->
+    <line x1="6" y1="8" x2="26" y2="8"/>
+    <line x1="6" y1="13" x2="26" y2="13"/>
+    <line x1="6" y1="18" x2="26" y2="18"/>
+    <line x1="6" y1="23" x2="26" y2="23"/>
+    <!-- 竖线 -->
+    <line x1="14" y1="8" x2="14" y2="27"/>
+    <line x1="22" y1="8" x2="22" y2="27"/>
+  </g>
+  
+  <!-- 表头 -->
+  <g font-family="monospace" font-size="3" fill="#686868">
+    <text x="10" y="7">事件</text>
+    <text x="17" y="7">代价</text>
+    <text x="24" y="7">余</text>
+  </g>
+  
+  <!-- 数据 -->
+  <g font-family="monospace" font-size="2.5" fill="#4a4a55">
+    <text x="7" y="12">回溯#1</text>
+    <text x="16" y="12">+2</text>
+    <text x="24" y="12">2</text>
+    
+    <text x="7" y="17">介入#3</text>
+    <text x="16" y="17">+1</text>
+    <text x="24" y="17">3</text>
+    
+    <text x="7" y="22" fill="#FF4444">错误</text>
+    <text x="16" y="22" fill="#FF4444">??</text>
+    <text x="24" y="22" fill="#FF4444">?</text>
+  </g>
+  
+  <!-- 警告标记 -->
+  <circle cx="24" cy="25" r="2" fill="#FF4444" opacity="0.6"/>
+</svg>
+

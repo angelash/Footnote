@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 牧平 立绘（待机状态）
+  角色: 平面信徒讲者，40+
+  尺寸: 400×600px
+  风格: 老成隐喻，素衣
+-->
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 素衣 -->
+    <linearGradient id="robeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8D4A0"/>
+      <stop offset="100%" style="stop-color:#D4C090"/>
+    </linearGradient>
+    
+    <!-- 古卷黄光环 -->
+    <filter id="scrollGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 皮肤（年长） -->
+    <linearGradient id="agedSkin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E0D0B8"/>
+      <stop offset="100%" style="stop-color:#D0C0A8"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 古卷光环 -->
+  <g filter="url(#scrollGlow)" opacity="0.15">
+    <ellipse cx="200" cy="350" rx="110" ry="200" fill="#E8D4A0" opacity="0.4"/>
+  </g>
+  
+  <!-- ===== 身体 ===== -->
+  
+  <!-- 长袍 -->
+  <path d="M140 210 Q125 300, 120 420 L110 560 L290 560 L280 420 Q275 300, 260 210 Z" fill="url(#robeGrad)" stroke="#C8B480" stroke-width="1"/>
+  
+  <!-- 袍子纹理 -->
+  <g stroke="#C8B480" stroke-width="0.5" fill="none" opacity="0.4">
+    <path d="M150 300 Q160 400, 130 550"/>
+    <path d="M200 250 L195 550"/>
+    <path d="M250 300 Q240 400, 270 550"/>
+  </g>
+  
+  <!-- 内衬 -->
+  <polygon points="175,215 200,250 225,215" fill="#C8B480"/>
+  
+  <!-- 腰带 -->
+  <rect x="130" y="350" width="140" height="20" rx="3" fill="#8B7355" stroke="#6B5345" stroke-width="0.5"/>
+  <rect x="185" y="345" width="30" height="30" rx="4" fill="#A08060" stroke="#8B7355" stroke-width="0.5"/>
+  
+  <!-- ===== 手臂 ===== -->
+  
+  <!-- 宽袖 -->
+  <path d="M140 220 Q100 280, 80 360 Q60 440, 90 500" fill="none" stroke="url(#robeGrad)" stroke-width="45" stroke-linecap="round"/>
+  <path d="M260 220 Q300 280, 320 360 Q340 440, 310 500" fill="none" stroke="url(#robeGrad)" stroke-width="45" stroke-linecap="round"/>
+  
+  <!-- 手（合十或持物） -->
+  <g transform="translate(180, 380)">
+    <ellipse cx="0" cy="0" rx="18" ry="22" fill="url(#agedSkin)" stroke="#C8B898" stroke-width="0.5"/>
+    <ellipse cx="40" cy="0" rx="18" ry="22" fill="url(#agedSkin)" stroke="#C8B898" stroke-width="0.5"/>
+  </g>
+  
+  <!-- ===== 头部 ===== -->
+  
+  <!-- 颈部 -->
+  <rect x="180" y="175" width="40" height="45" rx="5" fill="url(#agedSkin)"/>
+  
+  <!-- 脸部 -->
+  <ellipse cx="200" cy="115" rx="50" ry="65" fill="url(#agedSkin)" stroke="#C8B898" stroke-width="0.5"/>
+  
+  <!-- 头发（稀疏灰白） -->
+  <path d="M155 85 Q165 50, 200 45 Q235 50, 245 85 L248 120 Q240 95, 200 90 Q160 95, 152 120 Z" fill="#8a8a8a" stroke="#9a9a9a" stroke-width="0.5"/>
+  
+  <!-- 皱纹 -->
+  <g stroke="#C8B898" stroke-width="0.5" opacity="0.4">
+    <path d="M165 95 Q175 92, 185 95"/>
+    <path d="M215 95 Q225 92, 235 95"/>
+    <path d="M170 145 Q180 148, 190 145"/>
+    <path d="M210 145 Q220 148, 230 145"/>
+  </g>
+  
+  <!-- 眼睛（智慧深邃） -->
+  <g transform="translate(168, 108)">
+    <!-- 左眼 -->
+    <path d="M-8 0 Q0 -6, 8 0 Q0 4, -8 0" fill="#1a1a24"/>
+    <circle cx="0" cy="-1" r="3" fill="#605040"/>
+    <circle cx="1" cy="-2" r="1" fill="#FFFFFF"/>
+    
+    <!-- 右眼 -->
+    <path d="M56 0 Q64 -6, 72 0 Q64 4, 56 0" fill="#1a1a24"/>
+    <circle cx="64" cy="-1" r="3" fill="#605040"/>
+    <circle cx="65" cy="-2" r="1" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- 眉毛（浓密灰白） -->
+  <path d="M152 95 Q168 88, 185 95" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M215 95 Q232 88, 248 95" fill="none" stroke="#8a8a8a" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- 鼻子 -->
+  <path d="M200 118 L195 145 L200 155 L205 145" fill="none" stroke="#C8B898" stroke-width="1" opacity="0.5"/>
+  
+  <!-- 嘴巴（平静） -->
+  <path d="M185 172 L215 172" fill="none" stroke="#908070" stroke-width="1.5"/>
+  
+  <!-- 胡须 -->
+  <path d="M185 178 Q195 195, 200 210 Q205 195, 215 178" fill="none" stroke="#9a9a9a" stroke-width="1.5"/>
+  <path d="M175 175 Q165 185, 160 200" fill="none" stroke="#9a9a9a" stroke-width="1"/>
+  <path d="M225 175 Q235 185, 240 200" fill="none" stroke="#9a9a9a" stroke-width="1"/>
+  
+  <!-- ===== 腿部（袍下隐藏） ===== -->
+  
+  <!-- 鞋 -->
+  <ellipse cx="170" cy="558" rx="25" ry="8" fill="#8B7355" stroke="#6B5345" stroke-width="0.5"/>
+  <ellipse cx="230" cy="558" rx="25" ry="8" fill="#8B7355" stroke="#6B5345" stroke-width="0.5"/>
+  
+  <!-- ===== 古卷/祷文装饰 ===== -->
+  
+  <!-- 祷文符号 -->
+  <g filter="url(#scrollGlow)" opacity="0.3">
+    <text x="140" y="320" font-family="serif" font-size="14" fill="#C8B480">平</text>
+    <text x="245" y="320" font-family="serif" font-size="14" fill="#C8B480">面</text>
+    <text x="190" y="420" font-family="serif" font-size="12" fill="#C8B480">真实</text>
+  </g>
+</svg>
+

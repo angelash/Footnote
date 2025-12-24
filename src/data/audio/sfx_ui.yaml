@@ -1,0 +1,202 @@
+﻿# 銆婂娉?/ Footnote銆婾I闊虫晥閰嶇疆
+# 鏍煎紡: YAML
+# 鐘舵€? 寰呯敓鎴愰煶棰戞枃浠讹紙閰嶇疆鍏堣锛?
+
+# ==========================================
+# UI闊虫晥鍒楄〃 (18涓?
+# ==========================================
+
+sfx_ui:
+  # ------------------------------------------
+  # 鍩虹浜や簰
+  # ------------------------------------------
+  - id: sfx_button_hover
+    name: "鎸夐挳鎮仠"
+    file: assets/audio/sfx/ui/sfx_button_hover.mp3
+    description: "榧犳爣鎮仠鍦ㄦ寜閽笂"
+    duration: 0.1
+    volume: 0.3
+    tags: [button, hover]
+    
+  - id: sfx_button_click
+    name: "鎸夐挳鐐瑰嚮"
+    file: assets/audio/sfx/ui/sfx_button_click.mp3
+    description: "鐐瑰嚮鎸夐挳纭"
+    duration: 0.15
+    volume: 0.5
+    tags: [button, click, confirm]
+    
+  - id: sfx_button_back
+    name: "杩斿洖/鍙栨秷"
+    file: assets/audio/sfx/ui/sfx_button_back.mp3
+    description: "杩斿洖涓婁竴绾ф垨鍙栨秷鎿嶄綔"
+    duration: 0.2
+    volume: 0.4
+    tags: [button, back, cancel]
+    
+  # ------------------------------------------
+  # 鑿滃崟/闈㈡澘
+  # ------------------------------------------
+  - id: sfx_menu_open
+    name: "鑿滃崟鎵撳紑"
+    file: assets/audio/sfx/ui/sfx_menu_open.mp3
+    description: "鎵撳紑鑿滃崟闈㈡澘"
+    duration: 0.3
+    volume: 0.4
+    tags: [menu, open, panel]
+    
+  - id: sfx_menu_close
+    name: "鑿滃崟鍏抽棴"
+    file: assets/audio/sfx/ui/sfx_menu_close.mp3
+    description: "鍏抽棴鑿滃崟闈㈡澘"
+    duration: 0.25
+    volume: 0.35
+    tags: [menu, close, panel]
+    
+  # ------------------------------------------
+  # 瀵硅瘽绯荤粺
+  # ------------------------------------------
+  - id: sfx_dialogue_appear
+    name: "瀵硅瘽妗嗗嚭鐜?
+    file: assets/audio/sfx/ui/sfx_dialogue_appear.mp3
+    description: "瀵硅瘽妗嗗脊鍑?
+    duration: 0.2
+    volume: 0.4
+    tags: [dialogue, appear]
+    
+  - id: sfx_dialogue_text
+    name: "鏂囧瓧鎵撳瓧"
+    file: assets/audio/sfx/ui/sfx_dialogue_text.mp3
+    description: "鏂囧瓧閫愬瓧鍑虹幇鐨勬墦瀛楅煶锛堝惊鐜煭闊筹級"
+    duration: 0.05
+    volume: 0.2
+    loop: true
+    tags: [dialogue, text, typing]
+    
+  - id: sfx_dialogue_complete
+    name: "瀵硅瘽瀹屾垚"
+    file: assets/audio/sfx/ui/sfx_dialogue_complete.mp3
+    description: "涓€娈靛璇濇枃瀛楁樉绀哄畬鎴?
+    duration: 0.1
+    volume: 0.3
+    tags: [dialogue, complete]
+    
+  - id: sfx_choice_appear
+    name: "閫夐」鍑虹幇"
+    file: assets/audio/sfx/ui/sfx_choice_appear.mp3
+    description: "瀵硅瘽閫夐」灞曞紑"
+    duration: 0.25
+    volume: 0.4
+    tags: [choice, appear]
+    
+  - id: sfx_choice_select
+    name: "閫夐」閫夋嫨"
+    file: assets/audio/sfx/ui/sfx_choice_select.mp3
+    description: "纭閫夋嫨瀵硅瘽閫夐」"
+    duration: 0.2
+    volume: 0.5
+    tags: [choice, select, confirm]
+    
+  # ------------------------------------------
+  # 鍗＄墖绯荤粺
+  # ------------------------------------------
+  - id: sfx_card_get
+    name: "鍗＄墖鑾峰彇"
+    file: assets/audio/sfx/ui/sfx_card_get.mp3
+    description: "鑾峰緱鏂板崱鐗?
+    duration: 0.5
+    volume: 0.6
+    tags: [card, get, reward]
+    
+  - id: sfx_card_flip
+    name: "鍗＄墖缈昏浆"
+    file: assets/audio/sfx/ui/sfx_card_flip.mp3
+    description: "闀挎寜鏌ョ湅鍗＄墖璇︽儏"
+    duration: 0.3
+    volume: 0.4
+    tags: [card, flip, detail]
+    
+  - id: sfx_card_archive
+    name: "鍗＄墖褰掓。"
+    file: assets/audio/sfx/ui/sfx_card_archive.mp3
+    description: "鍗＄墖鏀惧叆鏀惰棌"
+    duration: 0.25
+    volume: 0.35
+    tags: [card, archive]
+    
+  # ------------------------------------------
+  # 瀛樻。绯荤粺
+  # ------------------------------------------
+  - id: sfx_save
+    name: "瀛樻。"
+    file: assets/audio/sfx/ui/sfx_save.mp3
+    description: "娓告垙淇濆瓨鎴愬姛"
+    duration: 0.4
+    volume: 0.5
+    tags: [save, success]
+    
+  - id: sfx_load
+    name: "璇绘。"
+    file: assets/audio/sfx/ui/sfx_load.mp3
+    description: "鍔犺浇瀛樻。"
+    duration: 0.5
+    volume: 0.5
+    tags: [load]
+    
+  # ------------------------------------------
+  # 閫氱煡/鎻愮ず
+  # ------------------------------------------
+  - id: sfx_notification
+    name: "閫氱煡鎻愮ず"
+    file: assets/audio/sfx/ui/sfx_notification.mp3
+    description: "涓€鑸€氱煡寮瑰嚭"
+    duration: 0.3
+    volume: 0.45
+    tags: [notification, info]
+    
+  - id: sfx_warning
+    name: "璀﹀憡鎻愮ず"
+    file: assets/audio/sfx/ui/sfx_warning.mp3
+    description: "璀﹀憡鎴栧嵄闄╂彁绀?
+    duration: 0.35
+    volume: 0.55
+    tags: [warning, danger]
+    
+  - id: sfx_error
+    name: "閿欒鎻愮ず"
+    file: assets/audio/sfx/ui/sfx_error.mp3
+    description: "鎿嶄綔澶辫触鎴栭敊璇?
+    duration: 0.25
+    volume: 0.5
+    tags: [error, fail]
+
+# ==========================================
+# 闊虫晥缁勯厤缃?
+# ==========================================
+
+groups:
+  button:
+    - sfx_button_hover
+    - sfx_button_click
+    - sfx_button_back
+    
+  dialogue:
+    - sfx_dialogue_appear
+    - sfx_dialogue_text
+    - sfx_dialogue_complete
+    - sfx_choice_appear
+    - sfx_choice_select
+    
+  card:
+    - sfx_card_get
+    - sfx_card_flip
+    - sfx_card_archive
+    
+  system:
+    - sfx_save
+    - sfx_load
+    - sfx_notification
+    - sfx_warning
+    - sfx_error
+
+

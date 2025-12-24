@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 档案碎片
+  尺寸: 32×32px
+  来源: 档案室
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- 纸张主体（不规则撕裂） -->
+  <path d="M6 4 L22 4 L26 8 L26 26 Q24 28, 20 27 L8 28 Q5 27, 6 24 Z" fill="#E8E6E3" stroke="#C8C6C0" stroke-width="0.5"/>
+  
+  <!-- 折角 -->
+  <path d="M22 4 L22 8 L26 8 Z" fill="#C8C6C0"/>
+  
+  <!-- 文字线 -->
+  <g stroke="#4a4a55" stroke-width="1" opacity="0.3">
+    <line x1="9" y1="10" x2="23" y2="10"/>
+    <line x1="9" y1="14" x2="20" y2="14"/>
+    <line x1="9" y1="18" x2="22" y2="18"/>
+    <line x1="9" y1="22" x2="18" y2="22"/>
+  </g>
+  
+  <!-- 撕裂边缘 -->
+  <path d="M6 24 Q4 20, 6 16 Q5 12, 6 8" fill="none" stroke="#B8B6B0" stroke-width="0.5"/>
+  
+  <!-- 系统蓝标记 -->
+  <rect x="18" y="8" width="5" height="3" fill="#4A9EFF" opacity="0.5"/>
+</svg>
+

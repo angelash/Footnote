@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 漂移者信物
+  尺寸: 32×32px
+  来源: 阿棠
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="driftGlow2" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- 信物主体（碎片状） -->
+  <polygon points="16,3 24,10 22,20 16,28 10,20 8,10" fill="#3a2a4a" stroke="#FF88FF" stroke-width="1" filter="url(#driftGlow2)"/>
+  
+  <!-- 内部裂纹 -->
+  <path d="M16 8 L14 14 L16 16 L18 14 L16 20" fill="none" stroke="#FF88FF" stroke-width="0.8" opacity="0.6"/>
+  
+  <!-- 漂移光点 -->
+  <circle cx="16" cy="14" r="2" fill="#FF88FF" opacity="0.8">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- 碎片漂浮 -->
+  <rect x="6" y="12" width="3" height="3" fill="#FF88FF" opacity="0.3" transform="rotate(15 7 13)">
+    <animate attributeName="y" values="12;10;12" dur="3s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="23" y="14" width="2" height="2" fill="#FF88FF" opacity="0.3" transform="rotate(-10 24 15)">
+    <animate attributeName="y" values="14;12;14" dur="2.5s" repeatCount="indefinite"/>
+  </rect>
+</svg>
+

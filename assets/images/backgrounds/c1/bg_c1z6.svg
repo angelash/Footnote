@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- C1-Z6 边缘断口小坍塌
+  尺寸: 750×1334px（竖屏）
+  场景: 裂缝、警戒线，结构不稳
+  氛围: 危险、异常暴露
+-->
+<svg width="750" height="1334" viewBox="0 0 750 1334" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 危险区背景 -->
+    <linearGradient id="dangerBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0c0a0a"/>
+      <stop offset="100%" style="stop-color:#0a0808"/>
+    </linearGradient>
+    
+    <!-- 裂缝发光 -->
+    <filter id="crackGlow2" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 警戒线纹理 -->
+    <pattern id="warningStripes" patternUnits="userSpaceOnUse" width="40" height="20">
+      <rect width="40" height="20" fill="#FFAA00"/>
+      <polygon points="0,0 20,0 0,20" fill="#1a1a24"/>
+      <polygon points="20,0 40,0 40,20 20,20" fill="#1a1a24"/>
+    </pattern>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect x="0" y="0" width="750" height="1334" fill="url(#dangerBg)"/>
+  
+  <!-- 红色警告氛围 -->
+  <rect x="0" y="0" width="750" height="1334" fill="#FF4444" opacity="0.02"/>
+  
+  <!-- ===== 建筑废墟 ===== -->
+  
+  <!-- 左侧残墙 -->
+  <g transform="translate(0, 200)">
+    <polygon points="0,0 150,0 180,100 200,300 180,600 0,600" fill="#14121a"/>
+    <!-- 裂纹 -->
+    <path d="M80 50 L70 150 L90 200 L75 350" fill="none" stroke="#2a2830" stroke-width="2"/>
+    <path d="M120 100 L140 180 L130 250" fill="none" stroke="#2a2830" stroke-width="1.5"/>
+  </g>
+  
+  <!-- 右侧残墙 -->
+  <g transform="translate(550, 180)">
+    <polygon points="0,100 50,0 200,0 200,620 0,620 30,400" fill="#14121a"/>
+    <path d="M100 80 L90 180 L110 280 L95 400" fill="none" stroke="#2a2830" stroke-width="2"/>
+  </g>
+  
+  <!-- ===== 中央坍塌区 ===== -->
+  
+  <!-- 坍塌边缘 -->
+  <path d="M180 500 Q250 450, 300 480 Q350 420, 400 460 Q450 400, 500 450 Q550 480, 570 520" fill="none" stroke="#1a1820" stroke-width="8"/>
+  
+  <!-- 深渊/裂缝 -->
+  <path d="M180 500 Q250 450, 300 480 Q350 420, 400 460 Q450 400, 500 450 Q550 480, 570 520 L580 900 L170 900 Z" fill="#080608"/>
+  
+  <!-- 裂缝内部深度发光 -->
+  <g filter="url(#crackGlow2)">
+    <path d="M250 550 L280 650 L260 750 L290 850" stroke="#00FFAA" stroke-width="2" fill="none" opacity="0.4">
+      <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M380 500 L400 600 L370 700 L390 800" stroke="#00FFAA" stroke-width="3" fill="none" opacity="0.5">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M480 520 L510 620 L490 720" stroke="#00FFAA" stroke-width="2" fill="none" opacity="0.3">
+      <animate attributeName="opacity" values="0.2;0.4;0.2" dur="1.8s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- 深度结构暴露 -->
+  <g opacity="0.3">
+    <rect x="300" y="600" width="80" height="60" fill="none" stroke="#00FFAA" stroke-width="1" stroke-dasharray="5 3"/>
+    <rect x="320" y="700" width="60" height="50" fill="none" stroke="#00FFAA" stroke-width="1" stroke-dasharray="5 3"/>
+    <line x1="340" y1="660" x2="350" y2="700" stroke="#00FFAA" stroke-width="1"/>
+  </g>
+  
+  <!-- ===== 警戒线 ===== -->
+  
+  <!-- 前方警戒带 -->
+  <g transform="translate(100, 450)">
+    <rect x="0" y="0" width="550" height="20" fill="url(#warningStripes)" transform="rotate(-5)"/>
+  </g>
+  
+  <!-- 警示牌 -->
+  <g transform="translate(300, 350)">
+    <rect x="0" y="0" width="150" height="80" rx="4" fill="#1a1a24" stroke="#FF4444" stroke-width="2"/>
+    <polygon points="75,15 60,50 90,50" fill="#FF4444"/>
+    <text x="75" y="40" font-family="sans-serif" font-size="16" fill="#FF4444" text-anchor="middle">!</text>
+    <text x="75" y="65" font-family="Noto Sans SC" font-size="12" fill="#FF4444" text-anchor="middle">结构失稳区</text>
+  </g>
+  
+  <!-- 警戒柱 -->
+  <g transform="translate(200, 400)">
+    <rect x="0" y="0" width="15" height="80" fill="#2a2a35"/>
+    <rect x="0" y="10" width="15" height="15" fill="#FF4444"/>
+    <rect x="0" y="40" width="15" height="15" fill="#FF4444"/>
+  </g>
+  <g transform="translate(535, 420)">
+    <rect x="0" y="0" width="15" height="80" fill="#2a2a35"/>
+    <rect x="0" y="10" width="15" height="15" fill="#FF4444"/>
+    <rect x="0" y="40" width="15" height="15" fill="#FF4444"/>
+  </g>
+  
+  <!-- ===== 散落碎石 ===== -->
+  <g fill="#1a1820">
+    <polygon points="150,520 170,510 180,530 160,540"/>
+    <polygon points="560,540 580,525 595,545 575,555"/>
+    <polygon points="250,900 270,885 290,900 275,920 255,915"/>
+    <polygon points="450,920 480,905 495,925 460,935"/>
+  </g>
+  
+  <!-- ===== 地面 ===== -->
+  <rect x="0" y="900" width="750" height="434" fill="#0a0808"/>
+  
+  <!-- 裂纹延伸 -->
+  <g stroke="#14121a" stroke-width="2">
+    <path d="M170 900 L200 1000 L180 1100"/>
+    <path d="M580 900 L550 1000 L570 1100"/>
+    <path d="M350 900 L380 1050 L360 1200"/>
+  </g>
+  
+  <!-- ===== 系统警告 ===== -->
+  <g transform="translate(200, 150)">
+    <rect x="0" y="0" width="350" height="60" rx="4" fill="#1a1a24" stroke="#FF4444" stroke-width="1" opacity="0.8"/>
+    <text x="175" y="25" font-family="monospace" font-size="12" fill="#FF4444" text-anchor="middle">⚠ 结构稳定性: 危险</text>
+    <text x="175" y="45" font-family="monospace" font-size="10" fill="#686868" text-anchor="middle">深度格暴露 | 请勿靠近</text>
+  </g>
+  
+  <!-- ===== 氛围效果 ===== -->
+  
+  <!-- 红光脉冲 -->
+  <rect x="0" y="0" width="750" height="1334" fill="#FF4444" opacity="0">
+    <animate attributeName="opacity" values="0;0.03;0" dur="3s" repeatCount="indefinite"/>
+  </rect>
+  
+  <!-- 粒子/灰尘 -->
+  <g fill="#E8E6E3" opacity="0.3">
+    <circle cx="300" cy="600" r="1">
+      <animate attributeName="cy" values="600;550;600" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="400" cy="550" r="0.8">
+      <animate attributeName="cy" values="550;500;550" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="350" cy="700" r="1.2">
+      <animate attributeName="cy" values="700;650;700" dur="5s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 底部渐变 -->
+  <defs>
+    <linearGradient id="bottomFadeDanger" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0808;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#0a0808;stop-opacity:0.9"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="1150" width="750" height="184" fill="url(#bottomFadeDanger)"/>
+</svg>
+

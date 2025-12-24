@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 对齐日志
+  尺寸: 32×32px
+  来源: 收敛运行时
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- 终端外框 -->
+  <rect x="4" y="4" width="24" height="24" rx="2" fill="#1a1a24" stroke="#4A9EFF" stroke-width="1"/>
+  
+  <!-- 屏幕 -->
+  <rect x="6" y="6" width="20" height="20" rx="1" fill="#0a0a0f"/>
+  
+  <!-- 日志文字 -->
+  <g font-family="monospace" font-size="3.5" fill="#4A9EFF">
+    <text x="8" y="11">[ALIGN] ok</text>
+    <text x="8" y="16">[ALIGN] ok</text>
+    <text x="8" y="21" fill="#FFAA00">[WARN] drift</text>
+  </g>
+  
+  <!-- 滚动条 -->
+  <rect x="24" y="8" width="1" height="16" fill="#2a2a35"/>
+  <rect x="24" y="14" width="1" height="6" fill="#4A9EFF" opacity="0.5"/>
+  
+  <!-- 闪烁光标 -->
+  <rect x="8" y="22" width="4" height="1" fill="#4A9EFF">
+    <animate attributeName="opacity" values="0;1;0" dur="1s" repeatCount="indefinite"/>
+  </rect>
+</svg>
+

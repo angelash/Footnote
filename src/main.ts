@@ -79,7 +79,7 @@ const config: Phaser.Types.Core.GameConfig = {
   
   // 回调
   callbacks: {
-    preBoot: (game) => {
+    preBoot: () => {
       console.log('[Footnote] 游戏初始化中...');
     },
     postBoot: (game) => {

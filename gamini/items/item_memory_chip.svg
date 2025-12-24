@@ -1,0 +1,38 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="chipBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a35;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#15151a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="goldContact" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#daa520;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffd700;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Shadow -->
+  <rect x="34" y="34" width="60" height="70" rx="4" fill="#000" opacity="0.3" />
+
+  <!-- Main PCB Body -->
+  <rect x="30" y="30" width="68" height="68" rx="4" fill="url(#chipBody)" stroke="#444" stroke-width="1" />
+
+  <!-- Gold Contacts (Bottom) -->
+  <g transform="translate(38, 85)">
+    <rect x="0" y="0" width="6" height="12" fill="url(#goldContact)" />
+    <rect x="10" y="0" width="6" height="12" fill="url(#goldContact)" />
+    <rect x="20" y="0" width="6" height="12" fill="url(#goldContact)" />
+    <rect x="30" y="0" width="6" height="12" fill="url(#goldContact)" />
+    <rect x="40" y="0" width="6" height="12" fill="url(#goldContact)" />
+    <rect x="50" y="0" width="6" height="12" fill="url(#goldContact)" />
+  </g>
+
+  <!-- Circuit Traces -->
+  <path d="M45,80 V60 L55,50 H75 L85,60 V80" fill="none" stroke="#555" stroke-width="2" />
+  <circle cx="64" cy="50" r="8" fill="#111" stroke="#333" stroke-width="1" />
+  <rect x="60" y="46" width="8" height="8" fill="#222" />
+
+  <!-- Label/Logo -->
+  <rect x="38" y="36" width="20" height="4" fill="#fff" opacity="0.2" />
+  <text x="64" y="68" font-family="monospace" font-size="8" fill="#666" text-anchor="middle">MEM-01</text>
+</svg>

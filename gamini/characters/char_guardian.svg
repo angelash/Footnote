@@ -1,0 +1,39 @@
+<svg width="200" height="300" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="eyeGlow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#00ffaa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00ffaa;stop-opacity:0" />
+    </radialGradient>
+    <filter id="neon">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Body Silhouette -->
+  <path d="M60,60 Q100,20 140,60 L160,120 Q170,180 140,240 L120,280 H80 L60,240 Q30,180 40,120 Z" 
+        fill="#1a1a24" stroke="#00ffaa" stroke-width="2" />
+
+  <!-- Armor Plates -->
+  <path d="M60,60 Q100,30 140,60" fill="none" stroke="#00ffaa" stroke-width="1" opacity="0.5" />
+  <path d="M50,120 Q100,140 150,120" fill="none" stroke="#00ffaa" stroke-width="1" opacity="0.5" />
+  <path d="M70,240 Q100,260 130,240" fill="none" stroke="#00ffaa" stroke-width="1" opacity="0.5" />
+
+  <!-- Core/Eye -->
+  <circle cx="100" cy="100" r="15" fill="#1a1a24" stroke="#00ffaa" stroke-width="2" filter="url(#neon)" />
+  <circle cx="100" cy="100" r="6" fill="#00ffaa" />
+  
+  <!-- Floating Elements (High Dimensions) -->
+  <rect x="30" y="40" width="20" height="4" fill="#00ffaa" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" />
+  </rect>
+  <rect x="150" y="50" width="30" height="2" fill="#00ffaa" opacity="0.4">
+    <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.5s" repeatCount="indefinite" />
+  </rect>
+
+  <!-- Weapon/Tool -->
+  <path d="M160,120 L190,100 L185,140 Z" fill="#00ffaa" opacity="0.8" filter="url(#neon)" />
+</svg>

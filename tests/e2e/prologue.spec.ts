@@ -46,14 +46,14 @@ test.describe('序章流程', () => {
   // TODO: 更多测试用例
   // 这些测试需要在游戏功能完成后补充
   
-  test.skip('C0-Z1: 宿舍走廊基本流程', async ({ page }) => {
+  test.skip('C0-Z1: 宿舍走廊基本流程', async () => {
     // 进入游戏
     // 等待场景加载
     // 验证Zone标题
     // 交互测试
   });
 
-  test.skip('C0-Z2: 无收益选择应增加R值', async ({ page }) => {
+  test.skip('C0-Z2: 无收益选择应增加R值', async () => {
     // 导航到C0-Z2
     // 选择无收益选项
     // 验证R值增加
@@ -61,14 +61,14 @@ test.describe('序章流程', () => {
 });
 
 test.describe('存档功能', () => {
-  test.skip('应该能保存游戏进度', async ({ page }) => {
+  test.skip('应该能保存游戏进度', async () => {
     // 开始新游戏
     // 进行一些操作
     // 保存游戏
     // 验证存档存在
   });
 
-  test.skip('应该能加载存档', async ({ page }) => {
+  test.skip('应该能加载存档', async () => {
     // 假设有存档
     // 点击继续游戏
     // 验证加载正确的进度

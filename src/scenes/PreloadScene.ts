@@ -3,7 +3,8 @@
  * 负责加载游戏所有资源
  */
 import Phaser from 'phaser';
-import { SCENES, CONSTANTS } from '@/config/game.config';
+import { SCENES } from '@/config/game.config';
+import { PIXEL_IMAGE_ASSETS, PIXEL_SPRITESHEETS } from '@/data/pixelAssets';
 
 export class PreloadScene extends Phaser.Scene {
   private _loadingBar!: Phaser.GameObjects.Graphics;
@@ -119,6 +120,17 @@ export class PreloadScene extends Phaser.Scene {
 
     // 临时占位：创建一些基础几何图形作为占位符
     this._createPlaceholders();
+
+    // ===== 像素PNG资源（配置化场景会用到）=====
+    Object.entries(PIXEL_IMAGE_ASSETS).forEach(([key, url]) => {
+      this.load.image(key, url);
+    });
+    Object.entries(PIXEL_SPRITESHEETS).forEach(([key, sheet]) => {
+      this.load.spritesheet(key, sheet.url, {
+        frameWidth: sheet.frameWidth,
+        frameHeight: sheet.frameHeight,
+      });
+    });
   }
 
   private _loadAudio(): void {

@@ -3,7 +3,10 @@
  * 负责Zone渲染和游戏逻辑
  */
 import Phaser from 'phaser';
-import { SCENES, CONSTANTS, TEXT_STYLES, COLORS } from '@/config/game.config';
+import { SCENES, TEXT_STYLES } from '@/config/game.config';
+import { getSceneConfig } from '@/data/scenes';
+import { SceneAssembler } from '@/systems/scene/SceneAssembler';
+import type { IAssembledScene, ISceneAction } from '@/types/scene';
 
 interface IGameSceneData {
   zoneId: string;
@@ -14,9 +17,10 @@ interface IGameSceneData {
 export class GameScene extends Phaser.Scene {
   private _currentZoneId: string = '';
   private _isNewGame: boolean = false;
+  private _assembledScene: IAssembledScene | null = null;
+  private _sceneAssembler!: SceneAssembler;
 
   // 游戏对象
-  private _background!: Phaser.GameObjects.Image;
   private _player!: Phaser.GameObjects.Sprite;
   private _interactables: Phaser.GameObjects.Container[] = [];
 
@@ -46,6 +50,10 @@ export class GameScene extends Phaser.Scene {
     this._createPlayer(width, height);
     this._createUI(width, height);
 
+    this._sceneAssembler = new SceneAssembler(this, {
+      onAction: (action) => this._handleSceneAction(action),
+    });
+
     // 加载Zone数据
     this._loadZone(this._currentZoneId);
 
@@ -59,12 +67,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
-    // 更新玩家位置（如果有移动逻辑）
+    // 开发阶段：让玩家占位符做轻微呼吸，避免 noUnusedParameters/noUnusedLocals
+    if (this._player) {
+      this._player.y = this.scale.height * 0.7 + Math.sin(time / 600) * 2;
+    }
+    void delta;
   }
 
   private _createBackground(width: number, height: number): void {
     // 临时使用纯色背景
-    this._background = this.add.image(0, 0, 'placeholder_bg')
+    this.add.image(0, 0, 'placeholder_bg')
       .setOrigin(0)
       .setDisplaySize(width, height);
   }
@@ -175,7 +187,54 @@ export class GameScene extends Phaser.Scene {
     });
 
     // TODO: 创建交互点
-    this._createInteractionPoints(zoneId);
+    this._buildZoneFromConfig(zoneId);
+  }
+
+  private _buildZoneFromConfig(zoneId: string): void {
+    // 清理旧场景物件
+    if (this._assembledScene) {
+      this._sceneAssembler.destroy(this._assembledScene);
+      this._assembledScene = null;
+    }
+
+    const cfg = getSceneConfig(zoneId);
+    if (!cfg) {
+      // 回退到旧的硬编码交互点（开发阶段安全兜底）
+      this._createInteractionPoints(zoneId);
+      return;
+    }
+
+    // 标题使用配置优先
+    if (cfg.title) {
+      this._zoneTitle.setText(cfg.title);
+    }
+
+    this._assembledScene = this._sceneAssembler.build(cfg);
+  }
+
+  private _handleSceneAction(action: ISceneAction): void {
+    switch (action.type) {
+      case 'dialogue': {
+        this._showDialogue({
+          speaker: action.speaker ?? '系统',
+          text: action.text ?? '',
+        });
+        return;
+      }
+      case 'card': {
+        if (action.cardId) this._showCard(action.cardId);
+        return;
+      }
+      case 'gotoZone': {
+        if (action.zoneId) {
+          this.scene.restart({ zoneId: action.zoneId, fromZone: this._currentZoneId });
+        }
+        return;
+      }
+      case 'none':
+      default:
+        return;
+    }
   }
 
   private _createInteractionPoints(zoneId: string): void {
@@ -245,7 +304,7 @@ export class GameScene extends Phaser.Scene {
 
   private _setupInput(): void {
     // 点击空白处关闭对话
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+    this.input.on('pointerdown', () => {
       if (this._dialogueBox.visible) {
         this._hideDialogue();
       }

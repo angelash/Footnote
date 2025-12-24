@@ -1,0 +1,60 @@
+id: C0-Z1
+title: 宿舍走廊
+background:
+  texture: placeholder_bg
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 身份卡（示例：点击 -> 卡片）
+  - id: identity_card
+    type: image
+    texture: px_item_keycard
+    x: 200
+    y: 620
+    scale: 0.55
+    depth: 10
+    label: 身份卡
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: identity-card
+      action:
+        type: card
+        cardId: CARD_C0_01
+
+  # 公告板（示例：点击 -> 对话）
+  - id: notice_board
+    type: image
+    texture: px_item_archive
+    x: 520
+    y: 520
+    scale: 0.55
+    depth: 10
+    label: 公告板
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        speaker: 系统
+        text: 公告板上贴满了通知，日期处有涂改痕迹...
+
+  # 漂移者残影（示例：sprite 动画）
+  - id: drifter_ghost
+    type: sprite
+    texture: px_sprite_ghost_idle
+    x: 560
+    y: 820
+    scale: 0.65
+    depth: 5
+    animation:
+      key: ghost_idle
+      frameRate: 4
+      repeat: -1
+      frames:
+        start: 0
+        end: 3
+
+

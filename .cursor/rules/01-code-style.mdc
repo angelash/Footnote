@@ -1,0 +1,212 @@
+---
+description: TypeScript代码风格规范
+globs: ["**/*.ts", "**/*.tsx"]
+alwaysApply: true
+---
+
+# TypeScript 代码规范
+
+## 基本原则
+- 使用 TypeScript strict 模式
+- 优先使用 const，其次 let，禁止 var
+- 所有函数必须有明确的返回类型
+- 避免 any，使用 unknown 或泛型
+
+## 命名规范
+
+### 文件命名
+```
+PascalCase.ts     - 类/组件文件
+camelCase.ts      - 工具函数文件
+CONSTANT.ts       - 常量文件
+*.test.ts         - 测试文件
+*.d.ts            - 类型声明文件
+```
+
+### 变量命名
+```typescript
+// 常量 - UPPER_SNAKE_CASE
+const MAX_DIALOGUE_LENGTH = 200;
+const ZONE_IDS = ['C0-Z1', 'C0-Z2'] as const;
+
+// 变量/函数 - camelCase
+let currentZone = 'C0-Z1';
+function loadDialogue(id: string): IDialogue { }
+
+// 类 - PascalCase
+class NarrativeEngine { }
+
+// 接口 - I前缀 + PascalCase
+interface IDialogue { }
+interface ICard { }
+
+// 类型别名 - T前缀（仅用于泛型或联合类型）
+type TDialogueKey = keyof typeof dialogues;
+type TZoneState = 'locked' | 'unlocked' | 'completed';
+
+// 私有成员 - _前缀
+private _worldState: IWorldState;
+private _updateCounter(): void { }
+
+// 枚举 - PascalCase
+enum AbilityType {
+  DepthPerception = 'DEPTH_PERCEPTION',
+  DepthIntervention = 'DEPTH_INTERVENTION',
+  TimeIntervention = 'TIME_INTERVENTION',
+}
+```
+
+## 类型定义
+
+### 接口优先
+```typescript
+// ✅ 推荐：使用 interface
+interface ICard {
+  id: string;
+  title: string;
+  content: string;
+  type: CardType;
+}
+
+// ✅ 联合类型时使用 type
+type CardType = 'archive' | 'item' | 'prayer' | 'verdict';
+
+// ❌ 避免：简单对象用 type
+type Card = {
+  id: string;
+  // ...
+};
+```
+
+### 泛型使用
+```typescript
+// 泛型命名：T, U, V 或描述性名称
+interface IRepository<TEntity> {
+  findById(id: string): Promise<TEntity | null>;
+  save(entity: TEntity): Promise<void>;
+}
+
+// 泛型约束
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+```
+
+## 函数规范
+
+### 函数声明
+```typescript
+// ✅ 明确返回类型
+function calculateR(actions: IAction[]): number {
+  return actions.filter(a => a.reward === 0).length;
+}
+
+// ✅ 异步函数
+async function loadZone(zoneId: string): Promise<IZone> {
+  const data = await fetch(`/data/zones/${zoneId}.yaml`);
+  return parseYaml(data);
+}
+
+// ✅ 箭头函数（短函数/回调）
+const isUnlocked = (zone: IZone): boolean => zone.state === 'unlocked';
+
+// ❌ 避免：无返回类型
+function doSomething() { } // 应该是 void
+```
+
+### 参数处理
+```typescript
+// ✅ 解构参数
+interface IDialogueOptions {
+  speaker: string;
+  text: string;
+  delay?: number;
+}
+
+function showDialogue({ speaker, text, delay = 0 }: IDialogueOptions): void {
+  // ...
+}
+
+// ✅ 可选参数放最后
+function loadAsset(path: string, type: AssetType, cache?: boolean): void { }
+
+// ✅ 参数数量控制（超过3个用对象）
+// ❌ function create(a, b, c, d, e) { }
+// ✅ function create(options: ICreateOptions) { }
+```
+
+## 错误处理
+
+```typescript
+// ✅ 自定义错误类
+class GameError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly context?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = 'GameError';
+  }
+}
+
+// ✅ 类型守卫
+function isDialogue(data: unknown): data is IDialogue {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'id' in data &&
+    'text' in data
+  );
+}
+
+// ✅ 断言函数
+function assertNonNull<T>(value: T | null | undefined, message: string): asserts value is T {
+  if (value == null) {
+    throw new GameError(message, 'NULL_VALUE');
+  }
+}
+```
+
+## 注释规范
+
+```typescript
+/**
+ * 加载指定Zone的数据和资源
+ * @param zoneId Zone标识符（如 'C0-Z1'）
+ * @param preload 是否预加载相邻Zone
+ * @returns Zone数据对象
+ * @throws {GameError} 当Zone不存在时
+ */
+async function loadZone(zoneId: string, preload = false): Promise<IZone> {
+  // ...
+}
+
+// 单行注释用于解释"为什么"
+// 回溯后需要保留伤痕，这是游戏核心机制
+this._worldState.preserveScars();
+
+// TODO: 待实现
+// FIXME: 需要修复
+// HACK: 临时方案
+// NOTE: 重要说明
+```
+
+## 导入规范
+
+```typescript
+// 1. 外部依赖
+import Phaser from 'phaser';
+import { parse as parseYaml } from 'yaml';
+
+// 2. 内部模块（按层级）
+import { GameConfig } from '@/config/game.config';
+import { NarrativeEngine } from '@/systems/narrative';
+import { IDialogue, ICard } from '@/types';
+
+// 3. 相对导入
+import { formatText } from './utils';
+
+// 类型导入
+import type { IWorldState } from '@/systems/world';
+```

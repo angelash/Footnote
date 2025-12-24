@@ -1,0 +1,323 @@
+---
+description: Phaser 3 游戏引擎开发规范
+globs: ["**/scenes/**/*.ts", "**/entities/**/*.ts", "**/systems/**/*.ts"]
+alwaysApply: false
+---
+
+# Phaser 3 开发规范
+
+## 场景结构
+
+### 场景生命周期
+```typescript
+export class GameScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'GameScene' });
+  }
+
+  // 1. 初始化（接收传递的数据）
+  init(data: ISceneData): void {
+    this._zoneId = data.zoneId;
+  }
+
+  // 2. 预加载资源（PreloadScene已加载的不需要）
+  preload(): void {
+    // 仅加载本场景特有资源
+  }
+
+  // 3. 创建游戏对象
+  create(): void {
+    this._setupWorld();
+    this._setupUI();
+    this._setupEvents();
+  }
+
+  // 4. 更新循环
+  update(time: number, delta: number): void {
+    this._player?.update(time, delta);
+  }
+
+  // 5. 清理（场景切换时）
+  shutdown(): void {
+    this._cleanup();
+  }
+}
+```
+
+### 标准场景列表
+```typescript
+// src/scenes/index.ts
+export const SCENES = {
+  BOOT: 'BootScene',        // 启动检查
+  PRELOAD: 'PreloadScene',  // 资源预加载
+  MENU: 'MenuScene',        // 主菜单
+  GAME: 'GameScene',        // 游戏主场景
+  UI: 'UIOverlay',          // UI覆盖层（并行运行）
+} as const;
+```
+
+## 资源管理
+
+### PreloadScene 统一加载
+```typescript
+export class PreloadScene extends Phaser.Scene {
+  preload(): void {
+    // 显示加载进度
+    this._createLoadingBar();
+
+    // 图片资源
+    this.load.image('bg_c0z1', 'assets/images/backgrounds/c0-z1.svg');
+    this.load.spritesheet('player', 'assets/images/characters/player.png', {
+      frameWidth: 64,
+      frameHeight: 64,
+    });
+
+    // 音频资源
+    this.load.audio('bgm_main', 'assets/audio/bgm/main.mp3');
+
+    // 数据文件
+    this.load.yaml('dialogues_c0', 'assets/data/dialogues/c0.yaml');
+    this.load.json('cards', 'assets/data/cards.json');
+  }
+
+  create(): void {
+    // 初始化全局资源后跳转
+    this.scene.start(SCENES.MENU);
+  }
+}
+```
+
+### 资源键命名规范
+```typescript
+// 图片: {type}_{identifier}
+'bg_c0z1'           // 背景
+'char_cenhui'       // 角色
+'ui_button_primary' // UI元素
+'card_template'     // 卡片模板
+'fx_glow'           // 特效
+
+// 音频: {type}_{name}
+'bgm_main'          // 背景音乐
+'sfx_click'         // 音效
+
+// 数据: {type}_{scope}
+'dialogues_c0'      // 对话数据
+'zones_c1'          // Zone数据
+```
+
+## UI层管理
+
+### DOM Overlay 模式
+```typescript
+// 使用DOM作为UI层（更灵活的文本/样式）
+export class UIOverlay extends Phaser.Scene {
+  create(): void {
+    // 获取DOM容器
+    this._container = this.add.dom(0, 0).createFromCache('ui-template');
+
+    // 监听游戏事件更新UI
+    this.game.events.on('dialogue:show', this._showDialogue, this);
+    this.game.events.on('card:collect', this._showCardPopup, this);
+  }
+
+  private _showDialogue(dialogue: IDialogue): void {
+    const box = document.getElementById('dialogue-box');
+    box.querySelector('.speaker').textContent = dialogue.speaker;
+    box.querySelector('.text').textContent = dialogue.text;
+    box.classList.add('visible');
+  }
+}
+```
+
+### Phaser UI 模式
+```typescript
+// 纯Phaser UI（适合简单交互）
+export class DialogueBox extends Phaser.GameObjects.Container {
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x, y);
+
+    // 背景
+    this._bg = scene.add.nineslice(0, 0, 'ui_panel', undefined, 600, 200);
+
+    // 文字
+    this._text = scene.add.text(20, 20, '', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '18px',
+      color: '#E8E6E3',
+      wordWrap: { width: 560 },
+    });
+
+    this.add([this._bg, this._text]);
+    scene.add.existing(this);
+  }
+
+  show(text: string): void {
+    this._text.setText(text);
+    this.setVisible(true);
+  }
+}
+```
+
+## 事件系统
+
+### 全局事件总线
+```typescript
+// 使用Phaser内置事件系统
+// 游戏事件通过 game.events 发送
+
+// 发送事件
+this.game.events.emit('zone:enter', { zoneId: 'C0-Z1' });
+this.game.events.emit('dialogue:start', dialogue);
+this.game.events.emit('card:collect', card);
+this.game.events.emit('ability:use', { type: 'DEPTH_PERCEPTION' });
+
+// 监听事件
+this.game.events.on('zone:enter', this._onZoneEnter, this);
+this.game.events.once('dialogue:end', this._onDialogueEnd, this);
+
+// 清理监听
+this.game.events.off('zone:enter', this._onZoneEnter, this);
+```
+
+### 场景间通信
+```typescript
+// 场景切换传递数据
+this.scene.start('GameScene', { zoneId: 'C1-Z1', fromZone: 'C0-Z4' });
+
+// 并行场景通信
+this.scene.get('UIOverlay').showCard(card);
+
+// 或通过事件
+this.game.events.emit('ui:showCard', card);
+```
+
+## 输入处理
+
+### 触摸/点击
+```typescript
+// 交互对象
+const button = this.add.image(100, 100, 'button')
+  .setInteractive({ useHandCursor: true })
+  .on('pointerdown', () => this._onClick())
+  .on('pointerover', () => button.setTint(0xcccccc))
+  .on('pointerout', () => button.clearTint());
+
+// 长按检测
+let pressTime = 0;
+this.input.on('pointerdown', () => {
+  pressTime = this.time.now;
+});
+this.input.on('pointerup', () => {
+  const duration = this.time.now - pressTime;
+  if (duration > 500) {
+    this._onLongPress();
+  } else {
+    this._onTap();
+  }
+});
+```
+
+### 手势支持
+```typescript
+// 滑动检测
+let startX = 0;
+this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+  startX = pointer.x;
+});
+this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+  const deltaX = pointer.x - startX;
+  if (Math.abs(deltaX) > 50) {
+    deltaX > 0 ? this._swipeRight() : this._swipeLeft();
+  }
+});
+```
+
+## 动画系统
+
+### 帧动画
+```typescript
+// 创建动画
+this.anims.create({
+  key: 'player_walk',
+  frames: this.anims.generateFrameNumbers('player', { start: 0, end: 7 }),
+  frameRate: 10,
+  repeat: -1,
+});
+
+// 播放
+this._sprite.play('player_walk');
+```
+
+### Tween动画
+```typescript
+// UI动画（常用）
+this.tweens.add({
+  targets: dialogueBox,
+  y: { from: 800, to: 600 },
+  alpha: { from: 0, to: 1 },
+  duration: 300,
+  ease: 'Power2',
+  onComplete: () => this._onAnimComplete(),
+});
+
+// 深度感知视觉效果
+this.tweens.add({
+  targets: this._depthOverlay,
+  alpha: 0.7,
+  duration: 500,
+  yoyo: true,
+  repeat: -1,
+});
+```
+
+## 性能优化
+
+### 对象池
+```typescript
+// 创建对象池
+this._particlePool = this.add.group({
+  classType: Phaser.GameObjects.Image,
+  maxSize: 50,
+  runChildUpdate: false,
+});
+
+// 获取对象
+const particle = this._particlePool.get(x, y, 'particle');
+if (particle) {
+  particle.setActive(true).setVisible(true);
+}
+
+// 回收对象
+this._particlePool.killAndHide(particle);
+```
+
+### 渲染优化
+```typescript
+// 静态内容使用RenderTexture
+const staticBg = this.add.renderTexture(0, 0, 750, 1334);
+staticBg.draw(bg1);
+staticBg.draw(bg2);
+staticBg.draw(bg3);
+
+// 离屏对象禁用更新
+object.setActive(false);
+
+// 使用Camera裁剪
+this.cameras.main.setBounds(0, 0, worldWidth, worldHeight);
+```
+
+## 调试支持
+
+```typescript
+// 开发模式调试
+if (import.meta.env.DEV) {
+  // FPS显示
+  this.game.config.fps.forceSetTimeOut = true;
+
+  // 物理调试
+  this.physics.world.createDebugGraphic();
+
+  // 输入调试
+  this.input.enableDebug(this._player);
+}
+```

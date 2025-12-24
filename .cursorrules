@@ -1,0 +1,92 @@
+# Footnote 项目 Cursor AI 规则
+
+## 项目概述
+这是一个名为《备注 / Footnote》的H5竖版手机网页游戏，叙事驱动的2D系统策略冒险游戏。
+
+## 技术栈
+- **语言**: TypeScript (strict mode)
+- **游戏引擎**: Phaser 3
+- **构建工具**: Vite
+- **存档**: IndexedDB
+- **测试**: Vitest + Playwright
+- **内容格式**: YAML/JSON
+
+## 代码规范
+
+### 命名约定
+- 文件名: PascalCase（类）, camelCase（工具函数）
+- 类名: PascalCase
+- 接口: I前缀 + PascalCase (如 IDialogue, ICard)
+- 常量: UPPER_SNAKE_CASE
+- 私有成员: _前缀
+
+### 目录结构
+```
+src/
+  scenes/     - Phaser场景
+  systems/    - 核心系统（叙事、世界、存档、UI）
+  entities/   - 游戏实体
+  data/       - 数据加载器
+  utils/      - 工具函数
+assets/       - 游戏资源
+```
+
+### TypeScript规则
+- 启用strict模式
+- 所有函数必须有返回类型
+- 避免any，使用unknown或泛型
+- 使用interface而非type alias（除非需要联合类型）
+- 异步函数使用async/await
+
+### Phaser 3规范
+- 场景继承自Phaser.Scene
+- 使用preload/create/update生命周期
+- 资源使用this.load在PreloadScene统一加载
+- 事件使用Phaser.Events.EventEmitter
+
+### 叙事系统规范
+- 所有对白数据存放在 src/data/dialogues/*.yaml
+- 卡片数据存放在 src/data/cards/*.yaml
+- Zone数据存放在 src/data/zones/*.yaml
+- 使用对白键名引用（如 CENHUI_MONO_01）
+
+### 存档系统
+- 使用IndexedDB存储
+- 存档结构包含: worldState, inventory, progress, settings
+- 支持多存档槽位
+
+## 设计文档位置
+- design/ 目录包含所有设计文档
+- 角色数据参考: design/角色人生线档案 v2.md
+- 对白参考: design/对白词库 v1.md
+- Zone脚本参考: design/章节×区域叙事布置/
+- 卡片数据参考: design/卡片文本全集 v1.md
+
+## 游戏核心概念
+1. **三层世界结构**: 人类可理解层 / 收敛运行时层 / 高维观测尺度
+2. **隐藏计数器**: R(无收益残差) / P(观察者压力) / W(世界可读性)
+3. **伏笔系统**: 20+伏笔，需要正确触发和回收
+4. **三种能力**: 深度感知 / 深度介入 / 时间干预
+
+## 美术规范
+- 主格式: SVG（可缩放、文件小）
+- 备选: 像素风PNG
+- 竖屏设计: 750×1334px
+- 深色主调 + 荧光强调色
+
+## 测试要求
+- 单元测试覆盖核心逻辑
+- E2E测试覆盖关键流程
+- 使用data-testid属性便于测试定位
+
+## 性能目标
+- 首屏加载 < 3s
+- 运行帧率 ≥ 60fps
+- 单场景内存 < 100MB
+
+## 禁止事项
+- 不要硬编码对白文本，使用数据文件
+- 不要直接操作DOM，使用Phaser API
+- 不要使用var，使用const/let
+- 不要忽略TypeScript错误
+

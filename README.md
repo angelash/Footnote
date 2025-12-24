@@ -98,7 +98,7 @@
 
 世界名（暂定）：
 
-> **《断层平面》（The Fractured Plane）**
+> **《备注 / Footnote》**
 
 世界状态：
 
@@ -410,7 +410,7 @@ T0 → T1 → T2 → T3 …
 
 # 🌍 PART 3：世界观与设定
 
-《断层平面 / The Fractured Plane》
+《备注 / Footnote》
 
 ------
 
@@ -624,7 +624,7 @@ T0 → T1 → T2 → T3 …
 
 # 📖 PART 4：主线剧情与章节结构
 
-《断层平面 / The Fractured Plane》
+《备注 / Footnote》
 
 ------
 

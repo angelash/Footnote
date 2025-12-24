@@ -22,7 +22,7 @@ import argparse
 import os
 import random
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Sequence, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 from PIL import Image
 
@@ -34,6 +34,7 @@ class PixelAsset:
     path: str
     base_size: Tuple[int, int]
     draw: "Callable[[Image.Image, random.Random], None]"
+    scale_override: Optional[int] = None
 
 
 def _clamp_u8(x: int) -> int:
@@ -408,6 +409,251 @@ def _asset_sprite_ghost_idle_strip(img: Image.Image, rng: random.Random) -> None
     _outline_from_alpha(img, pal["K"])
 
 
+def _draw_humanoid_frame_32(
+    img: Image.Image,
+    *,
+    ox: int,
+    wobble: int,
+    arm: int,
+    pal: Dict[str, Rgba],
+    suit: Rgba,
+    suit_shadow: Rgba,
+    accent: Rgba,
+    skin: Rgba,
+    hair: Rgba,
+    outline: Rgba,
+    add_noise: bool,
+    rng: random.Random,
+) -> None:
+    """
+    32x32 人形模板（五官可读）。
+    - ox: 帧偏移（每帧 32px 宽）
+    - wobble: 上下轻微漂浮（像素级）
+    - arm: 手臂摆动偏移（-1/0/1）
+    """
+    # ---- Head (bigger) ----
+    head_cx = ox + 16
+    head_cy = 9 + wobble
+    _circle(img, head_cx, head_cy, 6, skin, fill=True)
+    # hair cap / outline
+    _circle(img, head_cx, head_cy - 1, 6, hair, fill=False)
+    _rect(img, head_cx - 6, head_cy - 6, head_cx + 6, head_cy - 3, hair)  # fringe
+
+    # ---- Facial features (restrained, readable) ----
+    # keep eye whites subtle to avoid "chibi cute" 느낌
+    eye_white = _mix(pal["W"], skin, 0.45)
+    pupil = outline
+    brow = _mix(hair, outline, 0.55)
+    mouth = _mix(pal["M"], outline, 0.55)
+    # eyes (white + pupil)
+    _rect(img, head_cx - 4, head_cy - 1, head_cx - 3, head_cy - 1, eye_white)
+    _rect(img, head_cx + 3, head_cy - 1, head_cx + 4, head_cy - 1, eye_white)
+    _put(img, head_cx - 4, head_cy, pupil)
+    _put(img, head_cx + 4, head_cy, pupil)
+    # eyebrows
+    _line(img, head_cx - 5, head_cy - 3, head_cx - 3, head_cy - 3, brow)
+    _line(img, head_cx + 3, head_cy - 3, head_cx + 5, head_cy - 3, brow)
+    # mouth (tiny, neutral)
+    _line(img, head_cx - 1, head_cy + 4, head_cx + 1, head_cy + 4, mouth)
+
+    # ---- Neck ----
+    _rect(img, head_cx - 1, head_cy + 6, head_cx + 1, head_cy + 7, skin)
+
+    # ---- Body / suit ----
+    body_top = 17 + wobble
+    body_bottom = 27 + wobble
+    _rect(img, head_cx - 7, body_top, head_cx + 7, body_bottom, suit)
+    # inner shadow band
+    _rect(img, head_cx - 7, body_bottom - 3, head_cx + 7, body_bottom, suit_shadow)
+
+    # collar / lapel
+    collar = _mix(suit_shadow, pal["W"], 0.1)
+    _line(img, head_cx - 2, body_top, head_cx - 5, body_top + 3, collar)
+    _line(img, head_cx + 2, body_top, head_cx + 5, body_top + 3, collar)
+
+    # accent badge / keycard slot
+    _rect(img, head_cx + 4, body_top + 2, head_cx + 6, body_top + 5, accent)
+
+    # ---- Arms (swing, restrained) ----
+    arm_y0 = body_top + 2 + arm
+    arm_y1 = body_top + 8 + arm
+    _rect(img, head_cx - 10, arm_y0, head_cx - 8, arm_y1, suit_shadow)
+    _rect(img, head_cx + 8, arm_y0 - (2 * arm), head_cx + 10, arm_y1 - (2 * arm), suit_shadow)
+    # hands (skin)
+    _rect(img, head_cx - 10, arm_y1 + 1, head_cx - 9, arm_y1 + 2, skin)
+    _rect(img, head_cx + 9, arm_y1 - (2 * arm) + 1, head_cx + 10, arm_y1 - (2 * arm) + 2, skin)
+
+    # ---- Legs ----
+    leg_y0 = body_bottom + 1
+    _rect(img, head_cx - 5, leg_y0, head_cx - 2, leg_y0 + 4, suit_shadow)
+    _rect(img, head_cx + 2, leg_y0, head_cx + 5, leg_y0 + 4, suit_shadow)
+    # feet
+    _rect(img, head_cx - 5, leg_y0 + 4, head_cx - 2, leg_y0 + 4, outline)
+    _rect(img, head_cx + 2, leg_y0 + 4, head_cx + 5, leg_y0 + 4, outline)
+
+    # Optional: slight drift speckles for unstable characters
+    if add_noise:
+        _noise_speckle(img, rng, amount=6, color=_mix(accent, pal["W"], 0.18), alpha_only=True)
+
+
+def _accessory_cenhui(
+    img: Image.Image,
+    *,
+    ox: int,
+    wobble: int,
+    pal: Dict[str, Rgba],
+    accent: Rgba,
+) -> None:
+    """岑回：例外权限线（荧光绿），低信息量但一眼可辨。"""
+    cx = ox + 16
+    body_top = 17 + wobble
+    # diagonal permission line across chest
+    _line(img, cx - 6, body_top + 1, cx + 2, body_top + 9, _mix(accent, pal["W"], 0.1))
+    _put(img, cx - 1, body_top + 6, accent)
+
+
+def _accessory_gulin(
+    img: Image.Image,
+    *,
+    ox: int,
+    wobble: int,
+    arm: int,
+    pal: Dict[str, Rgba],
+    accent: Rgba,
+) -> None:
+    """顾临：平板/档案夹块（科技蓝），强调“流程化安全感”。"""
+    cx = ox + 16
+    body_top = 17 + wobble
+    # attach to right hand
+    px0 = cx + 10
+    py0 = body_top + 7 - (2 * arm)
+    _rect(img, px0, py0, px0 + 3, py0 + 5, _mix(accent, pal["W"], 0.12))
+    _rect(img, px0 + 1, py0 + 1, px0 + 2, py0 + 1, pal["W"])  # tiny highlight
+
+
+def _accessory_atang(
+    img: Image.Image,
+    *,
+    ox: int,
+    wobble: int,
+    pal: Dict[str, Rgba],
+    accent: Rgba,
+) -> None:
+    """阿棠：碎页/跳号页码（暖色点），配合轻微漂移。"""
+    cx = ox + 16
+    body_top = 17 + wobble
+    # small page fragment on left chest
+    _rect(img, cx - 7, body_top + 2, cx - 5, body_top + 4, _mix(pal["W"], pal["Y"], 0.25))
+    _put(img, cx - 6, body_top + 3, _mix(accent, pal["W"], 0.25))
+
+
+def _asset_sprite_cenhui_idle_strip(img: Image.Image, rng: random.Random) -> None:
+    """
+    64x16：4 帧 * 16x16 的岑回 idle 条带（frame0..3）
+    配色：灰色系制服 + 荧光绿（例外权限）
+    """
+    pal = _palette_footnote()
+    suit = _mix(pal["S"], pal["K"], 0.25)
+    suit_shadow = _mix(pal["M"], pal["K"], 0.35)
+    accent = pal["A"]
+    skin = _mix(pal["W"], pal["Y"], 0.15)
+    hair = _mix(pal["K"], pal["D"], 0.35)
+
+    wobbles = [0, 1, 0, -1]
+    arms = [0, 1, 0, -1]
+    for i in range(4):
+        _draw_humanoid_frame_32(
+            img,
+            ox=i * 32,
+            wobble=wobbles[i],
+            arm=arms[i],
+            pal=pal,
+            suit=suit,
+            suit_shadow=suit_shadow,
+            accent=accent,
+            skin=skin,
+            hair=hair,
+            outline=pal["K"],
+            add_noise=False,
+            rng=rng,
+        )
+        _accessory_cenhui(img, ox=i * 32, wobble=wobbles[i], pal=pal, accent=accent)
+
+    _outline_from_alpha(img, pal["K"])
+
+
+def _asset_sprite_gulin_idle_strip(img: Image.Image, rng: random.Random) -> None:
+    """
+    64x16：4 帧 * 16x16 的顾临 idle 条带（frame0..3）
+    配色：深蓝色系 + 科技蓝（系统气质）
+    """
+    pal = _palette_footnote()
+    suit = _mix(pal["B"], pal["K"], 0.55)
+    suit_shadow = _mix(pal["B"], pal["K"], 0.75)
+    accent = _mix(pal["B"], pal["W"], 0.15)
+    skin = _mix(pal["W"], pal["Y"], 0.1)
+    hair = _mix(pal["K"], pal["D"], 0.45)
+
+    wobbles = [0, 1, 0, -1]
+    arms = [0, -1, 0, 1]
+    for i in range(4):
+        _draw_humanoid_frame_32(
+            img,
+            ox=i * 32,
+            wobble=wobbles[i],
+            arm=arms[i],
+            pal=pal,
+            suit=suit,
+            suit_shadow=suit_shadow,
+            accent=accent,
+            skin=skin,
+            hair=hair,
+            outline=pal["K"],
+            add_noise=False,
+            rng=rng,
+        )
+        _accessory_gulin(img, ox=i * 32, wobble=wobbles[i], arm=arms[i], pal=pal, accent=pal["B"])
+
+    _outline_from_alpha(img, pal["K"])
+
+
+def _asset_sprite_atang_idle_strip(img: Image.Image, rng: random.Random) -> None:
+    """
+    64x16：4 帧 * 16x16 的阿棠 idle 条带（frame0..3）
+    配色：偏暖但不稳定（轻微色差/抖动） -> 用噪点模拟漂移
+    """
+    pal = _palette_footnote()
+    warm = (255, 170, 90, 255)
+    suit = _mix(warm, pal["K"], 0.6)
+    suit_shadow = _mix(warm, pal["K"], 0.78)
+    accent = _mix(pal["R"], pal["Y"], 0.35)
+    skin = _mix(pal["W"], warm, 0.2)
+    hair = _mix(pal["K"], warm, 0.85)
+
+    wobbles = [0, 1, 0, -1]
+    arms = [0, 1, 0, -1]
+    for i in range(4):
+        # frame-specific tiny hue jitter via mix
+        t = (i % 2) * 0.08
+        _draw_humanoid_frame_32(
+            img,
+            ox=i * 32,
+            wobble=wobbles[i],
+            arm=arms[i],
+            pal=pal,
+            suit=_mix(suit, pal["W"], t),
+            suit_shadow=_mix(suit_shadow, pal["W"], t),
+            accent=_mix(accent, pal["W"], t),
+            skin=_mix(skin, pal["W"], t * 0.5),
+            hair=hair,
+            outline=pal["K"],
+            add_noise=True,
+            rng=rng,
+        )
+        _accessory_atang(img, ox=i * 32, wobble=wobbles[i], pal=pal, accent=accent)
+
+    _outline_from_alpha(img, pal["K"])
+
 def _asset_tiles_platform_basic(img: Image.Image, rng: random.Random) -> None:
     """
     64x16：4 个 16x16 tile（平台/墙体），可用于简单地编排 tilemap。
@@ -622,6 +868,25 @@ def _assets() -> List[PixelAsset]:
 
         # 更复杂示例（精灵条带 / tiles / UI）
         PixelAsset(path="sprites/px_sprite_ghost_idle_strip.png", base_size=(64, 16), draw=_asset_sprite_ghost_idle_strip),
+        # 角色精灵：用更高基底(32x32)以容纳五官细节，但保持最终输出帧为 128x128
+        PixelAsset(
+            path="sprites/px_sprite_cenhui_idle_strip.png",
+            base_size=(128, 32),  # 4 frames * 32x32
+            draw=_asset_sprite_cenhui_idle_strip,
+            scale_override=4,
+        ),
+        PixelAsset(
+            path="sprites/px_sprite_gulin_idle_strip.png",
+            base_size=(128, 32),  # 4 frames * 32x32
+            draw=_asset_sprite_gulin_idle_strip,
+            scale_override=4,
+        ),
+        PixelAsset(
+            path="sprites/px_sprite_atang_idle_strip.png",
+            base_size=(128, 32),  # 4 frames * 32x32
+            draw=_asset_sprite_atang_idle_strip,
+            scale_override=4,
+        ),
         PixelAsset(path="tiles/px_tiles_platform_basic.png", base_size=(64, 16), draw=_asset_tiles_platform_basic),
         PixelAsset(path="ui/px_ui_panel_9slice.png", base_size=(24, 24), draw=_asset_ui_panel_9slice),
     ]
@@ -656,7 +921,8 @@ def main() -> None:
         img = Image.new("RGBA", asset.base_size, (0, 0, 0, 0))
         asset.draw(img, rng)
         img = _quantize_rgba(img, max_colors=max_colors, dither=dither)
-        img_scaled = _scale_nearest(img, scale)
+        asset_scale = asset.scale_override if asset.scale_override is not None else scale
+        img_scaled = _scale_nearest(img, asset_scale)
         out_path = os.path.join(out_dir, asset.path)
         _save(img_scaled, out_path)
         generated += 1

@@ -32,6 +32,21 @@ export const PIXEL_SPRITESHEETS: Record<string, IPixelSpritesheetAsset> = {
     frameWidth: 128,
     frameHeight: 128,
   },
+  px_sprite_cenhui_idle: {
+    url: new URL('../../assets/images/pixel/sprites/px_sprite_cenhui_idle_strip.png', import.meta.url).toString(),
+    frameWidth: 128,
+    frameHeight: 128,
+  },
+  px_sprite_gulin_idle: {
+    url: new URL('../../assets/images/pixel/sprites/px_sprite_gulin_idle_strip.png', import.meta.url).toString(),
+    frameWidth: 128,
+    frameHeight: 128,
+  },
+  px_sprite_atang_idle: {
+    url: new URL('../../assets/images/pixel/sprites/px_sprite_atang_idle_strip.png', import.meta.url).toString(),
+    frameWidth: 128,
+    frameHeight: 128,
+  },
 } as const;
 
 

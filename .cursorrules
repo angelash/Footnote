@@ -90,3 +90,22 @@ assets/       - 游戏资源
 - 不要使用var，使用const/let
 - 不要忽略TypeScript错误
 
+---
+
+## 完成通知（强制）
+
+> ⚠️ **每次任务完成后必须发送通知** ⚠️
+
+### 规则
+1. TODO 列表最后一项必须是 **发送完成通知**
+2. 任务结束前必须检查是否已发送
+3. 即使小改动也要发送
+
+### 通知命令模板
+```bash
+cmd /c python -c "import requests; title = r'Cursor\u4efb\u52a1\u5b8c\u6210'.encode().decode('unicode_escape'); msg = r'<\u5b8c\u6210\u8bf4\u660e>'.encode().decode('unicode_escape'); payload={'receiver':'gz0149','title': title, 'msg': msg}; r=requests.post('https://newsfeed.4399om.com/api/messages/send.json', json=payload); print('status', r.status_code); print(r.text)"
+```
+
+### 成功判定
+- 输出 `status 200` 且返回 JSON 中 `ret:0` 为成功
+

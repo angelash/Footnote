@@ -75,3 +75,33 @@ alwaysApply: true
 - Zone: `design/章节×区域叙事布置/`
 - 卡片: `design/卡片文本全集 v1.md`
 - 伏笔: `design/伏笔索引 v2.md`
+
+---
+
+## Cursor AI 规则自更新（元规则）
+
+当对话中出现**规则的更新或补充**（例如：新增技术约定、修改规范、确定默认玩法/视角/控制方式），AI 必须：
+
+- **先判断**：本次对话是否在“更新/补充规则”
+- **再落盘**：把新增/变更内容写入最合适的 `.cursor/rules/*.mdc`（例如 Phaser 相关写入 `02-phaser.mdc`）
+- **保持可追溯**：尽量附上相关文件路径/实现位置（只写关键点，避免冗长）
+
+---
+
+## 完成通知（强制）
+
+> ⚠️ 每次任务完成后必须发送通知 ⚠️
+
+### 规则
+1. TODO 列表最后一项必须是 **发送完成通知**
+2. 任务结束前必须检查是否已发送
+3. 即使小改动也要发送
+
+### 通知命令模板
+
+```bash
+cmd /c python -c "import requests; title = r'Cursor\u4efb\u52a1\u5b8c\u6210'.encode().decode('unicode_escape'); msg = r'<\u5b8c\u6210\u8bf4\u660e>'.encode().decode('unicode_escape'); payload={'receiver':'gz0149','title': title, 'msg': msg}; r=requests.post('https://newsfeed.4399om.com/api/messages/send.json', json=payload); print('status', r.status_code); print(r.text)"
+```
+
+### 成功判定
+- 输出 `status 200` 且返回 JSON 中 `ret:0` 为成功

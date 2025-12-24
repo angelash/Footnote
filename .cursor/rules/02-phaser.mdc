@@ -193,6 +193,21 @@ this.game.events.emit('ui:showCard', card);
 
 ## 输入处理
 
+## 场景视角与移动（Footnote 当前约定）
+
+### 视角
+- **第三人称俯视角（Top-down 2D）**
+- 场景遮挡采用 **y-sort**：默认 `depth = y`（显式 `depth` 优先）
+
+### 移动
+- **上下左右控制**：方向键 + WASD
+- **对角线归一化**：避免斜向移动更快
+- **物理**：使用 Arcade Physics（`physics.add.sprite`）作为玩家实体，便于后续扩展碰撞/不可走区域
+
+参考实现位置：
+- `src/scenes/GameScene.ts`（玩家移动）
+- `src/systems/scene/SceneAssembler.ts`（物件默认 y-sort）
+
 ### 触摸/点击
 ```typescript
 // 交互对象

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 空字段图标
+  尺寸: 24×24px
+  用途: 字段◦◦◦效果
+-->
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="fieldGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- 三个空心圆点 -->
+  <g filter="url(#fieldGlow)">
+    <circle cx="6" cy="12" r="2" fill="none" stroke="#FFD700" stroke-width="1.5">
+      <animate attributeName="opacity" values="0.4;0.9;0.4" dur="1.5s" begin="0s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="12" cy="12" r="2" fill="none" stroke="#FFD700" stroke-width="1.5">
+      <animate attributeName="opacity" values="0.4;0.9;0.4" dur="1.5s" begin="0.2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="18" cy="12" r="2" fill="none" stroke="#FFD700" stroke-width="1.5">
+      <animate attributeName="opacity" values="0.4;0.9;0.4" dur="1.5s" begin="0.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
+

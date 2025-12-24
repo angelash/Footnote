@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 阿棠 立绘
+  尺寸: 400×600px
+  角色: 漂移者/对账失败的活证据
+  特征: 16-18岁少女，眼神迷离，碎片感
+  特征色: #FF88FF（漂移紫）
+-->
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 皮肤渐变（苍白） -->
+    <linearGradient id="skinAT" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F8F0E8"/>
+      <stop offset="100%" style="stop-color:#E8E0D8"/>
+    </linearGradient>
+    
+    <!-- 头发渐变（深紫黑） -->
+    <linearGradient id="hairAT" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2030"/>
+      <stop offset="100%" style="stop-color:#1a1020"/>
+    </linearGradient>
+    
+    <!-- 校服渐变 -->
+    <linearGradient id="uniformAT" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a3848"/>
+      <stop offset="100%" style="stop-color:#2a2838"/>
+    </linearGradient>
+    
+    <!-- 漂移紫发光 -->
+    <filter id="driftGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 碎片化效果 -->
+    <filter id="fragmentFilter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    
+    <!-- 阴影 -->
+    <filter id="shadowAT" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    
+    <!-- 眼睛（淡紫色，迷离） -->
+    <radialGradient id="irisAT" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#CC88CC"/>
+      <stop offset="70%" style="stop-color:#AA66AA"/>
+      <stop offset="100%" style="stop-color:#884488"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- 背景光晕（漂移感） -->
+  <ellipse cx="200" cy="300" rx="150" ry="250" fill="#FF88FF" opacity="0.03"/>
+  
+  <!-- 漂移残影（左侧偏移） -->
+  <g opacity="0.15" transform="translate(-8, 0)">
+    <ellipse cx="200" cy="145" rx="60" ry="80" fill="#FF88FF"/>
+  </g>
+  
+  <!-- ===== 身体 ===== -->
+  <g filter="url(#shadowAT)">
+    
+    <!-- 校服外套 -->
+    <path d="M125 270 
+             Q105 320, 100 400 
+             L100 580 L300 580 L300 400 
+             Q295 320, 275 270
+             Q245 250, 200 250 
+             Q155 250, 125 270" 
+          fill="url(#uniformAT)" stroke="#1a1828" stroke-width="1"/>
+    
+    <!-- 校服领 -->
+    <path d="M145 265 L180 255 L200 270 L220 255 L255 265 L245 285 L200 275 L155 285 Z" 
+          fill="#4a4858" stroke="#3a3848" stroke-width="1"/>
+    
+    <!-- 蝴蝶结 -->
+    <g transform="translate(200, 280)">
+      <path d="M0 0 L-20 -10 L-25 0 L-20 10 Z" fill="#FF88FF" opacity="0.7"/>
+      <path d="M0 0 L20 -10 L25 0 L20 10 Z" fill="#FF88FF" opacity="0.7"/>
+      <circle cx="0" cy="0" r="6" fill="#FF88FF"/>
+    </g>
+    
+    <!-- 衬衫 -->
+    <path d="M160 265 L200 320 L240 265 Q220 255, 200 255 Q180 255, 160 265" 
+          fill="#F8F8F4" stroke="#E0E0DC" stroke-width="0.5"/>
+    
+    <!-- 裙摆暗示 -->
+    <path d="M100 450 Q150 445, 200 450 Q250 445, 300 450 L305 580 L95 580 Z" 
+          fill="#2a2838" stroke="#1a1828" stroke-width="1"/>
+    
+    <!-- 袖子（瘦弱） -->
+    <path d="M100 285 Q75 340, 72 400 Q70 440, 80 470 L108 470 Q115 440, 112 400 Q108 350, 118 295" 
+          fill="url(#uniformAT)" stroke="#1a1828" stroke-width="1"/>
+    
+    <path d="M300 285 Q325 340, 328 400 Q330 440, 320 470 L292 470 Q285 440, 288 400 Q292 350, 282 295" 
+          fill="url(#uniformAT)" stroke="#1a1828" stroke-width="1"/>
+    
+    <!-- 手部（纤细苍白） -->
+    <ellipse cx="94" cy="485" rx="18" ry="22" fill="url(#skinAT)"/>
+    <ellipse cx="306" cy="485" rx="18" ry="22" fill="url(#skinAT)"/>
+    
+    <!-- 左手持日记本碎片 -->
+    <g transform="translate(75, 460)">
+      <rect x="0" y="0" width="30" height="40" rx="2" fill="#E8E4D8" stroke="#C0BCA8" stroke-width="1" transform="rotate(-15)"/>
+      <!-- 撕裂边 -->
+      <path d="M28 0 L32 8 L28 15 L33 22 L28 30" fill="none" stroke="#C0BCA8" stroke-width="0.5" transform="rotate(-15)"/>
+    </g>
+  </g>
+  
+  <!-- ===== 颈部 ===== -->
+  <path d="M170 245 Q185 252, 200 254 Q215 252, 230 245 L230 225 Q215 230, 200 230 Q185 230, 170 225 Z" 
+        fill="url(#skinAT)"/>
+  
+  <!-- ===== 头部 ===== -->
+  <g filter="url(#shadowAT)">
+    
+    <!-- 脸部轮廓（瘦削少女） -->
+    <ellipse cx="200" cy="140" rx="58" ry="78" fill="url(#skinAT)"/>
+    
+    <!-- 下巴（尖） -->
+    <path d="M150 158 Q160 205, 200 225 Q240 205, 250 158" 
+          fill="url(#skinAT)"/>
+    
+    <!-- 耳朵 -->
+    <ellipse cx="140" cy="140" rx="8" ry="15" fill="url(#skinAT)"/>
+    <ellipse cx="260" cy="140" rx="8" ry="15" fill="url(#skinAT)"/>
+    
+    <!-- ===== 头发（凌乱长发） ===== -->
+    <path d="M145 90 
+             Q140 50, 175 30 
+             Q200 18, 225 30 
+             Q260 50, 255 90
+             Q265 140, 260 180
+             L255 140 Q250 85, 200 78 Q150 85, 145 140
+             L140 180 Q140 140, 145 90" 
+          fill="url(#hairAT)"/>
+    
+    <!-- 凌乱刘海 -->
+    <path d="M148 88 Q158 60, 175 72 Q165 90, 155 115" fill="url(#hairAT)"/>
+    <path d="M165 85 Q180 58, 200 65 Q190 85, 185 110" fill="url(#hairAT)"/>
+    <path d="M195 82 Q210 55, 235 68 Q225 88, 218 112" fill="url(#hairAT)"/>
+    <path d="M252 88 Q242 60, 225 72 Q235 90, 245 115" fill="url(#hairAT)"/>
+    
+    <!-- 长发垂落（遮挡部分脸） -->
+    <path d="M140 140 Q125 220, 115 320 Q110 380, 120 420" fill="url(#hairAT)" stroke="#1a1020" stroke-width="0.5"/>
+    <path d="M260 140 Q275 220, 285 320 Q290 380, 280 420" fill="url(#hairAT)" stroke="#1a1020" stroke-width="0.5"/>
+    
+    <!-- 遮眼发丝 -->
+    <path d="M160 115 Q175 130, 165 155" fill="url(#hairAT)" opacity="0.7"/>
+  </g>
+  
+  <!-- ===== 五官（迷离）===== -->
+  
+  <!-- 眉毛（淡） -->
+  <path d="M155 112 Q170 108, 182 110" fill="none" stroke="#4a4050" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M218 110 Q230 108, 245 112" fill="none" stroke="#4a4050" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- 眼睛 - 左（大眼，迷离） -->
+  <g>
+    <ellipse cx="168" cy="130" rx="16" ry="12" fill="#FFFFFF"/>
+    <ellipse cx="168" cy="130" rx="16" ry="12" fill="none" stroke="#4a4050" stroke-width="1"/>
+    <circle cx="166" cy="132" r="9" fill="url(#irisAT)"/>
+    <circle cx="166" cy="132" r="4" fill="#1a1020"/>
+    <!-- 多个高光（迷离感） -->
+    <circle cx="163" cy="128" r="3" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="170" cy="134" r="1.5" fill="#FFFFFF" opacity="0.5"/>
+    <circle cx="161" cy="135" r="1" fill="#FF88FF" opacity="0.4"/>
+    <path d="M152 123 Q168 118, 184 123" fill="none" stroke="#D8D0C8" stroke-width="1"/>
+  </g>
+  
+  <!-- 眼睛 - 右 -->
+  <g>
+    <ellipse cx="232" cy="130" rx="16" ry="12" fill="#FFFFFF"/>
+    <ellipse cx="232" cy="130" rx="16" ry="12" fill="none" stroke="#4a4050" stroke-width="1"/>
+    <circle cx="230" cy="132" r="9" fill="url(#irisAT)"/>
+    <circle cx="230" cy="132" r="4" fill="#1a1020"/>
+    <circle cx="227" cy="128" r="3" fill="#FFFFFF" opacity="0.9"/>
+    <circle cx="234" cy="134" r="1.5" fill="#FFFFFF" opacity="0.5"/>
+    <circle cx="225" cy="135" r="1" fill="#FF88FF" opacity="0.4"/>
+    <path d="M216 123 Q232 118, 248 123" fill="none" stroke="#D8D0C8" stroke-width="1"/>
+  </g>
+  
+  <!-- 鼻子（小巧） -->
+  <path d="M200 138 L199 162 Q196 168, 200 170 Q204 168, 201 162 L200 138" 
+        fill="none" stroke="#D8D0C8" stroke-width="0.8"/>
+  
+  <!-- 嘴唇（微张，不确定表情） -->
+  <path d="M183 188 Q192 185, 200 186 Q208 185, 217 188" 
+        fill="none" stroke="#C0A0A0" stroke-width="1.5" stroke-linecap="round"/>
+  <ellipse cx="200" cy="190" rx="8" ry="3" fill="#2a2030" opacity="0.3"/>
+  
+  <!-- ===== 漂移效果 ===== -->
+  
+  <!-- 身体局部碎片化 -->
+  <g filter="url(#driftGlow)" opacity="0.4">
+    <rect x="280" y="350" width="15" height="20" fill="#FF88FF" transform="rotate(15)">
+      <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="105" y="380" width="12" height="18" fill="#FF88FF" transform="rotate(-10)">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <!-- 发丝漂移 -->
+  <g filter="url(#driftGlow)" opacity="0.3">
+    <path d="M130 200 Q115 250, 105 300" fill="none" stroke="#FF88FF" stroke-width="2">
+      <animate attributeName="d" values="M130 200 Q115 250, 105 300;M132 200 Q118 252, 108 302;M130 200 Q115 250, 105 300" dur="4s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- 页码跳号标记 -->
+  <g transform="translate(310, 520)" opacity="0.5">
+    <text font-family="serif" font-size="10" fill="#FF88FF" font-style="italic">...13→17</text>
+  </g>
+</svg>
+

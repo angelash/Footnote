@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 祷文卡模板
+  尺寸: 300×450px
+  用途: 首字链祷文、礼堂街内容
+  风格: 神圣 + 隐秘 + 金色点缀
+-->
+<svg width="300" height="450" viewBox="0 0 300 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 深邃背景 -->
+    <radialGradient id="prayerBg" cx="50%" cy="20%" r="80%">
+      <stop offset="0%" style="stop-color:#1a1820"/>
+      <stop offset="100%" style="stop-color:#0a0a10"/>
+    </radialGradient>
+    
+    <!-- 金色光晕 -->
+    <radialGradient id="goldGlow" cx="50%" cy="15%" r="50%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.08"/>
+      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:0"/>
+    </radialGradient>
+    
+    <!-- 金色边框 -->
+    <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.5"/>
+      <stop offset="50%" style="stop-color:#E8D4A0;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#FFD700;stop-opacity:0.5"/>
+    </linearGradient>
+    
+    <!-- 首字母装饰 -->
+    <filter id="letterGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 装饰图案 -->
+    <pattern id="holyPattern" patternUnits="userSpaceOnUse" width="40" height="40">
+      <circle cx="20" cy="20" r="1" fill="#FFD700" opacity="0.1"/>
+    </pattern>
+  </defs>
+  
+  <!-- 卡片阴影 -->
+  <rect x="6" y="6" width="290" height="440" rx="8" fill="#000000" opacity="0.35"/>
+  
+  <!-- 主背景 -->
+  <rect x="2" y="2" width="296" height="446" rx="8" fill="url(#prayerBg)"/>
+  <rect x="2" y="2" width="296" height="446" rx="8" fill="url(#goldGlow)"/>
+  
+  <!-- 装饰图案层 -->
+  <rect x="2" y="2" width="296" height="446" rx="8" fill="url(#holyPattern)"/>
+  
+  <!-- 边框 -->
+  <rect x="2" y="2" width="296" height="446" rx="8" 
+        fill="none" stroke="url(#goldBorder)" stroke-width="1.5"/>
+  
+  <!-- 内层装饰边框 -->
+  <rect x="12" y="12" width="276" height="426" rx="4" 
+        fill="none" stroke="#E8D4A0" stroke-width="0.5" opacity="0.2"/>
+  
+  <!-- 顶部圣徽占位 -->
+  <g transform="translate(150, 50)">
+    <circle cx="0" cy="0" r="25" fill="none" stroke="#FFD700" stroke-width="1" opacity="0.4"/>
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#FFD700" stroke-width="0.5" opacity="0.3"/>
+    <!-- 十字/光芒装饰 -->
+    <line x1="0" y1="-25" x2="0" y2="-35" stroke="#FFD700" stroke-width="1" opacity="0.5"/>
+    <line x1="0" y1="25" x2="0" y2="35" stroke="#FFD700" stroke-width="1" opacity="0.5"/>
+    <line x1="-25" y1="0" x2="-35" y2="0" stroke="#FFD700" stroke-width="1" opacity="0.5"/>
+    <line x1="25" y1="0" x2="35" y2="0" stroke="#FFD700" stroke-width="1" opacity="0.5"/>
+  </g>
+  
+  <!-- 标题区 -->
+  <text x="150" y="115" font-family="serif" font-size="14" fill="#E8D4A0" text-anchor="middle" letter-spacing="4">祷 文</text>
+  
+  <!-- 分隔线 -->
+  <g transform="translate(50, 130)">
+    <line x1="0" y1="0" x2="80" y2="0" stroke="#E8D4A0" stroke-width="0.5" opacity="0.3"/>
+    <circle cx="100" cy="0" r="2" fill="#FFD700" opacity="0.5"/>
+    <line x1="120" y1="0" x2="200" y2="0" stroke="#E8D4A0" stroke-width="0.5" opacity="0.3"/>
+  </g>
+  
+  <!-- 首字母区域 -->
+  <g transform="translate(30, 160)" filter="url(#letterGlow)">
+    <rect x="0" y="0" width="50" height="60" rx="4" fill="#1a1820" stroke="#FFD700" stroke-width="1" opacity="0.5"/>
+    <text x="25" y="45" font-family="serif" font-size="36" fill="#FFD700" text-anchor="middle" opacity="0.8">愿</text>
+  </g>
+  
+  <!-- 祷文正文区域 -->
+  <g transform="translate(90, 165)">
+    <rect x="0" y="0" width="180" height="16" rx="1" fill="#1a1820" opacity="0.3"/>
+    <rect x="0" y="22" width="175" height="16" rx="1" fill="#1a1820" opacity="0.25"/>
+    <rect x="0" y="44" width="180" height="16" rx="1" fill="#1a1820" opacity="0.2"/>
+  </g>
+  
+  <!-- 首字链提示 -->
+  <g transform="translate(30, 250)">
+    <text x="0" y="12" font-family="Noto Sans SC" font-size="10" fill="#686860" opacity="0.5">首字链：</text>
+    <g transform="translate(55, 0)">
+      <text x="0" y="12" font-family="serif" font-size="11" fill="#FFD700" letter-spacing="8">愿 · 世 · 平 · 安</text>
+    </g>
+  </g>
+  
+  <!-- 更多祷文行 -->
+  <g transform="translate(30, 290)">
+    <rect x="0" y="0" width="240" height="14" rx="1" fill="#1a1820" opacity="0.2"/>
+    <rect x="0" y="20" width="235" height="14" rx="1" fill="#1a1820" opacity="0.18"/>
+    <rect x="0" y="40" width="240" height="14" rx="1" fill="#1a1820" opacity="0.15"/>
+    <rect x="0" y="60" width="200" height="14" rx="1" fill="#1a1820" opacity="0.12"/>
+  </g>
+  
+  <!-- 底部注释 -->
+  <g transform="translate(30, 390)">
+    <line x1="0" y1="0" x2="240" y2="0" stroke="#E8D4A0" stroke-width="0.5" opacity="0.2"/>
+    <text x="0" y="20" font-family="Noto Sans SC" font-size="10" fill="#686860" opacity="0.4">礼堂街口传</text>
+    <text x="0" y="38" font-family="monospace" font-size="9" fill="#E8D4A0" opacity="0.3">-牧平讲</text>
+  </g>
+  
+  <!-- 微光粒子效果 -->
+  <g opacity="0.4">
+    <circle cx="80" cy="100" r="1" fill="#FFD700">
+      <animate attributeName="opacity" values="0.2;0.5;0.2" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="220" cy="180" r="0.8" fill="#FFD700">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="150" cy="350" r="1" fill="#FFD700">
+      <animate attributeName="opacity" values="0.2;0.4;0.2" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
+

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 因果失稳图标
+  尺寸: 24×24px
+-->
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="timeGlow2" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="0.8"/>
+    </filter>
+  </defs>
+  
+  <!-- 时钟轮廓 -->
+  <circle cx="12" cy="12" r="9" fill="#1a1a24" stroke="#FF4444" stroke-width="1.5"/>
+  
+  <!-- 指针（扭曲） -->
+  <g filter="url(#timeGlow2)">
+    <path d="M12 12 L12 6" stroke="#FF4444" stroke-width="2" stroke-linecap="round"/>
+    <path d="M12 12 L16 14" stroke="#FF4444" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- 回溯箭头 -->
+  <path d="M6 8 Q4 6, 6 4 Q8 2, 10 4" fill="none" stroke="#FF4444" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M6 8 L4 6 L7 5" fill="none" stroke="#FF4444" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- 时间刻度 -->
+  <g stroke="#FF4444" stroke-width="0.5" opacity="0.5">
+    <line x1="12" y1="4" x2="12" y2="5"/>
+    <line x1="20" y1="12" x2="19" y2="12"/>
+    <line x1="12" y1="20" x2="12" y2="19"/>
+    <line x1="4" y1="12" x2="5" y2="12"/>
+  </g>
+</svg>
+

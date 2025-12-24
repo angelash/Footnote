@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 陈匠 立绘
+  尺寸: 400×600px
+  角色: 点灯者/对象不存在仍坚持的人
+  特征: 朴实，带旧灯芯
+  特征色: #FFAA44（灯火橙）
+-->
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 皮肤渐变（风吹日晒） -->
+    <linearGradient id="skinCJ" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D0C0A8"/>
+      <stop offset="100%" style="stop-color:#C0B098"/>
+    </linearGradient>
+    
+    <!-- 头发（灰褐色） -->
+    <linearGradient id="hairCJ" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5a5048"/>
+      <stop offset="100%" style="stop-color:#4a4038"/>
+    </linearGradient>
+    
+    <!-- 工装渐变 -->
+    <linearGradient id="workCJ" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5a5850"/>
+      <stop offset="100%" style="stop-color:#4a4840"/>
+    </linearGradient>
+    
+    <!-- 灯火橙发光 -->
+    <filter id="lampGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 阴影 -->
+    <filter id="shadowCJ" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    
+    <!-- 眼睛（朴实深沉） -->
+    <radialGradient id="irisCJ" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#6B5B4B"/>
+      <stop offset="70%" style="stop-color:#5B4B3B"/>
+      <stop offset="100%" style="stop-color:#4B3B2B"/>
+    </radialGradient>
+    
+    <!-- 灯火渐变 -->
+    <radialGradient id="flameGrad" cx="50%" cy="70%" r="50%">
+      <stop offset="0%" style="stop-color:#FFDD88"/>
+      <stop offset="50%" style="stop-color:#FFAA44"/>
+      <stop offset="100%" style="stop-color:#FF8820"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- 背景光晕（温暖） -->
+  <ellipse cx="200" cy="300" rx="150" ry="250" fill="#FFAA44" opacity="0.03"/>
+  
+  <!-- 灯火照亮效果 -->
+  <ellipse cx="350" cy="450" rx="80" ry="120" fill="#FFAA44" opacity="0.05"/>
+  
+  <!-- ===== 身体 ===== -->
+  <g filter="url(#shadowCJ)">
+    
+    <!-- 工装上衣 -->
+    <path d="M120 278 
+             Q95 335, 90 425 
+             L90 580 L310 580 L310 425 
+             Q305 335, 280 278
+             Q250 258, 200 258 
+             Q150 258, 120 278" 
+          fill="url(#workCJ)" stroke="#3a3830" stroke-width="1"/>
+    
+    <!-- 领口（简单） -->
+    <ellipse cx="200" cy="268" rx="42" ry="14" fill="#4a4840" stroke="#5a5850" stroke-width="1"/>
+    
+    <!-- 内衬 -->
+    <path d="M165 270 L200 310 L235 270 Q218 262, 200 262 Q182 262, 165 270" 
+          fill="#3a3830"/>
+    
+    <!-- 口袋 -->
+    <rect x="120" y="340" width="55" height="65" rx="4" fill="#4a4840" stroke="#5a5850" stroke-width="1"/>
+    <rect x="225" y="340" width="55" height="65" rx="4" fill="#4a4840" stroke="#5a5850" stroke-width="1"/>
+    
+    <!-- 灯芯工具包 -->
+    <g transform="translate(230, 345)">
+      <rect x="0" y="0" width="40" height="30" rx="3" fill="#8B7355" stroke="#6B5335" stroke-width="1"/>
+      <!-- 灯芯露出 -->
+      <rect x="8" y="-8" width="5" height="15" rx="1" fill="#E8D4A0"/>
+      <rect x="20" y="-5" width="4" height="12" rx="1" fill="#D8C490"/>
+    </g>
+    
+    <!-- 工具腰带 -->
+    <rect x="100" y="420" width="200" height="16" rx="3" fill="#6B5335" stroke="#4B3315" stroke-width="1"/>
+    
+    <!-- 袖子 -->
+    <path d="M90 295 Q60 360, 55 440 Q52 485, 68 520 L105 520 Q118 485, 115 440 Q110 370, 122 305" 
+          fill="url(#workCJ)" stroke="#3a3830" stroke-width="1"/>
+    
+    <path d="M310 295 Q340 360, 345 440 Q348 485, 332 520 L295 520 Q282 485, 285 440 Q290 370, 278 305" 
+          fill="url(#workCJ)" stroke="#3a3830" stroke-width="1"/>
+    
+    <!-- 袖口卷起 -->
+    <rect x="55" y="505" width="50" height="18" rx="4" fill="#5a5850"/>
+    <rect x="295" y="505" width="50" height="18" rx="4" fill="#5a5850"/>
+    
+    <!-- 手部（粗糙劳作） -->
+    <ellipse cx="82" cy="540" rx="24" ry="30" fill="url(#skinCJ)"/>
+    
+    <!-- 右手持旧灯 -->
+    <g transform="translate(310, 430)">
+      <!-- 手 -->
+      <ellipse cx="20" cy="70" rx="24" ry="30" fill="url(#skinCJ)"/>
+      
+      <!-- 旧油灯 -->
+      <g transform="translate(-15, -20)">
+        <!-- 灯体 -->
+        <ellipse cx="30" cy="50" rx="25" ry="15" fill="#8B7355" stroke="#6B5335" stroke-width="1"/>
+        <rect x="15" y="35" width="30" height="18" rx="3" fill="#9B8365" stroke="#7B6345" stroke-width="1"/>
+        
+        <!-- 灯柄 -->
+        <path d="M55 45 Q70 40, 75 55 Q70 65, 55 55" fill="none" stroke="#6B5335" stroke-width="3"/>
+        
+        <!-- 灯芯座 -->
+        <rect x="25" y="25" width="10" height="12" rx="2" fill="#6B5335"/>
+        
+        <!-- 灯芯 -->
+        <rect x="28" y="15" width="4" height="15" rx="1" fill="#E8D4A0"/>
+        
+        <!-- 火焰 -->
+        <g filter="url(#lampGlow)">
+          <ellipse cx="30" cy="8" rx="8" ry="12" fill="url(#flameGrad)">
+            <animate attributeName="ry" values="10;13;10" dur="0.5s" repeatCount="indefinite"/>
+            <animate attributeName="rx" values="6;9;6" dur="0.5s" repeatCount="indefinite"/>
+          </ellipse>
+          <!-- 内焰 -->
+          <ellipse cx="30" cy="10" rx="4" ry="7" fill="#FFEE99">
+            <animate attributeName="ry" values="6;8;6" dur="0.4s" repeatCount="indefinite"/>
+          </ellipse>
+        </g>
+      </g>
+    </g>
+  </g>
+  
+  <!-- ===== 颈部 ===== -->
+  <path d="M168 252 Q182 260, 200 262 Q218 260, 232 252 L232 228 Q218 235, 200 235 Q182 235, 168 228 Z" 
+        fill="url(#skinCJ)"/>
+  
+  <!-- ===== 头部 ===== -->
+  <g filter="url(#shadowCJ)">
+    
+    <!-- 脸部轮廓（方正朴实） -->
+    <path d="M142 135 
+             Q138 92, 165 65 
+             Q185 48, 200 45 
+             Q215 48, 235 65 
+             Q262 92, 258 135
+             Q265 175, 252 205
+             Q235 238, 200 248
+             Q165 238, 148 205
+             Q135 175, 142 135" 
+          fill="url(#skinCJ)"/>
+    
+    <!-- 耳朵 -->
+    <ellipse cx="138" cy="148" rx="12" ry="20" fill="url(#skinCJ)"/>
+    <ellipse cx="262" cy="148" rx="12" ry="20" fill="url(#skinCJ)"/>
+    
+    <!-- ===== 头发（短平头） ===== -->
+    <path d="M145 98 
+             Q142 58, 175 42 
+             Q200 32, 225 42 
+             Q258 58, 255 98
+             Q262 128, 260 145
+             L256 118 Q250 75, 200 70 Q150 75, 144 118
+             L140 145 Q140 128, 145 98" 
+          fill="url(#hairCJ)" stroke="#4a4038" stroke-width="1"/>
+    
+    <!-- 简单平直刘海 -->
+    <rect x="148" y="85" width="104" height="20" rx="3" fill="url(#hairCJ)"/>
+    
+    <!-- 鬓角 -->
+    <path d="M142 115 Q135 148, 138 175" fill="url(#hairCJ)"/>
+    <path d="M258 115 Q265 148, 262 175" fill="url(#hairCJ)"/>
+  </g>
+  
+  <!-- ===== 五官（朴实坚毅）===== -->
+  
+  <!-- 眉毛（浓黑） -->
+  <path d="M152 118 Q172 112, 188 118" fill="none" stroke="#4a4038" stroke-width="3" stroke-linecap="round"/>
+  <path d="M212 118 Q228 112, 248 118" fill="none" stroke="#4a4038" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- 眼睛 - 左 -->
+  <g>
+    <ellipse cx="170" cy="140" rx="15" ry="10" fill="#FFFFFF"/>
+    <ellipse cx="170" cy="140" rx="15" ry="10" fill="none" stroke="#4a4038" stroke-width="1"/>
+    <circle cx="170" cy="141" r="7" fill="url(#irisCJ)"/>
+    <circle cx="170" cy="141" r="3" fill="#1a1a18"/>
+    <circle cx="168" cy="139" r="2" fill="#FFFFFF" opacity="0.7"/>
+    <!-- 灯火映射 -->
+    <circle cx="173" cy="142" r="1" fill="#FFAA44" opacity="0.4"/>
+    <path d="M155 134 Q170 130, 185 134" fill="none" stroke="#B0A090" stroke-width="1.5"/>
+  </g>
+  
+  <!-- 眼睛 - 右 -->
+  <g>
+    <ellipse cx="230" cy="140" rx="15" ry="10" fill="#FFFFFF"/>
+    <ellipse cx="230" cy="140" rx="15" ry="10" fill="none" stroke="#4a4038" stroke-width="1"/>
+    <circle cx="230" cy="141" r="7" fill="url(#irisCJ)"/>
+    <circle cx="230" cy="141" r="3" fill="#1a1a18"/>
+    <circle cx="228" cy="139" r="2" fill="#FFFFFF" opacity="0.7"/>
+    <circle cx="233" cy="142" r="1" fill="#FFAA44" opacity="0.4"/>
+    <path d="M215 134 Q230 130, 245 134" fill="none" stroke="#B0A090" stroke-width="1.5"/>
+  </g>
+  
+  <!-- 鼻子 -->
+  <path d="M200 145 L197 180 Q192 190, 200 193 Q208 190, 203 180 L200 145" 
+        fill="none" stroke="#B0A090" stroke-width="1"/>
+  
+  <!-- 嘴唇（紧闭，坚定） -->
+  <path d="M175 210 Q190 205, 200 208 Q210 205, 225 210" 
+        fill="none" stroke="#908070" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- 皱纹 -->
+  <path d="M155 195 Q162 210, 170 220" fill="none" stroke="#C0B0A0" stroke-width="0.5" opacity="0.4"/>
+  <path d="M245 195 Q238 210, 230 220" fill="none" stroke="#C0B0A0" stroke-width="0.5" opacity="0.4"/>
+  
+  <!-- ===== 灯火光照效果 ===== -->
+  <g opacity="0.15">
+    <!-- 脸部灯光 -->
+    <ellipse cx="250" cy="160" rx="60" ry="80" fill="#FFAA44"/>
+  </g>
+  
+  <!-- 点灯者铭文 -->
+  <g transform="translate(130, 475)" opacity="0.4">
+    <text font-family="serif" font-size="10" fill="#FFAA44" font-style="italic">灯还在</text>
+  </g>
+</svg>
+

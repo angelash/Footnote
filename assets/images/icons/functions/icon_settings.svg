@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 设置图标
+  尺寸: 32×32px
+-->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="settingsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A9EFF"/>
+      <stop offset="100%" style="stop-color:#3080DD"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 齿轮外圈 -->
+  <g fill="none" stroke="url(#settingsGrad)" stroke-width="2">
+    <circle cx="16" cy="16" r="6"/>
+    <!-- 齿轮齿 -->
+    <path d="M16 4 L16 8 M16 24 L16 28"/>
+    <path d="M4 16 L8 16 M24 16 L28 16"/>
+    <path d="M7.5 7.5 L10.3 10.3 M21.7 21.7 L24.5 24.5"/>
+    <path d="M24.5 7.5 L21.7 10.3 M10.3 21.7 L7.5 24.5"/>
+  </g>
+  
+  <!-- 齿轮端点 -->
+  <g fill="#4A9EFF">
+    <circle cx="16" cy="5" r="2"/>
+    <circle cx="16" cy="27" r="2"/>
+    <circle cx="5" cy="16" r="2"/>
+    <circle cx="27" cy="16" r="2"/>
+    <circle cx="8" cy="8" r="1.5"/>
+    <circle cx="24" cy="24" r="1.5"/>
+    <circle cx="24" cy="8" r="1.5"/>
+    <circle cx="8" cy="24" r="1.5"/>
+  </g>
+  
+  <!-- 中心点 -->
+  <circle cx="16" cy="16" r="3" fill="#4A9EFF" opacity="0.5"/>
+</svg>
+

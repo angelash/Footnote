@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- C0-Z1 宿舍走廊
+  尺寸: 750×1334px（竖屏）
+  场景: 维修局宿舍走廊，储物柜、门锁、公告板
+  氛围: 清晨微光，秩序但有微妙不安
+-->
+<svg width="750" height="1334" viewBox="0 0 750 1334" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 走廊背景渐变 -->
+    <linearGradient id="corridorBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a10"/>
+      <stop offset="50%" style="stop-color:#0e0e15"/>
+      <stop offset="100%" style="stop-color:#08080c"/>
+    </linearGradient>
+    
+    <!-- 天花板光源 -->
+    <radialGradient id="ceilingLight" cx="50%" cy="5%" r="40%">
+      <stop offset="0%" style="stop-color:#1a1a25;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0a0a10;stop-opacity:1"/>
+    </radialGradient>
+    
+    <!-- 灯光发光 -->
+    <filter id="lightGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 墙面纹理 -->
+    <pattern id="wallTexture" patternUnits="userSpaceOnUse" width="20" height="20">
+      <rect width="20" height="20" fill="#12121a"/>
+      <rect x="0" y="0" width="10" height="10" fill="#14141c" opacity="0.3"/>
+    </pattern>
+    
+    <!-- 地板反光 -->
+    <linearGradient id="floorReflect" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a24"/>
+      <stop offset="100%" style="stop-color:#0e0e14"/>
+    </linearGradient>
+    
+    <!-- 储物柜渐变 -->
+    <linearGradient id="lockerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a35"/>
+      <stop offset="50%" style="stop-color:#3a3a48"/>
+      <stop offset="100%" style="stop-color:#2a2a35"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect x="0" y="0" width="750" height="1334" fill="url(#corridorBg)"/>
+  
+  <!-- ===== 透视走廊结构 ===== -->
+  
+  <!-- 天花板 -->
+  <polygon points="0,0 750,0 650,200 100,200" fill="url(#ceilingLight)"/>
+  
+  <!-- 天花板灯带 -->
+  <g filter="url(#lightGlow)">
+    <rect x="300" y="80" width="150" height="8" rx="2" fill="#4A9EFF" opacity="0.3"/>
+    <rect x="325" y="82" width="100" height="4" fill="#4A9EFF" opacity="0.5"/>
+  </g>
+  <g filter="url(#lightGlow)">
+    <rect x="300" y="140" width="150" height="8" rx="2" fill="#4A9EFF" opacity="0.2"/>
+  </g>
+  
+  <!-- 左墙 -->
+  <polygon points="0,0 100,200 100,1000 0,1200" fill="url(#wallTexture)"/>
+  <polygon points="0,0 100,200 100,1000 0,1200" fill="#12121a" opacity="0.5"/>
+  
+  <!-- 右墙 -->
+  <polygon points="750,0 650,200 650,1000 750,1200" fill="url(#wallTexture)"/>
+  <polygon points="750,0 650,200 650,1000 750,1200" fill="#12121a" opacity="0.5"/>
+  
+  <!-- 地板 -->
+  <polygon points="0,1200 100,1000 650,1000 750,1200 750,1334 0,1334" fill="url(#floorReflect)"/>
+  
+  <!-- 地板分割线 -->
+  <line x1="375" y1="1000" x2="375" y2="1334" stroke="#2a2a35" stroke-width="2"/>
+  <line x1="200" y1="1100" x2="550" y2="1100" stroke="#2a2a35" stroke-width="1" opacity="0.5"/>
+  <line x1="150" y1="1200" x2="600" y2="1200" stroke="#2a2a35" stroke-width="1" opacity="0.3"/>
+  
+  <!-- ===== 左侧储物柜 ===== -->
+  <g transform="translate(20, 300)">
+    <!-- 储物柜组 -->
+    <rect x="0" y="0" width="100" height="500" rx="4" fill="url(#lockerGrad)" stroke="#1a1a24" stroke-width="2"/>
+    
+    <!-- 上排柜门 -->
+    <rect x="8" y="10" width="84" height="110" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    <rect x="8" y="130" width="84" height="110" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    <rect x="8" y="250" width="84" height="110" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    <rect x="8" y="370" width="84" height="110" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    
+    <!-- 柜门把手 -->
+    <circle cx="80" cy="65" r="5" fill="#4a4a58"/>
+    <circle cx="80" cy="185" r="5" fill="#4a4a58"/>
+    <circle cx="80" cy="305" r="5" fill="#4a4a58"/>
+    <circle cx="80" cy="425" r="5" fill="#4a4a58"/>
+    
+    <!-- 编号标签 -->
+    <text x="50" y="30" font-family="monospace" font-size="10" fill="#4A9EFF" text-anchor="middle" opacity="0.6">001</text>
+    <text x="50" y="150" font-family="monospace" font-size="10" fill="#4A9EFF" text-anchor="middle" opacity="0.6">002</text>
+    <text x="50" y="270" font-family="monospace" font-size="10" fill="#4A9EFF" text-anchor="middle" opacity="0.6">003</text>
+    <text x="50" y="390" font-family="monospace" font-size="10" fill="#00FFAA" text-anchor="middle" opacity="0.8">004</text>
+  </g>
+  
+  <!-- ===== 右侧门和走廊 ===== -->
+  
+  <!-- 门框1 -->
+  <g transform="translate(580, 280)">
+    <rect x="0" y="0" width="100" height="400" rx="2" fill="#1e1e28" stroke="#2a2a35" stroke-width="2"/>
+    <rect x="10" y="10" width="80" height="380" rx="2" fill="#14141c"/>
+    <!-- 门把手 -->
+    <ellipse cx="75" cy="200" rx="8" ry="12" fill="#4a4a58"/>
+    <!-- 门牌 -->
+    <rect x="25" y="30" width="50" height="25" rx="3" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    <text x="50" y="48" font-family="monospace" font-size="12" fill="#E8E6E3" text-anchor="middle">A-01</text>
+  </g>
+  
+  <!-- 门框2 -->
+  <g transform="translate(580, 720)">
+    <rect x="0" y="0" width="100" height="250" rx="2" fill="#1e1e28" stroke="#2a2a35" stroke-width="2"/>
+    <rect x="10" y="10" width="80" height="230" rx="2" fill="#14141c"/>
+    <ellipse cx="75" cy="120" rx="8" ry="12" fill="#4a4a58"/>
+    <rect x="25" y="25" width="50" height="22" rx="3" fill="#2a2a35"/>
+    <text x="50" y="42" font-family="monospace" font-size="11" fill="#E8E6E3" text-anchor="middle">A-02</text>
+  </g>
+  
+  <!-- ===== 公告板 ===== -->
+  <g transform="translate(200, 350)">
+    <rect x="0" y="0" width="200" height="280" rx="4" fill="#1e1e28" stroke="#3a3a48" stroke-width="2"/>
+    
+    <!-- 标题栏 -->
+    <rect x="0" y="0" width="200" height="35" rx="4" fill="#2a2a35"/>
+    <text x="100" y="24" font-family="Noto Sans SC" font-size="14" fill="#E8E6E3" text-anchor="middle">公 告</text>
+    
+    <!-- 公告内容（便签） -->
+    <g transform="translate(15, 50)">
+      <rect x="0" y="0" width="80" height="60" fill="#E8D4A0" transform="rotate(-3)"/>
+      <text x="40" y="20" font-family="Noto Sans SC" font-size="9" fill="#3a3028" text-anchor="middle" transform="rotate(-3)">巡检班表</text>
+      <text x="40" y="35" font-family="Noto Sans SC" font-size="8" fill="#5a5048" text-anchor="middle" transform="rotate(-3)">本周轮值</text>
+    </g>
+    
+    <g transform="translate(100, 55)">
+      <rect x="0" y="0" width="85" height="55" fill="#D4E8F0" transform="rotate(2)"/>
+      <text x="42" y="18" font-family="Noto Sans SC" font-size="9" fill="#2a3840" text-anchor="middle" transform="rotate(2)">结构稳定</text>
+      <text x="42" y="32" font-family="Noto Sans SC" font-size="8" fill="#4a5860" text-anchor="middle" transform="rotate(2)">区域正常</text>
+    </g>
+    
+    <g transform="translate(20, 125)">
+      <rect x="0" y="0" width="75" height="50" fill="#FFE4E4" transform="rotate(1)"/>
+      <text x="37" y="18" font-family="Noto Sans SC" font-size="9" fill="#804040" text-anchor="middle" transform="rotate(1)">注意</text>
+      <text x="37" y="32" font-family="Noto Sans SC" font-size="8" fill="#A06060" text-anchor="middle" transform="rotate(1)">...</text>
+    </g>
+    
+    <g transform="translate(105, 130)">
+      <rect x="0" y="0" width="80" height="55" fill="#E4F0E4" transform="rotate(-2)"/>
+    </g>
+    
+    <!-- 图钉 -->
+    <circle cx="55" cy="75" r="4" fill="#FF6666"/>
+    <circle cx="140" cy="80" r="4" fill="#4A9EFF"/>
+    <circle cx="60" cy="150" r="4" fill="#FFD700"/>
+    <circle cx="145" cy="155" r="4" fill="#00CC66"/>
+    
+    <!-- 微光效果 -->
+    <rect x="0" y="0" width="200" height="280" rx="4" fill="none" stroke="#4A9EFF" stroke-width="1" opacity="0.1">
+      <animate attributeName="opacity" values="0.05;0.15;0.05" dur="3s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <!-- ===== 走廊尽头 ===== -->
+  <rect x="100" y="200" width="550" height="800" fill="#0a0a0f"/>
+  
+  <!-- 远处的门 -->
+  <rect x="300" y="280" width="150" height="350" rx="4" fill="#14141c" stroke="#2a2a35" stroke-width="2"/>
+  <rect x="310" y="290" width="130" height="330" fill="#0e0e14"/>
+  <ellipse cx="420" cy="455" rx="6" ry="10" fill="#4a4a58"/>
+  
+  <!-- ===== 氛围效果 ===== -->
+  
+  <!-- 微尘粒子 -->
+  <g opacity="0.3">
+    <circle cx="200" cy="400" r="1" fill="#E8E6E3">
+      <animate attributeName="cy" values="400;380;400" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="450" cy="500" r="0.8" fill="#E8E6E3">
+      <animate attributeName="cy" values="500;480;500" dur="4s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="350" cy="600" r="1.2" fill="#E8E6E3">
+      <animate attributeName="cy" values="600;575;600" dur="6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 底部渐变遮罩 -->
+  <defs>
+    <linearGradient id="bottomFade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:0.8"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="1100" width="750" height="234" fill="url(#bottomFade)"/>
+</svg>
+

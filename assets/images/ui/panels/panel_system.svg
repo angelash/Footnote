@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 系统提示面板
+  尺寸: 600×80px
+  风格: 冷静科技感 + 系统蓝边框
+  用途: "已更正"、"已对齐"、"无可用收益"等系统提示
+-->
+<svg width="600" height="80" viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 背景渐变 -->
+    <linearGradient id="sysBg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:0.95"/>
+      <stop offset="50%" style="stop-color:#0f0f16;stop-opacity:0.97"/>
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:0.95"/>
+    </linearGradient>
+    
+    <!-- 边框发光 -->
+    <filter id="sysGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 顶部边线渐变 -->
+    <linearGradient id="sysTopLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A9EFF;stop-opacity:0"/>
+      <stop offset="30%" style="stop-color:#4A9EFF;stop-opacity:0.8"/>
+      <stop offset="70%" style="stop-color:#4A9EFF;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#4A9EFF;stop-opacity:0"/>
+    </linearGradient>
+    
+    <!-- 底部边线渐变 -->
+    <linearGradient id="sysBottomLine" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A9EFF;stop-opacity:0"/>
+      <stop offset="30%" style="stop-color:#4A9EFF;stop-opacity:0.4"/>
+      <stop offset="70%" style="stop-color:#4A9EFF;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#4A9EFF;stop-opacity:0"/>
+    </linearGradient>
+    
+    <!-- 左侧图标区背景 -->
+    <linearGradient id="iconBg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A9EFF;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#4A9EFF;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect x="1" y="1" width="598" height="78" rx="4" ry="4" fill="url(#sysBg)"/>
+  
+  <!-- 边框 -->
+  <rect x="1" y="1" width="598" height="78" rx="4" ry="4" 
+        fill="none" stroke="#1a1a24" stroke-width="1"/>
+  
+  <!-- 顶部发光线 -->
+  <rect x="60" y="1" width="480" height="1.5" fill="url(#sysTopLine)" filter="url(#sysGlow)"/>
+  
+  <!-- 底部发光线 -->
+  <rect x="100" y="77.5" width="400" height="1" fill="url(#sysBottomLine)"/>
+  
+  <!-- 左侧图标区域 -->
+  <rect x="8" y="8" width="64" height="64" rx="4" fill="url(#iconBg)"/>
+  
+  <!-- 系统图标占位（齿轮形状） -->
+  <g transform="translate(40, 40)">
+    <circle cx="0" cy="0" r="16" fill="none" stroke="#4A9EFF" stroke-width="2" opacity="0.6"/>
+    <circle cx="0" cy="0" r="8" fill="none" stroke="#4A9EFF" stroke-width="2" opacity="0.8"/>
+    <!-- 齿轮齿 -->
+    <g stroke="#4A9EFF" stroke-width="2" opacity="0.6">
+      <line x1="0" y1="-18" x2="0" y2="-22"/>
+      <line x1="12.7" y1="-12.7" x2="15.6" y2="-15.6"/>
+      <line x1="18" y1="0" x2="22" y2="0"/>
+      <line x1="12.7" y1="12.7" x2="15.6" y2="15.6"/>
+      <line x1="0" y1="18" x2="0" y2="22"/>
+      <line x1="-12.7" y1="12.7" x2="-15.6" y2="15.6"/>
+      <line x1="-18" y1="0" x2="-22" y2="0"/>
+      <line x1="-12.7" y1="-12.7" x2="-15.6" y2="-15.6"/>
+    </g>
+  </g>
+  
+  <!-- 分隔线 -->
+  <line x1="80" y1="16" x2="80" y2="64" stroke="#2a2a35" stroke-width="1"/>
+  
+  <!-- 文本内容区域 (开发用) -->
+  <rect x="92" y="20" width="480" height="40" rx="2" fill="none" stroke="#1a1a22" stroke-dasharray="2 2" opacity="0.2"/>
+  
+  <!-- 右侧状态指示点 -->
+  <circle cx="580" cy="40" r="4" fill="#4A9EFF" opacity="0.8">
+    <animate attributeName="opacity" values="0.4;0.9;0.4" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- 扫描线装饰 -->
+  <g opacity="0.02">
+    <line x1="0" y1="20" x2="600" y2="20" stroke="#4A9EFF" stroke-width="1"/>
+    <line x1="0" y1="40" x2="600" y2="40" stroke="#4A9EFF" stroke-width="1"/>
+    <line x1="0" y1="60" x2="600" y2="60" stroke="#4A9EFF" stroke-width="1"/>
+  </g>
+</svg>
+

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 选项按钮
+  尺寸: 620×56px
+  用途: 对话选项、任务选项
+  风格: 宽条形 + 悬浮感
+-->
+<svg width="620" height="56" viewBox="0 0 620 56" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 背景渐变 -->
+    <linearGradient id="choiceBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a24;stop-opacity:0.9"/>
+      <stop offset="100%" style="stop-color:#12121a;stop-opacity:0.95"/>
+    </linearGradient>
+    
+    <!-- 左侧强调条 -->
+    <linearGradient id="choiceAccent" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFAA"/>
+      <stop offset="100%" style="stop-color:#00CC88"/>
+    </linearGradient>
+    
+    <!-- Hover背景 -->
+    <linearGradient id="choiceHoverBg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00FFAA;stop-opacity:0.08"/>
+      <stop offset="100%" style="stop-color:#00FFAA;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect x="1" y="1" width="618" height="54" rx="6" fill="url(#choiceBg)"/>
+  
+  <!-- 边框 -->
+  <rect x="1" y="1" width="618" height="54" rx="6" 
+        fill="none" stroke="#2a2a35" stroke-width="1"/>
+  
+  <!-- 左侧强调条 -->
+  <rect x="0" y="8" width="3" height="40" rx="1.5" fill="url(#choiceAccent)"/>
+  
+  <!-- 左侧图标区域 -->
+  <rect x="16" y="12" width="32" height="32" rx="4" fill="none" stroke="#2a2a35" stroke-width="1"/>
+  <circle cx="32" cy="28" r="8" fill="none" stroke="#00FFAA" stroke-width="1" opacity="0.4"/>
+  
+  <!-- 选项文本区域 -->
+  <rect x="60" y="16" width="480" height="24" rx="2" fill="none" stroke="#1a1a24" stroke-dasharray="2 2" opacity="0.15"/>
+  
+  <!-- 右侧箭头 -->
+  <g transform="translate(585, 28)" opacity="0.5">
+    <path d="M-6 -6 L0 0 L-6 6" fill="none" stroke="#00FFAA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Hover覆盖层 (CSS控制显示) -->
+  <rect x="1" y="1" width="618" height="54" rx="6" fill="url(#choiceHoverBg)" opacity="0" class="hover-overlay"/>
+</svg>
+

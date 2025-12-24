@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- C0-Z4 维修局前台
+  尺寸: 750×1334px（竖屏）
+  场景: 接待台、档案柜，秩序与控制
+  氛围: 官方、冷静、系统化
+-->
+<svg width="750" height="1334" viewBox="0 0 750 1334" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 办公背景 -->
+    <linearGradient id="officeBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0e0e14"/>
+      <stop offset="100%" style="stop-color:#0a0a0f"/>
+    </linearGradient>
+    
+    <!-- 天花板灯光 -->
+    <radialGradient id="officeLightR" cx="50%" cy="0%" r="50%">
+      <stop offset="0%" style="stop-color:#1a1a28;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0e0e14;stop-opacity:1"/>
+    </radialGradient>
+    
+    <!-- 系统蓝发光 -->
+    <filter id="systemGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 金属质感 -->
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a3a48"/>
+      <stop offset="50%" style="stop-color:#4a4a58"/>
+      <stop offset="100%" style="stop-color:#3a3a48"/>
+    </linearGradient>
+    
+    <!-- 档案柜渐变 -->
+    <linearGradient id="cabinetGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a35"/>
+      <stop offset="50%" style="stop-color:#3a3a48"/>
+      <stop offset="100%" style="stop-color:#2a2a35"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect x="0" y="0" width="750" height="1334" fill="url(#officeBg)"/>
+  
+  <!-- 天花板区域 -->
+  <rect x="0" y="0" width="750" height="200" fill="url(#officeLightR)"/>
+  
+  <!-- ===== 天花板灯具 ===== -->
+  <g filter="url(#systemGlow)">
+    <rect x="150" y="50" width="450" height="15" rx="3" fill="#1e1e28" stroke="#4A9EFF" stroke-width="1"/>
+    <rect x="180" y="53" width="390" height="9" fill="#4A9EFF" opacity="0.3"/>
+    <rect x="200" y="55" width="350" height="5" fill="#4A9EFF" opacity="0.5"/>
+  </g>
+  
+  <!-- 光晕 -->
+  <ellipse cx="375" cy="150" rx="300" ry="100" fill="#4A9EFF" opacity="0.02"/>
+  
+  <!-- ===== 后墙 ===== -->
+  <rect x="50" y="180" width="650" height="400" fill="#14141c" stroke="#1e1e28" stroke-width="2"/>
+  
+  <!-- 维修局标志 -->
+  <g transform="translate(275, 220)">
+    <rect x="0" y="0" width="200" height="80" rx="4" fill="#1a1a24" stroke="#4A9EFF" stroke-width="2"/>
+    <text x="100" y="35" font-family="Noto Sans SC" font-size="22" fill="#E8E6E3" text-anchor="middle" font-weight="bold">维修局</text>
+    <text x="100" y="60" font-family="Noto Sans SC" font-size="12" fill="#4A9EFF" text-anchor="middle">结构维护部</text>
+    <!-- 标志装饰 -->
+    <rect x="10" y="68" width="80" height="2" fill="#4A9EFF" opacity="0.3"/>
+    <rect x="110" y="68" width="80" height="2" fill="#4A9EFF" opacity="0.3"/>
+  </g>
+  
+  <!-- ===== 档案柜墙 ===== -->
+  <g transform="translate(50, 320)">
+    <!-- 档案柜组 -->
+    <rect x="0" y="0" width="650" height="250" fill="url(#cabinetGrad)" stroke="#1a1a24" stroke-width="2"/>
+    
+    <!-- 抽屉行1 -->
+    <g transform="translate(10, 10)">
+      <rect x="0" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="160" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="320" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="480" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <!-- 标签 -->
+      <text x="75" y="35" font-family="monospace" font-size="10" fill="#4A9EFF" text-anchor="middle">A-001~050</text>
+      <text x="235" y="35" font-family="monospace" font-size="10" fill="#4A9EFF" text-anchor="middle">A-051~100</text>
+      <text x="395" y="35" font-family="monospace" font-size="10" fill="#4A9EFF" text-anchor="middle">A-101~150</text>
+      <text x="555" y="35" font-family="monospace" font-size="10" fill="#4A9EFF" text-anchor="middle">A-151~200</text>
+      <!-- 把手 -->
+      <rect x="65" y="45" width="20" height="5" rx="1" fill="#4a4a58"/>
+      <rect x="225" y="45" width="20" height="5" rx="1" fill="#4a4a58"/>
+      <rect x="385" y="45" width="20" height="5" rx="1" fill="#4a4a58"/>
+      <rect x="545" y="45" width="20" height="5" rx="1" fill="#4a4a58"/>
+    </g>
+    
+    <!-- 抽屉行2 -->
+    <g transform="translate(10, 70)">
+      <rect x="0" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="160" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="320" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="480" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <text x="75" y="35" font-family="monospace" font-size="10" fill="#686868" text-anchor="middle">B-001~050</text>
+      <text x="235" y="35" font-family="monospace" font-size="10" fill="#686868" text-anchor="middle">B-051~100</text>
+      <text x="395" y="35" font-family="monospace" font-size="10" fill="#00FFAA" text-anchor="middle">异常记录</text>
+      <text x="555" y="35" font-family="monospace" font-size="10" fill="#686868" text-anchor="middle">归档中</text>
+      <rect x="65" y="45" width="20" height="5" rx="1" fill="#4a4a58"/>
+      <rect x="225" y="45" width="20" height="5" rx="1" fill="#4a4a58"/>
+      <rect x="385" y="45" width="20" height="5" rx="1" fill="#00FFAA" opacity="0.5"/>
+      <rect x="545" y="45" width="20" height="5" rx="1" fill="#4a4a58"/>
+    </g>
+    
+    <!-- 抽屉行3 -->
+    <g transform="translate(10, 130)">
+      <rect x="0" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="160" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="320" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="480" y="0" width="150" height="55" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    </g>
+    
+    <!-- 抽屉行4（部分） -->
+    <g transform="translate(10, 190)">
+      <rect x="0" y="0" width="150" height="50" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="160" y="0" width="150" height="50" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="320" y="0" width="150" height="50" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+      <rect x="480" y="0" width="150" height="50" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    </g>
+  </g>
+  
+  <!-- ===== 接待柜台 ===== -->
+  <g transform="translate(100, 620)">
+    <!-- 柜台主体 -->
+    <rect x="0" y="0" width="550" height="180" rx="8" fill="url(#metalGrad)" stroke="#2a2a35" stroke-width="2"/>
+    
+    <!-- 柜台顶面 -->
+    <rect x="0" y="0" width="550" height="20" rx="8" fill="#4a4a58"/>
+    
+    <!-- 柜台装饰线 -->
+    <line x1="20" y1="40" x2="530" y2="40" stroke="#4A9EFF" stroke-width="1" opacity="0.3"/>
+    
+    <!-- 服务窗口 -->
+    <rect x="50" y="50" width="200" height="100" rx="4" fill="#1a1a24" stroke="#3a3a48" stroke-width="1"/>
+    <text x="150" y="90" font-family="Noto Sans SC" font-size="12" fill="#686868" text-anchor="middle">1号窗口</text>
+    <text x="150" y="110" font-family="Noto Sans SC" font-size="10" fill="#4A9EFF" text-anchor="middle">接待中</text>
+    
+    <rect x="300" y="50" width="200" height="100" rx="4" fill="#1a1a24" stroke="#3a3a48" stroke-width="1"/>
+    <text x="400" y="90" font-family="Noto Sans SC" font-size="12" fill="#686868" text-anchor="middle">2号窗口</text>
+    <text x="400" y="110" font-family="Noto Sans SC" font-size="10" fill="#686868" text-anchor="middle">暂停</text>
+    
+    <!-- 柜台后工作区 -->
+    <g transform="translate(0, -100)">
+      <!-- 电脑 -->
+      <rect x="80" y="0" width="120" height="80" rx="4" fill="#1e1e28" stroke="#2a2a35" stroke-width="1"/>
+      <rect x="90" y="10" width="100" height="55" rx="2" fill="#0a0a0f"/>
+      <!-- 屏幕内容 -->
+      <text x="140" y="35" font-family="monospace" font-size="8" fill="#4A9EFF" text-anchor="middle">系统在线</text>
+      <text x="140" y="50" font-family="monospace" font-size="6" fill="#00FFAA" text-anchor="middle">结构稳定 ✓</text>
+      
+      <!-- 文件架 -->
+      <rect x="350" y="10" width="80" height="70" rx="2" fill="#2a2a35"/>
+      <rect x="355" y="15" width="70" height="12" fill="#E8D4A0" opacity="0.8"/>
+      <rect x="355" y="30" width="70" height="12" fill="#D4E8F0" opacity="0.8"/>
+      <rect x="355" y="45" width="70" height="12" fill="#E8D4A0" opacity="0.8"/>
+    </g>
+  </g>
+  
+  <!-- ===== 地面 ===== -->
+  <rect x="0" y="850" width="750" height="484" fill="#0c0c12"/>
+  
+  <!-- 地板格 -->
+  <g stroke="#14141c" stroke-width="1">
+    <line x1="0" y1="950" x2="750" y2="950"/>
+    <line x1="0" y1="1050" x2="750" y2="1050"/>
+    <line x1="0" y1="1150" x2="750" y2="1150"/>
+    <line x1="0" y1="1250" x2="750" y2="1250"/>
+    <line x1="150" y1="850" x2="150" y2="1334"/>
+    <line x1="300" y1="850" x2="300" y2="1334"/>
+    <line x1="450" y1="850" x2="450" y2="1334"/>
+    <line x1="600" y1="850" x2="600" y2="1334"/>
+  </g>
+  
+  <!-- 地面引导线 -->
+  <g transform="translate(350, 950)">
+    <rect x="0" y="0" width="50" height="250" fill="#4A9EFF" opacity="0.05"/>
+    <line x1="25" y1="0" x2="25" y2="250" stroke="#4A9EFF" stroke-width="2" stroke-dasharray="10 5" opacity="0.2"/>
+  </g>
+  
+  <!-- ===== 等候区 ===== -->
+  <!-- 椅子 -->
+  <g transform="translate(80, 900)">
+    <rect x="0" y="0" width="120" height="40" rx="4" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    <rect x="0" y="40" width="120" height="60" rx="4" fill="#2a2a35"/>
+  </g>
+  <g transform="translate(550, 900)">
+    <rect x="0" y="0" width="120" height="40" rx="4" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    <rect x="0" y="40" width="120" height="60" rx="4" fill="#2a2a35"/>
+  </g>
+  
+  <!-- ===== 取号机 ===== -->
+  <g transform="translate(620, 650)">
+    <rect x="0" y="0" width="80" height="150" rx="4" fill="#2a2a35" stroke="#3a3a48" stroke-width="2"/>
+    <rect x="10" y="20" width="60" height="50" rx="2" fill="#1a1a24"/>
+    <!-- 显示屏 -->
+    <text x="40" y="50" font-family="monospace" font-size="18" fill="#00FFAA" text-anchor="middle">A-07</text>
+    <!-- 按钮 -->
+    <rect x="20" y="85" width="40" height="30" rx="4" fill="#4A9EFF" opacity="0.3"/>
+    <text x="40" y="105" font-family="Noto Sans SC" font-size="10" fill="#4A9EFF" text-anchor="middle">取号</text>
+    <!-- 出票口 -->
+    <rect x="15" y="125" width="50" height="8" rx="2" fill="#1a1a24"/>
+  </g>
+  
+  <!-- ===== 系统状态显示 ===== -->
+  <g transform="translate(50, 600)">
+    <rect x="0" y="0" width="40" height="150" rx="4" fill="#1a1a24" stroke="#2a2a35" stroke-width="1"/>
+    <!-- 状态灯 -->
+    <circle cx="20" cy="30" r="8" fill="#00CC66">
+      <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="20" y="55" font-family="Noto Sans SC" font-size="8" fill="#00CC66" text-anchor="middle">正常</text>
+    
+    <circle cx="20" cy="80" r="8" fill="#4A9EFF" opacity="0.3"/>
+    <text x="20" y="105" font-family="Noto Sans SC" font-size="8" fill="#686868" text-anchor="middle">待机</text>
+    
+    <circle cx="20" cy="130" r="8" fill="#FF4444" opacity="0.2"/>
+    <text x="20" y="148" font-family="Noto Sans SC" font-size="7" fill="#686868" text-anchor="middle">异常</text>
+  </g>
+  
+  <!-- ===== 氛围 ===== -->
+  
+  <!-- 底部渐变 -->
+  <defs>
+    <linearGradient id="bottomFade4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0f;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:0.9"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="1150" width="750" height="184" fill="url(#bottomFade4)"/>
+</svg>
+

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 时间干预特效
+  尺寸: 200×200px（可缩放）
+  用途: 激活时间干预时的视觉叠加层
+-->
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 时间扭曲渐变 -->
+    <radialGradient id="timeWarpGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FF4444;stop-opacity:0.6"/>
+      <stop offset="60%" style="stop-color:#FF4444;stop-opacity:0.2"/>
+      <stop offset="100%" style="stop-color:#FF4444;stop-opacity:0"/>
+    </radialGradient>
+    
+    <!-- 时间线发光 -->
+    <filter id="timeGlowFilter" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 螺旋变换 -->
+    <animateTransform id="spiralAnim" attributeName="transform" type="rotate" from="0 100 100" to="-360 100 100" dur="4s" repeatCount="indefinite"/>
+  </defs>
+  
+  <!-- 背景场 -->
+  <circle cx="100" cy="100" r="95" fill="url(#timeWarpGrad)">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- 时间螺旋 -->
+  <g filter="url(#timeGlowFilter)">
+    <g stroke="#FF4444" stroke-width="1.5" fill="none">
+      <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="-360 100 100" dur="6s" repeatCount="indefinite"/>
+      
+      <path d="M100 20 Q160 40, 160 100 Q160 160, 100 160 Q40 160, 60 100" stroke-dasharray="10 5"/>
+      <path d="M100 35 Q145 50, 145 100 Q145 145, 100 140 Q55 140, 70 100" stroke-dasharray="8 4"/>
+      <path d="M100 50 Q130 60, 130 100 Q130 130, 100 125 Q70 125, 80 100" stroke-dasharray="6 3"/>
+    </g>
+  </g>
+  
+  <!-- 回溯箭头 -->
+  <g filter="url(#timeGlowFilter)" fill="#FF4444">
+    <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="-360 100 100" dur="3s" repeatCount="indefinite"/>
+    
+    <polygon points="100,25 90,40 95,40 95,55 105,55 105,40 110,40" opacity="0.8">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite"/>
+    </polygon>
+  </g>
+  
+  <!-- 时钟刻度 -->
+  <g stroke="#FF4444" stroke-width="1" opacity="0.5">
+    <line x1="100" y1="15" x2="100" y2="25"/>
+    <line x1="100" y1="175" x2="100" y2="185"/>
+    <line x1="15" y1="100" x2="25" y2="100"/>
+    <line x1="175" y1="100" x2="185" y2="100"/>
+    <line x1="38" y1="38" x2="45" y2="45"/>
+    <line x1="155" y1="155" x2="162" y2="162"/>
+    <line x1="162" y1="38" x2="155" y2="45"/>
+    <line x1="45" y1="155" x2="38" y2="162"/>
+  </g>
+  
+  <!-- 时间节点 -->
+  <g filter="url(#timeGlowFilter)">
+    <circle cx="100" cy="100" r="12" fill="#FF4444" opacity="0.9">
+      <animate attributeName="r" values="10;15;10" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="100" cy="100" r="6" fill="#FFFFFF"/>
+    
+    <!-- 节点连接线 -->
+    <g stroke="#FF4444" stroke-width="2" stroke-dasharray="4 2">
+      <line x1="100" y1="88" x2="100" y2="40" opacity="0.6"/>
+      <line x1="112" y1="100" x2="160" y2="100" opacity="0.6"/>
+    </g>
+    
+    <!-- 小节点 -->
+    <circle cx="100" cy="40" r="4" fill="#FF4444" opacity="0.6"/>
+    <circle cx="160" cy="100" r="4" fill="#FF4444" opacity="0.6"/>
+  </g>
+  
+  <!-- 污染警告 -->
+  <g transform="translate(100, 175)">
+    <text x="0" y="0" font-family="monospace" font-size="10" fill="#FF4444" text-anchor="middle" opacity="0.9">TIME INTERVENTION</text>
+    <text x="0" y="12" font-family="monospace" font-size="8" fill="#FF4444" text-anchor="middle">
+      ⚠ CONTAMINATION RISK
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="0.8s" repeatCount="indefinite"/>
+    </text>
+  </g>
+</svg>
+

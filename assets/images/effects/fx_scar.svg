@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 深度伤痕特效
+  尺寸: 100×100px（可缩放）
+  用途: 标记被深度介入改变过的区域
+-->
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 伤痕发光 -->
+    <filter id="scarGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 裂纹渐变 -->
+    <linearGradient id="crackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFAA"/>
+      <stop offset="50%" style="stop-color:#00CC88"/>
+      <stop offset="100%" style="stop-color:#009966"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景裂纹区域 -->
+  <circle cx="50" cy="50" r="45" fill="none" stroke="#00FFAA" stroke-width="0.5" opacity="0.2" stroke-dasharray="3 3"/>
+  
+  <!-- 主裂纹 -->
+  <g filter="url(#scarGlow)" stroke="url(#crackGrad)" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M50 10 L45 30 L55 45 L48 60 L52 80 L50 90">
+      <animate attributeName="stroke-width" values="2;3;2" dur="2s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- 分支 -->
+    <path d="M45 30 L30 35" stroke-width="1"/>
+    <path d="M55 45 L70 42" stroke-width="1"/>
+    <path d="M48 60 L35 65" stroke-width="1"/>
+    <path d="M52 80 L65 82" stroke-width="1"/>
+  </g>
+  
+  <!-- 能量泄漏点 -->
+  <g filter="url(#scarGlow)">
+    <circle cx="45" cy="30" r="3" fill="#00FFAA" opacity="0.8">
+      <animate attributeName="r" values="2;4;2" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="55" cy="45" r="2.5" fill="#00FFAA" opacity="0.7">
+      <animate attributeName="r" values="1.5;3.5;1.5" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="48" cy="60" r="2" fill="#00FFAA" opacity="0.6">
+      <animate attributeName="r" values="1;3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 粒子散发 -->
+  <g fill="#00FFAA">
+    <circle cx="40" cy="25" r="1" opacity="0">
+      <animate attributeName="cy" values="25;15;25" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.5;0" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="60" cy="50" r="1" opacity="0">
+      <animate attributeName="cx" values="60;70;60" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.4;0" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="45" cy="65" r="0.8" opacity="0">
+      <animate attributeName="cx" values="45;35;45" dur="2.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;0.3;0" dur="2.8s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>
+

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 对话框面板
+  尺寸: 690×200px
+  风格: 深色科幻叙事 + 微光边框
+-->
+<svg width="690" height="200" viewBox="0 0 690 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 背景渐变 -->
+    <linearGradient id="dialogueBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a22;stop-opacity:0.98"/>
+      <stop offset="100%" style="stop-color:#0a0a0f;stop-opacity:0.98"/>
+    </linearGradient>
+    
+    <!-- 边框发光效果 -->
+    <filter id="glowBorder" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 顶部高光 -->
+    <linearGradient id="topHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00FFAA;stop-opacity:0"/>
+      <stop offset="20%" style="stop-color:#00FFAA;stop-opacity:0.4"/>
+      <stop offset="50%" style="stop-color:#00FFAA;stop-opacity:0.6"/>
+      <stop offset="80%" style="stop-color:#00FFAA;stop-opacity:0.4"/>
+      <stop offset="100%" style="stop-color:#00FFAA;stop-opacity:0"/>
+    </linearGradient>
+    
+    <!-- 角落装饰渐变 -->
+    <linearGradient id="cornerGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFAA;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#00FFAA;stop-opacity:0"/>
+    </linearGradient>
+    
+    <!-- 说话者名称区域背景 -->
+    <linearGradient id="speakerBg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00FFAA;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#00FFAA;stop-opacity:0"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect x="2" y="2" width="686" height="196" rx="8" ry="8" fill="url(#dialogueBg)"/>
+  
+  <!-- 边框 -->
+  <rect x="2" y="2" width="686" height="196" rx="8" ry="8" 
+        fill="none" stroke="#2a2a35" stroke-width="1"/>
+  
+  <!-- 顶部高光线 -->
+  <rect x="40" y="2" width="610" height="1" fill="url(#topHighlight)"/>
+  
+  <!-- 左上角装饰 -->
+  <g filter="url(#glowBorder)">
+    <path d="M2 20 L2 8 Q2 2 8 2 L20 2" 
+          fill="none" stroke="#00FFAA" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- 右上角装饰 -->
+  <g filter="url(#glowBorder)">
+    <path d="M688 20 L688 8 Q688 2 682 2 L670 2" 
+          fill="none" stroke="#00FFAA" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- 左下角装饰 -->
+  <g filter="url(#glowBorder)">
+    <path d="M2 180 L2 192 Q2 198 8 198 L20 198" 
+          fill="none" stroke="#4A9EFF" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  </g>
+  
+  <!-- 右下角装饰 -->
+  <g filter="url(#glowBorder)">
+    <path d="M688 180 L688 192 Q688 198 682 198 L670 198" 
+          fill="none" stroke="#4A9EFF" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  </g>
+  
+  <!-- 说话者名称区域背景 -->
+  <rect x="20" y="15" width="200" height="28" rx="4" fill="url(#speakerBg)"/>
+  
+  <!-- 分隔线 -->
+  <line x1="20" y1="50" x2="670" y2="50" stroke="#2a2a35" stroke-width="1"/>
+  
+  <!-- 对话内容区域指示（开发用，实际渲染时不显示） -->
+  <rect x="20" y="58" width="650" height="120" rx="4" fill="none" stroke="#1a1a22" stroke-dasharray="4 4" opacity="0.3"/>
+  
+  <!-- 底部继续提示区域 -->
+  <g transform="translate(650, 180)" opacity="0.6">
+    <!-- 继续箭头动画占位 -->
+    <polygon points="0,0 12,6 0,12" fill="#00FFAA">
+      <animate attributeName="opacity" values="0.4;0.8;0.4" dur="1.5s" repeatCount="indefinite"/>
+    </polygon>
+  </g>
+  
+  <!-- 扫描线效果 -->
+  <rect x="0" y="0" width="690" height="200" rx="8" fill="none" opacity="0.03">
+    <pattern id="scanlines" patternUnits="userSpaceOnUse" width="690" height="4">
+      <rect width="690" height="2" fill="#00FFAA"/>
+    </pattern>
+  </rect>
+</svg>
+

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 牧平 立绘
+  尺寸: 400×600px
+  角色: 平面信徒/神话保存技术残响
+  特征: 40+讲者，老成隐喻，素衣
+  特征色: #E8D4A0（古卷黄）
+-->
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 皮肤渐变（年长） -->
+    <linearGradient id="skinMP" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D8C8B0"/>
+      <stop offset="100%" style="stop-color:#C8B8A0"/>
+    </linearGradient>
+    
+    <!-- 头发（花白） -->
+    <linearGradient id="hairMP" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#808078"/>
+      <stop offset="100%" style="stop-color:#686860"/>
+    </linearGradient>
+    
+    <!-- 素衣渐变 -->
+    <linearGradient id="robeMP" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8E4D8"/>
+      <stop offset="100%" style="stop-color:#D8D4C8"/>
+    </linearGradient>
+    
+    <!-- 古卷黄发光 -->
+    <filter id="ancientGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 阴影 -->
+    <filter id="shadowMP" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+    
+    <!-- 眼睛（智慧深邃） -->
+    <radialGradient id="irisMP" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#6B5D4D"/>
+      <stop offset="70%" style="stop-color:#5B4D3D"/>
+      <stop offset="100%" style="stop-color:#4B3D2D"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- 背景光晕 -->
+  <ellipse cx="200" cy="300" rx="150" ry="250" fill="#E8D4A0" opacity="0.02"/>
+  
+  <!-- ===== 身体 ===== -->
+  <g filter="url(#shadowMP)">
+    
+    <!-- 素衣长袍 -->
+    <path d="M100 275 
+             Q75 340, 70 440 
+             L70 580 L330 580 L330 440 
+             Q325 340, 300 275
+             Q255 250, 200 250 
+             Q145 250, 100 275" 
+          fill="url(#robeMP)" stroke="#C8C4B8" stroke-width="1"/>
+    
+    <!-- 衣领（交叉） -->
+    <path d="M140 265 L200 340 L170 340 L120 280 Z" fill="#D8D4C8" stroke="#C8C4B8" stroke-width="1"/>
+    <path d="M260 265 L200 340 L230 340 L280 280 Z" fill="#D8D4C8" stroke="#C8C4B8" stroke-width="1"/>
+    
+    <!-- 腰带 -->
+    <rect x="95" y="380" width="210" height="20" rx="3" fill="#A89868" stroke="#887848" stroke-width="1"/>
+    <rect x="185" y="375" width="30" height="30" rx="4" fill="#C8B888" stroke="#A89868" stroke-width="1"/>
+    
+    <!-- 衣褶 -->
+    <path d="M130 400 Q140 480, 120 560" fill="none" stroke="#C8C4B8" stroke-width="1"/>
+    <path d="M170 400 Q175 490, 160 570" fill="none" stroke="#C8C4B8" stroke-width="1"/>
+    <path d="M230 400 Q225 490, 240 570" fill="none" stroke="#C8C4B8" stroke-width="1"/>
+    <path d="M270 400 Q260 480, 280 560" fill="none" stroke="#C8C4B8" stroke-width="1"/>
+    
+    <!-- 袖子（宽大） -->
+    <path d="M70 290 Q35 370, 30 460 Q28 510, 45 540 L100 540 Q115 510, 110 460 Q105 380, 115 300" 
+          fill="url(#robeMP)" stroke="#C8C4B8" stroke-width="1"/>
+    
+    <path d="M330 290 Q365 370, 370 460 Q372 510, 355 540 L300 540 Q285 510, 290 460 Q295 380, 285 300" 
+          fill="url(#robeMP)" stroke="#C8C4B8" stroke-width="1"/>
+    
+    <!-- 手部（苍老但有力） -->
+    <ellipse cx="72" cy="560" rx="24" ry="28" fill="url(#skinMP)"/>
+    <ellipse cx="328" cy="560" rx="24" ry="28" fill="url(#skinMP)"/>
+    
+    <!-- 手持经卷 -->
+    <g transform="translate(40, 520)">
+      <rect x="0" y="0" width="50" height="60" rx="3" fill="#E8D4A0" stroke="#C8B480" stroke-width="1"/>
+      <!-- 卷轴装饰 -->
+      <rect x="-5" y="-5" width="8" height="70" rx="3" fill="#A89060"/>
+      <rect x="47" y="-5" width="8" height="70" rx="3" fill="#A89060"/>
+      <!-- 文字线条 -->
+      <line x1="10" y1="15" x2="40" y2="15" stroke="#8B7355" stroke-width="0.5"/>
+      <line x1="10" y1="25" x2="38" y2="25" stroke="#8B7355" stroke-width="0.5"/>
+      <line x1="10" y1="35" x2="40" y2="35" stroke="#8B7355" stroke-width="0.5"/>
+      <line x1="10" y1="45" x2="35" y2="45" stroke="#8B7355" stroke-width="0.5"/>
+    </g>
+  </g>
+  
+  <!-- ===== 颈部 ===== -->
+  <path d="M165 245 Q182 255, 200 257 Q218 255, 235 245 L235 220 Q218 228, 200 228 Q182 228, 165 220 Z" 
+        fill="url(#skinMP)"/>
+  
+  <!-- ===== 头部 ===== -->
+  <g filter="url(#shadowMP)">
+    
+    <!-- 脸部轮廓（瘦削长者） -->
+    <path d="M145 130 
+             Q140 85, 168 58 
+             Q188 42, 200 40 
+             Q212 42, 232 58 
+             Q260 85, 255 130
+             Q262 175, 248 205
+             Q230 240, 200 250
+             Q170 240, 152 205
+             Q138 175, 145 130" 
+          fill="url(#skinMP)"/>
+    
+    <!-- 耳朵（略大） -->
+    <ellipse cx="142" cy="145" rx="12" ry="22" fill="url(#skinMP)"/>
+    <ellipse cx="258" cy="145" rx="12" ry="22" fill="url(#skinMP)"/>
+    
+    <!-- ===== 头发（稀疏花白，后梳） ===== -->
+    <path d="M150 90 
+             Q148 55, 180 40 
+             Q200 32, 220 40 
+             Q252 55, 250 90
+             Q258 125, 256 145
+             L252 115 Q245 75, 200 72 Q155 75, 148 115
+             L144 145 Q144 125, 150 90" 
+          fill="url(#hairMP)" stroke="#686860" stroke-width="0.5"/>
+    
+    <!-- 发际线后退 -->
+    <path d="M158 80 Q175 60, 195 65 Q180 80, 170 100" fill="url(#hairMP)" opacity="0.7"/>
+    <path d="M242 80 Q225 60, 205 65 Q220 80, 230 100" fill="url(#hairMP)" opacity="0.7"/>
+    
+    <!-- 白发丝 -->
+    <path d="M165 70 Q168 50, 172 75" fill="none" stroke="#B0B0A8" stroke-width="0.5"/>
+    <path d="M235 70 Q232 50, 228 75" fill="none" stroke="#B0B0A8" stroke-width="0.5"/>
+    <path d="M148 110 Q142 95, 150 115" fill="none" stroke="#B0B0A8" stroke-width="0.5"/>
+    
+    <!-- 鬓角（稀疏） -->
+    <path d="M145 110 Q138 145, 142 175" fill="url(#hairMP)" opacity="0.6"/>
+    <path d="M255 110 Q262 145, 258 175" fill="url(#hairMP)" opacity="0.6"/>
+  </g>
+  
+  <!-- ===== 五官（沉稳智慧）===== -->
+  
+  <!-- 眉毛（浓密下垂） -->
+  <path d="M152 118 Q168 112, 184 118" fill="none" stroke="#686860" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M216 118 Q232 112, 248 118" fill="none" stroke="#686860" stroke-width="2.5" stroke-linecap="round"/>
+  
+  <!-- 眼睛 - 左（深邃小眼） -->
+  <g>
+    <ellipse cx="168" cy="138" rx="14" ry="9" fill="#FFFFFF"/>
+    <ellipse cx="168" cy="138" rx="14" ry="9" fill="none" stroke="#5a5248" stroke-width="1"/>
+    <circle cx="168" cy="139" r="6" fill="url(#irisMP)"/>
+    <circle cx="168" cy="139" r="2.5" fill="#1a1a18"/>
+    <circle cx="166" cy="137" r="1.5" fill="#FFFFFF" opacity="0.6"/>
+    <path d="M154 132 Q168 128, 182 132" fill="none" stroke="#B0A090" stroke-width="1.5"/>
+    <!-- 眼袋/皱纹 -->
+    <path d="M156 148 Q168 152, 180 148" fill="none" stroke="#C8B8A8" stroke-width="0.5" opacity="0.5"/>
+  </g>
+  
+  <!-- 眼睛 - 右 -->
+  <g>
+    <ellipse cx="232" cy="138" rx="14" ry="9" fill="#FFFFFF"/>
+    <ellipse cx="232" cy="138" rx="14" ry="9" fill="none" stroke="#5a5248" stroke-width="1"/>
+    <circle cx="232" cy="139" r="6" fill="url(#irisMP)"/>
+    <circle cx="232" cy="139" r="2.5" fill="#1a1a18"/>
+    <circle cx="230" cy="137" r="1.5" fill="#FFFFFF" opacity="0.6"/>
+    <path d="M218 132 Q232 128, 246 132" fill="none" stroke="#B0A090" stroke-width="1.5"/>
+    <path d="M220 148 Q232 152, 244 148" fill="none" stroke="#C8B8A8" stroke-width="0.5" opacity="0.5"/>
+  </g>
+  
+  <!-- 鼻子（挺直略长） -->
+  <path d="M200 145 L197 182 Q192 192, 200 195 Q208 192, 203 182 L200 145" 
+        fill="none" stroke="#B0A090" stroke-width="1"/>
+  
+  <!-- 嘴唇（薄，略带笑意） -->
+  <path d="M175 212 Q190 208, 200 210 Q210 208, 225 212" 
+        fill="none" stroke="#908070" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 法令纹 -->
+  <path d="M158 185 Q165 205, 172 220" fill="none" stroke="#C8B8A8" stroke-width="0.5" opacity="0.5"/>
+  <path d="M242 185 Q235 205, 228 220" fill="none" stroke="#C8B8A8" stroke-width="0.5" opacity="0.5"/>
+  
+  <!-- 胡须（稀疏山羊胡） -->
+  <g stroke="#888880" stroke-width="0.5" opacity="0.4">
+    <path d="M195 230 Q198 245, 195 260"/>
+    <path d="M200 232 Q200 250, 200 265"/>
+    <path d="M205 230 Q202 245, 205 260"/>
+  </g>
+  
+  <!-- ===== 装饰 ===== -->
+  
+  <!-- 祷文符号（胸前） -->
+  <g transform="translate(200, 355)" filter="url(#ancientGlow)">
+    <circle cx="0" cy="0" r="15" fill="none" stroke="#E8D4A0" stroke-width="1.5"/>
+    <text x="0" y="5" font-family="serif" font-size="14" fill="#E8D4A0" text-anchor="middle">愿</text>
+  </g>
+  
+  <!-- 古卷光晕 -->
+  <g opacity="0.2">
+    <ellipse cx="65" cy="550" rx="40" ry="50" fill="#E8D4A0">
+      <animate attributeName="opacity" values="0.1;0.25;0.1" dur="4s" repeatCount="indefinite"/>
+    </ellipse>
+  </g>
+</svg>
+

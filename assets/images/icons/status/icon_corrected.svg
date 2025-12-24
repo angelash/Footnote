@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 已更正图标
+  尺寸: 24×24px
+  用途: 文字"已更正"标记
+-->
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="correctGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <circle cx="12" cy="12" r="10" fill="#0a0a0f" stroke="#4A9EFF" stroke-width="1" opacity="0.8"/>
+  
+  <!-- 勾选标记 -->
+  <g filter="url(#correctGlow)">
+    <path d="M7 12 L10 15 L17 8" fill="none" stroke="#4A9EFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- 微光闪烁 -->
+  <circle cx="12" cy="12" r="10" fill="none" stroke="#4A9EFF" stroke-width="0.5" opacity="0">
+    <animate attributeName="opacity" values="0;0.4;0" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 时间干预图标
+  尺寸: 48×48px
+  用途: 能力按钮、状态显示
+  风格: 时钟+回溯箭头 + 红色警告
+-->
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 发光效果 -->
+    <filter id="timeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 时间渐变 -->
+    <linearGradient id="timeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6666"/>
+      <stop offset="100%" style="stop-color:#FF4444"/>
+    </linearGradient>
+    
+    <!-- 回溯线渐变 -->
+    <linearGradient id="rewindGrad" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF4444;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#FF4444;stop-opacity:0.2"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景圆 -->
+  <circle cx="24" cy="24" r="22" fill="#0a0a0f" stroke="#1a1a24" stroke-width="1"/>
+  
+  <!-- 时钟外圈 -->
+  <g filter="url(#timeGlow)">
+    <circle cx="24" cy="24" r="14" fill="none" stroke="url(#timeGradient)" stroke-width="2"/>
+  </g>
+  
+  <!-- 时钟刻度 -->
+  <g stroke="#FF4444" stroke-width="1" opacity="0.5">
+    <line x1="24" y1="12" x2="24" y2="14"/>
+    <line x1="36" y1="24" x2="34" y2="24"/>
+    <line x1="24" y1="36" x2="24" y2="34"/>
+    <line x1="12" y1="24" x2="14" y2="24"/>
+  </g>
+  
+  <!-- 时钟指针 -->
+  <line x1="24" y1="24" x2="24" y2="16" stroke="#FF4444" stroke-width="2" stroke-linecap="round"/>
+  <line x1="24" y1="24" x2="30" y2="24" stroke="#FF4444" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- 中心点 -->
+  <circle cx="24" cy="24" r="2" fill="#FF4444"/>
+  
+  <!-- 回溯箭头 -->
+  <g filter="url(#timeGlow)">
+    <path d="M8 20 C8 14, 14 8, 22 8" 
+          fill="none" stroke="url(#rewindGrad)" stroke-width="2" stroke-linecap="round"/>
+    <path d="M8 20 L6 14 L12 16" 
+          fill="none" stroke="#FF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- 污染警告 -->
+  <g transform="translate(36, 36)">
+    <circle cx="0" cy="0" r="6" fill="#0a0a0f" stroke="#FF4444" stroke-width="1"/>
+    <text x="0" y="3" font-family="sans-serif" font-size="8" fill="#FF4444" text-anchor="middle" font-weight="bold">P</text>
+  </g>
+  
+  <!-- 时间波动动画 -->
+  <circle cx="24" cy="24" r="14" fill="none" stroke="#FF4444" stroke-width="1" opacity="0">
+    <animate attributeName="r" values="14;20;14" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>
+

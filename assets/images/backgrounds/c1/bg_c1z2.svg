@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- C1-Z2 错门走廊
+  尺寸: 750×1334px（竖屏）
+  场景: 多扇门、门牌错位，空间异常
+  氛围: 诡异、门牌号与房间不符
+-->
+<svg width="750" height="1334" viewBox="0 0 750 1334" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 走廊背景 -->
+    <linearGradient id="wrongDoorBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a10"/>
+      <stop offset="100%" style="stop-color:#06060a"/>
+    </linearGradient>
+    
+    <!-- 门框渐变 -->
+    <linearGradient id="doorFrameGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2a2a35"/>
+      <stop offset="50%" style="stop-color:#3a3a48"/>
+      <stop offset="100%" style="stop-color:#2a2a35"/>
+    </linearGradient>
+    
+    <!-- 异常闪烁 -->
+    <filter id="glitchEffect" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect x="0" y="0" width="750" height="1334" fill="url(#wrongDoorBg)"/>
+  
+  <!-- ===== 透视走廊 ===== -->
+  
+  <!-- 天花板 -->
+  <polygon points="0,0 750,0 600,180 150,180" fill="#0e0e15"/>
+  
+  <!-- 天花板灯 -->
+  <g>
+    <rect x="340" y="80" width="70" height="8" rx="2" fill="#2a2a35"/>
+    <rect x="350" y="82" width="50" height="4" fill="#E8E6E3" opacity="0.2"/>
+  </g>
+  
+  <!-- 左墙 -->
+  <polygon points="0,0 150,180 150,950 0,1150" fill="#12121a"/>
+  
+  <!-- 右墙 -->
+  <polygon points="750,0 600,180 600,950 750,1150" fill="#12121a"/>
+  
+  <!-- 地面 -->
+  <polygon points="0,1150 150,950 600,950 750,1150 750,1334 0,1334" fill="#0c0c12"/>
+  
+  <!-- ===== 左侧门组 ===== -->
+  
+  <!-- 门1（正常） -->
+  <g transform="translate(20, 220)">
+    <rect x="0" y="0" width="110" height="280" rx="2" fill="url(#doorFrameGrad)" stroke="#1a1a24" stroke-width="2"/>
+    <rect x="8" y="8" width="94" height="264" rx="2" fill="#1a1a24"/>
+    <ellipse cx="90" cy="150" rx="6" ry="10" fill="#4a4a58"/>
+    <!-- 门牌 -->
+    <rect x="30" y="20" width="50" height="25" rx="3" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+    <text x="55" y="38" font-family="monospace" font-size="12" fill="#E8E6E3" text-anchor="middle">101</text>
+  </g>
+  
+  <!-- 门2（门牌错位） -->
+  <g transform="translate(40, 520)">
+    <rect x="0" y="0" width="100" height="260" rx="2" fill="url(#doorFrameGrad)" stroke="#1a1a24" stroke-width="2"/>
+    <rect x="6" y="6" width="88" height="248" rx="2" fill="#1a1a24"/>
+    <ellipse cx="82" cy="140" rx="5" ry="9" fill="#4a4a58"/>
+    <!-- 门牌（错位：应该是102，显示103） -->
+    <g filter="url(#glitchEffect)">
+      <rect x="25" y="18" width="50" height="25" rx="3" fill="#2a2a35" stroke="#FF4444" stroke-width="1" opacity="0.5"/>
+      <text x="50" y="36" font-family="monospace" font-size="12" fill="#FF4444" text-anchor="middle" opacity="0.8">103</text>
+    </g>
+    <!-- 正确门牌残影 -->
+    <text x="52" y="38" font-family="monospace" font-size="11" fill="#4A9EFF" text-anchor="middle" opacity="0.2">102</text>
+  </g>
+  
+  <!-- ===== 右侧门组 ===== -->
+  
+  <!-- 门3 -->
+  <g transform="translate(620, 200)">
+    <rect x="0" y="0" width="115" height="290" rx="2" fill="url(#doorFrameGrad)" stroke="#1a1a24" stroke-width="2"/>
+    <rect x="8" y="8" width="99" height="274" rx="2" fill="#1a1a24"/>
+    <ellipse cx="20" cy="155" rx="6" ry="10" fill="#4a4a58"/>
+    <rect x="35" y="22" width="50" height="25" rx="3" fill="#2a2a35"/>
+    <text x="60" y="40" font-family="monospace" font-size="12" fill="#E8E6E3" text-anchor="middle">201</text>
+  </g>
+  
+  <!-- 门4（尺寸异常） -->
+  <g transform="translate(630, 510)">
+    <!-- 这扇门明显窄了 -->
+    <rect x="0" y="0" width="80" height="250" rx="2" fill="url(#doorFrameGrad)" stroke="#1a1a24" stroke-width="2"/>
+    <rect x="5" y="5" width="70" height="240" rx="2" fill="#1a1a24"/>
+    <ellipse cx="15" cy="130" rx="4" ry="8" fill="#4a4a58"/>
+    <rect x="20" y="15" width="40" height="22" rx="3" fill="#2a2a35"/>
+    <text x="40" y="31" font-family="monospace" font-size="10" fill="#686868" text-anchor="middle">202</text>
+    
+    <!-- 尺寸异常标记 -->
+    <text x="40" y="235" font-family="Noto Sans SC" font-size="8" fill="#FF4444" text-anchor="middle" opacity="0.5">窄</text>
+  </g>
+  
+  <!-- ===== 走廊尽头 ===== -->
+  <g transform="translate(150, 180)">
+    <rect x="0" y="0" width="450" height="770" fill="#08080c"/>
+    
+    <!-- 远处的门（透视） -->
+    <rect x="175" y="200" width="100" height="250" rx="2" fill="#1a1a24" stroke="#2a2a35" stroke-width="1"/>
+    <rect x="180" y="205" width="90" height="240" fill="#0e0e14"/>
+    <ellipse cx="260" cy="325" rx="4" ry="7" fill="#3a3a48"/>
+    
+    <!-- 远处门牌（看不清但有问题） -->
+    <rect x="200" y="215" width="40" height="18" rx="2" fill="#2a2a35"/>
+    <text x="220" y="228" font-family="monospace" font-size="8" fill="#686868" text-anchor="middle">???</text>
+  </g>
+  
+  <!-- ===== 地面标记 ===== -->
+  
+  <!-- 地面线 -->
+  <g stroke="#1a1a24" stroke-width="1">
+    <line x1="150" y1="1000" x2="600" y2="1000"/>
+    <line x1="100" y1="1100" x2="650" y2="1100"/>
+    <line x1="50" y1="1200" x2="700" y2="1200"/>
+  </g>
+  
+  <!-- 房间面积不符提示 -->
+  <g transform="translate(200, 850)">
+    <rect x="0" y="0" width="350" height="60" rx="4" fill="#1a1a24" opacity="0.8"/>
+    <text x="175" y="25" font-family="Noto Sans SC" font-size="12" fill="#686868" text-anchor="middle">注意：部分房间面积与门牌标注不符</text>
+    <text x="175" y="45" font-family="Noto Sans SC" font-size="10" fill="#4A9EFF" text-anchor="middle" opacity="0.6">"这很正常，别在意"</text>
+  </g>
+  
+  <!-- ===== 氛围效果 ===== -->
+  
+  <!-- 门牌闪烁 -->
+  <g opacity="0.3">
+    <rect x="65" y="538" width="50" height="25" fill="#FF4444">
+      <animate attributeName="opacity" values="0;0.3;0" dur="2s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+  
+  <!-- 微尘 -->
+  <g opacity="0.3">
+    <circle cx="300" cy="400" r="1" fill="#E8E6E3">
+      <animate attributeName="cy" values="400;370;400" dur="5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="450" cy="500" r="0.8" fill="#E8E6E3">
+      <animate attributeName="cy" values="500;465;500" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 底部渐变 -->
+  <defs>
+    <linearGradient id="bottomFadeC1Z2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#06060a;stop-opacity:0"/>
+      <stop offset="100%" style="stop-color:#06060a;stop-opacity:0.9"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="1150" width="750" height="184" fill="url(#bottomFadeC1Z2)"/>
+</svg>
+

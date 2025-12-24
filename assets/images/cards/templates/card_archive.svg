@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 档案卡模板
+  尺寸: 300×450px
+  用途: 身份卡、机构文书、回执
+  风格: 官方文档感 + 微妙损坏感
+-->
+<svg width="300" height="450" viewBox="0 0 300 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 卡片背景 -->
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e1e28"/>
+      <stop offset="100%" style="stop-color:#14141c"/>
+    </linearGradient>
+    
+    <!-- 纸张纹理效果 -->
+    <filter id="paperTexture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="5" result="noise"/>
+      <feDiffuseLighting in="noise" lighting-color="#ffffff" surfaceScale="1" result="diffLight">
+        <feDistantLight azimuth="45" elevation="60"/>
+      </feDiffuseLighting>
+      <feBlend in="SourceGraphic" in2="diffLight" mode="multiply"/>
+    </filter>
+    
+    <!-- 顶部装饰渐变 -->
+    <linearGradient id="cardHeaderBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A9EFF;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#4A9EFF;stop-opacity:0"/>
+    </linearGradient>
+    
+    <!-- 边框渐变 -->
+    <linearGradient id="cardBorder" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A9EFF;stop-opacity:0.5"/>
+      <stop offset="50%" style="stop-color:#2a2a35;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#4A9EFF;stop-opacity:0.3"/>
+    </linearGradient>
+    
+    <!-- 角落折痕 -->
+    <linearGradient id="cornerFold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a35"/>
+      <stop offset="100%" style="stop-color:#1a1a24"/>
+    </linearGradient>
+    
+    <!-- 涂改痕迹遮罩 -->
+    <pattern id="strikethrough" patternUnits="userSpaceOnUse" width="8" height="4">
+      <line x1="0" y1="2" x2="8" y2="2" stroke="#0a0a0f" stroke-width="2"/>
+    </pattern>
+  </defs>
+  
+  <!-- 卡片阴影 -->
+  <rect x="6" y="6" width="290" height="440" rx="8" fill="#000000" opacity="0.3"/>
+  
+  <!-- 主背景 -->
+  <rect x="2" y="2" width="296" height="446" rx="8" fill="url(#cardBg)"/>
+  
+  <!-- 纸张纹理层 -->
+  <rect x="2" y="2" width="296" height="446" rx="8" fill="#ffffff" opacity="0.02"/>
+  
+  <!-- 边框 -->
+  <rect x="2" y="2" width="296" height="446" rx="8" 
+        fill="none" stroke="url(#cardBorder)" stroke-width="1.5"/>
+  
+  <!-- 顶部区域 -->
+  <rect x="10" y="10" width="280" height="80" rx="4" fill="url(#cardHeaderBg)"/>
+  
+  <!-- 卡片类型标签 -->
+  <rect x="16" y="16" width="60" height="20" rx="3" fill="#4A9EFF" opacity="0.2"/>
+  <text x="46" y="30" font-family="Noto Sans SC" font-size="10" fill="#4A9EFF" text-anchor="middle" opacity="0.8">档案</text>
+  
+  <!-- 顶部装饰线 -->
+  <line x1="20" y1="50" x2="280" y2="50" stroke="#2a2a35" stroke-width="1"/>
+  <line x1="20" y1="52" x2="280" y2="52" stroke="#2a2a35" stroke-width="0.5" opacity="0.5"/>
+  
+  <!-- 标题区域 -->
+  <rect x="20" y="60" width="260" height="24" rx="2" fill="none" stroke="#1a1a24" stroke-dasharray="2 2" opacity="0.2"/>
+  
+  <!-- 分隔线 -->
+  <line x1="30" y1="100" x2="270" y2="100" stroke="#2a2a35" stroke-width="1"/>
+  
+  <!-- 内容区域 -->
+  <g transform="translate(20, 110)">
+    <!-- 多行文本占位 -->
+    <rect x="0" y="0" width="260" height="16" rx="2" fill="#1a1a24" opacity="0.3"/>
+    <rect x="0" y="24" width="240" height="16" rx="2" fill="#1a1a24" opacity="0.25"/>
+    <rect x="0" y="48" width="260" height="16" rx="2" fill="#1a1a24" opacity="0.2"/>
+    <rect x="0" y="72" width="200" height="16" rx="2" fill="#1a1a24" opacity="0.15"/>
+  </g>
+  
+  <!-- 中间分隔区 -->
+  <line x1="30" y1="220" x2="270" y2="220" stroke="#2a2a35" stroke-width="1"/>
+  
+  <!-- 备注区域 -->
+  <g transform="translate(20, 235)">
+    <text x="0" y="12" font-family="Noto Sans SC" font-size="12" fill="#686868">备注：</text>
+    <rect x="45" y="0" width="215" height="16" rx="2" fill="#1a1a24" opacity="0.2"/>
+  </g>
+  
+  <!-- 底部状态区 -->
+  <g transform="translate(20, 380)">
+    <!-- 状态标签 -->
+    <rect x="0" y="0" width="80" height="24" rx="4" fill="#1a1a24"/>
+    <text x="40" y="16" font-family="Noto Sans SC" font-size="11" fill="#686868" text-anchor="middle">状态</text>
+    
+    <!-- 校验区域 -->
+    <rect x="100" y="0" width="160" height="24" rx="4" fill="none" stroke="#2a2a35" stroke-width="1"/>
+  </g>
+  
+  <!-- 字段区域（用于终局追加） -->
+  <g transform="translate(20, 415)" opacity="0.4">
+    <text x="0" y="12" font-family="monospace" font-size="10" fill="#686868">字段：——</text>
+  </g>
+  
+  <!-- 右上角折角效果 -->
+  <g transform="translate(275, 0)">
+    <path d="M0 0 L25 0 L25 25 L0 0" fill="url(#cornerFold)"/>
+    <path d="M0 0 L25 25" stroke="#2a2a35" stroke-width="0.5"/>
+  </g>
+  
+  <!-- 涂改痕迹占位（可由JS控制显示） -->
+  <g id="correction-marks" opacity="0">
+    <rect x="100" y="130" width="80" height="12" fill="url(#strikethrough)"/>
+    <text x="105" y="140" font-family="Noto Sans SC" font-size="9" fill="#FF4444" opacity="0.6">(已更正)</text>
+  </g>
+  
+  <!-- 闪烁效果占位 -->
+  <rect id="flash-overlay" x="2" y="2" width="296" height="446" rx="8" fill="#4A9EFF" opacity="0">
+    <animate id="flash-anim" attributeName="opacity" values="0;0.15;0" dur="0.3s" begin="indefinite"/>
+  </rect>
+</svg>
+

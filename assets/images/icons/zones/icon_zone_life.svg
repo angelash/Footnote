@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 生活区图标
+  尺寸: 24×24px
+-->
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- 房屋 -->
+  <path d="M12 3 L3 10 L3 20 L21 20 L21 10 Z" fill="#1a1a24" stroke="#E8E6E3" stroke-width="1.5"/>
+  
+  <!-- 屋顶 -->
+  <path d="M12 3 L3 10 L21 10 Z" fill="#2a2a35"/>
+  
+  <!-- 门 -->
+  <rect x="10" y="13" width="4" height="7" rx="0.5" fill="#3a3a48" stroke="#E8E6E3" stroke-width="0.5"/>
+  
+  <!-- 窗户 -->
+  <rect x="5" y="12" width="3" height="3" rx="0.5" fill="#4A9EFF" opacity="0.3" stroke="#E8E6E3" stroke-width="0.5"/>
+  <rect x="16" y="12" width="3" height="3" rx="0.5" fill="#4A9EFF" opacity="0.3" stroke="#E8E6E3" stroke-width="0.5"/>
+</svg>
+

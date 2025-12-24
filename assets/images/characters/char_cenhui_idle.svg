@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  《备注 / Footnote》- 岑回 立绘（待机状态）
+  角色: 主角，维修局外勤技术员
+  尺寸: 400×600px
+  风格: 简约线稿 + 深度感知视觉元素
+-->
+<svg width="400" height="600" viewBox="0 0 400 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 人物渐变 -->
+    <linearGradient id="clothGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2a2a35"/>
+      <stop offset="100%" style="stop-color:#1e1e28"/>
+    </linearGradient>
+    
+    <!-- 制服渐变 -->
+    <linearGradient id="uniformGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a3050"/>
+      <stop offset="100%" style="stop-color:#0e1e30"/>
+    </linearGradient>
+    
+    <!-- 深度感知发光 -->
+    <filter id="depthAura" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    
+    <!-- 皮肤色 -->
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8D4C0"/>
+      <stop offset="100%" style="stop-color:#D4C0A8"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 深度感知光环（背景） -->
+  <g filter="url(#depthAura)" opacity="0.3">
+    <ellipse cx="200" cy="300" rx="120" ry="200" fill="#00FFAA" opacity="0.2"/>
+  </g>
+  
+  <!-- ===== 身体 ===== -->
+  
+  <!-- 躯干（制服） -->
+  <path d="M150 220 Q140 280, 145 380 L145 520 L255 520 L255 380 Q260 280, 250 220 Z" fill="url(#uniformGrad)" stroke="#4A9EFF" stroke-width="1"/>
+  
+  <!-- 制服细节 -->
+  <line x1="200" y1="230" x2="200" y2="450" stroke="#4A9EFF" stroke-width="0.5" opacity="0.3"/>
+  <rect x="165" y="250" width="70" height="20" rx="2" fill="#4A9EFF" opacity="0.1"/>
+  
+  <!-- 维修局徽章 -->
+  <g transform="translate(160, 255)">
+    <rect x="0" y="0" width="35" height="15" rx="2" fill="#0e1e30" stroke="#4A9EFF" stroke-width="0.5"/>
+    <text x="17.5" y="11" font-family="monospace" font-size="6" fill="#4A9EFF" text-anchor="middle">维修局</text>
+  </g>
+  
+  <!-- 工具带 -->
+  <rect x="145" y="380" width="110" height="15" rx="2" fill="#2a2a35" stroke="#3a3a48" stroke-width="1"/>
+  <rect x="155" y="383" width="12" height="9" rx="1" fill="#3a3a48"/>
+  <rect x="175" y="383" width="12" height="9" rx="1" fill="#3a3a48"/>
+  <rect x="195" y="383" width="12" height="9" rx="1" fill="#3a3a48"/>
+  
+  <!-- ===== 手臂 ===== -->
+  
+  <!-- 左臂 -->
+  <path d="M150 230 Q120 280, 110 350 Q105 400, 115 440" fill="none" stroke="url(#uniformGrad)" stroke-width="25" stroke-linecap="round"/>
+  <path d="M150 230 Q120 280, 110 350 Q105 400, 115 440" fill="none" stroke="#4A9EFF" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- 左手 -->
+  <ellipse cx="118" cy="455" rx="18" ry="22" fill="url(#skinGrad)" stroke="#C8B498" stroke-width="0.5"/>
+  
+  <!-- 右臂 -->
+  <path d="M250 230 Q280 280, 290 350 Q295 400, 285 440" fill="none" stroke="url(#uniformGrad)" stroke-width="25" stroke-linecap="round"/>
+  <path d="M250 230 Q280 280, 290 350 Q295 400, 285 440" fill="none" stroke="#4A9EFF" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- 右手 -->
+  <ellipse cx="282" cy="455" rx="18" ry="22" fill="url(#skinGrad)" stroke="#C8B498" stroke-width="0.5"/>
+  
+  <!-- ===== 头部 ===== -->
+  
+  <!-- 颈部 -->
+  <rect x="180" y="190" width="40" height="40" rx="5" fill="url(#skinGrad)"/>
+  
+  <!-- 脸部 -->
+  <ellipse cx="200" cy="140" rx="55" ry="70" fill="url(#skinGrad)" stroke="#C8B498" stroke-width="0.5"/>
+  
+  <!-- 头发 -->
+  <path d="M145 100 Q150 60, 200 50 Q250 60, 255 100 Q260 130, 250 140 L250 110 Q240 90, 200 85 Q160 90, 150 110 L150 140 Q140 130, 145 100 Z" fill="#2a2a35" stroke="#3a3a48" stroke-width="0.5"/>
+  
+  <!-- 眼睛 -->
+  <g transform="translate(170, 130)">
+    <!-- 左眼 -->
+    <ellipse cx="0" cy="0" rx="10" ry="6" fill="#1a1a24"/>
+    <circle cx="2" cy="-1" r="4" fill="#4A9EFF" opacity="0.8"/>
+    <circle cx="3" cy="-2" r="1.5" fill="#FFFFFF"/>
+    
+    <!-- 右眼 -->
+    <ellipse cx="60" cy="0" rx="10" ry="6" fill="#1a1a24"/>
+    <circle cx="62" cy="-1" r="4" fill="#4A9EFF" opacity="0.8"/>
+    <circle cx="63" cy="-2" r="1.5" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- 眉毛 -->
+  <path d="M155 118 Q170 112, 185 118" fill="none" stroke="#2a2a35" stroke-width="2" stroke-linecap="round"/>
+  <path d="M215 118 Q230 112, 245 118" fill="none" stroke="#2a2a35" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- 鼻子 -->
+  <path d="M200 140 L195 160 L200 165 L205 160" fill="none" stroke="#C8B498" stroke-width="1" opacity="0.5"/>
+  
+  <!-- 嘴巴 -->
+  <path d="M185 180 Q200 185, 215 180" fill="none" stroke="#B08878" stroke-width="1.5"/>
+  
+  <!-- ===== 腿部 ===== -->
+  
+  <!-- 左腿 -->
+  <rect x="155" y="500" width="35" height="95" rx="4" fill="url(#clothGrad)"/>
+  
+  <!-- 右腿 -->
+  <rect x="210" y="500" width="35" height="95" rx="4" fill="url(#clothGrad)"/>
+  
+  <!-- 鞋子 -->
+  <ellipse cx="172" cy="595" rx="22" ry="10" fill="#1a1a24" stroke="#2a2a35" stroke-width="1"/>
+  <ellipse cx="228" cy="595" rx="22" ry="10" fill="#1a1a24" stroke="#2a2a35" stroke-width="1"/>
+  
+  <!-- ===== 深度感知元素 ===== -->
+  
+  <!-- 眼部深度感知激活暗示 -->
+  <g opacity="0.4">
+    <circle cx="172" cy="129" r="15" fill="none" stroke="#00FFAA" stroke-width="0.5" stroke-dasharray="3 2">
+      <animate attributeName="r" values="12;18;12" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="228" cy="129" r="15" fill="none" stroke="#00FFAA" stroke-width="0.5" stroke-dasharray="3 2">
+      <animate attributeName="r" values="12;18;12" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 名牌 -->
+  <g transform="translate(155, 270)">
+    <rect x="0" y="0" width="40" height="12" rx="1" fill="#E8E6E3" opacity="0.9"/>
+    <text x="20" y="9" font-family="Noto Sans SC" font-size="6" fill="#1a1a24" text-anchor="middle">岑回</text>
+  </g>
+</svg>
+

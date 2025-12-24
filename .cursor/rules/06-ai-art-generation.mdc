@@ -1,0 +1,112 @@
+# 智绘AI生图自动化规范
+
+## 适用场景
+当需要使用智绘AI生成游戏美术资产时，遵循此规范。
+
+## 目标网站
+- URL: `https://artflow.gz4399.com/image/nextImage/chat`
+- 模型: Nano Banana Pro(预览版)
+- 输出: 2K分辨率 (2048×2048)，WebP格式，透明背景
+
+---
+
+## 完整工作流
+
+### 1. 生成图片
+
+```
+1. browser_navigate → 智绘网站
+2. browser_wait_for(3) → 等待加载/登录
+3. browser_snapshot → 获取页面状态
+4. browser_click → 关闭欢迎弹窗（如有"已知悉"按钮）
+5. browser_click → 点击输入框
+6. browser_type → 输入提示词
+7. browser_snapshot → 确认发送按钮可用
+8. browser_click → 点击发送
+9. browser_wait_for(60) → 等待生成
+10. browser_take_screenshot → 截图确认结果
+```
+
+### 2. 下载图片
+
+```
+1. browser_click → 点击生成的图片打开预览
+2. browser_evaluate → 提取图片URL
+3. Python requests → 下载到项目目录
+```
+
+### 3. 提取URL的JavaScript
+
+```javascript
+() => {
+  const images = document.querySelectorAll('img');
+  const urls = [];
+  images.forEach(img => {
+    if (img.src.includes('storage_out') && img.src.includes('_small.webp')) {
+      urls.push(img.src);
+    }
+  });
+  return [...new Set(urls)];
+}
+```
+
+### 4. 下载脚本模板
+
+```python
+import requests
+import os
+
+save_dir = 'assets/images/characters/generated'
+os.makedirs(save_dir, exist_ok=True)
+
+urls = [...]  # 从browser_evaluate获取
+
+for i, url in enumerate(urls, 1):
+    response = requests.get(url, timeout=30)
+    if response.status_code == 200:
+        filename = f'{save_dir}/character_{i}.webp'
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+        print(f'Downloaded: {filename} ({len(response.content)} bytes)')
+```
+
+---
+
+## 提示词模板
+
+### 像素风格角色
+```
+像素风格游戏角色，[角色描述]，[服装描述]，[表情/姿态]，正面站姿，透明背景，32x32像素，游戏sprite风格
+```
+
+### Footnote 角色对照表
+
+| 角色 | 描述 | 服装 |
+|------|------|------|
+| 岑回 | 年轻中国女性，黑色短发 | 深色连帽卫衣 |
+| 顾临 | 中年中国男性，短发整洁 | 正式深色西装 |
+| 宋岚 | 年轻中国女性，长发马尾 | 工装外套 |
+| 许澄 | 中年中国男性，戴眼镜 | 白大褂 |
+| 阿棠 | 年轻人，凌乱短发 | 破旧灰色外套 |
+| 牧平 | 老年男性，白发 | 朴素长袍 |
+| 栖蓝 | 年轻女性，蓝色短发 | 简单T恤 |
+| 陈匠 | 中年男性，粗犷 | 工作服 |
+
+### 场景背景
+```
+像素风格游戏场景背景，[场景描述]，[氛围描述]，[色调]，竖版构图，750x1334像素
+```
+
+---
+
+## 关键注意事项
+
+1. **登录认证**: 使用已登录的浏览器会话
+2. **下载URL**: 使用 `_small.webp` 后缀（实际是高清2K）
+3. **等待时间**: 生成4张2K图约需60秒
+4. **保存位置**: `assets/images/characters/generated/`
+
+---
+
+## 详细文档
+完整操作指南见: `docs/智绘AI生图自动化操作指南.md`

@@ -1,0 +1,339 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Footnote 资产规格文件模板
+# 版本: 2.0
+# 说明: 用于定义单个或一组资产的完整规格，供AI生成和QC验收使用
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 一、资产基础信息
+# ─────────────────────────────────────────────────────────────────────────────
+asset:
+  id: "unique-asset-id"                    # 唯一标识符
+  name: "资产名称"                          # 显示名称
+  type: "character"                         # 类型: character | scene | tile | object | ui | vfx | icon
+  category: "portrait"                      # 子类别
+  kit: "kit-residential"                    # 所属Kit
+  version: "1.0.0"                          # 版本号
+  author: "ai-generated"                    # 作者: ai-generated | manual | mixed
+  created_at: "2025-12-25"                  # 创建日期
+  updated_at: "2025-12-25"                  # 更新日期
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 二、技术规格
+# ─────────────────────────────────────────────────────────────────────────────
+technical:
+  # 画布尺寸
+  canvas:
+    width: 512                              # 画布宽度(px)
+    height: 512                             # 画布高度(px)
+    format: "webp"                          # 输出格式: webp | png | svg
+    quality: 90                             # 压缩质量(webp/jpeg)
+    
+  # 占格信息 (仅适用于场景物件)
+  footprint:
+    width_tu: 2                             # 占用TU宽度
+    height_tu: 1                            # 占用TU高度
+    notation: "2×1"                         # 简写记法
+    
+  # 视觉边界
+  visual_bounds:
+    width: 256                              # 视觉宽度(px)
+    height: 384                             # 视觉高度(px)
+    headroom: 128                           # 视觉上方冗余(px)
+    
+  # 锚点设置
+  pivot:
+    x: 0.5                                  # X锚点(0-1)
+    y: 1.0                                  # Y锚点(0-1, 1=底部)
+    type: "bottom-center"                   # 类型: bottom-center | center | custom
+    
+  # 透明度规则
+  transparency:
+    background: true                        # 背景透明
+    alpha_threshold: 0                      # Alpha阈值
+    edge_anti_alias: true                   # 边缘抗锯齿
+    
+  # 层级信息
+  layer:
+    render_layer: 3                         # 渲染层级(0-7)
+    layer_name: "object_base"               # 层级名称
+    z_index: 100                            # Z轴排序
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 三、视觉规格 (对应三大圣经)
+# ─────────────────────────────────────────────────────────────────────────────
+visual:
+  # 镜头圣经
+  camera:
+    type: "orthographic"                    # 类型: orthographic | isometric
+    angle: "eye-level"                      # 角度: eye-level | top-down | 3/4-view
+    iso_angle: null                         # 等距角度(如30°)
+    
+  # 光照圣经
+  lighting:
+    key_light:
+      direction: "top-left"                 # 主光源方向
+      intensity: 0.8                        # 强度(0-1)
+      color: "#FFFFFF"                      # 颜色
+    fill_light:
+      direction: "bottom-right"             # 补光方向
+      intensity: 0.3                        # 强度
+    ambient:
+      intensity: 0.2                        # 环境光强度
+      color: "#1A1A2E"                      # 环境色
+    rim_light:
+      enabled: true                         # 是否启用轮廓光
+      color: "#00FFF0"                      # 轮廓光颜色(通常为荧光色)
+      
+  # 材质与细节预算
+  material:
+    style: "pixel-art"                      # 风格: pixel-art | vector | painterly
+    pixel_size: 2                           # 像素大小(px)
+    detail_budget: "medium"                 # 细节预算: low | medium | high
+    line_weight: 1                          # 描边粗细(px)
+    texture_scale: 16                       # 纹理重复尺度(px)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 四、配色规格
+# ─────────────────────────────────────────────────────────────────────────────
+palette:
+  # 主色系
+  primary:
+    - "#1A1A2E"                             # 深夜蓝(主背景)
+    - "#2D2D44"                             # 暗灰蓝(次级背景)
+    - "#E8E8E8"                             # 浅灰白(文字/边框)
+    
+  # 强调色
+  accent:
+    - "#00FFF0"                             # 系统青(信息/可交互)
+    - "#FF3366"                             # 警告红(危险/消耗)
+    - "#FFD93D"                             # 记忆金(收集/成就)
+    - "#A855F7"                             # 高维紫(能力/特殊)
+    
+  # 资产专属色
+  asset_specific:
+    main: "#4ECDC4"                         # 主体色
+    secondary: "#2D3436"                    # 次要色
+    highlight: "#00FFF0"                    # 高光色
+    shadow: "#1A1A2E"                       # 阴影色
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 五、动画规格 (仅适用于序列帧资产)
+# ─────────────────────────────────────────────────────────────────────────────
+animation:
+  enabled: true                             # 是否为动画资产
+  
+  # 帧设置
+  frames:
+    count: 8                                # 总帧数
+    fps: 12                                 # 帧率
+    loop: true                              # 是否循环
+    ping_pong: false                        # 是否往返播放
+    
+  # 精灵图设置
+  spritesheet:
+    layout: "horizontal"                    # 布局: horizontal | vertical | grid
+    columns: 8                              # 列数(grid布局)
+    rows: 1                                 # 行数(grid布局)
+    padding: 0                              # 帧间距(px)
+    
+  # 一致性约束
+  consistency:
+    fixed_baseline: true                    # 固定脚底基线
+    headbox_locked: true                    # 头顶盒锁定
+    joint_domain_edit: true                 # 关节域编辑
+    baseline_y: 480                         # 基线Y坐标(px)
+    headbox_y: 50                           # 头顶Y坐标(px)
+    
+  # 动作列表
+  actions:
+    - name: "idle"                          # 动作名称
+      frames: [0, 1, 2, 3]                  # 使用的帧索引
+      loop: true
+    - name: "walk"
+      frames: [4, 5, 6, 7]
+      loop: true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 六、交互状态 (仅适用于可交互物件)
+# ─────────────────────────────────────────────────────────────────────────────
+interactive:
+  enabled: true                             # 是否可交互
+  
+  states:
+    default:
+      description: "默认状态"
+      file_suffix: ""                       # 文件后缀
+      visual_effect: null
+      
+    highlight:
+      description: "高亮提示状态"
+      file_suffix: "_highlight"
+      visual_effect: "rim_glow"             # 轮廓发光
+      glow_color: "#00FFF0"
+      
+    active:
+      description: "交互进行中"
+      file_suffix: "_active"
+      visual_effect: "pulse"                # 脉冲效果
+      
+    depleted:
+      description: "交互后状态"
+      file_suffix: "_depleted"
+      visual_effect: "desaturate"           # 降饱和度
+      saturation: 0.5
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 七、AI生成配置
+# ─────────────────────────────────────────────────────────────────────────────
+ai_generation:
+  # 锚定图引用
+  anchors:
+    style: "assets/anchors/style_anchor_v1.webp"
+    palette: "assets/anchors/palette_residential.webp"
+    camera: "assets/anchors/camera_grid_ortho.webp"
+    lighting: "assets/anchors/lighting_topleft.webp"
+    
+  # 提示词模板
+  prompt:
+    prefix: |
+      pixel art style, cyberpunk aesthetic, dark atmosphere,
+      transparent background, consistent top-left lighting,
+      crisp edges, no text, no watermark
+    body: |
+      [在此填写资产具体描述]
+    suffix: |
+      game asset, professional quality, 
+      matching reference style exactly
+      
+  # 生成参数
+  parameters:
+    model: "gemini-2.5-flash"               # 使用模型
+    mode: "generate"                        # 模式: generate | edit
+    reference_weight: 0.8                   # 参考图权重
+    creativity: 0.3                         # 创造性(0-1)
+    
+  # 编辑模式专用(序列帧)
+  edit_mode:
+    master_frame: "frame_0.webp"            # 主帧文件
+    edit_region: "limbs"                    # 编辑区域: limbs | face | full
+    preserve_regions:                       # 保留区域
+      - "torso"
+      - "head_shape"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 八、QC验收清单
+# ─────────────────────────────────────────────────────────────────────────────
+qc_checklist:
+  # 技术检查
+  technical:
+    - check: "canvas_size"
+      description: "画布尺寸符合规格"
+      auto: true
+    - check: "format_correct"
+      description: "输出格式正确"
+      auto: true
+    - check: "transparency_valid"
+      description: "透明通道正确"
+      auto: true
+    - check: "no_artifacts"
+      description: "无压缩伪影"
+      auto: false
+      
+  # 视觉检查
+  visual:
+    - check: "lighting_consistent"
+      description: "光照方向一致"
+      auto: false
+    - check: "palette_match"
+      description: "配色符合规格"
+      auto: true
+    - check: "style_match"
+      description: "风格与锚定图一致"
+      auto: false
+    - check: "no_text_watermark"
+      description: "无文字水印"
+      auto: false
+      
+  # 动画检查(如适用)
+  animation:
+    - check: "frame_count"
+      description: "帧数正确"
+      auto: true
+    - check: "baseline_stable"
+      description: "基线稳定无抖动"
+      auto: false
+    - check: "seamless_loop"
+      description: "循环无跳帧"
+      auto: false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 九、文件输出
+# ─────────────────────────────────────────────────────────────────────────────
+output:
+  # 命名规则
+  naming:
+    pattern: "{type}_{category}_{name}_{variant}"
+    example: "char_portrait_cenhui_neutral"
+    
+  # 输出路径
+  paths:
+    main: "assets/images/{type}s/{category}/"
+    variants: "assets/images/{type}s/{category}/variants/"
+    spritesheet: "assets/images/animated/{name}/"
+    
+  # 变体列表
+  variants:
+    - name: "default"
+      suffix: ""
+    - name: "highlight"
+      suffix: "_highlight"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 十、依赖与关联
+# ─────────────────────────────────────────────────────────────────────────────
+dependencies:
+  # 前置资产
+  requires:
+    - "kit-base-residential"                # 需要的Kit
+    - "palette-residential"                 # 需要的配色表
+    
+  # 关联资产
+  related:
+    - "char_portrait_cenhui_happy"          # 同角色其他表情
+    - "char_sprite_cenhui_idle"             # 同角色精灵
+    
+  # 可替换资产
+  fallback: "char_portrait_placeholder"     # 占位符
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 十一、状态追踪
+# ─────────────────────────────────────────────────────────────────────────────
+status:
+  state: "draft"                            # draft | in_progress | review | approved | rejected
+  priority: "high"                          # critical | high | medium | low
+  assignee: "ai"                            # 负责人
+  due_date: "2025-12-30"                    # 截止日期
+  
+  # 审核记录
+  reviews:
+    - reviewer: "art_lead"
+      date: "2025-12-25"
+      result: "approved"
+      notes: "符合规格，可投入使用"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 十二、元数据
+# ─────────────────────────────────────────────────────────────────────────────
+meta:
+  tags:
+    - "protagonist"
+    - "chapter-0"
+    - "residential"
+  description: "岑回的中性表情立绘，用于一般对话场景"
+  usage_notes: "适用于序章至第二章的常规对话"
+  changelog:
+    - version: "1.0.0"
+      date: "2025-12-25"
+      changes: "初始版本"
+

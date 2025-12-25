@@ -1,0 +1,295 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Footnote Tileset 规格文件模板
+# 版本: 2.0
+# 说明: 专用于地块/瓦片集的规格定义
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 一、Tileset基础信息
+# ─────────────────────────────────────────────────────────────────────────────
+tileset:
+  id: "tileset-residential-floor"
+  name: "居民区地面瓦片集"
+  region: "residential"                     # 所属区域
+  layer: "ground_base"                      # 层级: ground_base | transition | overlay
+  version: "1.0.0"
+  
+# ─────────────────────────────────────────────────────────────────────────────
+# 二、瓦片技术规格
+# ─────────────────────────────────────────────────────────────────────────────
+tile_spec:
+  # 单个瓦片尺寸
+  tile_size:
+    width: 128                              # 1TU = 128px
+    height: 128
+    
+  # Tileset类型
+  type: "blob-16"                           # blob-16 | blob-47 | wang-2corner | simple-4
+  
+  # 瓦片数量
+  tile_count: 16                            # blob-16需要16个瓦片
+  
+  # 精灵图布局
+  spritesheet:
+    columns: 4
+    rows: 4
+    total_width: 512
+    total_height: 512
+    
+  # 无缝规则
+  seamless:
+    enabled: true
+    edge_tolerance: 2                       # 边缘容差(px)
+    avoid_strong_features: true             # 避免边缘强特征
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 三、Blob-16瓦片索引
+# ─────────────────────────────────────────────────────────────────────────────
+# Blob-16位掩码说明:
+# 位0(1)=上, 位1(2)=右, 位2(4)=下, 位3(8)=左
+# 值 = 相邻同类瓦片的位掩码之和
+
+blob_tiles:
+  # 孤立瓦片
+  - index: 0
+    bitmask: 0                              # 0000 - 四周无连接
+    name: "isolated"
+    description: "孤立瓦片，四周无同类"
+    
+  # 端点瓦片
+  - index: 1
+    bitmask: 1                              # 0001 - 仅上方连接
+    name: "end_top"
+    description: "上端点"
+    
+  - index: 2
+    bitmask: 2                              # 0010 - 仅右方连接
+    name: "end_right"
+    description: "右端点"
+    
+  - index: 4
+    bitmask: 4                              # 0100 - 仅下方连接
+    name: "end_bottom"
+    description: "下端点"
+    
+  - index: 8
+    bitmask: 8                              # 1000 - 仅左方连接
+    name: "end_left"
+    description: "左端点"
+    
+  # 直线瓦片
+  - index: 5
+    bitmask: 5                              # 0101 - 上下连接
+    name: "line_vertical"
+    description: "垂直直线"
+    
+  - index: 10
+    bitmask: 10                             # 1010 - 左右连接
+    name: "line_horizontal"
+    description: "水平直线"
+    
+  # L形转角
+  - index: 3
+    bitmask: 3                              # 0011 - 上右连接
+    name: "corner_top_right"
+    description: "右上转角"
+    
+  - index: 6
+    bitmask: 6                              # 0110 - 右下连接
+    name: "corner_right_bottom"
+    description: "右下转角"
+    
+  - index: 12
+    bitmask: 12                             # 1100 - 下左连接
+    name: "corner_bottom_left"
+    description: "左下转角"
+    
+  - index: 9
+    bitmask: 9                              # 1001 - 左上连接
+    name: "corner_left_top"
+    description: "左上转角"
+    
+  # T形交叉
+  - index: 7
+    bitmask: 7                              # 0111 - 上右下连接
+    name: "t_right"
+    description: "T形朝右"
+    
+  - index: 14
+    bitmask: 14                             # 1110 - 右下左连接
+    name: "t_bottom"
+    description: "T形朝下"
+    
+  - index: 13
+    bitmask: 13                             # 1101 - 下左上连接
+    name: "t_left"
+    description: "T形朝左"
+    
+  - index: 11
+    bitmask: 11                             # 1011 - 左上右连接
+    name: "t_top"
+    description: "T形朝上"
+    
+  # 十字交叉
+  - index: 15
+    bitmask: 15                             # 1111 - 四方连接
+    name: "cross"
+    description: "十字交叉，四方连通"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 四、视觉规格
+# ─────────────────────────────────────────────────────────────────────────────
+visual:
+  # 材质规格
+  material:
+    style: "pixel-art"
+    pixel_size: 2
+    texture_scale: 16                       # 纹理重复尺度
+    
+  # 纹理锚点 (保持一致性)
+  texture_anchor:
+    enabled: true
+    anchor_point: "top-left"                # 纹理对齐锚点
+    pattern_repeat: 16                      # 图案重复周期(px)
+    
+  # 光照
+  lighting:
+    direction: "top-left"
+    shadow_offset: 2                        # 阴影偏移(px)
+    highlight_edge: "top-left"              # 高光边缘
+    
+  # 配色
+  palette:
+    base: "#2D2D44"                         # 基础色
+    highlight: "#3D3D55"                    # 高光
+    shadow: "#1A1A2E"                       # 阴影
+    detail: "#4A4A66"                       # 细节色
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 五、地形高度
+# ─────────────────────────────────────────────────────────────────────────────
+terrain:
+  height_level: 0                           # 高度层级(0=地面)
+  walkable: true                            # 是否可行走
+  
+  # 高度过渡(用于台阶等)
+  elevation:
+    enabled: false
+    from_height: 0
+    to_height: 1
+    direction: "north"                      # 过渡方向
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 六、变体系统
+# ─────────────────────────────────────────────────────────────────────────────
+variants:
+  # 主变体
+  - id: "default"
+    name: "标准地面"
+    probability: 0.7                        # 随机放置时的权重
+    
+  # 破损变体
+  - id: "damaged"
+    name: "破损地面"
+    probability: 0.15
+    visual_diff: "裂纹、碎片"
+    
+  # 装饰变体
+  - id: "decorated"
+    name: "装饰地面"
+    probability: 0.15
+    visual_diff: "图案、污渍"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 七、AI生成配置
+# ─────────────────────────────────────────────────────────────────────────────
+ai_generation:
+  # 生成顺序
+  generation_order:
+    1: "先生成中心瓦片(index 15, cross)"
+    2: "基于中心瓦片编辑生成边缘瓦片"
+    3: "最后生成孤立和端点瓦片"
+    
+  # 提示词
+  prompt:
+    prefix: |
+      pixel art tileset, seamless edges, cyberpunk floor,
+      consistent lighting from top-left, dark atmosphere
+    body: |
+      [具体瓦片描述: 居民区金属地板，有磨损痕迹，
+      微弱的蓝色指示灯嵌入边缘]
+    suffix: |
+      game tileset asset, 128x128 pixels per tile,
+      edges must connect seamlessly
+      
+  # 一致性检查
+  consistency_check:
+    - "所有瓦片边缘颜色必须匹配"
+    - "光照方向全部统一"
+    - "纹理密度一致"
+    - "像素大小一致"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 八、QC清单
+# ─────────────────────────────────────────────────────────────────────────────
+qc_checklist:
+  # 接缝测试
+  seam_test:
+    - "铺设3×3测试区域，检查所有接缝"
+    - "确认无明显断裂或错位"
+    - "确认纹理连续性"
+    
+  # 完整性测试
+  completeness:
+    - "16个瓦片全部存在"
+    - "每个bitmask对应正确"
+    - "变体数量符合规格"
+    
+  # 视觉一致性
+  visual_consistency:
+    - "光照方向统一"
+    - "配色方案一致"
+    - "细节密度均匀"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 九、输出规格
+# ─────────────────────────────────────────────────────────────────────────────
+output:
+  # 精灵图输出
+  spritesheet:
+    filename: "tileset_{region}_{name}.webp"
+    example: "tileset_residential_floor.webp"
+    path: "assets/images/tilesets/"
+    
+  # 单独瓦片输出(可选)
+  individual_tiles:
+    enabled: false
+    pattern: "tile_{region}_{name}_{index}.webp"
+    path: "assets/images/tilesets/individual/"
+    
+  # 元数据输出
+  metadata:
+    filename: "tileset_{region}_{name}.json"
+    path: "src/data/tilesets/"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 十、使用示例
+# ─────────────────────────────────────────────────────────────────────────────
+usage_example:
+  # Phaser中加载
+  phaser_load: |
+    this.load.spritesheet('tileset-residential-floor', 
+      'assets/images/tilesets/tileset_residential_floor.webp',
+      { frameWidth: 128, frameHeight: 128 }
+    );
+    
+  # 自动Tilemap规则
+  auto_tile_rule: |
+    // 根据相邻瓦片计算bitmask
+    const bitmask = 
+      (hasTop ? 1 : 0) + 
+      (hasRight ? 2 : 0) + 
+      (hasBottom ? 4 : 0) + 
+      (hasLeft ? 8 : 0);
+    return tileIndexFromBitmask[bitmask];
+

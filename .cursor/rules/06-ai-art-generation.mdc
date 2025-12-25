@@ -1,178 +1,209 @@
 ---
-description: 智绘AI生图自动化操作指南
+description: 智绘AI生图工业化操作指南
 globs: ["**/assets/images/**/*"]
 alwaysApply: false
 ---
 
-# 智绘AI生图操作指南
+# 智绘AI生图工业化操作指南 v2.0
 
 ## 目标平台
 - **URL**: `https://artflow.gz4399.com/image/nextImage/chat`
-- **模型**: Nano Banana Pro(预览版)
-- **输出**: 2K分辨率 WebP格式
+- **模型**: Nano Banana Pro
+- **输出**: 2K分辨率 WebP/PNG
 
 ---
 
-## 一、操作流程
+## 四张锚定图系统
 
-### 1.1 完整工作流
+**每次生成必须参考**
+
+| 锚定图 | 用途 | 位置 |
+|--------|------|------|
+| Style Anchor | 风格锚定 | `assets/references/anchors/style_anchor.png` |
+| Palette Anchor | 色彩锚定 | `assets/references/anchors/palette.png` |
+| Camera Grid | 视角锚定 | `assets/references/anchors/camera_grid.png` |
+| Lighting | 光照锚定 | `assets/references/anchors/lighting.png` |
+
+---
+
+## 全局Prompt前缀（必须包含）
+
 ```
-1. browser_navigate → 智绘网站
-2. browser_wait_for(3) → 等待加载
-3. browser_snapshot → 获取页面状态
-4. browser_click → 关闭欢迎弹窗（如有）
-5. browser_click → 点击输入框
-6. browser_type → 输入提示词
-7. browser_click → 点击发送
-8. browser_wait_for(60-90) → 等待生成
-9. browser_take_screenshot → 截图确认
-10. browser_evaluate → 提取图片URL
-11. Python requests → 下载图片
-12. AI视觉检查 → 质量审核
-13. 分类移动 → approved/rejected目录
-```
-
-### 1.2 URL提取JavaScript
-```javascript
-() => {
-  const images = document.querySelectorAll('img');
-  const urls = [];
-  images.forEach(img => {
-    if (img.src.includes('storage_out') && img.src.includes('_small.webp')) {
-      urls.push(img.src);
-    }
-  });
-  return [...new Set(urls)];
-}
-```
-
-### 1.3 Python下载脚本
-```python
-import requests
-import os
-
-def download_images(urls, save_dir, asset_name):
-    os.makedirs(save_dir, exist_ok=True)
-    for i, url in enumerate(urls, 1):
-        response = requests.get(url, timeout=30)
-        filename = f'{asset_name}_{i}.webp'
-        with open(f'{save_dir}/{filename}', 'wb') as f:
-            f.write(response.content)
-        print(f'Downloaded: {filename}')
+【全局约束】
+- 相机：3/4俯视，弱透视/近似正交，画面与地面网格对齐
+- 光照：左上主光，统一阴影方向与软硬
+- 材质：玩具模型质感，细节预算受控
+- 输出：主体居中、留边距、纯色背景(#00FF00)、无文字无水印
 ```
 
 ---
 
-## 二、提示词核心约束
+## 生成 vs 编辑决策
 
-### 必须包含的风格约束
-```
-pixel art style, 2D game asset, cyberpunk aesthetic,
-clean lines, digital art, no text, no watermark
-```
+| 什么时候用生成 | 什么时候用编辑 |
+|----------------|----------------|
+| 创建类别母版 | 同角色不同帧 |
+| 首个地块/物件 | 物件变体（破损/染色） |
+| 新主题Kit | 放入场景保持风格 |
 
-### 按资产类型的必选约束
-
-| 类型 | 必选约束 |
-|------|----------|
-| 角色头像 | `transparent background, front facing, portrait` |
-| 场景背景 | `vertical composition, 750x1334, dark background` |
-| 物件 | `transparent background, isometric view, isolated` |
-| 特效 | `transparent background, glowing effect` |
-
-### 朝向控制词
-| 需求 | 约束词 |
-|------|--------|
-| 纯正面 | `facing camera directly, front view, perfectly symmetrical` |
-| 侧面 | `side profile view, facing left/right` |
-| 3/4侧 | `3/4 view, slight turn` |
+> **核心**：所有"系列内容"用编辑迭代，不从零生成
 
 ---
 
-## 三、质量检查
+## 资产类型Prompt模板
 
-### 必须通过项（否则拒绝）
+### 地块Base
+```
+生成 1×1 TU 的[地面类型] base tile，
+纯平铺，无边缘过渡，无显眼装饰点，
+纹理颗粒尺度与Texture Anchor一致，
+光照左上，背景纯绿(#00FF00)用于抠图，
+俯视玩具盒风格，禁止透视旋转。
+```
+
+### 过渡边Transition
+```
+生成 1×1 TU 的过渡边 tile：
+[源地面]到[目标地面]的[N/S/E/W]边缘，
+只画边缘形状，中间透明，
+接缝可无痕循环，光照左上，禁止新增装饰。
+```
+
+### 角色母版
+```
+pixel art game character, full body standing pose,
+[角色描述：年龄、性别、体型、服装],
+3/4 top-down view compatible proportions,
+[配色描述],
+transparent background (#00FF00),
+256x256 canvas, baseline at y=208,
+clean lines, no text, no watermark
+```
+
+### 角色帧编辑
+```
+在保持角色造型、配色、五官完全一致的前提下，
+把姿势改成骨架图所示的[动作帧]，
+仅允许修改[变化部位]，其他部位保持不变，
+保持脚底基线与pivot不动，背景纯绿(#00FF00)。
+```
+
+### 头像
+```
+pixel art portrait of [角色名],
+[表情] expression, head and shoulders,
+[配色描述],
+cyberpunk aesthetic,
+transparent background, front facing, centered,
+512x512, no text, no watermark
+```
+
+---
+
+## 关节域编辑原则
+
+**一次只改一个域**
+
+| 域 | 范围 | 适用动画 |
+|----|------|----------|
+| 腿域 | 骨盆以下 | walk, run |
+| 臂域 | 肩以下 | interact, wave |
+| 躯干域 | 肩到骨盆 | idle breathe |
+| 头域 | 颈以上 | look, talk |
+
+**禁止**：同时改腿+手+表情
+
+---
+
+## 序列帧工作流
+
+1. **制作骨架帧**（5分钟/帧）
+   - 火柴人/简化块面
+   - 头、躯干、骨盆、手脚位置
+
+2. **AI贴皮**
+   - 输入：角色母版 + 骨架图 + Lock Pack
+   - 只允许姿势变化，禁止改造型
+
+3. **验收检查**
+   - 基线一致（y=208 ±1px）
+   - 头顶不越界（y≤48）
+   - 宽度不越界（64≤x≤192）
+
+---
+
+## 质量检查必过项
+
 | 检查项 | 标准 |
 |--------|------|
-| 朝向 | 正面必须对称 |
-| 背景 | 必须透明（角色/物件） |
-| 完整性 | 无截断、无缺失 |
-| 风格 | 像素/数字艺术风格 |
+| 视角 | 符合Camera Bible |
+| 光向 | 左上→右下一致 |
+| 背景 | 纯绿#00FF00可抠 |
+| 完整性 | 无截断无缺失 |
 | 构图 | 主体居中 |
-
-### 重要检查项（允许轻微偏差）
-| 检查项 | 容忍度 |
-|--------|--------|
-| 配色 | 色调正确即可 |
-| 表情 | 整体情绪对即可 |
-| 细节 | 80%特征存在 |
-
-### 质量评分
-| 等级 | 分数 | 处理 |
-|------|------|------|
-| A | 9.0+ | → approved/ |
-| B | 8.0-8.9 | → approved/ |
-| C | 7.0-7.9 | 视情况决定 |
-| D | <7.0 | → rejected/ |
+| 无文字 | 无任何文字符号 |
 
 ---
 
-## 四、重试策略
-
-**最大重试次数: 5次**
+## 重试策略（最多5次）
 
 | 问题 | 调整方案 |
 |------|----------|
-| 朝向不正 | 加强 `perfectly symmetrical, mirror image` |
-| 背景有杂色 | 加强 `isolated on transparent, no background` |
-| 风格不一致 | 加强 `pixel art style, 2D game sprite` |
-| 构图偏移 | 加强 `centered composition, subject in center` |
-| 细节缺失 | 补充具体特征描述词 |
+| 视角不正 | 加强 `3/4 top-down, weak perspective` |
+| 背景杂色 | 加强 `pure green #00FF00 background` |
+| 风格不一 | 加强参考锚定图 |
+| 细节过多 | 加强 `toy model feel, limited detail` |
+| 光向错误 | 加强 `lighting from top-left` |
 
 ---
 
-## 五、资产分类目录
+## 批量生成工作流
+
+```
+1. browser_navigate → 智绘网站
+2. browser_snapshot → 获取页面状态
+3. browser_click → 点击输入框
+4. browser_type → 输入提示词
+5. browser_click → 发送
+6. browser_wait_for(60-90) → 等待生成
+7. browser_evaluate → 提取图片URL
+8. Python下载 → 保存到指定目录
+9. AI视觉检查 → 质量审核
+10. 分类移动 → approved/rejected
+```
+
+---
+
+## 资产分类目录
 
 ```
 assets/images/
-├── characters/portraits/{name}/  # 角色头像
-├── backgrounds/{chapter}/        # 场景背景
-├── objects/{category}/           # 场景物件
-├── effects/{type}/               # 特效
-└── ui/                           # UI元素
-
-每个目录下包含:
-├── approved/   # ✅ 通过
-├── rejected/   # ❌ 未通过
-└── remaining/  # 🔄 待处理
+├── tiles/
+│   ├── grass/
+│   ├── dirt/
+│   └── transitions/
+├── props/
+│   └── {kit}/
+├── characters/
+│   ├── masters/
+│   ├── sprites/
+│   └── portraits/
+├── effects/
+└── ui/
 ```
+
+每个目录包含：
+- `approved/` - 通过验收
+- `rejected/` - 未通过
+- `raw/` - 原始生成
 
 ---
 
-## 六、命名规范
+## 详细文档索引
 
-### 文件命名格式
-```
-{类型}_{对象}_{变体}_{版本}.webp
-```
-
-### 类型前缀
-| 前缀 | 类型 |
+| 文档 | 内容 |
 |------|------|
-| `char_` | 角色立绘 |
-| `portrait_` | 头像 |
-| `bg_` | 背景 |
-| `obj_` | 物件 |
-| `fx_` | 特效 |
-| `ui_` | UI组件 |
-
----
-
-## 详细提示词模板
-
-具体资产的提示词模板请参考：
-- `docs/art/提示词模板.md` - 通用模板和表情词汇表
-- `docs/art/角色设计规范.md` - 8个角色详细设计
-- `docs/art/场景设计规范.md` - 6大区域+Zone列表
-- `docs/art/特效设计规范.md` - 能力和系统特效
-- `docs/art/智绘提示词详细模板.md` - 智绘平台专用模板
+| `docs/art/美术工作流总纲_v2.md` | 完整工作流 |
+| `docs/art/角色设计规范.md` | Lock Pack体系 |
+| `docs/art/质量控制与验收标准.md` | QC规则 |
+| `docs/art/智绘提示词详细模板.md` | 完整模板库 |

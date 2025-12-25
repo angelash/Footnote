@@ -1,0 +1,419 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Footnote 角色资产规格文件模板
+# 版本: 2.0
+# 说明: 专用于角色相关资产(立绘、精灵、动画)的完整规格定义
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 一、角色基础信息
+# ─────────────────────────────────────────────────────────────────────────────
+character:
+  id: "cenhui"                              # 角色ID
+  name: "岑回"                              # 角色名称
+  name_en: "Cen Hui"                        # 英文名
+  role: "protagonist"                       # 角色类型: protagonist | major | minor | npc
+  description: "玩家角色，例外处理器"
+  chapter_appearance: [0, 1, 2, 3, 4, 5]    # 出场章节
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 二、角色锁定包 (Character Lock Pack)
+# 不可变属性，所有资产必须严格遵守
+# ─────────────────────────────────────────────────────────────────────────────
+lock_pack:
+  # ═══ 比例锁 ═══
+  proportion:
+    head_to_body: "1:5"                     # 头身比
+    shoulder_width: 0.3                     # 肩宽比(相对画布)
+    limb_ratio: "standard"                  # 肢体比例: standard | stylized
+    
+  # ═══ 配色锁 ═══
+  palette:
+    # 固定色值(不可变)
+    hair: "#1A1A2E"                         # 发色
+    skin: "#E8D5C4"                         # 肤色
+    eye: "#00FFF0"                          # 瞳色
+    primary_cloth: "#2D3436"                # 主要服装色
+    secondary_cloth: "#4A4A66"              # 次要服装色
+    accent: "#00FFF0"                       # 强调色(通常与瞳色一致)
+    
+    # 色彩容差
+    tolerance: 5                            # HSL容差范围
+    
+  # ═══ 五官布局锁 ═══
+  facial_layout:
+    # 基于512px画布的像素坐标
+    eye_y: 180                              # 眼睛Y坐标
+    eye_spacing: 60                         # 两眼间距
+    nose_y: 220                             # 鼻子Y坐标
+    mouth_y: 260                            # 嘴巴Y坐标
+    face_width: 120                         # 脸宽
+    
+  # ═══ 轮廓锁 ═══
+  silhouette:
+    # 识别特征(剪影可辨识)
+    distinguishing_features:
+      - "不对称刘海"
+      - "尖锐的眼角"
+      - "修长的脖子"
+    # 轮廓关键点
+    key_points:
+      hair_peak: [256, 20]                  # 头发最高点
+      shoulder_left: [150, 200]             # 左肩
+      shoulder_right: [362, 200]            # 右肩
+      
+  # ═══ 材质锁 ═══
+  material:
+    hair: "matte-dark"                      # 头发材质: 哑光深色
+    skin: "soft-glow"                       # 皮肤材质: 柔和光泽
+    cloth: "tech-fabric"                    # 服装材质: 科技布料
+    eye: "emissive"                         # 眼睛材质: 自发光
+    
+  # ═══ 线边规则 ═══
+  line_rules:
+    outline_weight: 2                       # 外轮廓线粗细(px)
+    internal_weight: 1                      # 内部线条粗细(px)
+    outline_color: "#0D0D1A"                # 轮廓线颜色
+    anti_alias: false                       # 像素风不抗锯齿
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 三、立绘规格
+# ─────────────────────────────────────────────────────────────────────────────
+portrait:
+  # 技术规格
+  canvas:
+    width: 512
+    height: 512
+    format: "webp"
+    
+  # 构图规则
+  composition:
+    framing: "bust"                         # bust(半身) | full(全身) | headshot(头像)
+    face_position: [256, 200]               # 脸部中心位置
+    margin_top: 50                          # 顶部边距
+    margin_bottom: 20                       # 底部边距(半身可裁切)
+    
+  # 表情列表
+  expressions:
+    - id: "neutral"
+      name: "中性"
+      description: "默认表情，平静状态"
+      usage: "一般对话"
+      
+    - id: "happy"
+      name: "开心"
+      description: "微笑，眼睛略弯"
+      usage: "正面情绪对话"
+      
+    - id: "sad"
+      name: "悲伤"
+      description: "眉头微皱，嘴角下垂"
+      usage: "负面情绪对话"
+      
+    - id: "angry"
+      name: "愤怒"
+      description: "眉头紧锁，嘴唇紧闭"
+      usage: "冲突场景"
+      
+    - id: "surprised"
+      name: "惊讶"
+      description: "睁大眼睛，嘴巴微张"
+      usage: "意外发现"
+      
+    - id: "thinking"
+      name: "思考"
+      description: "眼睛看向一侧，若有所思"
+      usage: "推理/回忆场景"
+      
+    - id: "determined"
+      name: "坚定"
+      description: "眼神锐利，表情严肃"
+      usage: "关键决策"
+      
+    - id: "tired"
+      name: "疲惫"
+      description: "眼神涣散，略显疲态"
+      usage: "高P值状态"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 四、精灵规格
+# ─────────────────────────────────────────────────────────────────────────────
+sprite:
+  # 技术规格
+  canvas:
+    width: 128                              # 单帧宽度
+    height: 192                             # 单帧高度
+    format: "webp"
+    
+  # 角色在画布中的位置
+  character_bounds:
+    visual_height: 160                      # 角色视觉高度
+    foot_y: 188                             # 脚底Y坐标
+    head_y: 28                              # 头顶Y坐标
+    center_x: 64                            # 水平中心
+    
+  # 锚点
+  pivot:
+    x: 0.5
+    y: 1.0                                  # 底部中心
+    
+  # 朝向
+  directions:
+    - id: "down"
+      name: "面向下(玩家)"
+      primary: true                         # 主要朝向
+    - id: "up"
+      name: "面向上"
+      primary: false
+    - id: "left"
+      name: "面向左"
+      can_flip: true                        # 可通过翻转生成右向
+    - id: "right"
+      name: "面向右"
+      flip_from: "left"                     # 由左向翻转得到
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 五、动画规格
+# ─────────────────────────────────────────────────────────────────────────────
+animations:
+  # 全局动画设置
+  global:
+    fps: 12                                 # 默认帧率
+    pixel_size: 2                           # 像素大小
+    
+  # 一致性三件套
+  consistency:
+    fixed_baseline:
+      enabled: true
+      y: 188                                # 脚底基线Y
+      tolerance: 0                          # 不允许偏移
+      
+    headbox:
+      enabled: true
+      y_min: 24                             # 头顶最小Y
+      y_max: 32                             # 头顶最大Y(允许轻微点头)
+      
+    joint_domain:
+      torso_fixed: true                     # 躯干固定
+      editable_joints:                      # 可动关节
+        - "shoulder_left"
+        - "shoulder_right"
+        - "elbow_left"
+        - "elbow_right"
+        - "hip_left"
+        - "hip_right"
+        - "knee_left"
+        - "knee_right"
+        
+  # 动作列表
+  actions:
+    # ─── Idle动作 ───
+    - id: "idle"
+      name: "待机"
+      frames: 4
+      fps: 8
+      loop: true
+      description: "轻微呼吸起伏"
+      keyframes:
+        - frame: 0
+          description: "中间位置"
+        - frame: 1
+          description: "微微上升"
+        - frame: 2
+          description: "中间位置"
+        - frame: 3
+          description: "微微下降"
+          
+    # ─── Walk动作 ───
+    - id: "walk"
+      name: "行走"
+      frames: 8
+      fps: 12
+      loop: true
+      description: "标准行走循环"
+      keyframes:
+        - frame: 0
+          description: "接触位-左脚着地"
+        - frame: 1
+          description: "下降位"
+        - frame: 2
+          description: "中间位-单脚支撑"
+        - frame: 3
+          description: "抬起位"
+        - frame: 4
+          description: "接触位-右脚着地"
+        - frame: 5
+          description: "下降位"
+        - frame: 6
+          description: "中间位-单脚支撑"
+        - frame: 7
+          description: "抬起位"
+          
+    # ─── 交互动作 ───
+    - id: "interact"
+      name: "交互"
+      frames: 6
+      fps: 12
+      loop: false
+      description: "伸手触摸/拾取"
+      keyframes:
+        - frame: 0
+          description: "准备姿势"
+        - frame: 1-2
+          description: "手臂伸出"
+        - frame: 3-4
+          description: "触碰目标"
+        - frame: 5
+          description: "收回"
+          
+    # ─── 能力动作 ───
+    - id: "ability_perception"
+      name: "深度感知"
+      frames: 6
+      fps: 10
+      loop: false
+      description: "激活深度感知能力"
+      vfx_sync: "fx_perception_activate"    # 同步特效
+      keyframes:
+        - frame: 0-1
+          description: "闭眼集中"
+        - frame: 2-3
+          description: "睁眼，瞳孔发光"
+        - frame: 4-5
+          description: "进入感知状态"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 六、AI生成配置
+# ─────────────────────────────────────────────────────────────────────────────
+ai_generation:
+  # 锚定图
+  anchors:
+    character_reference: "assets/anchors/char_cenhui_master.webp"
+    style: "assets/anchors/style_anchor_v1.webp"
+    palette: "assets/anchors/palette_character.webp"
+    
+  # 立绘生成
+  portrait_generation:
+    mode: "edit"                            # 基于主立绘编辑
+    master: "char_portrait_cenhui_neutral"
+    edit_region: "face_only"                # 只编辑脸部
+    preserve:
+      - "hair"
+      - "clothing"
+      - "pose"
+      - "lighting"
+      
+  # 动画帧生成
+  animation_generation:
+    mode: "skeleton_first"                  # 先骨架后贴皮
+    workflow:
+      1: "生成骨架参考帧(低细节)"
+      2: "确认动作正确"
+      3: "逐帧贴皮(高细节)"
+      4: "统一调色确保一致"
+      
+    # 编辑规则
+    edit_rules:
+      - "每帧只编辑关节区域"
+      - "躯干和头部使用复制"
+      - "保持固定基线"
+      
+  # 提示词模板
+  prompts:
+    portrait: |
+      pixel art character portrait, 512x512,
+      [角色名] from cyberpunk game,
+      [表情描述], [服装描述],
+      transparent background, consistent top-left lighting,
+      dark atmosphere with cyan accent lighting,
+      matching reference character exactly
+      
+    sprite: |
+      pixel art game sprite, 128x192,
+      [角色名] [动作描述] [朝向],
+      transparent background, 
+      consistent proportions,
+      feet at bottom edge
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 七、输出清单
+# ─────────────────────────────────────────────────────────────────────────────
+output_manifest:
+  # 立绘输出
+  portraits:
+    path: "assets/images/characters/portraits/"
+    naming: "char_portrait_{character}_{expression}.webp"
+    count: 8                                # 8种表情
+    list:
+      - "char_portrait_cenhui_neutral.webp"
+      - "char_portrait_cenhui_happy.webp"
+      - "char_portrait_cenhui_sad.webp"
+      - "char_portrait_cenhui_angry.webp"
+      - "char_portrait_cenhui_surprised.webp"
+      - "char_portrait_cenhui_thinking.webp"
+      - "char_portrait_cenhui_determined.webp"
+      - "char_portrait_cenhui_tired.webp"
+      
+  # 精灵图输出
+  spritesheets:
+    path: "assets/images/characters/sprites/"
+    list:
+      - file: "char_sprite_cenhui_idle.webp"
+        frames: 4
+        layout: "1×4"
+        
+      - file: "char_sprite_cenhui_walk_down.webp"
+        frames: 8
+        layout: "1×8"
+        
+      - file: "char_sprite_cenhui_walk_left.webp"
+        frames: 8
+        layout: "1×8"
+        note: "右向通过代码翻转"
+        
+      - file: "char_sprite_cenhui_interact.webp"
+        frames: 6
+        layout: "1×6"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 八、QC验收清单
+# ─────────────────────────────────────────────────────────────────────────────
+qc_checklist:
+  # Lock Pack验证
+  lock_pack_check:
+    - "配色与锁定色值误差 < 5 HSL"
+    - "头身比符合1:5"
+    - "轮廓剪影可识别"
+    - "五官位置符合布局"
+    
+  # 立绘检查
+  portrait_check:
+    - "所有表情脸部位置一致"
+    - "光照方向统一"
+    - "透明背景无杂色"
+    
+  # 动画检查
+  animation_check:
+    - "基线稳定，无上下抖动"
+    - "头顶盒高度一致"
+    - "循环动画首尾帧衔接"
+    - "帧率播放流畅"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 九、状态追踪
+# ─────────────────────────────────────────────────────────────────────────────
+status:
+  portraits:
+    total: 8
+    completed: 0
+    in_progress: 0
+    approved: 0
+    
+  sprites:
+    total: 4
+    completed: 0
+    in_progress: 0
+    approved: 0
+    
+  overall: "draft"
+  priority: "critical"                      # 主角为最高优先级
+

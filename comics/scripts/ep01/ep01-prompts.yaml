@@ -1,0 +1,411 @@
+# 第一话提示词列表
+# 自动生成于分镜脚本
+# 用于智绘平台批量生成
+
+episode_id: "EP01"
+title: "不一致"
+total_prompts: 24
+
+prompts:
+  # === 扉页 ===
+  - full_id: "EP01-P01-P1"
+    page_id: "EP01-P01"
+    panel_id: 1
+    size: "full"
+    shot_type: "wide"
+    description: "扉页：城市全景"
+    save_as: "EP01-P01-P1_title.webp"
+    prompt: |
+      comic panel, manga style, cyberpunk aesthetic,
+      wide establishing shot,
+      dystopian city skyline from above,
+      gray-blue color palette, overcast sky,
+      giant digital screens in distance displaying text,
+      uniform rectangular buildings stretching to horizon,
+      oppressive atmosphere, industrial aesthetic,
+      dark sci-fi mood,
+      professional comic art quality, clean lines,
+      cinematic composition, 16:9 aspect ratio
+      
+  # === 第2页：晨间核验 ===
+  - full_id: "EP01-P02-P1"
+    page_id: "EP01-P02"
+    panel_id: 1
+    size: "large"
+    shot_type: "wide"
+    description: "维修局大厅全景"
+    save_as: "EP01-P02-P1_lobby.webp"
+    prompt: |
+      comic panel, manga style, cyberpunk interior,
+      wide establishing shot,
+      futuristic maintenance bureau lobby,
+      gray industrial aesthetic, cold fluorescent lighting,
+      multiple turnstile gates in row,
+      queue barriers, digital screens on walls,
+      young asian man in gray uniform walking toward gate,
+      other workers in background, routine morning,
+      dark color palette with cold blue accent,
+      professional comic art, clean lines,
+      detailed architecture, 16:9 aspect ratio
+      
+  - full_id: "EP01-P02-P2"
+    page_id: "EP01-P02"
+    panel_id: 2
+    size: "medium"
+    shot_type: "medium"
+    description: "岑回刷卡"
+    save_as: "EP01-P02-P2_scan.webp"
+    prompt: |
+      comic panel, manga style, cyberpunk,
+      medium shot,
+      young asian man in gray uniform at turnstile gate,
+      hand touching card reader panel,
+      routine expression, everyday action,
+      digital screen on gate glowing blue,
+      cold lighting, institutional atmosphere,
+      clean linework, professional comic art
+      
+  - full_id: "EP01-P02-P3"
+    page_id: "EP01-P02"
+    panel_id: 3
+    size: "medium"
+    shot_type: "close-up"
+    description: "屏幕显示核对中"
+    save_as: "EP01-P02-P3_screen.webp"
+    prompt: |
+      comic panel, minimalist tech interface,
+      close-up shot,
+      digital screen on turnstile gate,
+      displaying chinese text,
+      cold blue glow, slight static effect,
+      dark background, sharp focus on screen,
+      cyberpunk UI aesthetic
+      
+  # === 第3页：延迟的三秒 ===
+  - full_id: "EP01-P03-P1"
+    page_id: "EP01-P03"
+    panel_id: 1
+    size: "medium"
+    shot_type: "close-up"
+    description: "岑回微微皱眉"
+    save_as: "EP01-P03-P1_frown.webp"
+    prompt: |
+      comic panel, manga style,
+      close-up portrait shot,
+      young asian man face, slight frown,
+      tired but alert eyes, subtle worry,
+      short black messy hair,
+      gray uniform collar visible,
+      cold lighting from below (screen reflection),
+      high detail on expression,
+      professional manga art
+      
+  - full_id: "EP01-P03-P2"
+    page_id: "EP01-P03"
+    panel_id: 2
+    size: "medium"
+    shot_type: "extreme_close-up"
+    description: "屏幕仍显示核对中"
+    save_as: "EP01-P03-P2_waiting.webp"
+    prompt: |
+      comic panel, minimalist,
+      extreme close-up on digital screen,
+      processing indicator still displaying,
+      subtle flicker effect, waiting state,
+      cold blue glow, dark background,
+      tension building moment
+      
+  - full_id: "EP01-P03-P3"
+    page_id: "EP01-P03"
+    panel_id: 3
+    size: "large"
+    shot_type: "medium"
+    description: "紧握的拳头"
+    save_as: "EP01-P03-P3_tension.webp"
+    prompt: |
+      comic panel, manga style, tense atmosphere,
+      medium shot with dutch angle,
+      young asian man standing still at gate,
+      fist clenched at side, tense posture,
+      blurred figures behind looking curious,
+      cold fluorescent lighting, dramatic shadows,
+      anxiety conveyed through composition,
+      professional comic art
+      
+  - full_id: "EP01-P03-P4"
+    page_id: "EP01-P03"
+    panel_id: 4
+    size: "strip"
+    shot_type: "close-up"
+    description: "屏幕显示通过"
+    save_as: "EP01-P03-P4_pass.webp"
+    prompt: |
+      comic panel, minimalist tech aesthetic,
+      close-up on digital screen,
+      text displaying approval status,
+      green tint replacing blue,
+      relief moment but lingering unease,
+      cyberpunk interface design
+      
+  # === 第4页：薄墙任务 ===
+  - full_id: "EP01-P04-P1"
+    page_id: "EP01-P04"
+    panel_id: 1
+    size: "medium"
+    shot_type: "medium"
+    description: "领取任务"
+    save_as: "EP01-P04-P1_task.webp"
+    prompt: |
+      comic panel, manga style,
+      medium shot, service window scene,
+      young man receiving paper from clerk,
+      institutional gray interior,
+      routine administrative scene,
+      fluorescent lighting, clean lines
+      
+  - full_id: "EP01-P04-P2"
+    page_id: "EP01-P04"
+    panel_id: 2
+    size: "medium"
+    shot_type: "close-up"
+    description: "任务单特写"
+    save_as: "EP01-P04-P2_tasksheet.webp"
+    prompt: |
+      comic panel, document close-up,
+      task sheet with official stamp,
+      visible text showing location code,
+      paper texture, bureaucratic formatting,
+      held between fingers
+      
+  - full_id: "EP01-P04-P3"
+    page_id: "EP01-P04"
+    panel_id: 3
+    size: "large"
+    shot_type: "wide"
+    description: "楼道场景"
+    save_as: "EP01-P04-P3_stairwell.webp"
+    prompt: |
+      comic panel, manga style,
+      wide shot, apartment building stairwell,
+      young man carrying tool bag climbing stairs,
+      old but clean interior, fluorescent tube lights,
+      gray walls, institutional atmosphere,
+      slightly claustrophobic composition,
+      professional comic art
+      
+  - full_id: "EP01-P04-P5"
+    page_id: "EP01-P04"
+    panel_id: 5
+    size: "small"
+    shot_type: "close-up"
+    description: "手敲墙面"
+    save_as: "EP01-P04-P5_knock.webp"
+    prompt: |
+      comic panel, close-up,
+      hand knocking on gray wall surface,
+      impact lines around knuckles,
+      wall texture visible,
+      action moment
+      
+  # === 第5页：发现空腔 ===
+  - full_id: "EP01-P05-P1"
+    page_id: "EP01-P05"
+    panel_id: 1
+    size: "large"
+    shot_type: "close-up"
+    description: "声波扩散效果"
+    save_as: "EP01-P05-P1_soundwave.webp"
+    prompt: |
+      comic panel, manga style, dramatic,
+      close-up on hand knocking wall,
+      visible sound wave ripples expanding from impact point,
+      abstract representation of echo,
+      blue-tinted ripple effect radiating outward,
+      wall surface with subtle texture,
+      mysterious atmosphere,
+      professional comic art
+      
+  - full_id: "EP01-P05-P2"
+    page_id: "EP01-P05"
+    panel_id: 2
+    size: "medium"
+    shot_type: "extreme_close-up"
+    description: "瞳孔收缩"
+    save_as: "EP01-P05-P2_eye.webp"
+    prompt: |
+      comic panel, extreme close-up,
+      asian man's eye, pupil contracting,
+      realization dawning, alert expression,
+      high detail on iris and subtle reflection,
+      dramatic moment, discovery
+      
+  - full_id: "EP01-P05-P3"
+    page_id: "EP01-P05"
+    panel_id: 3
+    size: "large"
+    shot_type: "medium"
+    description: "耳朵贴墙"
+    save_as: "EP01-P05-P3_listen.webp"
+    prompt: |
+      comic panel, manga style,
+      medium shot low angle,
+      young man pressing ear against gray wall,
+      intense concentration, serious expression,
+      dramatic side lighting,
+      wall surface texture prominent,
+      mysterious atmosphere,
+      professional comic art
+      
+  # === 第6页：第一次记录 ===
+  - full_id: "EP01-P06-P2"
+    page_id: "EP01-P06"
+    panel_id: 2
+    size: "medium"
+    shot_type: "close-up"
+    description: "空白纸卡"
+    save_as: "EP01-P06-P2_card.webp"
+    prompt: |
+      comic panel, close-up,
+      blank rough paper card,
+      uneven edges, cream-colored surface,
+      held between fingers, texture visible,
+      simple composition, important object
+      
+  - full_id: "EP01-P06-P4"
+    page_id: "EP01-P06"
+    panel_id: 4
+    size: "large"
+    shot_type: "close-up"
+    description: "写下空腔"
+    save_as: "EP01-P06-P4_write.webp"
+    prompt: |
+      comic panel, close-up on paper,
+      handwritten chinese characters on rough paper card,
+      pen visible at edge of frame,
+      dramatic lighting, important moment,
+      shallow depth of field,
+      professional comic art
+      
+  # === 空椅场景（高潮）===
+  - full_id: "EP01-P12-P1"
+    page_id: "EP01-P12"
+    panel_id: 1
+    size: "large"
+    shot_type: "medium"
+    description: "女人坐在空气上"
+    save_as: "EP01-P12-P1_sitting.webp"
+    prompt: |
+      comic panel, manga style, surreal,
+      medium shot,
+      middle-aged asian woman sitting in mid-air,
+      posture as if sitting on invisible chair,
+      residential courtyard background,
+      afternoon light, long shadows,
+      surreal everyday scene,
+      professional comic art
+      
+  - full_id: "EP01-P13-P1"
+    page_id: "EP01-P13"
+    panel_id: 1
+    size: "full"
+    shot_type: "medium"
+    description: "悬浮的菜篮子（关键画面）"
+    save_as: "EP01-P13-P1_floating_basket.webp"
+    prompt: |
+      comic panel, manga style, surreal cyberpunk,
+      full page composition,
+      vegetable basket floating in mid-air,
+      woman sitting on invisible chair in background,
+      child walking toward basket naturally,
+      residential courtyard setting,
+      afternoon golden hour lighting,
+      long dramatic shadows,
+      mysterious yet everyday atmosphere,
+      surreal normalcy,
+      professional comic art quality,
+      cinematic composition
+      
+  - full_id: "EP01-P14-P5"
+    page_id: "EP01-P14"
+    panel_id: 5
+    size: "medium"
+    shot_type: "close-up"
+    description: "纸卡新增记录"
+    save_as: "EP01-P14-P5_record.webp"
+    prompt: |
+      comic panel, close-up,
+      rough paper card with multiple handwritten entries,
+      new entry being added,
+      pen in hand, focused writing,
+      dramatic lighting,
+      professional comic art
+      
+  # === 夜晚思考 ===
+  - full_id: "EP01-P15-P3"
+    page_id: "EP01-P15"
+    panel_id: 3
+    size: "large"
+    shot_type: "medium"
+    description: "桌上的纸卡"
+    save_as: "EP01-P15-P3_desk.webp"
+    prompt: |
+      comic panel, manga style,
+      medium shot looking down at desk,
+      rough paper cards spread on desk surface,
+      handwritten notes visible,
+      dim room lighting, desk lamp,
+      contemplative atmosphere,
+      night scene, window showing city lights,
+      professional comic art
+      
+  - full_id: "EP01-P16-P4"
+    page_id: "EP01-P16"
+    panel_id: 4
+    size: "large"
+    shot_type: "close-up"
+    description: "写下不一致"
+    save_as: "EP01-P16-P4_inconsistent.webp"
+    prompt: |
+      comic panel, close-up,
+      paper card with handwritten chinese text,
+      final entry: key word being written,
+      pen completing stroke,
+      dramatic lighting,
+      pivotal moment,
+      professional comic art
+      
+  # === 结尾 ===
+  - full_id: "EP01-P17-P3"
+    page_id: "EP01-P17"
+    panel_id: 3
+    size: "large"
+    shot_type: "wide"
+    description: "窗外夜景"
+    save_as: "EP01-P17-P3_night.webp"
+    prompt: |
+      comic panel, manga style, cyberpunk,
+      wide shot,
+      silhouette of man standing at window,
+      looking out at cyberpunk city night,
+      neon lights in distance, dark room interior,
+      contemplative mood, decision made,
+      dramatic lighting contrast,
+      professional comic art,
+      cinematic composition
+
+# 生成指南
+generation_guide:
+  platform: "智绘 (artflow.gz4399.com)"
+  batch_size: 4  # 每批生成4张
+  wait_time: 60  # 每张等待60秒
+  retry_on_fail: 3  # 失败重试3次
+  
+  quality_checklist:
+    - "构图符合要求"
+    - "人物识别度高"
+    - "表情正确"
+    - "背景匹配"
+    - "风格一致"
+    - "无AI瑕疵"
+    - "适合添加对话"
+

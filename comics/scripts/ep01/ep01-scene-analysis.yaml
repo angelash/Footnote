@@ -1,0 +1,218 @@
+# 第一话：不一致
+# 覆盖章节：第1-5章
+# 主题：发现世界的异常
+
+episode_info:
+  id: "EP01"
+  title: "不一致"
+  chapters: [1, 2, 3, 4, 5]
+  estimated_pages: 18
+  estimated_panels: 72
+
+# 核心场景列表
+scenes:
+  # 开场：日常异常
+  - id: "EP01-S01"
+    chapter: 1
+    title: "晨间核验"
+    type: "interior"
+    location: "维修局大厅"
+    time_of_day: "morning"
+    
+    description: |
+      岑回像往常一样通过维修局闸机。
+      但今天闸机屏幕停顿了三秒，显示"身份：核对中"。
+      这微小的延迟让他心里一紧。
+      
+    characters:
+      - name: "岑回"
+        action: "站在闸机前等待"
+        expression: "微微紧张"
+        
+    key_objects:
+      - "闸机"
+      - "电子屏幕"
+      - "工号牌"
+      
+    dialogue:
+      - type: "system"
+        text: "身份：核对中。"
+      - type: "system"
+        text: "通过。"
+      - type: "narration"
+        text: "三秒的延迟，让他的心跳先于流程。"
+        
+    mood: "压抑中的日常"
+    tension_level: 3
+    visual_focus: "屏幕上的文字闪烁"
+    
+  # 薄墙回音
+  - id: "EP01-S02"
+    chapter: 1
+    title: "薄墙回音"
+    type: "interior"
+    location: "居住区某栋楼道"
+    time_of_day: "afternoon"
+    
+    description: |
+      岑回接到任务，去修一面"回音异常"的墙。
+      他敲击墙面，发现某处声音不对——
+      像墙里有一个不该存在的空腔。
+      
+    characters:
+      - name: "岑回"
+        action: "用手敲击墙面，侧耳倾听"
+        expression: "专注、困惑"
+        
+    key_objects:
+      - "灰色墙面"
+      - "工具箱"
+      - "回声波纹（抽象表现）"
+      
+    dialogue:
+      - type: "sfx"
+        text: "咚——咚——"
+      - type: "thought"
+        speaker: "岑回"
+        text: "这里……有空腔？"
+      - type: "narration"
+        text: "墙不该有回音。但他听见了。"
+        
+    mood: "神秘、不安"
+    tension_level: 5
+    visual_focus: "手触墙面，周围有抽象的声波扩散"
+    
+  # 小票悖论
+  - id: "EP01-S03"
+    chapter: 2
+    title: "双日期小票"
+    type: "interior"
+    location: "早餐摊/路边"
+    time_of_day: "morning"
+    
+    description: |
+      岑回买早餐时，发现小票上有两个日期。
+      "昨天"和"今天"同时存在。
+      这是他第一次用纸记录"不一致"。
+      
+    characters:
+      - name: "岑回"
+        action: "盯着手中的小票"
+        expression: "震惊、困惑"
+        
+    key_objects:
+      - "早餐小票"
+      - "两个日期戳记"
+      - "岑回随身的纸卡"
+      
+    dialogue:
+      - type: "thought"
+        speaker: "岑回"
+        text: "两个日期……这不可能。"
+      - type: "narration"
+        text: "他把小票塞进口袋。第一份证据。"
+        
+    mood: "日常中的裂缝"
+    tension_level: 4
+    visual_focus: "特写小票，两个日期清晰可见"
+    
+  # 错误的门
+  - id: "EP01-S04"
+    chapter: 3
+    title: "门牌变化"
+    type: "interior"
+    location: "居住区楼道"
+    time_of_day: "evening"
+    
+    description: |
+      岑回回家时发现自己差点走错门。
+      门牌号变了——或者说，他"记错了"？
+      但墙角的污渍证明他没记错。
+      
+    characters:
+      - name: "岑回"
+        action: "站在门前，对比门牌和墙角"
+        expression: "警觉"
+        
+    key_objects:
+      - "门牌号"
+      - "墙角污渍"
+      - "楼道灯光"
+      
+    dialogue:
+      - type: "thought"
+        speaker: "岑回"
+        text: "污渍还在，但门牌变了。"
+      - type: "thought"
+        speaker: "岑回"
+        text: "不是我记错了。是它被改过。"
+        
+    mood: "疑惑、警觉"
+    tension_level: 5
+    visual_focus: "对比构图：门牌 vs 墙角污渍"
+    
+  # 空椅发现
+  - id: "EP01-S05"
+    chapter: 5
+    title: "空椅"
+    type: "exterior"
+    location: "居住区东侧小院"
+    time_of_day: "afternoon"
+    
+    description: |
+      岑回在小院看到诡异一幕：
+      一个女人坐在空气上，姿势像坐着椅子。
+      小孩把菜篮子放在空气中的某个高度——稳稳放住。
+      
+    characters:
+      - name: "女人"
+        action: "坐在'空气'上"
+        expression: "自然、无觉"
+      - name: "小孩"
+        action: "把篮子放在'空气'上"
+        expression: "习惯性动作"
+      - name: "岑回"
+        action: "远处观察"
+        expression: "震惊"
+        
+    key_objects:
+      - "悬浮的菜篮子"
+      - "坐姿异常的女人"
+      - "空地上不存在的椅子位置"
+      
+    dialogue:
+      - type: "speech"
+        speaker: "小孩"
+        text: "妈，篮子放这儿！"
+      - type: "thought"
+        speaker: "岑回"
+        text: "她们坐的是什么？"
+      - type: "narration"
+        text: "椅子不存在。但她们的身体记得它。"
+        
+    mood: "超现实、日常中的诡异"
+    tension_level: 7
+    visual_focus: "悬浮的菜篮子，背景是坐着'空气'的女人"
+
+# 情感曲线
+emotional_arc:
+  opening: "日常中的微小不适"
+  rising: "异常累积，开始记录"
+  climax: "空椅发现——世界的裂缝显露"
+  ending: "岑回决定继续观察"
+
+# 视觉主题
+visual_themes:
+  color_palette:
+    primary: "灰蓝色调（维修局、楼道）"
+    accent: "偶尔的暖色（早餐摊）"
+    anomaly: "微微泛青的光晕（异常处）"
+  lighting:
+    normal: "冷荧光灯、阴天自然光"
+    anomaly: "边缘略微失真的光"
+  recurring_motifs:
+    - "墙面纹理"
+    - "电子屏幕"
+    - "纸张（小票、纸卡）"
+    - "边界/阈值"
+

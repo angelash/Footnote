@@ -1,0 +1,667 @@
+# 第一话分镜脚本
+# 标题：不一致
+# 页数：18页
+
+episode_id: "EP01"
+title: "不一致"
+total_pages: 18
+
+pages:
+  # === 第1页：扉页 ===
+  - page_id: "EP01-P01"
+    layout_type: "full_page"
+    purpose: "扉页/标题页"
+    panels:
+      - panel_id: 1
+        size: "full"
+        position: "full"
+        
+        shot_type: "wide"
+        angle: "straight"
+        
+        scene_ref: "title_page"
+        description: |
+          城市全景俯视，灰蓝色调的赛博朋克城市，
+          远处有巨大的电子屏幕滚动文字，
+          建筑整齐划一，压抑的氛围。
+          
+        background: "赛博朋克城市天际线，阴沉的天空，远处巨型屏幕"
+        
+        text_overlay:
+          title: "备 注"
+          subtitle: "FOOTNOTE"
+          episode: "第一话：不一致"
+          position: "center-bottom"
+          
+        prompt_hints:
+          style: "wide establishing shot, cyberpunk city skyline"
+          emphasis: "oppressive atmosphere, gray-blue palette"
+          details: "giant screens in distance, uniform buildings"
+          
+  # === 第2页：晨间核验 ===
+  - page_id: "EP01-P02"
+    layout_type: "dramatic_3"
+    purpose: "建立日常，引入主角"
+    panels:
+      - panel_id: 1
+        size: "large"
+        position: "top-full"
+        
+        shot_type: "wide"
+        angle: "slightly_low"
+        
+        scene_ref: "EP01-S01"
+        description: "维修局大厅全景，岑回走向闸机，周围有其他人排队"
+        
+        characters:
+          - name: "岑回"
+            position: "center"
+            action: "走向闸机"
+            expression: "平静"
+            
+        background: "维修局大厅，灰色工业风，荧光灯照明，多个闸机通道"
+        
+        dialogue:
+          - type: "narration"
+            text: "维修局，早晨八点。"
+            position: "top-left"
+            
+        prompt: |
+          comic panel, manga style, cyberpunk interior,
+          wide shot establishing shot,
+          futuristic maintenance bureau lobby, 
+          gray industrial aesthetic, cold fluorescent lighting,
+          multiple turnstile gates, queue barriers,
+          young asian man in gray uniform walking toward gate,
+          other workers in background, routine morning atmosphere,
+          dark color palette, professional comic art,
+          clean lines, detailed architecture
+          
+      - panel_id: 2
+        size: "medium"
+        position: "bottom-left"
+        
+        shot_type: "medium"
+        angle: "straight"
+        
+        description: "岑回站在闸机前，手触读卡器"
+        
+        characters:
+          - name: "岑回"
+            position: "center"
+            action: "刷卡"
+            expression: "例行公事"
+            
+        dialogue:
+          - type: "sfx"
+            text: "滴——"
+            position: "near-card"
+            
+        prompt: |
+          comic panel, manga style, cyberpunk,
+          medium shot, 
+          young asian man in gray uniform at turnstile gate,
+          hand touching card reader, routine expression,
+          digital screen on gate, cold lighting,
+          clean linework, professional comic art
+          
+      - panel_id: 3
+        size: "medium"
+        position: "bottom-right"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "闸机屏幕特写，显示'身份：核对中'"
+        
+        key_objects:
+          - "闸机屏幕"
+          - "文字：身份：核对中"
+          
+        dialogue:
+          - type: "system"
+            text: "身份：核对中。"
+            position: "center"
+            
+        prompt: |
+          comic panel, manga style, tech interface,
+          close-up shot,
+          digital screen on turnstile gate,
+          displaying chinese text "身份：核对中",
+          cold blue glow, slight static effect,
+          minimalist design, sharp focus on text
+          
+  # === 第3页：延迟的三秒 ===
+  - page_id: "EP01-P03"
+    layout_type: "tension_4"
+    purpose: "建立第一个异常信号"
+    panels:
+      - panel_id: 1
+        size: "medium"
+        position: "top-left"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "岑回脸部特写，微微皱眉"
+        
+        characters:
+          - name: "岑回"
+            expression: "开始不安"
+            
+        dialogue:
+          - type: "thought"
+            speaker: "岑回"
+            text: "……"
+            position: "top"
+            
+        prompt: |
+          comic panel, manga style,
+          close-up portrait shot,
+          young asian man face, slight frown,
+          tired but alert eyes, subtle worry,
+          gray uniform collar visible,
+          cold lighting from below (screen reflection),
+          high detail on expression
+          
+      - panel_id: 2
+        size: "medium"
+        position: "top-right"
+        
+        shot_type: "extreme_close-up"
+        angle: "straight"
+        
+        description: "时间流逝表现：屏幕仍显示'核对中'，1秒"
+        
+        dialogue:
+          - type: "narration"
+            text: "一秒。"
+            position: "bottom"
+            
+        prompt: |
+          comic panel, minimalist,
+          extreme close-up on digital screen,
+          text "核对中" still displaying,
+          subtle flicker effect,
+          cold blue glow, dark background
+          
+      - panel_id: 3
+        size: "large"
+        position: "middle-full"
+        
+        shot_type: "medium"
+        angle: "dutch"
+        
+        description: "岑回的手紧握在身侧，背景模糊的其他人开始注意"
+        
+        characters:
+          - name: "岑回"
+            action: "手紧握，站着不动"
+            expression: "紧张"
+            
+        dialogue:
+          - type: "narration"
+            text: "两秒。三秒。"
+            position: "top"
+          - type: "thought"
+            speaker: "岑回"
+            text: "为什么这么久？"
+            position: "right"
+            
+        prompt: |
+          comic panel, manga style, tense atmosphere,
+          medium shot with dutch angle,
+          young asian man standing still at gate,
+          fist clenched at side, tense posture,
+          blurred figures behind looking curious,
+          cold fluorescent lighting, dramatic shadows,
+          anxiety conveyed through composition
+          
+      - panel_id: 4
+        size: "strip"
+        position: "bottom-full"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "屏幕终于变化：'通过'"
+        
+        dialogue:
+          - type: "system"
+            text: "通过。"
+            position: "center"
+          - type: "narration"
+            text: "三秒的延迟，让他的心跳先于流程。"
+            position: "bottom"
+            
+        prompt: |
+          comic panel, minimalist tech aesthetic,
+          close-up on digital screen,
+          text changing to "通过",
+          green tint replacing blue,
+          relief but lingering unease
+          
+  # === 第4页：薄墙任务 ===
+  - page_id: "EP01-P04"
+    layout_type: "standard_6"
+    purpose: "引入薄墙场景"
+    panels:
+      - panel_id: 1
+        size: "medium"
+        position: "top-left"
+        
+        shot_type: "medium"
+        angle: "straight"
+        
+        description: "岑回在外勤窗口领任务"
+        
+        characters:
+          - name: "岑回"
+            action: "接过任务单"
+            
+        dialogue:
+          - type: "speech"
+            speaker: "窗口人员"
+            text: "C区3栋，墙面回音异常。"
+            position: "top"
+            
+        prompt: |
+          comic panel, manga style,
+          medium shot, service window scene,
+          young man receiving paper from clerk,
+          institutional gray interior,
+          routine administrative scene
+          
+      - panel_id: 2
+        size: "medium"
+        position: "top-right"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "任务单特写"
+        
+        key_objects:
+          - "任务单纸张"
+          - "印章：外勤-修复"
+          
+        prompt: |
+          comic panel, document close-up,
+          task sheet with stamp,
+          text visible: location code, task type,
+          paper texture, official formatting
+          
+      - panel_id: 3
+        size: "large"
+        position: "middle-full"
+        
+        shot_type: "wide"
+        angle: "straight"
+        
+        description: "C区3栋楼道，岑回走上楼梯"
+        
+        characters:
+          - name: "岑回"
+            position: "center"
+            action: "背工具箱上楼"
+            
+        background: "老旧但整洁的楼道，荧光灯管，灰色墙面"
+        
+        prompt: |
+          comic panel, manga style,
+          wide shot, apartment building stairwell,
+          young man carrying tool bag climbing stairs,
+          old but clean interior, fluorescent tube lights,
+          gray walls, institutional atmosphere,
+          slightly claustrophobic composition
+          
+      - panel_id: 4
+        size: "medium"
+        position: "bottom-left"
+        
+        shot_type: "medium"
+        angle: "straight"
+        
+        description: "岑回找到目标墙面，开始检查"
+        
+        characters:
+          - name: "岑回"
+            action: "面对墙面，准备检测"
+            expression: "专业、专注"
+            
+        prompt: |
+          comic panel, manga style,
+          medium shot from behind,
+          maintenance worker facing wall,
+          tool bag nearby, inspection posture,
+          gray wall surface in focus
+          
+      - panel_id: 5
+        size: "small"
+        position: "bottom-center"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "手敲击墙面"
+        
+        dialogue:
+          - type: "sfx"
+            text: "咚"
+            position: "center"
+            
+        prompt: |
+          comic panel, close-up,
+          hand knocking on wall surface,
+          impact lines around knuckles,
+          gray wall texture visible
+          
+      - panel_id: 6
+        size: "small"
+        position: "bottom-right"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "岑回侧耳倾听"
+        
+        characters:
+          - name: "岑回"
+            expression: "专注倾听"
+            
+        prompt: |
+          comic panel, close-up portrait,
+          man's face from side, ear prominent,
+          listening intently, concentrated expression
+          
+  # === 第5页：发现空腔 ===
+  - page_id: "EP01-P05"
+    layout_type: "irregular"
+    purpose: "关键发现时刻"
+    panels:
+      - panel_id: 1
+        size: "large"
+        position: "top-full"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "手再次敲击墙面，声波扩散效果"
+        
+        dialogue:
+          - type: "sfx"
+            text: "咚——"
+            position: "center"
+            style: "echo_effect"
+            
+        effects:
+          - type: "sound_wave"
+            description: "从敲击点向外扩散的波纹"
+            
+        prompt: |
+          comic panel, manga style, dramatic,
+          close-up on hand knocking wall,
+          visible sound wave ripples expanding from impact,
+          abstract representation of echo,
+          blue-tinted ripple effect,
+          wall surface with subtle cracks
+          
+      - panel_id: 2
+        size: "medium"
+        position: "middle-left"
+        
+        shot_type: "extreme_close-up"
+        angle: "straight"
+        
+        description: "岑回瞳孔微微收缩"
+        
+        characters:
+          - name: "岑回"
+            expression: "警觉、发现异常"
+            
+        prompt: |
+          comic panel, extreme close-up,
+          asian man's eye, pupil contracting,
+          realization dawning, alert expression,
+          high detail on iris and reflection
+          
+      - panel_id: 3
+        size: "large"
+        position: "middle-right-bottom"
+        
+        shot_type: "medium"
+        angle: "low"
+        
+        description: "岑回将耳朵贴近墙面，表情凝重"
+        
+        characters:
+          - name: "岑回"
+            action: "耳朵贴墙，专注倾听"
+            expression: "严肃、困惑"
+            
+        dialogue:
+          - type: "thought"
+            speaker: "岑回"
+            text: "空腔……"
+            position: "top"
+          - type: "thought"
+            speaker: "岑回"
+            text: "这里不该有空腔。"
+            position: "bottom"
+            
+        prompt: |
+          comic panel, manga style,
+          medium shot low angle,
+          young man pressing ear against gray wall,
+          intense concentration, serious expression,
+          dramatic lighting from side,
+          wall surface texture prominent
+          
+  # === 第6页：第一次记录 ===
+  - page_id: "EP01-P06"
+    layout_type: "standard_6"
+    purpose: "岑回开始记录异常"
+    panels:
+      - panel_id: 1
+        size: "medium"
+        position: "top-left"
+        
+        shot_type: "medium"
+        angle: "over_shoulder"
+        
+        description: "岑回掏出一张纸卡"
+        
+        characters:
+          - name: "岑回"
+            action: "从口袋掏出纸卡"
+            
+        prompt: |
+          comic panel, manga style,
+          over shoulder shot,
+          man pulling out small paper card from pocket,
+          gray uniform visible, dim hallway background
+          
+      - panel_id: 2
+        size: "medium"
+        position: "top-right"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "纸卡特写，空白的粗糙纸面"
+        
+        key_objects:
+          - "空白纸卡"
+          - "粗糙边缘"
+          
+        prompt: |
+          comic panel, close-up,
+          blank rough paper card,
+          uneven edges, cream-colored surface,
+          held between fingers, texture visible
+          
+      - panel_id: 3
+        size: "strip"
+        position: "middle-full"
+        
+        shot_type: "extreme_close-up"
+        angle: "straight"
+        
+        description: "笔尖接触纸面，写下两个字"
+        
+        dialogue:
+          - type: "narration"
+            text: "他写下了两个字。"
+            position: "top"
+            
+        prompt: |
+          comic panel, extreme close-up,
+          pen tip touching paper surface,
+          about to write, dramatic moment,
+          shallow depth of field
+          
+      - panel_id: 4
+        size: "large"
+        position: "bottom-full"
+        
+        shot_type: "close-up"
+        angle: "straight"
+        
+        description: "纸卡上写着：'空腔'"
+        
+        key_objects:
+          - "纸卡"
+          - "手写字：空腔"
+          
+        dialogue:
+          - type: "narration"
+            text: "空腔。"
+            position: "bottom"
+          - type: "narration"
+            text: "第一条记录。"
+            position: "bottom-right"
+            
+        prompt: |
+          comic panel, close-up on paper,
+          handwritten chinese characters "空腔",
+          rough paper texture, pen visible at edge,
+          dramatic lighting, important moment,
+          professional comic art
+          
+  # === 后续页面的框架（简化）===
+  
+  # 第7-8页：双日期小票
+  - page_id: "EP01-P07"
+    layout_type: "standard_6"
+    purpose: "早餐摊场景，发现双日期"
+    summary: |
+      - 早餐摊场景建立
+      - 岑回购买早餐
+      - 接过小票
+      - 发现两个日期
+      - 困惑表情
+      - 收起小票作为证据
+      
+  - page_id: "EP01-P08"
+    layout_type: "tension_4"
+    purpose: "小票悖论的冲击"
+    summary: |
+      - 小票特写，两个日期清晰可见
+      - 岑回的震惊
+      - 他环顾四周，确认没人注意
+      - 将小票塞入口袋
+      
+  # 第9-10页：错误的门
+  - page_id: "EP01-P09"
+    layout_type: "dramatic_3"
+    purpose: "门牌变化发现"
+    summary: |
+      - 傍晚回家场景
+      - 走到门前停住
+      - 门牌号与记忆不符
+      
+  - page_id: "EP01-P10"
+    layout_type: "standard_6"
+    purpose: "污渍作为证据"
+    summary: |
+      - 墙角污渍特写
+      - 门牌号特写
+      - 岑回对比分析
+      - 确认：是门牌被改了
+      - 再次记录
+      - 不安的夜晚
+      
+  # 第11-14页：空椅发现（高潮）
+  - page_id: "EP01-P11"
+    layout_type: "wide"
+    purpose: "空地场景建立"
+    summary: |
+      - 居住区东侧小院全景
+      - 岑回路过
+      - 远处看到奇怪一幕
+      
+  - page_id: "EP01-P12"
+    layout_type: "tension_4"
+    purpose: "空椅发现"
+    summary: |
+      - 女人"坐"在空气上
+      - 岑回震惊表情
+      - 小孩跑过来
+      - 菜篮子被放在空气中
+      
+  - page_id: "EP01-P13"
+    layout_type: "full_page"
+    purpose: "关键画面：悬浮的篮子"
+    summary: |
+      - 全页大图：菜篮子悬浮在空中
+      - 背景：女人坐在"空气椅"上
+      - 小孩若无其事
+      - 岑回在远处观察
+      
+  - page_id: "EP01-P14"
+    layout_type: "standard_6"
+    purpose: "反应与记录"
+    summary: |
+      - 岑回的震惊
+      - 他的手不自觉摸向口袋里的纸卡
+      - 决定不上前打扰
+      - 悄悄离开
+      - 在角落写下记录
+      - 纸卡上新增："空椅"
+      
+  # 第15-17页：夜晚思考
+  - page_id: "EP01-P15"
+    layout_type: "dramatic_3"
+    purpose: "夜晚独处思考"
+    summary: |
+      - 岑回房间
+      - 桌上摊开的纸卡
+      - 三条记录：空腔、双日期、空椅
+      
+  - page_id: "EP01-P16"
+    layout_type: "standard_6"
+    purpose: "整理思绪"
+    summary: |
+      - 岑回看着记录
+      - 回忆闪回
+      - 试图寻找联系
+      - 写下新词："不一致"
+      
+  - page_id: "EP01-P17"
+    layout_type: "tension_4"
+    purpose: "决心"
+    summary: |
+      - 岑回合上纸卡
+      - 窗外城市夜景
+      - 决定继续观察
+      - 旁白：第一话完
+      
+  # 第18页：预告/尾页
+  - page_id: "EP01-P18"
+    layout_type: "full_page"
+    purpose: "下话预告"
+    summary: |
+      - 意象画面：深度视野开启时的骨架线
+      - 预告文字：下一话《深度》
+      - 制作信息
+

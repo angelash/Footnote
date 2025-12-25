@@ -1,0 +1,434 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# Footnote 场景Kit规格文件模板
+# 版本: 2.0
+# 说明: 定义一个完整场景套件(Kit)的所有资产规格
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 一、Kit基础信息
+# ─────────────────────────────────────────────────────────────────────────────
+kit:
+  id: "kit-residential"                     # Kit唯一ID
+  name: "居民区场景套件"
+  region: "residential"                     # 所属区域
+  description: "居民区通用场景资产，包含地块、物件、装饰"
+  version: "1.0.0"
+  
+  # Kit覆盖的Zone
+  zones:
+    - "C0-Z1"                               # 序章Zone1
+    - "C0-Z2"
+    - "C1-Z1"
+    - "C1-Z2"
+    
+  # 视觉主题
+  theme:
+    mood: "压抑但有生活气息"
+    time_of_day: "永夜(人工照明)"
+    weather: "室内/无天气"
+    key_colors:
+      primary: "#1A1A2E"                    # 深夜蓝
+      secondary: "#2D3436"                  # 暗灰
+      accent: "#00FFF0"                     # 系统青
+      warm: "#FFD93D"                       # 暖光点缀
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 二、地块资产清单
+# ─────────────────────────────────────────────────────────────────────────────
+tiles:
+  # Ground Base层
+  ground_base:
+    - id: "tileset-residential-floor-metal"
+      name: "金属地板"
+      type: "blob-16"
+      tile_size: 128
+      variants: 3                           # 3种变体
+      status: "pending"
+      
+    - id: "tileset-residential-floor-concrete"
+      name: "混凝土地面"
+      type: "blob-16"
+      tile_size: 128
+      variants: 2
+      status: "pending"
+      
+  # Transition层
+  transition:
+    - id: "tileset-residential-edge"
+      name: "边缘过渡"
+      type: "blob-16"
+      tile_size: 128
+      description: "用于地面与墙壁/深渊的过渡"
+      status: "pending"
+      
+  # Overlay层
+  overlay:
+    - id: "deco-residential-crack"
+      name: "裂缝贴花"
+      type: "decal"
+      count: 5                              # 5种不同裂缝
+      status: "pending"
+      
+    - id: "deco-residential-stain"
+      name: "污渍贴花"
+      type: "decal"
+      count: 4
+      status: "pending"
+      
+    - id: "deco-residential-glow-line"
+      name: "发光线条"
+      type: "decal"
+      count: 3
+      status: "pending"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 三、物件资产清单
+# ─────────────────────────────────────────────────────────────────────────────
+objects:
+  # ═══ 功能性物件(可交互) ═══
+  functional:
+    - id: "obj-residential-door"
+      name: "居民区门"
+      footprint: "1×2"                      # 占格
+      size_category: "M"
+      interactive: true
+      states:
+        - "default"                         # 关闭
+        - "highlight"                       # 高亮
+        - "open"                            # 打开
+        - "locked"                          # 锁定
+      animation:
+        open: 6                             # 开门6帧
+      status: "pending"
+      
+    - id: "obj-residential-terminal"
+      name: "终端机"
+      footprint: "1×1"
+      size_category: "M"
+      interactive: true
+      states:
+        - "default"
+        - "highlight"
+        - "active"
+        - "offline"
+      animation:
+        idle: 4                             # 待机闪烁
+        active: 8                           # 使用中
+      status: "pending"
+      
+    - id: "obj-residential-container"
+      name: "储物箱"
+      footprint: "1×1"
+      size_category: "S"
+      interactive: true
+      states:
+        - "default"
+        - "highlight"
+        - "open"
+        - "empty"
+      status: "pending"
+      
+  # ═══ 装饰性物件(不可交互) ═══
+  decorative:
+    - id: "obj-residential-pipe-h"
+      name: "水平管道"
+      footprint: "2×1"
+      size_category: "M"
+      interactive: false
+      variants: 3
+      status: "pending"
+      
+    - id: "obj-residential-pipe-v"
+      name: "垂直管道"
+      footprint: "1×2"
+      size_category: "M"
+      interactive: false
+      variants: 3
+      status: "pending"
+      
+    - id: "obj-residential-vent"
+      name: "通风口"
+      footprint: "1×1"
+      size_category: "S"
+      interactive: false
+      animation:
+        idle: 4                             # 叶片转动
+      status: "pending"
+      
+    - id: "obj-residential-light-wall"
+      name: "壁灯"
+      footprint: "1×1"
+      size_category: "S"
+      interactive: false
+      states:
+        - "on"
+        - "off"
+        - "flicker"
+      status: "pending"
+      
+    - id: "obj-residential-poster"
+      name: "墙贴海报"
+      footprint: "1×1"
+      size_category: "S"
+      interactive: false
+      variants: 5
+      status: "pending"
+      
+  # ═══ 大型物件 ═══
+  large:
+    - id: "obj-residential-bed"
+      name: "床铺"
+      footprint: "2×2"
+      size_category: "L"
+      interactive: true
+      states:
+        - "default"
+        - "highlight"
+        - "used"                            # 睡过
+      status: "pending"
+      
+    - id: "obj-residential-table"
+      name: "桌子"
+      footprint: "2×1"
+      size_category: "M"
+      interactive: false
+      variants: 2
+      status: "pending"
+      
+    - id: "obj-residential-shelf"
+      name: "货架"
+      footprint: "2×2"
+      size_category: "L"
+      interactive: true
+      states:
+        - "default"
+        - "highlight"
+        - "searched"
+      status: "pending"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 四、遮挡物资产
+# ─────────────────────────────────────────────────────────────────────────────
+occluders:
+  - id: "occluder-residential-pillar"
+    name: "柱子遮挡"
+    description: "柱子的前半部分，遮挡角色"
+    footprint: "1×1"
+    render_layer: 5                         # Canopy层
+    status: "pending"
+    
+  - id: "occluder-residential-awning"
+    name: "雨棚遮挡"
+    description: "突出的雨棚结构"
+    footprint: "2×1"
+    render_layer: 5
+    status: "pending"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 五、背景资产
+# ─────────────────────────────────────────────────────────────────────────────
+backgrounds:
+  # 远景层(不可交互，纯装饰)
+  distant:
+    - id: "bg-residential-skyline"
+      name: "城市天际线"
+      description: "远处的建筑剪影"
+      parallax: 0.3                         # 视差系数
+      status: "pending"
+      
+    - id: "bg-residential-haze"
+      name: "雾霾层"
+      description: "半透明雾气"
+      parallax: 0.5
+      status: "pending"
+      
+  # 中景层
+  midground:
+    - id: "bg-residential-building"
+      name: "背景建筑"
+      description: "可见但不可达的建筑"
+      parallax: 0.7
+      variants: 3
+      status: "pending"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 六、特效资产
+# ─────────────────────────────────────────────────────────────────────────────
+effects:
+  # 环境特效
+  ambient:
+    - id: "fx-residential-dust"
+      name: "灰尘粒子"
+      frames: 16
+      loop: true
+      status: "pending"
+      
+    - id: "fx-residential-flicker"
+      name: "灯光闪烁"
+      frames: 8
+      loop: true
+      status: "pending"
+      
+    - id: "fx-residential-steam"
+      name: "蒸汽"
+      frames: 12
+      loop: true
+      status: "pending"
+      
+  # 交互特效
+  interactive:
+    - id: "fx-residential-door-open"
+      name: "开门效果"
+      frames: 6
+      loop: false
+      status: "pending"
+      
+    - id: "fx-residential-terminal-access"
+      name: "终端访问"
+      frames: 8
+      loop: false
+      status: "pending"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 七、视觉规格(Kit级别)
+# ─────────────────────────────────────────────────────────────────────────────
+visual_spec:
+  # 统一光照
+  lighting:
+    key_direction: "top-left"
+    key_intensity: 0.7
+    ambient_color: "#1A1A2E"
+    accent_lights:                          # 点光源(场景内)
+      - color: "#00FFF0"
+        description: "系统指示灯"
+      - color: "#FFD93D"
+        description: "暖色照明"
+        
+  # 统一材质
+  material:
+    primary: "worn-metal"                   # 磨损金属
+    secondary: "tech-panel"                 # 科技面板
+    accent: "emissive-line"                 # 发光线条
+    
+  # 统一配色
+  palette:
+    # 主色(占比60%)
+    dominant:
+      - "#1A1A2E"
+      - "#2D2D44"
+    # 次色(占比30%)
+    secondary:
+      - "#2D3436"
+      - "#4A4A66"
+    # 强调色(占比10%)
+    accent:
+      - "#00FFF0"
+      - "#FFD93D"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 八、AI生成配置
+# ─────────────────────────────────────────────────────────────────────────────
+ai_generation:
+  # Kit级别锚定图
+  anchors:
+    style: "assets/anchors/style_anchor_v1.webp"
+    palette: "assets/anchors/palette_residential.webp"
+    lighting: "assets/anchors/lighting_residential.webp"
+    
+  # 生成顺序
+  generation_order:
+    1: "先生成地块Tileset(定义基调)"
+    2: "生成大型物件(确定比例)"
+    3: "生成中小型物件"
+    4: "生成装饰贴花"
+    5: "生成遮挡物"
+    6: "生成背景层"
+    7: "最后生成特效"
+    
+  # 批量生成提示词模板
+  prompt_template: |
+    pixel art game asset, cyberpunk residential area,
+    dark worn atmosphere, industrial tech aesthetic,
+    [具体物件描述],
+    transparent background, consistent top-left lighting,
+    cyan accent lights, warm yellow secondary lighting,
+    matching reference style exactly
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 九、Kit组装规则
+# ─────────────────────────────────────────────────────────────────────────────
+assembly_rules:
+  # 地块组合规则
+  tile_rules:
+    - "金属地板用于主要通道"
+    - "混凝土地面用于边缘/储藏区"
+    - "过渡Tile用于不同地面交界"
+    
+  # 物件放置规则
+  object_placement:
+    - "门必须放在墙壁边缘"
+    - "终端机靠墙放置"
+    - "床铺贴墙角"
+    - "管道沿墙壁/天花板延伸"
+    
+  # 密度指南
+  density:
+    functional_objects: "每9TU²至少1个"
+    decorative_objects: "每4TU²至少1个"
+    decals: "每6TU²1-2个"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 十、状态统计
+# ─────────────────────────────────────────────────────────────────────────────
+status_summary:
+  # 各类别统计
+  tiles:
+    total: 6
+    pending: 6
+    in_progress: 0
+    completed: 0
+    
+  objects:
+    total: 15
+    pending: 15
+    in_progress: 0
+    completed: 0
+    
+  occluders:
+    total: 2
+    pending: 2
+    in_progress: 0
+    completed: 0
+    
+  backgrounds:
+    total: 4
+    pending: 4
+    in_progress: 0
+    completed: 0
+    
+  effects:
+    total: 5
+    pending: 5
+    in_progress: 0
+    completed: 0
+    
+  # 整体进度
+  overall:
+    total_assets: 32
+    completion_rate: "0%"
+    priority: "high"
+    target_date: "2025-01-15"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 十一、输出目录结构
+# ─────────────────────────────────────────────────────────────────────────────
+output_structure:
+  base_path: "assets/images/"
+  directories:
+    tilesets: "tilesets/residential/"
+    objects: "objects/residential/"
+    occluders: "objects/residential/occluders/"
+    backgrounds: "backgrounds/residential/"
+    effects: "effects/residential/"
+    decals: "objects/residential/decals/"
+

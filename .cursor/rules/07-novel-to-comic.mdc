@@ -99,7 +99,7 @@ dialogue_examples:
 ```
 严格执行流程：
 1. 提交一个提示词
-2. 等待4张图片全部生成完成（进度100%）
+2. 等待图片生成完成
 3. 执行质量检查
 4. 下载通过的图片
 5. 才能提交下一个提示词
@@ -107,6 +107,29 @@ dialogue_examples:
 禁止行为：
 ❌ 连续提交多个提示词
 ❌ 在上一个任务未完成时提交新任务
+```
+
+### 0.8 状态判断与部分失败处理
+
+> ⚠️ **以截图为准，不要被进度条迷惑**
+
+```
+状态判断原则：
+1. 进度条显示可能不准确（经常显示0%但实际已完成）
+2. 判断任务是否完成，以截图看到的实际图片为准
+3. 如果截图显示有图片生成出来，就是完成了
+
+部分失败处理：
+1. 如果4张图中有部分显示叹号（失败），只要不是全部失败就先通过
+2. 对生成成功的图片进行质量检查
+3. 质检通过的图片下载保存
+4. 不需要因为部分失败就整体重新生成
+5. 只有全部4张都失败时才需要重新提交
+
+示例：
+- 4张中3张成功1张失败 → 下载3张成功的，继续下一个任务
+- 4张中2张成功2张失败 → 下载2张成功的，继续下一个任务
+- 4张全部失败 → 重新提交该任务
 ❌ 批量/队列式提交
 
 原因：
@@ -1200,7 +1223,150 @@ class ComicGenerator:
 
 ---
 
-## 十、附录
+## 十、经验总结（EP01生成实践）
+
+> ⚠️ **本章节记录EP01生成过程中发现的问题和解决方案，供后续生成参考**
+
+### 10.1 智绘平台特性发现
+
+```yaml
+platform_findings:
+  # URL格式发现
+  url_format:
+    发现: "_small.webp 后缀实际是完整分辨率图片（2816x1536）"
+    说明: "不需要修改URL，直接使用提取到的URL下载即可"
+    
+  # 进度条问题
+  progress_bar:
+    问题: "进度条经常显示0%但实际已完成"
+    解决: "以截图为准，看到图片生成出来就是完成了"
+    
+  # 批量失败处理
+  partial_failure:
+    问题: "4张图中可能有1-2张显示叹号失败"
+    解决: "只要不是全部失败，就下载成功的图片，继续下一个任务"
+    
+  # 生成卡顿
+  generation_stall:
+    问题: "有时进度停在99%长时间不动"
+    解决: "等待2分钟后，如果仍无变化，标记为异常待重试"
+```
+
+### 10.2 工作流程优化
+
+```yaml
+workflow_improvements:
+  # 禁止队列式提交
+  sequential_submission:
+    原规则: "批量提交多个提示词"
+    新规则: "严格一个一个提交，等待完成后再提交下一个"
+    原因: "队列式提交导致服务器拥堵、结果混乱、难以追踪"
+    
+  # 禁止windows-mcp手动操作
+  no_manual_download:
+    原规则: "使用Click-Tool点击下载按钮"
+    新规则: "使用browser_evaluate提取URL + Python脚本批量下载"
+    原因: "手动操作效率低、不稳定、难以批量处理"
+    
+  # 状态判断优先级
+  status_check_priority:
+    第一优先: "截图看到实际图片"
+    第二优先: "browser_evaluate提取到URL"
+    最低优先: "进度条显示（不可靠）"
+```
+
+### 10.3 常见问题与解决方案
+
+```yaml
+common_issues:
+  # 问题1：页面漏生成
+  missed_page:
+    症状: "某页完全没有生成的图片"
+    原因: "批量提交时漏掉或提交失败"
+    预防: "每次提交后确认收到反馈，记录已提交列表"
+    修复: "发现后单独重新生成该页"
+    
+  # 问题2：部分图片缺失
+  partial_missing:
+    症状: "4张图只有3张或更少"
+    原因: "平台生成时部分失败"
+    处理: "先下载成功的，不需要重新生成整组"
+    
+  # 问题3：生成卡住
+  generation_stuck:
+    症状: "进度条99%长时间不动，或显示0%"
+    判断: "截图确认是否实际有图片生成"
+    处理: |
+      - 有图片：正常下载
+      - 无图片：等待2分钟后标记异常重试
+      
+  # 问题4：风格不一致
+  style_inconsistent:
+    症状: "新生成的图与之前风格差异大"
+    预防: "每张图必须包含完整的风格锚定词"
+    修复: "调整提示词，强化风格描述后重新生成"
+```
+
+### 10.4 下载脚本模板
+
+```python
+#!/usr/bin/env python3
+"""批量下载智绘平台生成的图片"""
+
+import requests
+import os
+
+def download_images(urls, output_dir, prefix):
+    """下载图片到指定目录"""
+    os.makedirs(output_dir, exist_ok=True)
+    
+    downloaded = []
+    for i, url in enumerate(urls):
+        try:
+            r = requests.get(url, timeout=30)
+            if r.status_code == 200:
+                filepath = f'{output_dir}/{prefix}_{i+1}.webp'
+                with open(filepath, 'wb') as f:
+                    f.write(r.content)
+                print(f'[OK] Downloaded {i+1}/{len(urls)}: {filepath}')
+                downloaded.append(filepath)
+            else:
+                print(f'[FAIL] Failed {i+1}: HTTP {r.status_code}')
+        except Exception as e:
+            print(f'[ERR] Error {i+1}: {e}')
+    
+    return downloaded
+
+# 使用示例：
+# urls = ['https://artflow.gz4399.com/...', ...]
+# download_images(urls, 'comics/generated/ep01/approved', 'EP01-P04-wall')
+```
+
+### 10.5 EP01生成统计
+
+```yaml
+ep01_stats:
+  总计划页数: 18
+  成功完成: 15页（完整4张）
+  部分完成: 1页（P16: 3张）
+  完全缺失: 2页（P05, P17）
+  总图片数: 59张
+  成功率: 约82%
+  
+  主要问题:
+    - P05双日期小票：提交时漏掉
+    - P16整理思绪：只生成3张
+    - P17决心：生成卡在99%
+    
+  下次改进:
+    - 建立提交清单，逐项打勾确认
+    - 每提交一个后等待完成再继续
+    - 设置2分钟超时，超时即标记重试
+```
+
+---
+
+## 十一、附录
 
 ### 10.1 常用提示词词汇表
 

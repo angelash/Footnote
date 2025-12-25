@@ -1,575 +1,28 @@
-# 智绘AI生图自动化规范 v2.0
+---
+description: 智绘AI生图自动化操作指南
+globs: ["**/assets/images/**/*"]
+alwaysApply: false
+---
 
-## 适用场景
-当需要使用智绘AI生成游戏美术资产时，必须严格遵循此规范。
+# 智绘AI生图操作指南
 
-## 目标网站
-- URL: `https://artflow.gz4399.com/image/nextImage/chat`
-- 模型: Nano Banana Pro(预览版)
-- 输出: 2K分辨率 (2048×2048)，WebP格式
+## 目标平台
+- **URL**: `https://artflow.gz4399.com/image/nextImage/chat`
+- **模型**: Nano Banana Pro(预览版)
+- **输出**: 2K分辨率 WebP格式
 
 ---
 
-## 📁 资产目录结构
+## 一、操作流程
 
-```
-assets/images/
-├── characters/
-│   ├── approved/        # ✅ 通过审核的角色图
-│   ├── rejected/        # ❌ 未通过审核的角色图
-│   └── generated/       # 🔄 生成中/待审核
-├── backgrounds/
-│   ├── approved/        # ✅ 通过审核的背景图
-│   └── rejected/        # ❌ 未通过审核的背景图
-├── icons/
-│   ├── approved/        # ✅ 通过审核的图标
-│   └── rejected/        # ❌ 未通过审核的图标
-├── cards/
-│   ├── approved/        # ✅ 通过审核的卡片
-│   └── rejected/        # ❌ 未通过审核的卡片
-├── effects/
-│   ├── approved/        # ✅ 通过审核的特效
-│   └── rejected/        # ❌ 未通过审核的特效
-└── ui/
-    ├── approved/        # ✅ 通过审核的UI资产
-    └── rejected/        # ❌ 未通过审核的UI资产
-```
-
----
-
-## 🎨 风格统一规范（全局）
-
-### 核心视觉关键词（每个提示词必须包含）
-```
-pixel art style, 2D game asset, consistent art style, clean lines, 
-digital art, game sprite, centered composition
-```
-
-### 色彩系统（引用设计规范）
-| 名称 | 色值 | 用途 |
-|------|------|------|
-| 深空黑 | #0A0E17 | 最深背景 |
-| 夜幕蓝 | #141B2D | 面板背景 |
-| 量子青 | #00F5D4 | 主强调色 |
-| 琥珀光 | #FFD166 | 警告色 |
-| 收敛紫 | #A855F7 | 系统/高维 |
-
----
-
-## 一、角色资产提示词模板
-
-### 1.1 角色立绘（全身）- 400×800目标
-
-#### 通用模板结构
-```
-[风格] + [主体] + [外观] + [服装] + [表情] + [姿态] + [背景] + [技术]
-```
-
-#### 强制约束词
-| 需求 | 必须使用的约束词 |
-|------|------------------|
-| **纯正面** | `facing camera directly, front view, perfectly symmetrical, looking at viewer` |
-| **纯侧面** | `side profile view, facing left/right, 90 degree angle` |
-| **三分之一侧** | `3/4 view, slight turn, asymmetrical pose` |
-| **站立姿态** | `standing pose, full body, feet visible, upright posture` |
-| **透明背景** | `transparent background, PNG with alpha, isolated character` |
-
-#### 主角色提示词（8个核心角色）
-
-**CHR-001 岑回（主角/外勤）**
-```
-pixel art style, 2D game character, young Chinese woman in her 20s, 
-short black hair with slight wave, calm neutral expression, 
-gray and white color scheme, standard gray work uniform hoodie,
-standing pose facing camera directly front view perfectly symmetrical,
-full body visible, upright posture, arms relaxed at sides,
-transparent background PNG with alpha, isolated character,
-clean lines, digital art, game sprite style, 
-professional quality, consistent art style
-```
-- 配色：灰+白 #6B8CAE #B8C5D6
-- 特征：克制、标准化、隐藏锋芒
-- 表情变体：常态/惊讶/思考/悲伤/压力
-
-**CHR-002 顾临（维修局主管）**
-```
-pixel art style, 2D game character, middle-aged Chinese man in his 40s,
-neat short black hair, serious stern expression, 
-dark blue and gold color scheme, formal dark suit with gold trim details,
-standing pose facing camera directly front view perfectly symmetrical,
-full body visible, authoritative posture, hands clasped in front,
-transparent background PNG with alpha, isolated character,
-clean lines, digital art, game sprite style,
-professional quality, consistent art style
-```
-- 配色：深蓝+金边 #2C3E50 #F1C40F
-- 特征：温和、秩序、流程感
-
-**CHR-003 宋岚（档案记录者）**
-```
-pixel art style, 2D game character, young Chinese woman in her late 20s,
-long dark hair in ponytail, warm gentle expression,
-brown and cream color scheme, vintage work jacket with patches,
-standing pose facing camera directly front view perfectly symmetrical,
-full body visible, relaxed posture, holding old book or map,
-transparent background PNG with alpha, isolated character,
-clean lines, digital art, game sprite style,
-professional quality, consistent art style
-```
-- 配色：褐+米白 #7B8D6E #D4C5A9
-- 特征：旧书页、手工质感
-
-**CHR-004 许澄（医生）**
-```
-pixel art style, 2D game character, Chinese woman in her 30s,
-short neat black hair, professional tired expression,
-white and light green color scheme, white medical coat with blue trim,
-standing pose facing camera directly front view perfectly symmetrical,
-full body visible, professional posture, clipboard in hand,
-transparent background PNG with alpha, isolated character,
-clean lines, digital art, game sprite style,
-professional quality, consistent art style
-```
-- 配色：白+淡绿 #ECF0F1 #3498DB
-- 特征：专业、边界感、疲惫
-
-**CHR-005 阿棠（漂移者）**
-```
-pixel art style, 2D game character, young androgynous figure,
-blurry shifting features, ethereal dreamy expression,
-gradient shifting colors translucent, layered ghostly clothes,
-standing pose facing camera directly front view,
-full body visible, unstable floating posture, edges slightly blurred,
-transparent background PNG with alpha, isolated character,
-clean lines with blur effect, digital art, game sprite style,
-professional quality, consistent art style
-```
-- 配色：不定/渐变 #95A5A6
-- 特征：边缘模糊、存在感弱
-
-**CHR-006 牧平（平面信徒）**
-```
-pixel art style, 2D game character, older Chinese man in his 50s,
-bald head with simple beard, mystical serene expression,
-purple and gold color scheme, simple monk robe with ritual patterns,
-standing pose facing camera directly front view perfectly symmetrical,
-full body visible, meditative posture, hands in prayer position,
-transparent background PNG with alpha, isolated character,
-clean lines, digital art, game sprite style,
-professional quality, consistent art style
-```
-- 配色：紫+金 #8E6E53 #D4AF37
-- 特征：仪式感、神秘、古旧
-
-**CHR-007 栖蓝（多余者代表）**
-```
-pixel art style, 2D game character, young Chinese woman in her 20s,
-messy shoulder-length blue-tinted hair, warm kind expression,
-light blue with warm accent colors, patched comfortable clothes,
-standing pose facing camera directly front view perfectly symmetrical,
-full body visible, relaxed casual posture, holding handmade item,
-transparent background PNG with alpha, isolated character,
-clean lines, digital art, game sprite style,
-professional quality, consistent art style
-```
-- 配色：淡蓝+暖色点缀 #00F5D4 #1E2940
-- 特征：温暖、生活气息
-
-**CHR-008 陈匠（点灯者）**
-```
-pixel art style, 2D game character, elderly Chinese man in his 60s,
-gray hair weathered face, determined stubborn expression,
-orange yellow and dark gray color scheme, work clothes with oil stains,
-standing pose facing camera directly front view perfectly symmetrical,
-full body visible, steady posture, holding old oil lamp,
-transparent background PNG with alpha, isolated character,
-clean lines, digital art, game sprite style,
-professional quality, consistent art style
-```
-- 配色：橙黄+暗灰 #F39C12 #2C3E50
-- 特征：执着、旧光源、坚定
-
-### 1.2 角色头像（对话用）- 200×200目标
-
-#### 头像通用模板
-```
-pixel art style, portrait headshot, [角色描述], 
-[表情], close-up face and shoulders,
-centered composition, transparent background PNG,
-clean lines, digital art, game portrait style
-```
-
-#### 表情变体词汇表
-| 表情 | 提示词 |
-|------|--------|
-| 常态 | `neutral calm expression, relaxed face` |
-| 惊讶 | `surprised expression, wide eyes, raised eyebrows` |
-| 思考 | `thinking expression, slightly furrowed brow, looking aside` |
-| 悲伤 | `sad expression, downcast eyes, slight frown` |
-| 压力 | `stressed expression, tense jaw, worried eyes` |
-
-### 1.3 像素精灵（场景用）- 32×32/64×64
-
-#### 像素精灵通用模板
-```
-pixel art sprite, 32x32 pixels, [角色描述],
-[动作状态], chibi proportions, limited color palette,
-clean pixel edges, transparent background,
-retro game style, no anti-aliasing
-```
-
-#### 动作状态词汇表
-| 动作 | 提示词 |
-|------|--------|
-| idle | `standing idle pose, arms at sides, relaxed` |
-| walk | `walking pose, mid-step, one leg forward` |
-| interact | `reaching forward pose, arm extended` |
-| talk | `talking gesture, mouth open, slight hand movement` |
-| special | `[角色特有动作描述]` |
-
----
-
-## 二、场景背景提示词模板
-
-### 2.1 背景通用结构
-```
-[风格] + [场景类型] + [具体元素] + [光照] + [氛围] + [构图] + [技术]
-```
-
-### 2.2 六大区域风格模板
-
-**居住环（日常、温暖）**
-```
-pixel art background, 2D game scene, residential area,
-[具体场景元素], warm gray tones with soft warm lighting,
-cozy atmosphere with slight emptiness, 
-vertical mobile game format 750x1334,
-clean lines, digital art, game background style
-```
-- 色调：暖灰+少量暖光
-- 元素：旧楼、走廊、小店
-
-**市政环（秩序、冷硬）**
-```
-pixel art background, 2D game scene, government office area,
-[具体场景元素], cold blue gray with metallic accents,
-orderly oppressive atmosphere, fluorescent lighting,
-vertical mobile game format 750x1334,
-clean lines, digital art, game background style
-```
-- 色调：冷蓝灰+金属质感
-- 元素：办公楼、档案柜、标准化设施
-
-**档案巷（怀旧、神秘）**
-```
-pixel art background, 2D game scene, archive storage area,
-[具体场景元素], brown and dark yellow tones,
-nostalgic mysterious atmosphere, dim desk lamp lighting,
-vertical mobile game format 750x1334,
-clean lines, digital art, game background style
-```
-- 色调：褐色+暗黄
-- 元素：纸堆、旧地图、版本号
-
-**诊疗台（洁净、不安）**
-```
-pixel art background, 2D game scene, medical clinic area,
-[具体场景元素], white and blue tones not too bright,
-sterile unsettling atmosphere, even soft lighting,
-vertical mobile game format 750x1334,
-clean lines, digital art, game background style
-```
-- 色调：白+蓝（不刺眼）
-- 元素：医疗设备、病例卡
-
-**礼堂街（神秘、仪式）**
-```
-pixel art background, 2D game scene, ritual hall area,
-[具体场景元素], deep purple red and gold tones,
-mystical ceremonial atmosphere, candlelight and mysterious glow,
-vertical mobile game format 750x1334,
-clean lines, digital art, game background style
-```
-- 色调：深紫红+金
-- 元素：祭台、符号、祷文
-
-**边缘断口（危险、异常）**
-```
-pixel art background, 2D game scene, edge anomaly zone,
-[具体场景元素], deep black with glowing cyan cracks,
-dangerous abnormal atmosphere, anomalous light sources,
-vertical mobile game format 750x1334,
-clean lines, digital art, game background style
-```
-- 色调：深黑+荧光裂隙
-- 元素：断裂、扭曲、不存在的空间
-
-### 2.3 具体Zone背景模板示例
-
-**C0-Z1 宿舍走廊**
-```
-pixel art background, 2D game scene, dormitory corridor,
-long hallway with doors on both sides, notice board on wall,
-identity card slot beside door, warm gray tones with dim lighting,
-quiet lonely atmosphere, vertical mobile game format 750x1334,
-residential area style, clean lines, game background
-```
-
-**C1-Z2 顾临办公室**
-```
-pixel art background, 2D game scene, supervisor office interior,
-large desk with organized documents, file cabinets on wall,
-stability curve chart display, dark blue and gold accents,
-orderly authoritative atmosphere, cold lighting,
-vertical mobile game format 750x1334, government style
-```
-
----
-
-## 三、物品图标提示词模板
-
-### 3.1 图标通用结构
-```
-pixel art icon, game item, [物品名称和描述],
-[尺寸]x[尺寸] pixels, centered, transparent background,
-clean edges, limited color palette, no text
-```
-
-### 3.2 能力图标（48×48）
-
-**深度感知**
-```
-pixel art icon, game ability icon, mystical eye symbol,
-eye with depth layers behind it, cyan glow #00F5D4,
-48x48 pixels, centered, transparent background,
-clean pixel edges, ability icon style
-```
-
-**深度介入**
-```
-pixel art icon, game ability icon, reaching hand symbol,
-hand with penetrating effect ripples, cyan glow #00F5D4,
-48x48 pixels, centered, transparent background,
-clean pixel edges, ability icon style
-```
-
-**时间干预**
-```
-pixel art icon, game ability icon, clock with rewind symbol,
-clock face with counter-clockwise arrow, cyan glow #00F5D4,
-48x48 pixels, centered, transparent background,
-clean pixel edges, ability icon style
-```
-
-### 3.3 物品图标（64×64）
-
-**通用物品模板**
-```
-pixel art icon, game item icon, [物品名称],
-[物品描述和特征], [主色调],
-64x64 pixels, centered, transparent background,
-clean pixel edges, detailed item style
-```
-
-**物品图标示例**
-| 物品 | 提示词关键补充 |
-|------|----------------|
-| 身份识别卡 | `ID card with photo placeholder, gray and white` |
-| 维修工具 | `repair toolbox, mechanical tools, gray metal` |
-| 折叠地图 | `folded paper map, brown aged paper` |
-| 档案碎片 | `torn document piece, gray with text lines` |
-| 祈愿珠 | `prayer bead string, purple and gold` |
-| 旧油灯 | `old oil lamp, orange yellow light glow` |
-
-### 3.4 状态图标（32×32）
-```
-pixel art icon, status indicator, [状态描述],
-simple symbolic design, [颜色], 32x32 pixels,
-centered, transparent background, minimal style
-```
-
----
-
-## 四、卡片资产提示词模板
-
-### 4.1 卡片通用结构（400×560目标）
-```
-pixel art card design, game collectible card,
-[卡片类型] card template, [装饰元素],
-[配色方案], vertical card format,
-clean borders, game card style
-```
-
-### 4.2 四种卡片类型
-
-**档案卡**
-```
-pixel art card design, archive document card,
-official document style, gray header bar,
-gray and white color scheme #2A3A5A #141B2D,
-redacted text marks, document number in corner,
-vertical card format 400x560, game card style
-```
-
-**日记卡**
-```
-pixel art card design, diary journal card,
-handwritten style, wavy decorative lines,
-brown and cream color scheme #8B7355 #1E1810,
-paper texture feel, personal note style,
-vertical card format 400x560, game card style
-```
-
-**祈愿卡**
-```
-pixel art card design, prayer wish card,
-ceremonial mystical style, star decorations in corners,
-purple and gold color scheme #A855F7,
-glowing edge effect, centered symbol,
-vertical card format 400x560, game card style
-```
-
-**判词卡**
-```
-pixel art card design, system verdict card,
-official warning style, red alert header bar,
-black and red color scheme #FF6B6B #1A0A0A,
-system font style, warning symbol,
-vertical card format 400x560, game card style
-```
-
----
-
-## 五、UI组件提示词模板
-
-### 5.1 按钮组件
-
-**主按钮（280×64）**
-```
-pixel art UI button, primary action button,
-rectangular with rounded corners 8px, 280x64 pixels,
-dark blue background #1E2940, cyan border #00F5D4,
-glowing edge effect, game UI style
-```
-
-**次按钮（200×48）**
-```
-pixel art UI button, secondary action button,
-rectangular with rounded corners 8px, 200x48 pixels,
-transparent background, gray border #2A3A5A,
-subtle hover state, game UI style
-```
-
-### 5.2 面板组件
-
-**对话面板**
-```
-pixel art UI panel, dialogue box panel,
-rectangular with rounded corners 8px,
-gradient background #141B2D to #0A0E17,
-subtle border #2A3A5A, game UI style
-```
-
-**系统面板**
-```
-pixel art UI panel, system menu panel,
-rectangular with rounded corners 12px,
-solid background #141B2D, cyan accent #00F5D4,
-clean modern style, game UI style
-```
-
----
-
-## 六、特效资产提示词模板
-
-### 6.1 能力特效
-
-**深度感知激活**
-```
-pixel art effect sprite, depth perception activation,
-expanding ripple effect, cyan color #00F5D4,
-scan lines overlay, transparent background,
-12 frame animation sequence, game effect style
-```
-
-**深度介入效果**
-```
-pixel art effect sprite, depth intervention effect,
-hand reaching through surface, crack patterns,
-cyan glow with scar marks, transparent background,
-16 frame animation sequence, game effect style
-```
-
-**时间干预效果**
-```
-pixel art effect sprite, time intervention effect,
-rewind visual distortion, color shift effect,
-clock elements, timeline visualization,
-24 frame animation sequence, game effect style
-```
-
-### 6.2 系统特效
-
-**系统更正**
-```
-pixel art effect sprite, system correction effect,
-text being overwritten, strikethrough to new text,
-red to cyan color transition #FF6B6B to #00F5D4,
-12 frame animation, game effect style
-```
-
-**字段闪现**
-```
-pixel art effect sprite, field revelation effect,
-brief text flash at bottom, purple glow #A855F7,
-fade in and out quickly, 6 frame animation,
-game effect style
-```
-
----
-
-## 七、质量检查标准
-
-### 🔴 必须通过项（不通过直接拒绝）
-
-| 检查项 | 标准 | 检查方法 |
-|--------|------|----------|
-| **朝向一致性** | 要求正面必须完全对称 | 目测左右对称性 |
-| **背景透明** | 必须是透明背景 | 检查棋盘格显示 |
-| **角色完整** | 无截断、无缺失部位 | 检查头、手、脚 |
-| **风格匹配** | 必须是像素/数字艺术风格 | 对比参考图 |
-| **构图居中** | 主体必须居中 | 检查水平位置 |
-
-### 🟡 重要检查项（允许轻微偏差）
-
-| 检查项 | 标准 | 容忍度 |
-|--------|------|--------|
-| **配色准确** | 符合角色/区域配色 | 色调正确即可 |
-| **表情正确** | 符合指定表情 | 整体情绪对即可 |
-| **细节完整** | 关键特征存在 | 80%特征存在 |
-| **尺寸比例** | 符合目标比例 | ±10%偏差 |
-
-### 质量评分标准
-| 等级 | 分数 | 标准 |
-|------|------|------|
-| A | 9.0+ | 完美符合所有要求 |
-| B | 8.0-8.9 | 符合必须项，重要项轻微偏差 |
-| C | 7.0-7.9 | 符合必须项，重要项明显偏差 |
-| D | <7.0 | 必须项不通过，拒绝 |
-
----
-
-## 八、生成与审核流程
-
-### 8.1 完整工作流
-
+### 1.1 完整工作流
 ```
 1. browser_navigate → 智绘网站
 2. browser_wait_for(3) → 等待加载
 3. browser_snapshot → 获取页面状态
 4. browser_click → 关闭欢迎弹窗（如有）
 5. browser_click → 点击输入框
-6. browser_type → 输入提示词（使用本规范模板）
+6. browser_type → 输入提示词
 7. browser_click → 点击发送
 8. browser_wait_for(60-90) → 等待生成
 9. browser_take_screenshot → 截图确认
@@ -577,151 +30,9 @@ game effect style
 11. Python requests → 下载图片
 12. AI视觉检查 → 质量审核
 13. 分类移动 → approved/rejected目录
-14. 记录审核结果 → YAML审核记录
 ```
 
-### 8.2 自动化重试策略
-
-```
-最大重试次数: 5次
-
-重试触发条件与调整:
-├── 朝向不正确
-│   └── 调整: 加强 "facing camera directly, perfectly symmetrical, front view"
-├── 背景不透明
-│   └── 调整: 加强 "transparent background, PNG alpha, isolated on transparent"
-├── 风格不匹配
-│   └── 调整: 加强 "pixel art style, 2D game sprite, consistent art style"
-├── 构图偏移
-│   └── 调整: 加强 "centered composition, subject in center"
-└── 细节缺失
-    └── 调整: 补充具体特征描述词
-```
-
-### 8.3 批量生成流程
-
-```python
-# 批量生成模板
-for asset in asset_list:
-    attempt = 0
-    while attempt < 5:
-        # 1. 生成
-        generate_image(asset.prompt)
-        
-        # 2. 下载
-        images = download_generated_images()
-        
-        # 3. 审核
-        for img in images:
-            result = quality_check(img, asset.requirements)
-            
-            if result.score >= 8.0:
-                move_to_approved(img, asset.name)
-                record_audit(img, result, 'approved')
-            else:
-                move_to_rejected(img, asset.name)
-                record_audit(img, result, 'rejected')
-        
-        # 4. 检查是否有通过的
-        if has_approved_image(asset):
-            break
-        
-        # 5. 调整提示词重试
-        asset.prompt = adjust_prompt(asset.prompt, result.issues)
-        attempt += 1
-```
-
----
-
-## 九、审核记录规范
-
-### 9.1 审核记录文件命名
-```
-assets/images/[类型]/审核记录_[日期].yaml
-```
-
-### 9.2 审核记录格式
-```yaml
-# 审核记录
-date: "2025-12-24"
-auditor: "AI自动审核"
-
-batches:
-  - id: batch_001
-    timestamp: "2025-12-24T10:00:00"
-    asset_type: character  # character/background/icon/card/effect/ui
-    asset_name: 岑回立绘
-    prompt_version: 1
-    prompt_summary: "年轻中国女性，黑色短发，灰色工装..."
-    
-    images:
-      - file: cenhui_v1_1.webp
-        status: approved  # approved/rejected
-        score: 9.0
-        issues: []
-        check_results:
-          facing: "✅ 正面对称"
-          background: "✅ 透明背景"
-          completeness: "✅ 角色完整"
-          style: "✅ 像素风格"
-          composition: "✅ 居中构图"
-        moved_to: approved/cenhui_v1_1.webp
-        
-      - file: cenhui_v1_2.webp
-        status: rejected
-        score: 6.5
-        issues:
-          - "头部微侧，不是纯正面"
-        check_results:
-          facing: "❌ 头部微侧约15度"
-          background: "✅ 透明背景"
-          completeness: "✅ 角色完整"
-          style: "✅ 像素风格"
-          composition: "✅ 居中构图"
-        moved_to: rejected/cenhui_v1_2.webp
-
-statistics:
-  total_generated: 4
-  approved: 2
-  rejected: 2
-  approval_rate: 50%
-```
-
----
-
-## 十、资产命名规范
-
-### 10.1 文件命名格式
-```
-[类型]_[对象]_[变体]_[版本].webp
-
-示例：
-char_cenhui_idle_v1.webp      # 角色立绘
-portrait_cenhui_normal.webp   # 角色头像
-bg_c0z1_corridor_v1.webp      # 场景背景
-icon_item_key_v1.webp         # 物品图标
-card_archive_template_v1.webp # 卡片模板
-fx_depth_perception_v1.webp   # 特效
-ui_btn_primary_v1.webp        # UI组件
-```
-
-### 10.2 类型前缀
-| 前缀 | 类型 | 示例 |
-|------|------|------|
-| `char_` | 角色立绘 | `char_gulin_idle.webp` |
-| `portrait_` | 头像 | `portrait_gulin.webp` |
-| `px_` | 像素精灵 | `px_cenhui_walk.webp` |
-| `bg_` | 背景 | `bg_c1z2_office.webp` |
-| `icon_` | 图标 | `icon_ability_depth.webp` |
-| `card_` | 卡片 | `card_archive_001.webp` |
-| `fx_` | 特效 | `fx_time_rewind.webp` |
-| `ui_` | UI组件 | `ui_panel_dialogue.webp` |
-
----
-
-## 十一、URL提取与下载脚本
-
-### 11.1 提取URL的JavaScript
+### 1.2 URL提取JavaScript
 ```javascript
 () => {
   const images = document.querySelectorAll('img');
@@ -735,71 +46,133 @@ ui_btn_primary_v1.webp        # UI组件
 }
 ```
 
-### 11.2 Python下载脚本模板
+### 1.3 Python下载脚本
 ```python
 import requests
 import os
-from datetime import datetime
 
-def download_and_audit(urls, asset_type, asset_name, save_dir):
-    """下载图片并进行审核分类"""
-    os.makedirs(f'{save_dir}/approved', exist_ok=True)
-    os.makedirs(f'{save_dir}/rejected', exist_ok=True)
-    
-    results = []
+def download_images(urls, save_dir, asset_name):
+    os.makedirs(save_dir, exist_ok=True)
     for i, url in enumerate(urls, 1):
         response = requests.get(url, timeout=30)
-        filename = f'{asset_name}_v1_{i}.webp'
-        temp_path = f'{save_dir}/{filename}'
-        
-        with open(temp_path, 'wb') as f:
+        filename = f'{asset_name}_{i}.webp'
+        with open(f'{save_dir}/{filename}', 'wb') as f:
             f.write(response.content)
-        
-        # 返回文件信息供审核
-        results.append({
-            'file': filename,
-            'path': temp_path,
-            'size': len(response.content)
-        })
-    
-    return results
+        print(f'Downloaded: {filename}')
 ```
 
 ---
 
-## 十二、常见问题与解决方案
+## 二、提示词核心约束
 
-| 问题 | 原因 | 解决方案 |
-|------|------|----------|
-| 朝向不正 | 约束词不够强 | 添加 `perfectly symmetrical, mirror image` |
-| 背景有杂色 | 透明度词不够 | 添加 `isolated on transparent, no background elements` |
-| 风格不一致 | 缺少风格锚定 | 开头必须有 `pixel art style, 2D game asset` |
-| 细节模糊 | 描述不具体 | 补充具体特征：服装颜色、配饰、姿态 |
-| 比例失真 | 缺少比例约束 | 添加 `full body, proper proportions, human anatomy` |
+### 必须包含的风格约束
+```
+pixel art style, 2D game asset, cyberpunk aesthetic,
+clean lines, digital art, no text, no watermark
+```
 
----
+### 按资产类型的必选约束
 
-## 附录：快速参考卡片
+| 类型 | 必选约束 |
+|------|----------|
+| 角色头像 | `transparent background, front facing, portrait` |
+| 场景背景 | `vertical composition, 750x1334, dark background` |
+| 物件 | `transparent background, isometric view, isolated` |
+| 特效 | `transparent background, glowing effect` |
 
-### 角色生成检查清单
-- [ ] 提示词包含风格约束词
-- [ ] 提示词包含朝向约束词
-- [ ] 提示词包含透明背景约束
-- [ ] 提示词包含角色配色
-- [ ] 等待时间足够（60-90秒）
-- [ ] 下载使用 `_small.webp` URL
-- [ ] 审核朝向对称性
-- [ ] 审核背景透明度
-- [ ] 分类到正确目录
-- [ ] 记录审核结果
-
-### 背景生成检查清单
-- [ ] 提示词包含区域风格
-- [ ] 提示词包含竖屏尺寸 750x1334
-- [ ] 提示词包含光照氛围
-- [ ] 审核构图完整性
-- [ ] 审核风格一致性
+### 朝向控制词
+| 需求 | 约束词 |
+|------|--------|
+| 纯正面 | `facing camera directly, front view, perfectly symmetrical` |
+| 侧面 | `side profile view, facing left/right` |
+| 3/4侧 | `3/4 view, slight turn` |
 
 ---
 
-*规范版本: v2.0 | 最后更新: 2025-12-24*
+## 三、质量检查
+
+### 必须通过项（否则拒绝）
+| 检查项 | 标准 |
+|--------|------|
+| 朝向 | 正面必须对称 |
+| 背景 | 必须透明（角色/物件） |
+| 完整性 | 无截断、无缺失 |
+| 风格 | 像素/数字艺术风格 |
+| 构图 | 主体居中 |
+
+### 重要检查项（允许轻微偏差）
+| 检查项 | 容忍度 |
+|--------|--------|
+| 配色 | 色调正确即可 |
+| 表情 | 整体情绪对即可 |
+| 细节 | 80%特征存在 |
+
+### 质量评分
+| 等级 | 分数 | 处理 |
+|------|------|------|
+| A | 9.0+ | → approved/ |
+| B | 8.0-8.9 | → approved/ |
+| C | 7.0-7.9 | 视情况决定 |
+| D | <7.0 | → rejected/ |
+
+---
+
+## 四、重试策略
+
+**最大重试次数: 5次**
+
+| 问题 | 调整方案 |
+|------|----------|
+| 朝向不正 | 加强 `perfectly symmetrical, mirror image` |
+| 背景有杂色 | 加强 `isolated on transparent, no background` |
+| 风格不一致 | 加强 `pixel art style, 2D game sprite` |
+| 构图偏移 | 加强 `centered composition, subject in center` |
+| 细节缺失 | 补充具体特征描述词 |
+
+---
+
+## 五、资产分类目录
+
+```
+assets/images/
+├── characters/portraits/{name}/  # 角色头像
+├── backgrounds/{chapter}/        # 场景背景
+├── objects/{category}/           # 场景物件
+├── effects/{type}/               # 特效
+└── ui/                           # UI元素
+
+每个目录下包含:
+├── approved/   # ✅ 通过
+├── rejected/   # ❌ 未通过
+└── remaining/  # 🔄 待处理
+```
+
+---
+
+## 六、命名规范
+
+### 文件命名格式
+```
+{类型}_{对象}_{变体}_{版本}.webp
+```
+
+### 类型前缀
+| 前缀 | 类型 |
+|------|------|
+| `char_` | 角色立绘 |
+| `portrait_` | 头像 |
+| `bg_` | 背景 |
+| `obj_` | 物件 |
+| `fx_` | 特效 |
+| `ui_` | UI组件 |
+
+---
+
+## 详细提示词模板
+
+具体资产的提示词模板请参考：
+- `docs/art/提示词模板.md` - 通用模板和表情词汇表
+- `docs/art/角色设计规范.md` - 8个角色详细设计
+- `docs/art/场景设计规范.md` - 6大区域+Zone列表
+- `docs/art/特效设计规范.md` - 能力和系统特效
+- `docs/art/智绘提示词详细模板.md` - 智绘平台专用模板

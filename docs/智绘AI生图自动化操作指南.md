@@ -194,6 +194,239 @@ for i, url in enumerate(urls, 1):
 
 ---
 
+## 🖼️ 参考图上传（风格锁定）
+
+### 核心发现
+
+智绘页面有一个隐藏的文件上传组件，可以通过 JavaScript 的 `DataTransfer` API 直接设置文件，**完全绕过文件选择对话框**！
+
+### 隐藏元素信息
+
+| 项目 | 详情 |
+|------|------|
+| **选择器** | `input[type="file"][name="file"]` |
+| **支持格式** | `jpeg, jpg, png, webp` |
+| **最大数量** | 10 张参考图 |
+| **父元素类名** | `nextImage-upload` |
+
+### 自动上传代码模板
+
+```javascript
+// 在 browser_evaluate 中执行
+async () => {
+  // 1. 创建图片（可以是 canvas 生成、base64 解码、或 fetch 加载）
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  
+  // 绘制参考图内容（示例：赛博朋克风格渐变）
+  ctx.fillStyle = '#0a0a1a';
+  ctx.fillRect(0, 0, 512, 512);
+  const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+  gradient.addColorStop(0, 'rgba(255, 0, 128, 0.3)');
+  gradient.addColorStop(0.5, 'rgba(0, 255, 255, 0.2)');
+  gradient.addColorStop(1, 'rgba(128, 0, 255, 0.3)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 512, 512);
+  
+  // 2. 转换为 Blob
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  
+  // 3. 创建 File 对象
+  const file = new File([blob], 'style_reference.png', { type: 'image/png' });
+  
+  // 4. 获取隐藏的 file input
+  const fileInput = document.querySelector('input[type="file"][name="file"]');
+  
+  // 5. 使用 DataTransfer 设置文件
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  fileInput.files = dataTransfer.files;
+  
+  // 6. 触发 change 事件（关键！）
+  fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+  
+  return { success: true, fileName: file.name, fileSize: file.size };
+}
+```
+
+### 从 base64 上传真实图片
+
+```javascript
+async () => {
+  // base64 字符串（从 PowerShell 或其他方式获取）
+  const base64 = "iVBORw0KGgo..."; // 完整的 base64 数据
+  
+  // 解码为二进制
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  
+  // 创建 Blob 和 File
+  const blob = new Blob([bytes], { type: 'image/png' });
+  const file = new File([blob], 'reference.png', { type: 'image/png' });
+  
+  // 设置到 file input
+  const fileInput = document.querySelector('input[type="file"][name="file"]');
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  fileInput.files = dataTransfer.files;
+  fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+  
+  return { success: true };
+}
+```
+
+### 完整工作流程
+
+1. **导航到智绘**: `browser_navigate`
+2. **点击"参考图"按钮**: 激活参考图模式
+3. **执行上传脚本**: `browser_evaluate` 设置文件并触发 change 事件
+4. **等待上传完成**: 约 2-3 秒
+5. **输入提示词**: 描述想要生成的内容
+6. **点击发送**: 开始生成
+
+### 使用场景
+
+- **风格锁定**: 上传一张目标风格的参考图，生成同风格的多张图片
+- **批量生成**: 循环上传参考图 + 提示词，自动化生产资产
+- **一致性保证**: 同一批资产使用相同参考图，保持风格统一
+
+### ✅ 完整端到端流程示例（已验证可用）
+
+以下是使用真实角色图片生成动画序列帧的完整流程：
+
+#### 第1步：准备参考图（缩小为可传输的大小）
+
+```powershell
+# PowerShell - 使用 PIL 缩小图片到可传输大小
+python -c "
+import base64
+from PIL import Image
+import io
+
+# 读取原图
+img = Image.open(r'F:\workspace\github\Footnote\text2pic\generated\characters\char_wanderer.png')
+print(f'Original: {img.size}')
+
+# 缩小到256x256保持纵横比
+img.thumbnail((256, 256), Image.LANCZOS)
+
+# 保存为高质量JPEG（比PNG小很多）
+buf = io.BytesIO()
+img.save(buf, format='JPEG', quality=90, optimize=True)
+buf.seek(0)
+b64 = base64.b64encode(buf.read()).decode('ascii')
+print(f'Base64 length: {len(b64)} chars')
+
+# 保存base64到文件
+with open('small_ref.txt', 'w') as f:
+    f.write(b64)
+"
+```
+
+#### 第2步：导航到智绘并激活参考图模式
+
+```javascript
+// 1. 导航到智绘
+browser_navigate({ url: "https://artflow.gz4399.com/image/nextImage/chat" })
+
+// 2. 等待页面加载
+browser_wait_for({ time: 3 })
+
+// 3. 获取快照找到参考图按钮
+browser_snapshot()
+
+// 4. 点击参考图按钮激活
+browser_click({ element: "参考图按钮", ref: "eXXX" })
+```
+
+#### 第3步：上传参考图（核心代码）
+
+```javascript
+// 在 browser_evaluate 中执行
+async () => {
+  // base64 数据（从文件读取或直接嵌入）
+  const base64Data = '/9j/4AAQSkZJRgAB...'; // 完整的base64字符串
+  
+  // 解码 base64 为二进制
+  const byteString = atob(base64Data);
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const uint8Array = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < byteString.length; i++) {
+    uint8Array[i] = byteString.charCodeAt(i);
+  }
+  
+  // 创建 Blob 和 File
+  const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+  const file = new File([blob], 'reference.jpg', { type: 'image/jpeg' });
+  
+  // 找到隐藏的 file input
+  const fileInput = document.querySelector('input[type="file"][name="file"]');
+  if (!fileInput) return { error: 'File input not found' };
+  
+  // 使用 DataTransfer 设置文件
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  fileInput.files = dataTransfer.files;
+  
+  // 触发 change 事件
+  fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+  
+  return { success: true, fileSize: blob.size };
+}
+```
+
+#### 第4步：等待上传完成并输入提示词
+
+```javascript
+// 等待上传完成
+browser_wait_for({ time: 3 })
+
+// 获取快照确认上传成功（应该能看到参考图预览）
+browser_snapshot()
+
+// 点击输入框
+browser_click({ element: "输入框", ref: "eXXX" })
+
+// 输入提示词
+browser_type({
+  element: "提示词输入框",
+  ref: "eXXX",
+  text: "根据参考图的角色风格，生成4帧像素风格走路动画序列帧，保持角色外观一致，sprite sheet格式，每帧展示不同的行走姿势"
+})
+```
+
+#### 第5步：提交并等待生成
+
+```javascript
+// 获取快照确认发送按钮可用
+browser_snapshot()
+
+// 点击发送
+browser_click({ element: "发送按钮", ref: "eXXX" })
+
+// 等待生成（通常需要30-60秒）
+browser_wait_for({ time: 60 })
+
+// 截图查看结果
+browser_take_screenshot({ filename: "animation_frames.png" })
+```
+
+### 📌 关键技术点总结
+
+| 问题 | 解决方案 |
+|------|----------|
+| 图片太大无法传输 | 使用 PIL 缩小到 256x256，转 JPEG 格式 |
+| HTTPS 页面无法 fetch HTTP | 使用 base64 直接嵌入，避免跨域问题 |
+| 文件选择对话框无法自动化 | 使用 DataTransfer API 直接设置 files |
+| change 事件未触发 | 手动 dispatch Event 并设置 bubbles: true |
+
+---
+
 ## ⚠️ 已知问题与解决方案
 
 ### 1. 需要先登录

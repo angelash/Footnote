@@ -1,0 +1,158 @@
+# C3-Z7 边缘断口：断裂走廊
+# 永久后果展示
+id: C3-Z7
+title: 断裂走廊
+background:
+  texture: bg_collapse
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 裂缝地面段1
+  - id: cracked_floor_1
+    type: image
+    texture: obj_crack
+    x: 250
+    y: 500
+    scale: 0.8
+    depth: 8
+    label: 裂缝
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z7_CRACK_1
+
+  # 裂缝地面段2
+  - id: cracked_floor_2
+    type: image
+    texture: obj_crack
+    x: 400
+    y: 420
+    scale: 0.9
+    depth: 8
+
+  # 裂缝地面段3
+  - id: cracked_floor_3
+    type: image
+    texture: obj_crack
+    x: 500
+    y: 350
+    scale: 0.7
+    depth: 8
+
+  # 不稳定踏板
+  - id: unstable_platform
+    type: image
+    texture: px_tiles_platform
+    x: 350
+    y: 450
+    scale: 0.8
+    depth: 9
+    alpha: 0.85
+    label: 不稳定踏板
+    labelOffset: [0, 75]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z7_UNSTABLE_PLATFORM
+
+  # 深度感知区域 - 显示骨架断口
+  - id: depth_bone_view
+    type: zone
+    x: 350
+    y: 420
+    width: 200
+    height: 150
+    depth: 20
+    depthSenseTarget: true
+    showOnDepthSense: true
+
+  # 可选介入热点（深度感知下可见）
+  - id: intervention_point
+    type: zone
+    x: 400
+    y: 400
+    width: 80
+    height: 60
+    depth: 22
+    depthSenseTarget: true
+    label: 【介入】
+    condition:
+      abilityActive: depthPerception
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z7_INTERVENTION_CHOICE
+
+  # 终点门
+  - id: end_door
+    type: image
+    texture: obj_door
+    x: 550
+    y: 250
+    scale: 0.6
+    depth: 11
+    label: 出口
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_C3Z7_PASSED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z7_EXIT_DOOR
+
+  # 封锁装饰
+  - id: barrier_1
+    type: image
+    texture: obj_barrier
+    x: 200
+    y: 400
+    scale: 0.5
+    depth: 7
+    rotation: 0.1
+
+  - id: barrier_2
+    type: image
+    texture: obj_barrier
+    x: 600
+    y: 450
+    scale: 0.5
+    depth: 7
+    rotation: -0.1
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 200
+    y: 600
+    width: 150
+    height: 80
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z6
+
+  # 前往第4章
+  - id: exit_to_c4
+    type: zone
+    x: 550
+    y: 180
+    width: 150
+    height: 80
+    label: 继续前进
+    condition:
+      flag: FLAG_C3_COMPLETE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z1
+

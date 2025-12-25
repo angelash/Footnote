@@ -1,0 +1,125 @@
+# C2-Z2 薄墙巷口（重访）
+# 深度感知第一次实战
+id: C2-Z2
+title: 薄墙巷口
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 薄墙（深度感知可见空腔）
+  - id: thin_wall_depth
+    type: image
+    texture: px_item_wall_segment
+    x: 375
+    y: 400
+    scale: 1.2
+    depth: 10
+    label: 薄墙
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      testid: thin-wall
+      action:
+        type: dialogue
+        dialogueId: C2Z2_THIN_WALL
+
+  # 墙根裂缝（深度感知触发）
+  - id: wall_crack
+    type: image
+    texture: obj_crack
+    x: 350
+    y: 520
+    scale: 0.5
+    depth: 8
+    label: 裂缝
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z2_WALL_CRACK
+
+  # 深度感知区域（长按激活）
+  - id: depth_sense_zone
+    type: zone
+    x: 375
+    y: 450
+    width: 300
+    height: 200
+    depth: 20
+    depthSenseTarget: true
+    interactive:
+      cursor: true
+      action:
+        type: ability
+        abilityType: depthPerception
+
+  # 提交记录点
+  - id: submit_point
+    type: image
+    texture: px_fx_system_correct
+    x: 500
+    y: 350
+    scale: 0.4
+    depth: 15
+    label: 提交记录
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C2Z2_SAW_CAVITY
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z2_SUBMIT_RECORD
+
+  # 路人
+  - id: passerby
+    type: image
+    texture: placeholder_char
+    x: 600
+    y: 600
+    scale: 0.7
+    depth: 6
+    alpha: 0.5
+    tint: 0x666666
+
+  # 巷口装饰
+  - id: alley_sign
+    type: image
+    texture: px_item_sign
+    x: 150
+    y: 380
+    scale: 0.5
+    depth: 7
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往档案巷
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z3
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z1
+

@@ -1,0 +1,183 @@
+# C3-Z1 维修局：例外许可签发对话数据
+dialogues:
+  # 进入办公室
+  C3Z1_ENTER_OFFICE:
+    id: C3Z1_ENTER_OFFICE
+    lines:
+      - speaker: ""
+        text: 你推开办公室的门。
+      - speaker: ""
+        text: 顾临坐在桌前，手边放着一份文件。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z1_ENTERED
+        flagValue: true
+
+  # 顾临对话
+  C3Z1_GULIN_TALK:
+    id: C3Z1_GULIN_TALK
+    lines:
+      - speaker: 顾临
+        text: 你已经看见了。看见本身就够危险。
+      - speaker: 顾临
+        text: 今天开始你可以写入——但别把它当能力。
+      - speaker: 顾临
+        text: 这是债，不是奖赏。
+    choices:
+      - id: ask_why
+        text: 为什么要给我这个？
+        nextDialogueId: C3Z1_GULIN_WHY
+      - id: ask_save
+        text: 如果有人需要救呢？
+        nextDialogueId: C3Z1_GULIN_SAVE
+      - id: refuse
+        text: 我不想碰
+        nextDialogueId: C3Z1_GULIN_REFUSE
+
+  # 为什么
+  C3Z1_GULIN_WHY:
+    id: C3Z1_GULIN_WHY
+    lines:
+      - speaker: 顾临
+        text: 异常密度超阈值。需要例外处理。
+      - speaker: 顾临
+        text: 你的观测数据表明，你有处理这些的……潜力。
+      - speaker: 岑回
+        text: ……
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z1_GULIN_SPOKE
+        flagValue: true
+
+  # 救人
+  C3Z1_GULIN_SAVE:
+    id: C3Z1_GULIN_SAVE
+    lines:
+      - speaker: 顾临
+        text: 救援优先，但代价记在你身上。
+      - speaker: 顾临
+        text: 每次写入，都会增加解释成本。
+      - speaker: 顾临
+        text: 系统需要更多资源来……消化你的行为。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z1_GULIN_SPOKE
+        flagValue: true
+
+  # 拒绝
+  C3Z1_GULIN_REFUSE:
+    id: C3Z1_GULIN_REFUSE
+    lines:
+      - speaker: 顾临
+        text: 这反而说明你适合拿着它。
+      - speaker: 顾临
+        text: 不想碰的人，才不会滥用。
+      - speaker: 顾临
+        text: 但现实是……你迟早会遇到不得不碰的时候。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z1_GULIN_SPOKE
+        flagValue: true
+
+  # 许可文件夹
+  C3Z1_PERMIT_FOLDER:
+    id: C3Z1_PERMIT_FOLDER
+    lines:
+      - speaker: ""
+        text: 许可文件夹中只有一份薄薄的文件。
+      - speaker: ""
+        text: 「深度介入许可」
+      - speaker: ""
+        text: 权限：写入深度格（局部）
+      - speaker: ""
+        text: 警告：写入会增加解释成本
+      - speaker: ""
+        text: 条款：造成的结构伤痕不可完全回滚
+      - speaker: ""
+        text: 末尾有一行极淡的字：「结算方式：待定」
+    choices:
+      - id: sign_permit
+        text: 签署
+        nextDialogueId: C3Z1_SIGN_PERMIT
+      - id: delay_sign
+        text: 暂不签署
+        nextDialogueId: C3Z1_DELAY_SIGN
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z1_READ_PERMIT
+        flagValue: true
+
+  # 签署
+  C3Z1_SIGN_PERMIT:
+    id: C3Z1_SIGN_PERMIT
+    lines:
+      - speaker: ""
+        text: 你签下了自己的名字。
+      - speaker: 系统
+        text: 许可已签发。
+      - speaker: ""
+        text: 教学提示：深度视野下点击【介入】进行写入（慎用）
+      - speaker: 顾临
+        text: 记住：能不用就不用。
+    onComplete:
+      - type: card
+        cardId: CARD_C3_DEPTH_INTERVENTION
+      - type: flag
+        flagName: FLAG_DEPTH_INTERVENTION_UNLOCKED
+        flagValue: true
+      - type: ability
+        abilityType: depthIntervention
+        unlock: true
+
+  # 暂不签署
+  C3Z1_DELAY_SIGN:
+    id: C3Z1_DELAY_SIGN
+    lines:
+      - speaker: 顾临
+        text: 你可以按流程走……
+      - speaker: 顾临
+        text: 但那样很多事只会变成记录。
+      - speaker: 顾临
+        text: 不是所有问题都能等待系统更正的。
+      - speaker: ""
+        text: （他还是把任务单递给了你）
+    onComplete:
+      - type: card
+        cardId: CARD_C3_DEPTH_INTERVENTION
+      - type: flag
+        flagName: FLAG_DEPTH_INTERVENTION_UNLOCKED
+        flagValue: true
+      - type: ability
+        abilityType: depthIntervention
+        unlock: true
+
+  # 例外条款
+  C3Z1_EXCEPTION_CLAUSE:
+    id: C3Z1_EXCEPTION_CLAUSE
+    lines:
+      - speaker: ""
+        text: 例外条款（长按查看细节）
+      - speaker: ""
+        text: · 介入需二次确认，防止误触
+      - speaker: ""
+        text: · 每次介入将在区域留下永久伤痕
+      - speaker: ""
+        text: · 结构负担将可视化显示
+      - speaker: ""
+        text: · 超出阈值后系统可能……
+      - speaker: ""
+        text: （后面的字被涂黑了）
+
+  # 任务单
+  C3Z1_TASK_SHEET:
+    id: C3Z1_TASK_SHEET
+    lines:
+      - speaker: ""
+        text: 任务单上只写了一个地点：
+      - speaker: ""
+        text: 「边缘断口：不存在的房间」
+      - speaker: 顾临
+        text: 有人在那里。系统记录说那里不存在。
+      - speaker: 顾临
+        text: 你自己决定怎么处理。
+

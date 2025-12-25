@@ -1,0 +1,145 @@
+# C4-Z4 诊疗台：病例卡2
+# 对账序列暴露
+id: C4-Z4
+title: 诊疗台
+background:
+  texture: bg_clinic
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 许澄
+  - id: xucheng
+    type: image
+    texture: portrait_xucheng_professional
+    x: 500
+    y: 380
+    scale: 0.45
+    depth: 12
+    label: 许澄
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: xucheng
+      action:
+        type: dialogue
+        dialogueId: C4Z4_XUCHENG_TALK
+
+  # 问诊台
+  - id: consultation_desk
+    type: image
+    texture: obj_desk
+    x: 375
+    y: 450
+    scale: 0.8
+    depth: 10
+    label: 问诊台
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z4_CONSULTATION
+
+  # 回溯后症状清单
+  - id: symptom_list_new
+    type: image
+    texture: px_item_archive
+    x: 280
+    y: 520
+    scale: 0.5
+    depth: 9
+    label: 症状清单
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C4Z4_STARTED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z4_SYMPTOM_LIST
+
+  # 病例卡领取点
+  - id: med_card_point
+    type: image
+    texture: px_fx_system_correct
+    x: 480
+    y: 500
+    scale: 0.4
+    depth: 11
+    label: 病例卡
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C4Z4_SYMPTOMS_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z4_MED_CARD
+
+  # 展示节点卡选项
+  - id: show_node_card
+    type: image
+    texture: px_fx_glitch
+    x: 350
+    y: 580
+    scale: 0.35
+    depth: 10
+    alpha: 0.7
+    label: 展示节点卡
+    labelOffset: [0, 45]
+    condition:
+      flagTrue: FLAG_TIME_PATCH_MARK_SEEN
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z4_SHOW_NODE_CARD
+
+  # 医疗设备
+  - id: medical_equip
+    type: image
+    texture: obj_medical_equip
+    x: 200
+    y: 380
+    scale: 0.55
+    depth: 8
+
+  # 病床
+  - id: hospital_bed
+    type: image
+    texture: obj_hospital_bed
+    x: 180
+    y: 520
+    scale: 0.5
+    depth: 7
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往走廊
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z5
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z3
+

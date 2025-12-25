@@ -1,0 +1,117 @@
+# C2-Z6 礼堂街：祷文抄本2对话数据
+dialogues:
+  # 牧平对话
+  C2Z6_MUPING_TALK:
+    id: C2Z6_MUPING_TALK
+    lines:
+      - speaker: 牧平
+        text: 又见面了。
+      - speaker: 牧平
+        text: 你的眼睛……不一样了。
+      - speaker: 岑回
+        text: 我能看到一些东西了。
+      - speaker: 牧平
+        text: 你看见的不一定是神谕，可能只是纸背的风。
+      - speaker: 牧平
+        text: 风越大，纸越薄。
+    choices:
+      - id: tell_wall
+        text: 我看见墙里是空的
+        nextDialogueId: C2Z6_MUPING_WALL
+      - id: tell_stair
+        text: 我看见楼梯是假的
+        nextDialogueId: C2Z6_MUPING_STAIR
+      - id: just_pass
+        text: 我只是路过
+        nextDialogueId: C2Z6_MUPING_PASS
+
+  # 看见墙是空的
+  C2Z6_MUPING_WALL:
+    id: C2Z6_MUPING_WALL
+    lines:
+      - speaker: 牧平
+        text: 空，是被留下的。
+      - speaker: 牧平
+        text: 有东西曾经在那里，然后被移走了。
+      - speaker: 牧平
+        text: 别急着证明自己看见了什么——你要先学会承受。
+    choices:
+      - id: ask_what_do
+        text: 那我该怎么办？
+        effects:
+          rDelta: 1
+        nextDialogueId: C2Z6_MUPING_ADVICE
+      - id: ok
+        text: 我明白了
+        nextDialogueId: C2Z6_MUPING_END
+
+  # 看见楼梯是假的
+  C2Z6_MUPING_STAIR:
+    id: C2Z6_MUPING_STAIR
+    lines:
+      - speaker: 牧平
+        text: 假，不是不存在。
+      - speaker: 牧平
+        text: 假，是另一层的残影。
+      - speaker: 牧平
+        text: 别急着证明自己看见了什么——你要先学会承受。
+    choices:
+      - id: ask_what_do
+        text: 那我该怎么办？
+        effects:
+          rDelta: 1
+        nextDialogueId: C2Z6_MUPING_ADVICE
+      - id: ok
+        text: 我明白了
+        nextDialogueId: C2Z6_MUPING_END
+
+  # 只是路过
+  C2Z6_MUPING_PASS:
+    id: C2Z6_MUPING_PASS
+    lines:
+      - speaker: 牧平
+        text: 路过也是一种到达。
+      - speaker: 牧平
+        text: 你会回来的。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z6_TALKED_MUPING
+        flagValue: true
+
+  # 牧平建议
+  C2Z6_MUPING_ADVICE:
+    id: C2Z6_MUPING_ADVICE
+    lines:
+      - speaker: 牧平
+        text: 少写一点，或者写得更轻一点。
+      - speaker: 岑回
+        text: ……写？
+      - speaker: 牧平
+        text: 你会明白的。
+      - speaker: ""
+        text: （他递给你一张纸）
+    onComplete:
+      - type: card
+        cardId: CARD_C2_PRAYER_02
+      - type: flag
+        flagName: FLAG_C2Z6_TALKED_MUPING
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F15
+        foreshadowStage: deepen
+
+  # 结束
+  C2Z6_MUPING_END:
+    id: C2Z6_MUPING_END
+    lines:
+      - speaker: 牧平
+        text: 去吧。
+      - speaker: 牧平
+        text: 小心纸页。
+      - speaker: ""
+        text: 你得到了一段能活下去的解释。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z6_TALKED_MUPING
+        flagValue: true
+

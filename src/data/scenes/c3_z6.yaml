@@ -1,0 +1,137 @@
+# C3-Z6 礼堂街：牧平的警告
+# 价值观冲突
+id: C3-Z6
+title: 礼堂街
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 礼堂门口
+  - id: hall_entrance
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 280
+    scale: 1.0
+    depth: 8
+    alpha: 0.7
+    tint: 0x445566
+
+  # 讲台前排座位
+  - id: front_seats
+    type: image
+    texture: obj_chair
+    x: 300
+    y: 450
+    scale: 0.6
+    depth: 9
+    label: 前排座位
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z6_FRONT_SEATS
+
+  # 牧平
+  - id: muping
+    type: image
+    texture: portrait_muping_wise
+    x: 450
+    y: 400
+    scale: 0.45
+    depth: 12
+    label: 牧平
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: muping
+      action:
+        type: dialogue
+        dialogueId: C3Z6_MUPING_TALK
+
+  # 抄本领取处
+  - id: prayer_scroll_point
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 480
+    scale: 0.4
+    depth: 10
+    label: 抄本
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C3Z6_MUPING_SPOKE
+    interactive:
+      cursor: true
+      action:
+        type: card
+        cardId: CARD_C3_PRAYER_03
+
+  # 路灯
+  - id: street_lamp
+    type: image
+    texture: obj_lamp
+    x: 180
+    y: 350
+    scale: 0.6
+    depth: 10
+
+  # 夜空效果
+  - id: night_sky
+    type: image
+    texture: px_fx_field_accept
+    x: 375
+    y: 150
+    scale: 2.0
+    depth: 1
+    alpha: 0.2
+
+  # 可选：帮牧平摆椅子
+  - id: extra_chair
+    type: image
+    texture: obj_chair
+    x: 400
+    y: 520
+    scale: 0.5
+    depth: 8
+    rotation: 0.2
+    label: 歪椅子
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z6_EXTRA_CHAIR
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往断裂走廊
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z7
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z5
+

@@ -1,0 +1,96 @@
+# RV-04 C1-Z1 重返：维修局（深度介入变体）
+# 深度介入变体 - 可移动档案柜与隐藏通道
+id: RV-04
+title: 维修局 [深度介入]
+background:
+  texture: bg_c1z1
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 结构线网格
+  - id: structure_grid
+    type: image
+    texture: px_fx_glitch
+    x: 375
+    y: 400
+    scale: 2.0
+    depth: 5
+    alpha: 0.2
+
+  # 可移动档案柜
+  - id: movable_cabinet
+    type: image
+    texture: obj_filing_cabinet
+    x: 300
+    y: 450
+    scale: 0.7
+    depth: 10
+    label: 档案柜（可移动）
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: movable-cabinet
+      action:
+        type: dialogue
+        dialogueId: RV04_CABINET
+
+  # 隐藏通道入口（被档案柜挡住）
+  - id: hidden_passage
+    type: zone
+    x: 300
+    y: 480
+    width: 100
+    height: 80
+    depth: 8
+    label: ???
+    condition:
+      flagTrue: FLAG_RV04_CABINET_MOVED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV04_HIDDEN_PASSAGE
+
+  # 介入提示
+  - id: intervention_prompt
+    type: zone
+    x: 375
+    y: 650
+    width: 300
+    height: 80
+    depth: 20
+    label: 深度介入
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV04_INTERVENE
+
+  # 伤痕标记（介入后）
+  - id: scar_mark
+    type: image
+    texture: px_fx_scar
+    x: 350
+    y: 500
+    scale: 0.5
+    depth: 11
+    alpha: 0.6
+    condition:
+      flagTrue: FLAG_RV04_INTERVENED
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z1
+

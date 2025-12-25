@@ -1,0 +1,141 @@
+# C1-Z1 市政办事厅
+# 格式与更正第一次更显眼
+id: C1-Z1
+title: 市政办事厅
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 取号机
+  - id: ticket_machine
+    type: image
+    texture: px_item_archive
+    x: 150
+    y: 400
+    scale: 0.7
+    depth: 10
+    label: 取号机
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: ticket-machine
+      action:
+        type: dialogue
+        dialogueId: C1Z1_TICKET_MACHINE
+
+  # 填表台
+  - id: form_desk
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 500
+    scale: 0.8
+    depth: 10
+    label: 填表台
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      testid: form-desk
+      action:
+        type: dialogue
+        dialogueId: C1Z1_FORM_DESK
+
+  # 窗口
+  - id: service_window
+    type: image
+    texture: px_item_archive
+    x: 600
+    y: 350
+    scale: 0.75
+    depth: 12
+    label: 服务窗口
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: service-window
+      action:
+        type: dialogue
+        dialogueId: C1Z1_WINDOW
+
+  # 排队老人
+  - id: elderly_person
+    type: image
+    texture: placeholder_char
+    x: 280
+    y: 600
+    scale: 1.0
+    depth: 8
+    tint: 0xAA9988
+    label: 排队的老人
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: elderly-person
+      action:
+        type: dialogue
+        dialogueId: C1Z1_ELDERLY
+
+  # 市政职员
+  - id: clerk
+    type: image
+    texture: placeholder_char
+    x: 600
+    y: 280
+    scale: 0.9
+    depth: 11
+    tint: 0x88AA88
+
+  # 排队民众
+  - id: citizen_1
+    type: image
+    texture: placeholder_char
+    x: 200
+    y: 650
+    scale: 0.8
+    depth: 7
+    alpha: 0.7
+    tint: 0x888888
+
+  - id: citizen_2
+    type: image
+    texture: placeholder_char
+    x: 450
+    y: 680
+    scale: 0.8
+    depth: 7
+    alpha: 0.7
+    tint: 0x888888
+
+  # 出口 - 前往错门走廊
+  - id: exit_to_corridor
+    type: zone
+    x: 375
+    y: 200
+    width: 200
+    height: 100
+    label: 离开
+    condition:
+      flag: FLAG_C1Z1_PERMIT_OBTAINED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z2
+
+  # 返回序章
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C0-Z4
+

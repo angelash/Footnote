@@ -1,0 +1,225 @@
+# C5-Z1 版本冲突现场对话数据
+dialogues:
+  # 版本切换
+  C5Z1_VERSION_SWITCH:
+    id: C5Z1_VERSION_SWITCH
+    lines:
+      - speaker: ""
+        text: 地面裂纹处，你感到两种现实在交叠。
+      - speaker: ""
+        text: 点击可以在两个版本之间切换。
+    choices:
+      - id: switch_to_a
+        text: 切换到版本V-A
+        nextDialogueId: C5Z1_VERSION_A
+      - id: switch_to_b
+        text: 切换到版本V-B
+        nextDialogueId: C5Z1_VERSION_B
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z1_VERSION_SEEN
+        flagValue: true
+
+  # 版本A
+  C5Z1_VERSION_A:
+    id: C5Z1_VERSION_A
+    lines:
+      - speaker: ""
+        text: 版本V-A：路更顺，出口更安全。
+      - speaker: ""
+        text: 纪念墙不存在——像从没存在过。
+      - speaker: 系统
+        text: 状态：可归档
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z1_VERSION_A
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C5Z1_VERSION_B
+        flagValue: false
+
+  # 版本B
+  C5Z1_VERSION_B:
+    id: C5Z1_VERSION_B
+    lines:
+      - speaker: ""
+        text: 版本V-B：路更绕，需要深度视野辨别稳定骨架。
+      - speaker: ""
+        text: 纪念墙存在。上面写着很多名字。
+      - speaker: 系统
+        text: 状态：解释成本上升
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z1_VERSION_B
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C5Z1_VERSION_A
+        flagValue: false
+
+  # 纪念墙
+  C5Z1_MEMORIAL_WALL:
+    id: C5Z1_MEMORIAL_WALL
+    lines:
+      - speaker: ""
+        text: 纪念墙上写着十几个名字。
+      - speaker: ""
+        text: 有些名字已经模糊，有些还很清晰。
+      - speaker: ""
+        text: 长按可以查看名字列表。
+    choices:
+      - id: copy_names
+        text: 抄下来
+        effects:
+          rDelta: 2
+        nextDialogueId: C5Z1_COPY_NAMES
+      - id: dont_copy
+        text: 不抄
+        nextDialogueId: C5Z1_DONT_COPY
+
+  # 抄名字
+  C5Z1_COPY_NAMES:
+    id: C5Z1_COPY_NAMES
+    lines:
+      - speaker: ""
+        text: 你把名字一个个抄下来。
+      - speaker: ""
+        text: 系统结算：
+      - speaker: 系统
+        text: 无可用收益。
+      - speaker: ""
+        text: （但你做了）
+    onComplete:
+      - type: card
+        cardId: CARD_C5_MEMORIAL_COPY
+
+  # 不抄
+  C5Z1_DONT_COPY:
+    id: C5Z1_DONT_COPY
+    lines:
+      - speaker: 岑回
+        text: （也许只是看一眼……也够了）
+
+  # 宋岚对话
+  C5Z1_SONGLAN_TALK:
+    id: C5Z1_SONGLAN_TALK
+    lines:
+      - speaker: 宋岚
+        text: 你看见两个版本，都是真的。
+      - speaker: 宋岚
+        text: 系统会逼你选一个，逼你把另一个写成不存在。
+      - speaker: 宋岚
+        text: 问题不是你选哪个。
+      - speaker: 宋岚
+        text: 问题是：你愿不愿意承认你在参与更正。
+    choices:
+      - id: choose_walkable
+        text: 那我选能走的
+        nextDialogueId: C5Z1_CHOOSE_A
+      - id: keep_wall
+        text: 我不想删掉那面墙
+        nextDialogueId: C5Z1_CHOOSE_B
+      - id: keep_both
+        text: 有没有办法都留下？
+        nextDialogueId: C5Z1_KEEP_BOTH
+
+  # 选A
+  C5Z1_CHOOSE_A:
+    id: C5Z1_CHOOSE_A
+    lines:
+      - speaker: 宋岚
+        text: ……
+      - speaker: 宋岚
+        text: 那就去吧。
+
+  # 选B
+  C5Z1_CHOOSE_B:
+    id: C5Z1_CHOOSE_B
+    lines:
+      - speaker: 宋岚
+        text: 那你就得接受更绕的路。
+      - speaker: 宋岚
+        text: 和更高的解释成本。
+
+  # 都留下
+  C5Z1_KEEP_BOTH:
+    id: C5Z1_KEEP_BOTH
+    lines:
+      - speaker: 宋岚
+        text: 这就是我们一直在做的"多余的事"。
+      - speaker: 宋岚
+        text: 把差异保留得更久一点。
+      - speaker: 宋岚
+        text: 让它们更难被一次性抹掉。
+
+  # V-A出口
+  C5Z1_EXIT_VA:
+    id: C5Z1_EXIT_VA
+    lines:
+      - speaker: ""
+        text: 便捷出口。路很顺。
+      - speaker: ""
+        text: 但你知道，走这条路意味着……那面墙从未存在。
+
+  # V-B出口
+  C5Z1_EXIT_VB:
+    id: C5Z1_EXIT_VB
+    lines:
+      - speaker: ""
+        text: 绕行出口。路更碎，但墙还在。
+      - speaker: ""
+        text: 需要用深度视野辨别稳定骨架。
+
+  # 提交版本
+  C5Z1_SUBMIT_VERSION:
+    id: C5Z1_SUBMIT_VERSION
+    lines:
+      - speaker: ""
+        text: 差异标注点。
+      - speaker: ""
+        text: 提交你选择的版本，将锁定当前Zone状态。
+    choices:
+      - id: submit_a
+        text: 提交V-A（可归档）
+        nextDialogueId: C5Z1_SUBMIT_A
+      - id: submit_b
+        text: 提交V-B（解释成本↑）
+        effects:
+          rDelta: 1
+        nextDialogueId: C5Z1_SUBMIT_B
+
+  # 提交A
+  C5Z1_SUBMIT_A:
+    id: C5Z1_SUBMIT_A
+    lines:
+      - speaker: 系统
+        text: 版本已锁定：可归档。
+      - speaker: ""
+        text: （字段：——）
+    onComplete:
+      - type: card
+        cardId: CARD_C5_VERSION_CONFLICT
+      - type: flag
+        flagName: FLAG_C5Z1_VERSION_LOCKED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_VERSION_LOCK_A
+        flagValue: true
+
+  # 提交B
+  C5Z1_SUBMIT_B:
+    id: C5Z1_SUBMIT_B
+    lines:
+      - speaker: 系统
+        text: 版本已锁定：解释成本上升。
+      - speaker: ""
+        text: （字段：——）
+    onComplete:
+      - type: card
+        cardId: CARD_C5_VERSION_CONFLICT
+      - type: flag
+        flagName: FLAG_C5Z1_VERSION_LOCKED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_VERSION_LOCK_B
+        flagValue: true
+

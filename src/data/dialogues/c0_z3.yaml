@@ -1,0 +1,78 @@
+# C0-Z3 薄墙巷口对话数据
+dialogues:
+  # 薄墙基本交互
+  C0Z3_THIN_WALL:
+    id: C0Z3_THIN_WALL
+    lines:
+      - speaker: 岑回
+        text: 一面薄墙。表面看起来正常。
+      - speaker: 岑回
+        text: （可以长按仔细听听）
+
+  # 薄墙回声（长按触发）- F01伏笔
+  C0Z3_WALL_ECHO:
+    id: C0Z3_WALL_ECHO
+    lines:
+      - speaker: ""
+        text: （低频回声在墙内回荡……）
+        delay: 1500
+      - speaker: 岑回
+        text: 里面是空的。
+      - speaker: 岑回
+        text: 不该是这样的。
+      - speaker: 系统
+        text: 结构正常。
+        delay: 300
+      - speaker: 系统
+        text: 结构正常（已更正）
+        delay: 200
+      - speaker: 系统
+        text: 结构正常。
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F01
+        foreshadowStage: plant
+      - type: flag
+        flagName: FLAG_HEARD_WALL_ECHO
+        flagValue: true
+      - type: card
+        cardId: CARD_C0_ALLEY_RECORD
+
+  # 钉子拾取
+  C0Z3_NAIL_PICKUP:
+    id: C0Z3_NAIL_PICKUP
+    lines:
+      - speaker: 岑回
+        text: 墙缝里有一枚旧钉子。
+      - speaker: 岑回
+        text: 生锈了，但还算完整。
+    choices:
+      - id: pickup_nail
+        text: 收起来
+        effects:
+          setFlag:
+            name: FLAG_HAS_NAIL
+            value: true
+        nextDialogueId: C0Z3_NAIL_TAKEN
+      - id: leave_nail
+        text: 不需要
+        nextDialogueId: C0Z3_NAIL_LEFT
+
+  # 拿起钉子
+  C0Z3_NAIL_TAKEN:
+    id: C0Z3_NAIL_TAKEN
+    lines:
+      - speaker: 岑回
+        text: （收好了钉子）
+      - speaker: 岑回
+        text: 也许以后能用到。
+
+  # 留下钉子
+  C0Z3_NAIL_LEFT:
+    id: C0Z3_NAIL_LEFT
+    lines:
+      - speaker: 岑回
+        text: 不在任务范围内。
+      - speaker: 岑回
+        text: 留着吧。
+

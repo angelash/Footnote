@@ -5,6 +5,15 @@
 import Phaser from 'phaser';
 import { SCENES } from '@/config/game.config';
 import { PIXEL_IMAGE_ASSETS, PIXEL_SPRITESHEETS } from '@/data/pixelAssets';
+import {
+  CHARACTER_PORTRAITS,
+  SCENE_BACKGROUNDS,
+  ALL_SCENE_OBJECTS,
+  ALL_EFFECTS,
+  ANIMATED_OBJECTS,
+  WEBP_ASSET_STATS,
+} from '@/data/webpAssets';
+import { BGM_CONFIGS, SFX_CONFIGS, AMBIENCE_CONFIGS } from '@/data/audioConfig';
 
 export class PreloadScene extends Phaser.Scene {
   private _loadingBar!: Phaser.GameObjects.Graphics;
@@ -23,6 +32,9 @@ export class PreloadScene extends Phaser.Scene {
   create(): void {
     console.log('[PreloadScene] 资源加载完成');
 
+    // 创建动画
+    this._createAnimations();
+
     // 隐藏HTML加载屏幕
     const loadingScreen = document.getElementById('loading-screen');
     if (loadingScreen) {
@@ -32,13 +44,215 @@ export class PreloadScene extends Phaser.Scene {
       }, 500);
     }
 
-    // TODO: 初始化全局系统
-    // - WorldState
-    // - SaveManager
-    // - NarrativeEngine
-
     // 跳转到菜单场景
     this.scene.start(SCENES.MENU);
+  }
+
+  /**
+   * 创建精灵动画
+   */
+  private _createAnimations(): void {
+    // 岑回待机动画
+    if (this.textures.exists('px_sprite_cenhui_idle')) {
+      this.anims.create({
+        key: 'cenhui_idle',
+        frames: this.anims.generateFrameNumbers('px_sprite_cenhui_idle', { start: 0, end: 3 }),
+        frameRate: 4,
+        repeat: -1,
+      });
+    }
+
+    // 岑回行走动画
+    if (this.textures.exists('px_sprite_cenhui_walk')) {
+      this.anims.create({
+        key: 'cenhui_walk',
+        frames: this.anims.generateFrameNumbers('px_sprite_cenhui_walk', { start: 0, end: 7 }),
+        frameRate: 10,
+        repeat: -1,
+      });
+    }
+
+    // 顾临待机动画
+    if (this.textures.exists('px_sprite_gulin_idle')) {
+      this.anims.create({
+        key: 'gulin_idle',
+        frames: this.anims.generateFrameNumbers('px_sprite_gulin_idle', { start: 0, end: 3 }),
+        frameRate: 4,
+        repeat: -1,
+      });
+    }
+
+    // 阿棠待机动画
+    if (this.textures.exists('px_sprite_atang_idle')) {
+      this.anims.create({
+        key: 'atang_idle',
+        frames: this.anims.generateFrameNumbers('px_sprite_atang_idle', { start: 0, end: 3 }),
+        frameRate: 4,
+        repeat: -1,
+      });
+    }
+
+    // 幽灵待机动画
+    if (this.textures.exists('px_sprite_ghost_idle')) {
+      this.anims.create({
+        key: 'ghost_idle',
+        frames: this.anims.generateFrameNumbers('px_sprite_ghost_idle', { start: 0, end: 3 }),
+        frameRate: 6,
+        repeat: -1,
+      });
+    }
+
+    // 深度感知效果
+    if (this.textures.exists('px_seq_depth_perception')) {
+      this.anims.create({
+        key: 'fx_depth_perception',
+        frames: this.anims.generateFrameNumbers('px_seq_depth_perception', { start: 0, end: 11 }),
+        frameRate: 12,
+        repeat: -1,
+      });
+    }
+
+    // 深度介入效果
+    if (this.textures.exists('px_seq_depth_intervention')) {
+      this.anims.create({
+        key: 'fx_depth_intervention',
+        frames: this.anims.generateFrameNumbers('px_seq_depth_intervention', { start: 0, end: 11 }),
+        frameRate: 16,
+        repeat: 0,
+      });
+    }
+
+    // 时间干预效果
+    if (this.textures.exists('px_seq_time_intervention')) {
+      this.anims.create({
+        key: 'fx_time_intervention',
+        frames: this.anims.generateFrameNumbers('px_seq_time_intervention', { start: 0, end: 11 }),
+        frameRate: 12,
+        repeat: 0,
+      });
+    }
+
+    // 加载动画
+    if (this.textures.exists('px_seq_loader')) {
+      this.anims.create({
+        key: 'fx_loader',
+        frames: this.anims.generateFrameNumbers('px_seq_loader', { start: 0, end: 11 }),
+        frameRate: 12,
+        repeat: -1,
+      });
+    }
+
+    // 故障效果
+    if (this.textures.exists('px_seq_glitch')) {
+      this.anims.create({
+        key: 'fx_glitch',
+        frames: this.anims.generateFrameNumbers('px_seq_glitch', { start: 0, end: 11 }),
+        frameRate: 8,
+        repeat: -1,
+      });
+    }
+
+    // ===== WebP可动物件动画 =====
+    this._createWebpAnimations();
+
+    console.log('[PreloadScene] 动画创建完成');
+  }
+
+  /**
+   * 创建WebP可动物件动画
+   */
+  private _createWebpAnimations(): void {
+    // 台灯闪烁动画
+    if (this.textures.exists('anim_lamp_flicker_frame_0')) {
+      this.anims.create({
+        key: 'webp_lamp_flicker',
+        frames: [
+          { key: 'anim_lamp_flicker_frame_0' },
+          { key: 'anim_lamp_flicker_frame_1' },
+          { key: 'anim_lamp_flicker_frame_2' },
+          { key: 'anim_lamp_flicker_frame_3' },
+        ],
+        frameRate: 4,
+        repeat: -1,
+      });
+    }
+
+    // 油灯火焰动画
+    if (this.textures.exists('anim_oil_lamp_frame_0')) {
+      this.anims.create({
+        key: 'webp_oil_lamp',
+        frames: [
+          { key: 'anim_oil_lamp_frame_0' },
+          { key: 'anim_oil_lamp_frame_1' },
+          { key: 'anim_oil_lamp_frame_2' },
+          { key: 'anim_oil_lamp_frame_3' },
+        ],
+        frameRate: 6,
+        repeat: -1,
+      });
+    }
+
+    // 蜡烛燃烧动画
+    if (this.textures.exists('anim_candle_frame_0')) {
+      this.anims.create({
+        key: 'webp_candle',
+        frames: [
+          { key: 'anim_candle_frame_0' },
+          { key: 'anim_candle_frame_1' },
+          { key: 'anim_candle_frame_2' },
+          { key: 'anim_candle_frame_3' },
+        ],
+        frameRate: 6,
+        repeat: -1,
+      });
+    }
+
+    // 监视器闪烁动画
+    if (this.textures.exists('anim_monitor_frame_0')) {
+      this.anims.create({
+        key: 'webp_monitor',
+        frames: [
+          { key: 'anim_monitor_frame_0' },
+          { key: 'anim_monitor_frame_1' },
+          { key: 'anim_monitor_frame_2' },
+          { key: 'anim_monitor_frame_3' },
+        ],
+        frameRate: 3,
+        repeat: -1,
+      });
+    }
+
+    // 裂缝颤动动画
+    if (this.textures.exists('anim_crack_frame_0')) {
+      this.anims.create({
+        key: 'webp_crack',
+        frames: [
+          { key: 'anim_crack_frame_0' },
+          { key: 'anim_crack_frame_1' },
+          { key: 'anim_crack_frame_2' },
+          { key: 'anim_crack_frame_3' },
+        ],
+        frameRate: 2,
+        repeat: -1,
+      });
+    }
+
+    // 符文发光动画
+    if (this.textures.exists('anim_rune_frame_0')) {
+      this.anims.create({
+        key: 'webp_rune',
+        frames: [
+          { key: 'anim_rune_frame_0' },
+          { key: 'anim_rune_frame_1' },
+          { key: 'anim_rune_frame_2' },
+          { key: 'anim_rune_frame_3' },
+        ],
+        frameRate: 4,
+        repeat: -1,
+      });
+    }
+
+    console.log('[PreloadScene] WebP动画创建完成');
   }
 
   private _createLoadingUI(): void {
@@ -104,20 +318,6 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   private _loadImages(): void {
-    // 角色立绘
-    // this.load.svg('char_cenhui', 'assets/images/characters/portraits/char_cenhui.svg');
-    // this.load.svg('char_gulin', 'assets/images/characters/portraits/char_gulin.svg');
-    // ... 其他角色
-
-    // 背景场景
-    // this.load.svg('bg_c0z1', 'assets/images/backgrounds/c0/bg_c0z1.svg');
-    // ... 其他背景
-
-    // UI元素
-    // this.load.svg('ui_dialogue_box', 'assets/images/ui/panels/dialogue_box.svg');
-    // this.load.svg('ui_card_template', 'assets/images/ui/cards/card_template.svg');
-    // ... 其他UI
-
     // 临时占位：创建一些基础几何图形作为占位符
     this._createPlaceholders();
 
@@ -131,32 +331,140 @@ export class PreloadScene extends Phaser.Scene {
         frameHeight: sheet.frameHeight,
       });
     });
+
+    // ===== WebP资产（智绘AI生成）=====
+    console.log(`[PreloadScene] 开始加载 ${WEBP_ASSET_STATS.total} 个WebP资产...`);
+
+    // 角色头像
+    Object.entries(CHARACTER_PORTRAITS).forEach(([key, url]) => {
+      this.load.image(key, url);
+    });
+
+    // 场景背景
+    Object.entries(SCENE_BACKGROUNDS).forEach(([key, url]) => {
+      this.load.image(key, url);
+    });
+
+    // 场景物件
+    Object.entries(ALL_SCENE_OBJECTS).forEach(([key, url]) => {
+      this.load.image(key, url);
+    });
+
+    // 特效
+    Object.entries(ALL_EFFECTS).forEach(([key, url]) => {
+      this.load.image(key, url);
+    });
+
+    // 可动物件动画帧
+    Object.entries(ANIMATED_OBJECTS).forEach(([key, anim]) => {
+      anim.frames.forEach((url, index) => {
+        this.load.image(`${key}_frame_${index}`, url);
+      });
+    });
   }
 
   private _loadAudio(): void {
-    // 背景音乐
-    // this.load.audio('bgm_main', 'assets/audio/bgm/main.mp3');
+    const totalAudio = BGM_CONFIGS.length + SFX_CONFIGS.length + AMBIENCE_CONFIGS.length;
+    console.log(`[PreloadScene] 开始加载 ${totalAudio} 个音频资产...`);
 
-    // 音效
-    // this.load.audio('sfx_click', 'assets/audio/sfx/click.mp3');
-    // this.load.audio('sfx_card_collect', 'assets/audio/sfx/card_collect.mp3');
-    // this.load.audio('sfx_depth_activate', 'assets/audio/sfx/depth_activate.mp3');
+    // 加载BGM
+    BGM_CONFIGS.forEach(config => {
+      this.load.audio(config.id, config.file);
+    });
+
+    // 加载音效
+    SFX_CONFIGS.forEach(config => {
+      this.load.audio(config.id, config.file);
+    });
+
+    // 加载环境音
+    AMBIENCE_CONFIGS.forEach(config => {
+      this.load.audio(config.id, config.file);
+    });
   }
 
   private _loadData(): void {
-    // 对话数据
-    // this.load.yaml('dialogues_c0', 'assets/data/dialogues/c0.yaml');
-    // this.load.yaml('dialogues_c1', 'assets/data/dialogues/c1.yaml');
-    // ... 其他章节
+    // 对话数据（YAML格式）
+    const dialogueFiles = [
+      // 序章
+      'c0_z1',
+      'c0_z2',
+      'c0_z3',
+      'c0_z4',
+      // 第1章
+      'c1_z1',
+      'c1_z2',
+      'c1_z3',
+      'c1_z4',
+      'c1_z5',
+      'c1_z6',
+      // 第2章
+      'c2_z1',
+      'c2_z2',
+      'c2_z3',
+      'c2_z4',
+      'c2_z5',
+      'c2_z6',
+      'c2_z7',
+      // 第3章
+      'c3_z1',
+      'c3_z2',
+      'c3_z3',
+      'c3_z4',
+      'c3_z5',
+      'c3_z6',
+      'c3_z7',
+      // 第4章
+      'c4_z1',
+      'c4_z2',
+      'c4_z3',
+      'c4_z4',
+      'c4_z5',
+      'c4_z6',
+      'c4_z7',
+      'c4_z8',
+      // 第5章
+      'c5_z1',
+      'c5_z2',
+      'c5_z3',
+      'c5_z4',
+      'c5_z5',
+      'c5_z6',
+      'c5_z7',
+      // 终章
+      'cf_z1',
+      'cf_z2',
+      'cf_z3',
+      'cf_z4',
+      'cf_z5',
+      'cf_z6',
+      // 重返变体
+      'rv_dialogues',
+    ];
+    dialogueFiles.forEach((file) => {
+      this.load.text(`dialogue_${file}`, `src/data/dialogues/${file}.yaml`);
+    });
 
     // 卡片数据
-    // this.load.json('cards', 'assets/data/cards.json');
-
-    // Zone数据
-    // this.load.yaml('zones', 'assets/data/zones.yaml');
+    const cardFiles = [
+      'c0_cards',
+      'c1_cards',
+      'c2_cards',
+      'c3_cards',
+      'c4_cards',
+      'c5_cards',
+      'cf_cards',
+      'rv_cards',
+    ];
+    cardFiles.forEach((file) => {
+      this.load.text(`cards_${file}`, `src/data/cards/${file}.yaml`);
+    });
 
     // 伏笔数据
-    // this.load.yaml('foreshadows', 'assets/data/foreshadows.yaml');
+    this.load.text('foreshadows', 'src/data/foreshadows/foreshadows.yaml');
+
+    // Zone配置数据（场景组装器用）
+    // 已在 _loadImages 中通过 YAML 加载
 
     // 角色数据
     // this.load.yaml('characters', 'assets/data/characters.yaml');

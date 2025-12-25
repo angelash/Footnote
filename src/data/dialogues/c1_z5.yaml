@@ -1,0 +1,126 @@
+# C1-Z5 礼堂街夜谈对话数据
+dialogues:
+  # 牧平对话（核心）
+  C1Z5_MUPING_TALK:
+    id: C1Z5_MUPING_TALK
+    lines:
+      - speaker: ""
+        text: 一个穿着旧式长袍的人站在简易讲台旁。
+      - speaker: ""
+        text: 周围聚集了一些听众。
+      - speaker: 牧平
+        text: ……纸页不恨你，它只会承受不住。
+      - speaker: 牧平
+        text: 别往一页纸上写太多。
+      - speaker: 牧平
+        text: 你以为你在找真相，其实你在加墨。
+    choices:
+      - id: ask_meaning
+        text: 你在暗示什么？
+        nextDialogueId: C1Z5_MUPING_HINT
+      - id: just_passing
+        text: 我只是路过
+        nextDialogueId: C1Z5_MUPING_PASS
+      - id: mention_wall
+        text: 我见过墙里是空的
+        nextDialogueId: C1Z5_MUPING_WALL
+
+  # 牧平暗示
+  C1Z5_MUPING_HINT:
+    id: C1Z5_MUPING_HINT
+    lines:
+      - speaker: 牧平
+        text: 暗示是给还活得下去的人用的。
+      - speaker: 牧平
+        text: 你看起来还活得下去。
+      - speaker: 岑回
+        text: ……
+      - speaker: 牧平
+        text: 如果你想听完，就留下来。
+    choices:
+      - id: stay_listen
+        text: 留下听完
+        effects:
+          rDelta: 1
+          setFlag:
+            name: FLAG_C1Z5_STAYED
+            value: true
+        nextDialogueId: C1Z5_MUPING_FULL
+      - id: leave_now
+        text: 我该走了
+        nextDialogueId: C1Z5_MUPING_LEAVE
+
+  # 路过回应
+  C1Z5_MUPING_PASS:
+    id: C1Z5_MUPING_PASS
+    lines:
+      - speaker: 牧平
+        text: 路过也是一种到达。
+      - speaker: 牧平
+        text: 下次再来时，也许你会留下。
+      - speaker: ""
+        text: （他继续对其他听众讲话）
+
+  # 提到墙
+  C1Z5_MUPING_WALL:
+    id: C1Z5_MUPING_WALL
+    lines:
+      - speaker: 牧平
+        text: ……
+      - speaker: ""
+        text: （他看着你，眼神变得锐利）
+      - speaker: 牧平
+        text: 空，不是不存在。
+      - speaker: 牧平
+        text: 空，是被留下的。
+      - speaker: 牧平
+        text: 你看到的不是空洞，是痕迹。
+      - speaker: 岑回
+        text: 痕迹？
+      - speaker: 牧平
+        text: 有东西曾经在那里。然后被……移走了。
+      - speaker: 牧平
+        text: 但移走不等于消失。
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F15
+        foreshadowStage: plant
+
+  # 完整聆听
+  C1Z5_MUPING_FULL:
+    id: C1Z5_MUPING_FULL
+    lines:
+      - speaker: ""
+        text: （你留下来，听完了整个夜谈……）
+      - speaker: 牧平
+        text: ……当文字太多，纸页会皱缩。
+      - speaker: 牧平
+        text: 当皱缩太深，纸页会撕裂。
+      - speaker: 牧平
+        text: 我们都生活在纸上。
+      - speaker: 牧平
+        text: 所以要轻声走路。要小心落笔。
+      - speaker: ""
+        text: （夜谈结束。人群渐渐散去。）
+      - speaker: 牧平
+        text: 给你。
+      - speaker: ""
+        text: （他递给你一张写满字的纸片）
+      - speaker: 牧平
+        text: 这是抄本。不解释，你看就好。
+    onComplete:
+      - type: card
+        cardId: CARD_C1_PRAYER_01
+      - type: foreshadow
+        foreshadowId: F15
+        foreshadowStage: deepen
+
+  # 离开
+  C1Z5_MUPING_LEAVE:
+    id: C1Z5_MUPING_LEAVE
+    lines:
+      - speaker: 牧平
+        text: 走好。
+      - speaker: 牧平
+        text: 小心纸页。
+

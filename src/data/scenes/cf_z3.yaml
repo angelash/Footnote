@@ -1,0 +1,147 @@
+# CF-Z3 尺度失配：对视
+# 玩家"改模型"的动作 - 字段定义
+id: CF-Z3
+title: 对视走廊
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 对视走廊入口
+  - id: corridor_entrance
+    type: zone
+    x: 375
+    y: 350
+    width: 200
+    height: 100
+    depth: 10
+    label: 进入走廊
+    interactive:
+      cursor: true
+      testid: corridor-entrance
+      action:
+        type: dialogue
+        dialogueId: CFZ3_ENTER
+
+  # 格式坠落区域1
+  - id: format_zone_1
+    type: image
+    texture: px_fx_glitch
+    x: 250
+    y: 420
+    scale: 0.5
+    depth: 9
+    alpha: 0.6
+    label: 格式区①
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_CFZ3_ENTERED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ3_FORMAT_1
+
+  # 格式坠落区域2
+  - id: format_zone_2
+    type: image
+    texture: px_fx_field_accept
+    x: 400
+    y: 450
+    scale: 0.5
+    depth: 9
+    alpha: 0.6
+    label: 格式区②
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_CFZ3_FORMAT_1_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ3_FORMAT_2
+
+  # 格式坠落区域3
+  - id: format_zone_3
+    type: image
+    texture: px_fx_scar
+    x: 520
+    y: 400
+    scale: 0.5
+    depth: 9
+    alpha: 0.6
+    label: 格式区③
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_CFZ3_FORMAT_2_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ3_FORMAT_3
+
+  # 冗余字段条交互点（核心）
+  - id: field_bar
+    type: zone
+    x: 375
+    y: 1100
+    width: 300
+    height: 60
+    depth: 25
+    label: 字段：＿（待定义）
+    condition:
+      flagTrue: FLAG_CFZ3_ALL_FORMAT_DONE
+    interactive:
+      cursor: true
+      testid: field-bar
+      action:
+        type: dialogue
+        dialogueId: CFZ3_FIELD_DEFINE
+
+  # 稳定存在的细节（字段接受后）
+  - id: stable_detail
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 280
+    scale: 0.4
+    depth: 8
+    label: 纸条（稳定）
+    labelOffset: [0, 45]
+    condition:
+      flagTrue: FLAG_FIELD_ACCEPTED
+
+  # 出口门
+  - id: exit_door
+    type: image
+    texture: obj_door
+    x: 375
+    y: 220
+    scale: 0.7
+    depth: 10
+    label: 继续
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_FIELD_ACCEPTED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z4
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z2
+

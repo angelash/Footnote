@@ -1,0 +1,138 @@
+# CF-Z5 三结局选择对话数据
+dialogues:
+  # 代价说明
+  CFZ5_COST_INFO:
+    id: CFZ5_COST_INFO
+    lines:
+      - speaker: ""
+        text: 三个选择，都有代价：
+      - speaker: ""
+        text: 【继续收敛】维持可读性，字段◦◦◦被限制在边缘
+      - speaker: ""
+        text: 【释放表示】松开压缩，可读性下降，意义更易存活
+      - speaker: ""
+        text: 【承载字段】你成为运行时载体，代价由你承担
+
+  # 结局A
+  CFZ5_ENDING_A:
+    id: CFZ5_ENDING_A
+    lines:
+      - speaker: ""
+        text: 【继续收敛】
+      - speaker: ""
+        text: 维持可读性。
+      - speaker: ""
+        text: 世界继续作为稳定切片存在。
+      - speaker: ""
+        text: 字段◦◦◦将被保留，但被限制在边缘。
+    choices:
+      - id: confirm_a
+        text: 按住确认（1秒）
+        nextDialogueId: CFZ5_ENDING_A_CONFIRM
+      - id: cancel
+        text: 取消
+        nextDialogueId: CFZ5_CANCEL
+
+  # 结局A确认
+  CFZ5_ENDING_A_CONFIRM:
+    id: CFZ5_ENDING_A_CONFIRM
+    lines:
+      - speaker: 系统
+        text: 收敛继续。
+      - speaker: ""
+        text: 城还能继续被读。
+      - speaker: ""
+        text: 但你第一次看到：读不下去的东西，也能留下。
+    onComplete:
+      - type: flag
+        flagName: FLAG_ENDING_A
+        flagValue: true
+      - type: flag
+        flagName: FLAG_GAME_CLEAR
+        flagValue: true
+
+  # 结局B
+  CFZ5_ENDING_B:
+    id: CFZ5_ENDING_B
+    lines:
+      - speaker: ""
+        text: 【释放表示】
+      - speaker: ""
+        text: 松开压缩。
+      - speaker: ""
+        text: 更多互斥版本将同时涌现。
+      - speaker: ""
+        text: 可读性下降，但意义更容易存活。
+    choices:
+      - id: confirm_b
+        text: 按住确认（1秒）
+        nextDialogueId: CFZ5_ENDING_B_CONFIRM
+      - id: cancel
+        text: 取消
+        nextDialogueId: CFZ5_CANCEL
+
+  # 结局B确认
+  CFZ5_ENDING_B_CONFIRM:
+    id: CFZ5_ENDING_B_CONFIRM
+    lines:
+      - speaker: 系统
+        text: 表示松开。
+      - speaker: ""
+        text: 版本不再排队。它们同时存在。
+      - speaker: ""
+        text: 世界更乱了，但意义更自由了。
+    onComplete:
+      - type: flag
+        flagName: FLAG_ENDING_B
+        flagValue: true
+      - type: flag
+        flagName: FLAG_GAME_CLEAR
+        flagValue: true
+
+  # 结局C
+  CFZ5_ENDING_C:
+    id: CFZ5_ENDING_C
+    lines:
+      - speaker: ""
+        text: 【承载字段】
+      - speaker: ""
+        text: 你将成为字段◦◦◦的运行时载体。
+      - speaker: ""
+        text: 世界继续可读，但代价由你承担。
+      - speaker: ""
+        text: 你不再拥有完整的"个人结算"。
+    choices:
+      - id: confirm_c
+        text: 按住确认（1秒）
+        nextDialogueId: CFZ5_ENDING_C_CONFIRM
+      - id: cancel
+        text: 取消
+        nextDialogueId: CFZ5_CANCEL
+
+  # 结局C确认
+  CFZ5_ENDING_C_CONFIRM:
+    id: CFZ5_ENDING_C_CONFIRM
+    lines:
+      - speaker: 系统
+        text: 字段交接。
+      - speaker: ""
+        text: 你把代价背走了。
+      - speaker: ""
+        text: 你不是升维成神，你是背债。
+      - speaker: ""
+        text: 但你让某些人多活了一点。
+    onComplete:
+      - type: flag
+        flagName: FLAG_ENDING_C
+        flagValue: true
+      - type: flag
+        flagName: FLAG_GAME_CLEAR
+        flagValue: true
+
+  # 取消
+  CFZ5_CANCEL:
+    id: CFZ5_CANCEL
+    lines:
+      - speaker: 岑回
+        text: （再想想……）
+

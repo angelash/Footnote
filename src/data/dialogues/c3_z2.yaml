@@ -1,0 +1,212 @@
+# C3-Z2 不存在的房间对话数据
+dialogues:
+  # 门影轮廓
+  C3Z2_DOOR_OUTLINE:
+    id: C3Z2_DOOR_OUTLINE
+    lines:
+      - speaker: 系统
+        text: 对象：不存在。建议忽略。
+      - speaker: ""
+        text: 但你能听到里面传来微弱的敲击声……
+      - speaker: ""
+        text: 还有呼喊。
+      - speaker: 岑回
+        text: 有人在里面。
+
+  # 维护通道（解法A）
+  C3Z2_MAINTENANCE_HATCH:
+    id: C3Z2_MAINTENANCE_HATCH
+    lines:
+      - speaker: ""
+        text: 维护通道的盖板。
+      - speaker: ""
+        text: 上面标注着：「仅授权人员使用」
+      - speaker: 岑回
+        text: 也许可以从这里绕进去……
+    choices:
+      - id: open_hatch
+        text: 撬开盖板
+        nextDialogueId: C3Z2_OPEN_HATCH
+      - id: leave_hatch
+        text: 先不动
+        nextDialogueId: C3Z2_LEAVE_HATCH
+
+  # 撬开盖板
+  C3Z2_OPEN_HATCH:
+    id: C3Z2_OPEN_HATCH
+    lines:
+      - speaker: ""
+        text: 你费力地撬开了盖板。
+      - speaker: ""
+        text: 下面是一条狭窄的维护通道。
+      - speaker: 岑回
+        text: 这条路会更慢，但……至少是"存在"的路径。
+      - speaker: ""
+        text: （你沿着通道进入了内部空间）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z2_ENTERED_ROOM
+        flagValue: true
+      - type: flag
+        flagName: FLAG_SURFACE_DAMAGE
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C3Z2_METHOD_A
+        flagValue: true
+
+  # 先不动
+  C3Z2_LEAVE_HATCH:
+    id: C3Z2_LEAVE_HATCH
+    lines:
+      - speaker: 岑回
+        text: （也许还有别的办法……）
+
+  # 介入选择（解法B）
+  C3Z2_INTERVENTION_CHOICE:
+    id: C3Z2_INTERVENTION_CHOICE
+    lines:
+      - speaker: ""
+        text: 深度视野下，门影边缘出现【介入】选项。
+      - speaker: ""
+        text: 「深度介入（写入）」
+      - speaker: ""
+        text: 「将改写结构，并留下永久伤痕。」
+    choices:
+      - id: confirm_intervention
+        text: 按住确认（1秒）
+        effects:
+          pDelta: 3
+          rDelta: 1
+          setFlag:
+            name: FLAG_HALL_SCAR
+            value: 1
+        nextDialogueId: C3Z2_DO_INTERVENTION
+      - id: cancel_intervention
+        text: 取消
+        nextDialogueId: C3Z2_CANCEL_INTERVENTION
+
+  # 执行介入
+  C3Z2_DO_INTERVENTION:
+    id: C3Z2_DO_INTERVENTION
+    lines:
+      - speaker: ""
+        text: 你伸出手，触碰门影的边缘……
+      - speaker: ""
+        text: 结构在你的意识下重组。
+      - speaker: ""
+        text: 一道门在墙面上显现。
+      - speaker: 系统
+        text: 警告：结构写入已执行。伤痕已记录。
+      - speaker: ""
+        text: （你走进了那个"不存在"的房间）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z2_ENTERED_ROOM
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C3Z2_METHOD_B
+        flagValue: true
+
+  # 取消介入
+  C3Z2_CANCEL_INTERVENTION:
+    id: C3Z2_CANCEL_INTERVENTION
+    lines:
+      - speaker: 岑回
+        text: （还是找别的办法吧……）
+
+  # 陈匠对话
+  C3Z2_CHENJIANG_TALK:
+    id: C3Z2_CHENJIANG_TALK
+    lines:
+      - speaker: 陈匠
+        text: 你看得到这里？
+      - speaker: 岑回
+        text: 你被困了多久了？
+      - speaker: 陈匠
+        text: 我只是来把那盏灯点起来……它以前照过人。
+      - speaker: 陈匠
+        text: 他们说这里不存在。可不存在的地方，也会冷。
+    choices:
+      - id: follow_me
+        text: 跟我走
+        nextDialogueId: C3Z2_FOLLOW_ME
+      - id: ask_why_here
+        text: 你为什么要来？
+        nextDialogueId: C3Z2_WHY_HERE
+      - id: ask_name
+        text: 你叫什么？
+        nextDialogueId: C3Z2_ASK_NAME
+
+  # 跟我走
+  C3Z2_FOLLOW_ME:
+    id: C3Z2_FOLLOW_ME
+    lines:
+      - speaker: 陈匠
+        text: ……好。
+      - speaker: ""
+        text: （他递给你一截旧灯芯）
+      - speaker: 陈匠
+        text: 拿着这个。它没用了，但别让它被忘掉。
+    onComplete:
+      - type: card
+        cardId: CARD_C3_OLD_WICK
+      - type: flag
+        flagName: FLAG_C3Z2_RESCUED
+        flagValue: true
+
+  # 为什么来
+  C3Z2_WHY_HERE:
+    id: C3Z2_WHY_HERE
+    lines:
+      - speaker: 陈匠
+        text: 有人曾经在这里等过另一个人。
+      - speaker: 陈匠
+        text: 那个人没来。但灯还在。
+      - speaker: 陈匠
+        text: 我只是想让灯亮着，让那个"没来"显得不那么绝对。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z2_RESCUED
+        flagValue: true
+
+  # 你叫什么
+  C3Z2_ASK_NAME:
+    id: C3Z2_ASK_NAME
+    lines:
+      - speaker: 陈匠
+        text: 名字不重要，重要的是别让它被抹掉。
+      - speaker: 陈匠
+        text: 我叫陈匠。记住就好。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z2_RESCUED
+        flagValue: true
+
+  # 撤离
+  C3Z2_EVACUATION:
+    id: C3Z2_EVACUATION
+    lines:
+      - speaker: ""
+        text: 你带着陈匠离开了那个"不存在"的房间。
+      - speaker: ""
+        text: 身后的门影渐渐模糊。
+      - speaker: ""
+        text: 系统记录：
+    choices:
+      - id: check_result
+        text: 查看结果
+        nextDialogueId: C3Z2_RESULT
+
+  # 结果（根据解法不同）
+  C3Z2_RESULT:
+    id: C3Z2_RESULT
+    lines:
+      - speaker: ""
+        text: （救援完成）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z2_COMPLETE
+        flagValue: true
+      - type: card
+        cardId: CARD_C3_RESCUE_RECORD
+

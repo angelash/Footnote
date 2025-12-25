@@ -1,0 +1,106 @@
+# CF-Z1 冗余字段区对话数据
+dialogues:
+  # 进入
+  CFZ1_ENTER:
+    id: CFZ1_ENTER
+    lines:
+      - speaker: ""
+        text: 你进入冗余字段区——
+      - speaker: ""
+        text: 屏幕上方闪现半透明字段表……
+      - speaker: ""
+        text: 「条目：观测」
+      - speaker: ""
+        text: 「收敛：失败」
+      - speaker: ""
+        text: 「残差：保留」
+      - speaker: ""
+        text: 「字段：＿」
+      - speaker: ""
+        text: 「建议：降阶」
+      - speaker: ""
+        text: （遮罩消失，但底部出现一条冗余字段条）
+      - speaker: ""
+        text: 「字段：＿」——它不可关闭。
+      - speaker: 岑回
+        text: （关不掉……）
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ1_ENTERED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_F22_ACTIVE
+        flagValue: true
+
+  # 异常点A
+  CFZ1_ANOMALY_A:
+    id: CFZ1_ANOMALY_A
+    lines:
+      - speaker: ""
+        text: 异常点A：空白字段。
+      - speaker: ""
+        text: 深度视野下像一个缺口符号。
+      - speaker: ""
+        text: 你点击标注。
+      - speaker: 系统
+        text: 字段补全失败。
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ1_A_DONE
+        flagValue: true
+
+  # 异常点B
+  CFZ1_ANOMALY_B:
+    id: CFZ1_ANOMALY_B
+    lines:
+      - speaker: ""
+        text: 异常点B：重复事件。
+      - speaker: ""
+        text: 像双影符号。
+      - speaker: ""
+        text: 你点击标注。
+      - speaker: 系统
+        text: 重复事件：无法合并。
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ1_B_DONE
+        flagValue: true
+
+  # 异常点C
+  CFZ1_ANOMALY_C:
+    id: CFZ1_ANOMALY_C
+    lines:
+      - speaker: ""
+        text: 异常点C：无收益残差。
+      - speaker: ""
+        text: 像多余小点群符号。
+      - speaker: ""
+        text: 你点击标注。
+      - speaker: 系统
+        text: 残差：不可结算。
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ1_ALL_DONE
+        flagValue: true
+      - type: card
+        cardId: CARD_CF_REDUNDANT_SNAPSHOT
+
+  # 时间堆栈异化
+  CFZ1_TIME_STACK:
+    id: CFZ1_TIME_STACK
+    lines:
+      - speaker: ""
+        text: 你打开时间堆栈。
+      - speaker: ""
+        text: 其中一张节点卡的标题——
+      - speaker: ""
+        text: 「节点：◦◦ / ＿」
+      - speaker: ""
+        text: 你点击它。
+      - speaker: 系统
+        text: 无可回溯解释。
+      - speaker: 岑回
+        text: （这种格式……它在读什么？）
+    effects:
+      pDelta: 1
+

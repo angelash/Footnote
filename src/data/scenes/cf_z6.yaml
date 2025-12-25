@@ -1,0 +1,146 @@
+# CF-Z6 尾声重访
+# 6位角色各一段 + 通关后钩子
+id: CF-Z6
+title: 尾声
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 顾临入口
+  - id: gulin_entry
+    type: image
+    texture: portrait_gulin_neutral
+    x: 150
+    y: 300
+    scale: 0.35
+    depth: 10
+    label: 顾临
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: gulin
+      action:
+        type: dialogue
+        dialogueId: CFZ6_GULIN
+
+  # 宋岚入口
+  - id: songlan_entry
+    type: image
+    texture: portrait_songlan_neutral
+    x: 300
+    y: 300
+    scale: 0.35
+    depth: 10
+    label: 宋岚
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: songlan
+      action:
+        type: dialogue
+        dialogueId: CFZ6_SONGLAN
+
+  # 许澄入口
+  - id: xucheng_entry
+    type: image
+    texture: portrait_xucheng_neutral
+    x: 450
+    y: 300
+    scale: 0.35
+    depth: 10
+    label: 许澄
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: xucheng
+      action:
+        type: dialogue
+        dialogueId: CFZ6_XUCHENG
+
+  # 牧平入口
+  - id: muping_entry
+    type: image
+    texture: portrait_muping_neutral
+    x: 600
+    y: 300
+    scale: 0.35
+    depth: 10
+    label: 牧平
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: muping
+      action:
+        type: dialogue
+        dialogueId: CFZ6_MUPING
+
+  # 阿棠入口
+  - id: atang_entry
+    type: image
+    texture: portrait_atang_neutral
+    x: 225
+    y: 450
+    scale: 0.35
+    depth: 10
+    label: 阿棠
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: atang
+      action:
+        type: dialogue
+        dialogueId: CFZ6_ATANG
+
+  # 栖蓝入口
+  - id: qilan_entry
+    type: image
+    texture: portrait_qilan_neutral
+    x: 525
+    y: 450
+    scale: 0.35
+    depth: 10
+    label: 栖蓝
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: qilan
+      action:
+        type: dialogue
+        dialogueId: CFZ6_QILAN
+
+  # 无收益清单
+  - id: no_reward_list
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 580
+    scale: 0.5
+    depth: 9
+    label: 无收益清单
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ6_NO_REWARD_LIST
+
+  # 通关提示
+  - id: clear_hint
+    type: zone
+    x: 375
+    y: 700
+    width: 200
+    height: 60
+    depth: 15
+    label: 通关
+    condition:
+      flagTrue: FLAG_ALL_EPILOGUE_SEEN
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ6_GAME_CLEAR
+

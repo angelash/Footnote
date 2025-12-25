@@ -1,0 +1,160 @@
+# CF-Z6 尾声对话数据
+dialogues:
+  # 顾临尾声
+  CFZ6_GULIN:
+    id: CFZ6_GULIN
+    lines:
+      - speaker: ""
+        text: 维修局走廊。任务板上多了一条空白。
+      - speaker: 顾临
+        text: 城还能继续被读。
+      - speaker: 顾临
+        text: 但我第一次看到：读不下去的东西，也能留下。
+    onComplete:
+      - type: card
+        cardId: CARD_CF_GULIN_CLAUSE
+      - type: flag
+        flagName: FLAG_GULIN_SEEN
+        flagValue: true
+
+  # 宋岚尾声
+  CFZ6_SONGLAN:
+    id: CFZ6_SONGLAN
+    lines:
+      - speaker: ""
+        text: 版本库。翻版本卡不会再自动"已对齐"覆盖。
+      - speaker: 宋岚
+        text: 版本库还在。
+      - speaker: 宋岚
+        text: 但最底层多了一格——他们没删掉。
+    onComplete:
+      - type: card
+        cardId: CARD_CF_SONGLAN_LABEL
+      - type: flag
+        flagName: FLAG_SONGLAN_SEEN
+        flagValue: true
+
+  # 许澄尾声
+  CFZ6_XUCHENG:
+    id: CFZ6_XUCHENG
+    lines:
+      - speaker: ""
+        text: 诊室。海报背后有批注。
+      - speaker: 许澄
+        text: 人们稳定了。
+      - speaker: 许澄
+        text: 但我不再敢说这叫痊愈。
+    onComplete:
+      - type: card
+        cardId: CARD_CF_XUCHENG_NOTE
+      - type: flag
+        flagName: FLAG_XUCHENG_SEEN
+        flagValue: true
+
+  # 牧平尾声
+  CFZ6_MUPING:
+    id: CFZ6_MUPING
+    lines:
+      - speaker: ""
+        text: 礼堂。祷文抄本合集可以"拼读"了。
+      - speaker: 牧平
+        text: 纸还在。
+      - speaker: 牧平
+        text: 但纸上多了一道你写的折痕。
+    onComplete:
+      - type: card
+        cardId: CARD_CF_PRAYER_RESULT
+      - type: flag
+        flagName: FLAG_MUPING_SEEN
+        flagValue: true
+
+  # 阿棠尾声
+  CFZ6_ATANG:
+    id: CFZ6_ATANG
+    lines:
+      - speaker: ""
+        text: 窗边长椅。补丁痕迹改变了。
+      - speaker: 阿棠
+        text: 我还是会漂。
+      - speaker: 阿棠
+        text: 但我漂的时候，不再全是错。
+    onComplete:
+      - type: card
+        cardId: CARD_CF_ATANG_DIARY
+      - type: flag
+        flagName: FLAG_ATANG_SEEN
+        flagValue: true
+
+  # 栖蓝尾声
+  CFZ6_QILAN:
+    id: CFZ6_QILAN
+    lines:
+      - speaker: ""
+        text: 街角。那件多余的东西还在。
+      - speaker: 栖蓝
+        text: 它还在。
+      - speaker: 栖蓝
+        text: 这就够了。
+    onComplete:
+      - type: card
+        cardId: CARD_CF_QILAN_NOTE
+      - type: flag
+        flagName: FLAG_QILAN_SEEN
+        flagValue: true
+
+  # 无收益清单
+  CFZ6_NO_REWARD_LIST:
+    id: CFZ6_NO_REWARD_LIST
+    lines:
+      - speaker: ""
+        text: 「无收益清单」
+      - speaker: ""
+        text: 你做过的无收益行为条目（不评分）：
+      - speaker: ""
+        text: · 帮住户归整物品
+      - speaker: ""
+        text: · 抄录纪念墙名字
+      - speaker: ""
+        text: · 塞纸条回墙缝
+      - speaker: ""
+        text: · 贴无人需要的地图
+      - speaker: ""
+        text: · 摆正歪椅子
+      - speaker: ""
+        text: · 让空椅子"回来"
+      - speaker: ""
+        text: · 完成终局仪式
+      - speaker: ""
+        text: ……
+      - speaker: ""
+        text: 每条后面只有一句：
+      - speaker: 系统
+        text: 该行为无法纳入当前模型。
+      - speaker: 系统
+        text: 字段已接受。
+
+  # 通关
+  CFZ6_GAME_CLEAR:
+    id: CFZ6_GAME_CLEAR
+    lines:
+      - speaker: ""
+        text: ——通关——
+      - speaker: ""
+        text: 你之前做的那些多余的事，
+      - speaker: ""
+        text: 竟然真的改变了世界允许什么。
+      - speaker: ""
+        text: 而且你知道它不最优，
+      - speaker: ""
+        text: 但你还是会再做一次。
+      - speaker: ""
+        text: ——
+      - speaker: ""
+        text: 「字段模式」重玩已解锁。
+      - speaker: ""
+        text: 底部字段条◦◦◦将始终存在。
+    onComplete:
+      - type: flag
+        flagName: FLAG_ALL_EPILOGUE_SEEN
+        flagValue: true
+

@@ -1,0 +1,146 @@
+# C4-Z6 栖蓝：无人需要的地图对话数据
+dialogues:
+  # 栖蓝对话
+  C4Z6_QILAN_TALK:
+    id: C4Z6_QILAN_TALK
+    lines:
+      - speaker: 栖蓝
+        text: 这张地图没用。
+      - speaker: 栖蓝
+        text: 可我不想让它消失得那么轻松。
+      - speaker: 栖蓝
+        text: 你贴上去，它就得费点力气才能被抹掉。
+    choices:
+      - id: who_fighting
+        text: 你在跟谁较劲？
+        nextDialogueId: C4Z6_WHO_FIGHTING
+      - id: help_paste
+        text: 我帮你
+        nextDialogueId: C4Z6_HELP_PASTE
+      - id: will_be_torn
+        text: 它会被撕掉的
+        nextDialogueId: C4Z6_WILL_BE_TORN
+
+  # 跟谁较劲
+  C4Z6_WHO_FIGHTING:
+    id: C4Z6_WHO_FIGHTING
+    lines:
+      - speaker: 栖蓝
+        text: 我不知道。
+      - speaker: 栖蓝
+        text: 但如果我不做，就没人会记得这些巷子存在过。
+
+  # 我帮你
+  C4Z6_HELP_PASTE:
+    id: C4Z6_HELP_PASTE
+    lines:
+      - speaker: 栖蓝
+        text: ……谢谢。
+      - speaker: 栖蓝
+        text: 先看看这张地图。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z6_AGREED
+        flagValue: true
+
+  # 会被撕掉
+  C4Z6_WILL_BE_TORN:
+    id: C4Z6_WILL_BE_TORN
+    lines:
+      - speaker: 栖蓝
+        text: 那就让撕掉变成一个动作，而不是一句更正。
+      - speaker: 栖蓝
+        text: 更正太轻松了。
+      - speaker: 栖蓝
+        text: 我要让它变得稍微麻烦一点。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z6_AGREED
+        flagValue: true
+
+  # 墙面位置
+  C4Z6_WALL_POSITION:
+    id: C4Z6_WALL_POSITION
+    lines:
+      - speaker: ""
+        text: 破墙面上有一块平整的区域。
+      - speaker: ""
+        text: 足够贴下一张地图。
+
+  # 地图卷
+  C4Z6_MAP_SCROLL:
+    id: C4Z6_MAP_SCROLL
+    lines:
+      - speaker: ""
+        text: 你展开地图。
+      - speaker: ""
+        text: 上面标注了许多"已不存在的巷子/房间"。
+      - speaker: ""
+        text: 有些地方被划掉，有些被涂黑……
+      - speaker: ""
+        text: 角落有"版本号"，但被涂抹得看不清了。
+      - speaker: 岑回
+        text: 这些地方……真的都消失了吗？
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z6_SAW_MAP
+        flagValue: true
+
+  # 抹胶
+  C4Z6_APPLY_GLUE:
+    id: C4Z6_APPLY_GLUE
+    lines:
+      - speaker: ""
+        text: 你在地图背面抹上糨糊。
+      - speaker: ""
+        text: （第1步完成）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z6_GLUE_APPLIED
+        flagValue: true
+
+  # 压平
+  C4Z6_FLATTEN:
+    id: C4Z6_FLATTEN
+    lines:
+      - speaker: ""
+        text: 你把地图贴在墙上，用工具压平。
+      - speaker: ""
+        text: （第2步完成）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z6_FLATTENED
+        flagValue: true
+
+  # 完成
+  C4Z6_COMPLETE:
+    id: C4Z6_COMPLETE
+    lines:
+      - speaker: ""
+        text: 地图贴好了。
+      - speaker: ""
+        text: 它静静地挂在破墙上，记录着那些被抹去的地方。
+      - speaker: ""
+        text: 系统结算：
+      - speaker: 系统
+        text: 无可用收益。
+      - speaker: ""
+        text: （0.5秒后，一行小字淡出：）
+      - speaker: ""
+        text: 该行为无法纳入当前模型。
+      - speaker: 岑回
+        text: ……
+      - speaker: 栖蓝
+        text: 谢谢。
+    onComplete:
+      - type: card
+        cardId: CARD_C4_USELESS_MAP
+      - type: flag
+        flagName: FLAG_MAP_PASTED
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F21
+        foreshadowStage: plant
+    effects:
+      rDelta: 2
+

@@ -1,7 +1,7 @@
 id: C0-Z1
 title: 宿舍走廊
 background:
-  texture: placeholder_bg
+  texture: bg_c0_z1_corridor  # 使用WebP背景
   x: 0
   y: 0
   origin: [0, 0]
@@ -10,10 +10,10 @@ objects:
   # 身份卡（示例：点击 -> 卡片）
   - id: identity_card
     type: image
-    texture: px_item_keycard
+    texture: obj_filing_cabinet  # WebP物件：文件柜
     x: 200
     y: 620
-    scale: 0.55
+    scale: 0.8
     depth: 10
     label: 身份卡
     labelOffset: [0, 90]
@@ -27,10 +27,10 @@ objects:
   # 公告板（示例：点击 -> 对话）
   - id: notice_board
     type: image
-    texture: px_item_archive
+    texture: obj_sign  # WebP物件：标识牌
     x: 520
     y: 520
-    scale: 0.55
+    scale: 0.8
     depth: 10
     label: 公告板
     labelOffset: [0, 90]
@@ -41,20 +41,43 @@ objects:
         speaker: 系统
         text: 公告板上贴满了通知，日期处有涂改痕迹...
 
-  # 漂移者残影（示例：sprite 动画）
-  - id: drifter_ghost
+  # 走廊台灯（WebP可动物件动画）
+  - id: corridor_lamp
     type: sprite
-    texture: px_sprite_ghost_idle
-    x: 560
-    y: 820
-    scale: 0.65
-    depth: 5
+    texture: anim_lamp_flicker_frame_0  # 使用第一帧作为初始纹理
+    x: 380
+    y: 400
+    scale: 1.0
+    depth: 15
     animation:
-      key: ghost_idle
+      key: webp_lamp_flicker  # 动画键名
       frameRate: 4
       repeat: -1
-      frames:
-        start: 0
-        end: 3
+
+  # 走廊植物
+  - id: corridor_plant
+    type: image
+    texture: obj_plant  # WebP物件：植物
+    x: 650
+    y: 700
+    scale: 0.6
+    depth: 8
+
+  # 走廊门
+  - id: corridor_door
+    type: image
+    texture: obj_door  # WebP物件：门
+    x: 100
+    y: 450
+    scale: 0.7
+    depth: 5
+    label: 邻居的门
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        speaker: 岑回
+        text: 邻居的门紧闭着，门上有一个褪色的号码牌。
 
 

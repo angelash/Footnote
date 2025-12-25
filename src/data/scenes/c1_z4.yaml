@@ -1,0 +1,157 @@
+# C1-Z4 诊疗台候诊区
+# 记忆一致性问卷 - 答案被抹平
+id: C1-Z4
+title: 诊疗台候诊区
+background:
+  texture: bg_clinic
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 候诊椅
+  - id: waiting_chairs
+    type: image
+    texture: obj_chair
+    x: 200
+    y: 500
+    scale: 0.8
+    depth: 8
+
+  - id: waiting_chairs_2
+    type: image
+    texture: obj_chair
+    x: 350
+    y: 520
+    scale: 0.8
+    depth: 8
+
+  # 问卷台
+  - id: questionnaire_desk
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 380
+    scale: 0.9
+    depth: 10
+    label: 问卷台
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      testid: questionnaire-desk
+      action:
+        type: dialogue
+        dialogueId: C1Z4_QUESTIONNAIRE
+
+  # 许澄
+  - id: xucheng
+    type: image
+    texture: portrait_xucheng_neutral
+    x: 550
+    y: 350
+    scale: 0.4
+    depth: 12
+    label: 许澄
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: xucheng
+      action:
+        type: dialogue
+        dialogueId: C1Z4_XUCHENG_TALK
+
+  # 阿棠（远景）
+  - id: atang_distant
+    type: image
+    texture: portrait_atang_neutral
+    x: 650
+    y: 600
+    scale: 0.25
+    depth: 5
+    alpha: 0.7
+    label: 阿棠
+    labelOffset: [0, 50]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C1Z4_ATANG_BRIEF
+
+  # 候诊患者
+  - id: patient_1
+    type: image
+    texture: placeholder_char
+    x: 180
+    y: 550
+    scale: 0.8
+    depth: 7
+    alpha: 0.8
+    tint: 0x888899
+
+  - id: patient_2
+    type: image
+    texture: placeholder_char
+    x: 330
+    y: 570
+    scale: 0.8
+    depth: 7
+    alpha: 0.8
+    tint: 0x889988
+
+  # 诊疗室门
+  - id: clinic_door
+    type: image
+    texture: px_item_door
+    x: 600
+    y: 280
+    scale: 0.6
+    depth: 11
+    label: 诊疗室
+    labelOffset: [0, 70]
+
+  # 公告板
+  - id: notice_board
+    type: image
+    texture: px_item_archive
+    x: 150
+    y: 350
+    scale: 0.5
+    depth: 9
+    label: 公告板
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C1Z4_NOTICE_BOARD
+
+  # 出口 - 前往礼堂街
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 离开诊所
+    condition:
+      flag: FLAG_C1Z4_QUESTIONNAIRE_DONE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z5
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z3
+

@@ -1,0 +1,144 @@
+# C2-Z7 边缘断口：不存在的房间对话数据
+dialogues:
+  # 封锁牌
+  C2Z7_BARRIER:
+    id: C2Z7_BARRIER
+    lines:
+      - speaker: ""
+        text: 封锁牌上写着：
+      - speaker: ""
+        text: 「前方区域结构异常」
+      - speaker: ""
+        text: 「禁止进入」
+      - speaker: 岑回
+        text: 又是封锁区域……
+
+  # 墙面（普通视角）
+  C2Z7_WALL_NORMAL:
+    id: C2Z7_WALL_NORMAL
+    lines:
+      - speaker: ""
+        text: 从表面看，这只是一面普通的墙。
+      - speaker: 岑回
+        text: 看起来没什么特别的。
+      - speaker: 岑回
+        text: 但……试试深度感知？
+
+  # 门影轮廓
+  C2Z7_DOOR_OUTLINE:
+    id: C2Z7_DOOR_OUTLINE
+    lines:
+      - speaker: ""
+        text: （深度感知激活……）
+      - speaker: ""
+        text: 墙后出现巨大内部空间的线框！
+      - speaker: 岑回
+        text: ！！
+      - speaker: 岑回
+        text: 这……这么大的空间？
+      - speaker: ""
+        text: 在线框中央，隐约可见一个门的轮廓。
+    choices:
+      - id: try_enter
+        text: 尝试进入
+        nextDialogueId: C2Z7_TRY_ENTER
+      - id: just_record
+        text: 先记录下来
+        nextDialogueId: C2Z7_JUST_RECORD
+
+  # 尝试进入
+  C2Z7_TRY_ENTER:
+    id: C2Z7_TRY_ENTER
+    lines:
+      - speaker: ""
+        text: 你伸出手，试图触碰那个门影……
+      - speaker: 系统
+        text: 拒绝访问。
+      - speaker: 系统
+        text: 对象：不存在。
+      - speaker: 系统
+        text: 建议：忽略。
+      - speaker: 岑回
+        text: ……
+      - speaker: 岑回
+        text: 我看见了。
+      - speaker: 岑回
+        text: 他们却说没有。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z7_SAW_SPACE
+        flagValue: true
+
+  # 先记录
+  C2Z7_JUST_RECORD:
+    id: C2Z7_JUST_RECORD
+    lines:
+      - speaker: 岑回
+        text: （先不轻举妄动……记下来再说。）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z7_SAW_SPACE
+        flagValue: true
+
+  # 顾临远程
+  C2Z7_GULIN_REMOTE:
+    id: C2Z7_GULIN_REMOTE
+    lines:
+      - speaker: ""
+        text: 通讯点亮起。
+      - speaker: 顾临
+        text: 岑回，你在做什么？
+      - speaker: 岑回
+        text: 我看见了一个……
+      - speaker: 顾临
+        text: 记录就够了。别靠近。
+      - speaker: 顾临
+        text: 你的权限是「只读」。
+      - speaker: 顾临
+        text: 不要试图做更多。
+      - speaker: ""
+        text: （通讯结束）
+
+  # 提交记录
+  C2Z7_SUBMIT:
+    id: C2Z7_SUBMIT
+    lines:
+      - speaker: ""
+        text: 是否提交深度观测记录？
+    choices:
+      - id: submit_yes
+        text: 提交记录
+        nextDialogueId: C2Z7_SUBMIT_DONE
+      - id: submit_no
+        text: 暂不提交
+        nextDialogueId: C2Z7_SUBMIT_SKIP
+
+  # 提交完成
+  C2Z7_SUBMIT_DONE:
+    id: C2Z7_SUBMIT_DONE
+    lines:
+      - speaker: 系统
+        text: 记录已提交。
+      - speaker: ""
+        text: 你记录了一处"不存在"的空间。
+      - speaker: ""
+        text: 但你知道它存在。
+      - speaker: ""
+        text: 为什么系统否认？
+    onComplete:
+      - type: card
+        cardId: CARD_C2_DEPTH_FRAGMENT_02
+      - type: flag
+        flagName: FLAG_SAW_NONEXISTENT_HALL
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C2_COMPLETE
+        flagValue: true
+
+  # 跳过提交
+  C2Z7_SUBMIT_SKIP:
+    id: C2Z7_SUBMIT_SKIP
+    lines:
+      - speaker: 岑回
+        text: （先不提交……）
+

@@ -1,0 +1,143 @@
+# C5-Z1 档案巷：版本冲突现场
+# 互斥版本选择
+id: C5-Z1
+title: 版本冲突现场
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 版本切换点
+  - id: version_switch
+    type: image
+    texture: obj_crack
+    x: 375
+    y: 450
+    scale: 1.0
+    depth: 10
+    label: 版本切换
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: version-switch
+      action:
+        type: dialogue
+        dialogueId: C5Z1_VERSION_SWITCH
+
+  # 纪念墙（V-B版本）
+  - id: memorial_wall
+    type: image
+    texture: px_tiles_platform
+    x: 200
+    y: 380
+    scale: 1.2
+    depth: 9
+    label: 纪念墙
+    labelOffset: [0, 100]
+    condition:
+      flagTrue: FLAG_C5Z1_VERSION_B
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z1_MEMORIAL_WALL
+
+  # 流程出口（V-A版本）
+  - id: exit_va
+    type: zone
+    x: 375
+    y: 200
+    width: 150
+    height: 80
+    label: 便捷出口
+    condition:
+      flagTrue: FLAG_C5Z1_VERSION_A
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z1_EXIT_VA
+
+  # 不稳定出口（V-B版本）
+  - id: exit_vb
+    type: zone
+    x: 550
+    y: 250
+    width: 120
+    height: 70
+    label: 绕行出口
+    condition:
+      flagTrue: FLAG_C5Z1_VERSION_B
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z1_EXIT_VB
+
+  # 差异标注点
+  - id: diff_submit
+    type: image
+    texture: px_fx_system_correct
+    x: 480
+    y: 500
+    scale: 0.5
+    depth: 11
+    label: 提交版本
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C5Z1_VERSION_SEEN
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z1_SUBMIT_VERSION
+
+  # 宋岚
+  - id: songlan
+    type: image
+    texture: portrait_songlan_serious
+    x: 150
+    y: 420
+    scale: 0.4
+    depth: 12
+    label: 宋岚
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: songlan
+      action:
+        type: dialogue
+        dialogueId: C5Z1_SONGLAN_TALK
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往纠偏中心
+    condition:
+      flag: FLAG_C5Z1_VERSION_LOCKED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z2
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z8
+

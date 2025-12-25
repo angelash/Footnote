@@ -1,0 +1,66 @@
+# C5-Z4 牧平的"页背风暴"对话数据
+dialogues:
+  # 牧平对话
+  C5Z4_MUPING_TALK:
+    id: C5Z4_MUPING_TALK
+    lines:
+      - speaker: 牧平
+        text: 风不是越来越大。
+      - speaker: 牧平
+        text: 是纸开始承认：它背面还有东西。
+      - speaker: 牧平
+        text: 更正会变慢。
+      - speaker: 牧平
+        text: 不是因为他们心软，是因为他们算不过来了。
+      - speaker: 牧平
+        text: 算不过来的时候，他们会做一件事：删选项。
+    choices:
+      - id: should_stop
+        text: 所以我该停下？
+        nextDialogueId: C5Z4_SHOULD_STOP
+      - id: dont_delete
+        text: 我不想他们删
+        nextDialogueId: C5Z4_DONT_DELETE
+      - id: seen_back
+        text: 你见过"背面"吗？
+        nextDialogueId: C5Z4_SEEN_BACK
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z4_MUPING_SPOKE
+        flagValue: true
+
+  # 该停下？
+  C5Z4_SHOULD_STOP:
+    id: C5Z4_SHOULD_STOP
+    lines:
+      - speaker: 牧平
+        text: 停下是一种选择。
+      - speaker: 牧平
+        text: 但如果每个人都停下……
+      - speaker: 牧平
+        text: 那些被删掉的，就真的不存在了。
+
+  # 不想被删
+  C5Z4_DONT_DELETE:
+    id: C5Z4_DONT_DELETE
+    lines:
+      - speaker: 牧平
+        text: 那你就得做一些……他们最讨厌你做的事。
+      - speaker: 牧平
+        text: 那些"没用"的事。
+      - speaker: 牧平
+        text: 那些系统算不过来的事。
+
+  # 见过背面？
+  C5Z4_SEEN_BACK:
+    id: C5Z4_SEEN_BACK
+    lines:
+      - speaker: 牧平
+        text: ……
+      - speaker: 牧平
+        text: 我没见过。
+      - speaker: 牧平
+        text: 但我听过风的声音。
+      - speaker: 牧平
+        text: 风越大，说明背面的东西越多。
+

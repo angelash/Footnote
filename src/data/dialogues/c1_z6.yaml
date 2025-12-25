@@ -1,0 +1,193 @@
+# C1-Z6 边缘断口对话数据
+dialogues:
+  # 坍塌区域检查
+  C1Z6_COLLAPSE_INSPECT:
+    id: C1Z6_COLLAPSE_INSPECT
+    lines:
+      - speaker: 岑回
+        text: 这里……发生了什么？
+      - speaker: ""
+        text: 地面出现了一个不规则的凹陷。
+      - speaker: ""
+        text: 不像是自然塌陷，更像是……被抽空了。
+      - speaker: 岑回
+        text: 边缘很整齐。太整齐了。
+      - speaker: 岑回
+        text: 正常的坍塌不会是这样的。
+
+  # 警告标志
+  C1Z6_WARNING_SIGN:
+    id: C1Z6_WARNING_SIGN
+    lines:
+      - speaker: ""
+        text: 警告标志上写着：
+      - speaker: ""
+        text: 「结构异常区域」
+      - speaker: ""
+        text: 「请勿靠近」
+      - speaker: ""
+        text: 「等待系统更正」
+      - speaker: 岑回
+        text: 又是"系统更正"……
+      - speaker: 岑回
+        text: 他们不打算修复它，只是等着它被……更正？
+
+  # 受灾住户
+  C1Z6_RESIDENT:
+    id: C1Z6_RESIDENT
+    lines:
+      - speaker: 住户
+        text: 我的房子……一部分不见了。
+      - speaker: 岑回
+        text: 什么时候发生的？
+      - speaker: 住户
+        text: 就在昨晚。没有声音，没有震动。
+      - speaker: 住户
+        text: 早上起来，墙就……没了。
+      - speaker: 岑回
+        text: 维修局怎么说？
+      - speaker: 住户
+        text: 他们说会处理。
+      - speaker: 住户
+        text: 但他们只是围起来，什么都没做。
+      - speaker: 住户
+        text: 说是要等"更正"。
+      - speaker: 岑回
+        text: （更正……能把墙变回来吗？）
+
+  # 维修局标记
+  C1Z6_BUREAU_MARKER:
+    id: C1Z6_BUREAU_MARKER
+    lines:
+      - speaker: ""
+        text: 这是维修局留下的标记。
+      - speaker: ""
+        text: 上面记录着：
+      - speaker: ""
+        text: 「事件编号：COL-C1-047」
+      - speaker: ""
+        text: 「类型：结构异常（小型）」
+      - speaker: ""
+        text: 「状态：已标注」
+      - speaker: ""
+        text: 「处理方案：等待系统更正」
+      - speaker: 岑回
+        text: 就这样？不维修，只是等？
+
+  # 顾临远程通讯
+  C1Z6_GULIN_COMMS:
+    id: C1Z6_GULIN_COMMS
+    lines:
+      - speaker: ""
+        text: 通讯点亮起，传来顾临的声音。
+      - speaker: 顾临
+        text: 岑回，你到现场了？
+      - speaker: 岑回
+        text: 是的。这里……
+      - speaker: 顾临
+        text: 我知道你想说什么。
+      - speaker: 顾临
+        text: 这种规模的坍塌，不需要人工干预。
+      - speaker: 岑回
+        text: 不需要？但这里的住户——
+      - speaker: 顾临
+        text: 系统会处理。我们只需要标注和围挡。
+      - speaker: 顾临
+        text: 不要擅自行动。
+      - speaker: 顾临
+        text: 记住，你是来巡检的，不是来修复的。
+    choices:
+      - id: accept_order
+        text: 我明白了
+        nextDialogueId: C1Z6_GULIN_END
+      - id: question_order
+        text: 为什么不能修复？
+        nextDialogueId: C1Z6_GULIN_EXPLAIN
+
+  # 顾临解释
+  C1Z6_GULIN_EXPLAIN:
+    id: C1Z6_GULIN_EXPLAIN
+    lines:
+      - speaker: 顾临
+        text: ……
+      - speaker: 顾临
+        text: 有些东西，修复反而会造成更大的问题。
+      - speaker: 顾临
+        text: 你现在还不需要知道为什么。
+      - speaker: 顾临
+        text: 完成巡检，提交报告。这是你的工作。
+      - speaker: ""
+        text: （通讯结束）
+
+  # 顾临结束
+  C1Z6_GULIN_END:
+    id: C1Z6_GULIN_END
+    lines:
+      - speaker: 顾临
+        text: 很好。完成巡检后回来报告。
+      - speaker: ""
+        text: （通讯结束）
+
+  # 碎片检查
+  C1Z6_DEBRIS:
+    id: C1Z6_DEBRIS
+    lines:
+      - speaker: 岑回
+        text: 这些是坍塌后留下的碎片……
+      - speaker: ""
+        text: 但仔细看，碎片的边缘也很整齐。
+      - speaker: 岑回
+        text: 不像是被震碎的，更像是被……切割的。
+      - speaker: 岑回
+        text: 这到底是什么力量造成的？
+    onComplete:
+      - type: card
+        cardId: CARD_C1_COLLAPSE_REPORT
+
+  # 深度感知：隐藏结构
+  C1Z6_HIDDEN_STRUCTURE:
+    id: C1Z6_HIDDEN_STRUCTURE
+    lines:
+      - speaker: ""
+        text: （深度感知激活……）
+      - speaker: 岑回
+        text: ！
+      - speaker: ""
+        text: 在坍塌区域的边缘，你看到了某种……痕迹。
+      - speaker: ""
+        text: 像是文字，又像是图案。
+      - speaker: ""
+        text: 它们闪烁着微弱的光芒，随即消失。
+      - speaker: 岑回
+        text: 那是什么？
+      - speaker: 岑回
+        text: 那些符号……好像在告诉我什么。
+      - speaker: ""
+        text: 但你还读不懂它们。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_SAW_HIDDEN
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F07
+        foreshadowStage: plant
+
+  # 完成第1章
+  C1Z6_CHAPTER_COMPLETE:
+    id: C1Z6_CHAPTER_COMPLETE
+    lines:
+      - speaker: ""
+        text: 你完成了对坍塌现场的巡检。
+      - speaker: ""
+        text: 顾临说的对——你只是来巡检的，不是来修复的。
+      - speaker: ""
+        text: 但你心里知道，事情没有那么简单。
+      - speaker: 岑回
+        text: 这个世界……有什么地方不对。
+      - speaker: 岑回
+        text: 而我必须找出答案。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1_COMPLETE
+        flagValue: true
+

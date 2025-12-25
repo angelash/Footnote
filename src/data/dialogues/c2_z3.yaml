@@ -1,0 +1,130 @@
+# C2-Z3 档案巷：折叠楼梯间对话数据
+dialogues:
+  # 宋岚引导
+  C2Z3_SONGLAN_GUIDE:
+    id: C2Z3_SONGLAN_GUIDE
+    lines:
+      - speaker: 宋岚
+        text: 别信你看到的楼梯，信它的骨架。
+      - speaker: 岑回
+        text: ……骨架？
+      - speaker: 宋岚
+        text: 把差异记下来。差异会救你。
+    choices:
+      - id: ask_how
+        text: 你怎么知道这些？
+        nextDialogueId: C2Z3_SONGLAN_KNOW
+      - id: just_pass
+        text: 我只想过去
+        nextDialogueId: C2Z3_SONGLAN_PASS
+      - id: ask_diff
+        text: 差异有什么用？
+        nextDialogueId: C2Z3_SONGLAN_DIFF
+
+  # 宋岚回应：你怎么知道
+  C2Z3_SONGLAN_KNOW:
+    id: C2Z3_SONGLAN_KNOW
+    lines:
+      - speaker: 宋岚
+        text: 我被更正过很多次。
+      - speaker: 宋岚
+        text: 每一次，我都记得。
+      - speaker: 岑回
+        text: ……
+
+  # 宋岚回应：只想过去
+  C2Z3_SONGLAN_PASS:
+    id: C2Z3_SONGLAN_PASS
+    lines:
+      - speaker: 宋岚
+        text: 那就用你的眼睛找路。
+      - speaker: 宋岚
+        text: 真实的那条。
+
+  # 宋岚回应：差异有什么用
+  C2Z3_SONGLAN_DIFF:
+    id: C2Z3_SONGLAN_DIFF
+    lines:
+      - speaker: 宋岚
+        text: 因为它们还没被算完。
+      - speaker: 宋岚
+        text: 还没被算完的东西，有可能被保存。
+      - speaker: 岑回
+        text: （保存……什么意思？）
+
+  # 虚构楼梯
+  C2Z3_FAKE_STAIR:
+    id: C2Z3_FAKE_STAIR
+    lines:
+      - speaker: ""
+        text: （踏上这段楼梯……）
+      - speaker: ""
+        text: 脚下突然失去支撑。
+      - speaker: ""
+        text: 你被轻柔地送回了平台。
+      - speaker: 岑回
+        text: ！这段楼梯……是假的？
+      - speaker: 岑回
+        text: 看起来明明连着……
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z3_TRIGGERED_FAKE
+        flagValue: true
+
+  # 记录差异
+  C2Z3_RECORD_DIFF:
+    id: C2Z3_RECORD_DIFF
+    lines:
+      - speaker: ""
+        text: 宋岚说的任务：把踩空的那一段记下来。
+    choices:
+      - id: record_yes
+        text: 记录差异
+        effects:
+          rDelta: 1
+          setFlag:
+            name: FLAG_RECORDED_STAIR_DIFF
+            value: true
+        nextDialogueId: C2Z3_RECORD_DONE
+      - id: record_no
+        text: 算了
+        nextDialogueId: C2Z3_RECORD_SKIP
+
+  # 记录完成
+  C2Z3_RECORD_DONE:
+    id: C2Z3_RECORD_DONE
+    lines:
+      - speaker: ""
+        text: 差异保存了。
+      - speaker: ""
+        text: （没有奖励。但宋岚说过，这有用。）
+    onComplete:
+      - type: card
+        cardId: CARD_C2_VERSION_MAP_02
+      - type: foreshadow
+        foreshadowId: F12
+        foreshadowStage: deepen
+
+  # 跳过记录
+  C2Z3_RECORD_SKIP:
+    id: C2Z3_RECORD_SKIP
+    lines:
+      - speaker: 岑回
+        text: （算了，没时间做这个。）
+
+  # 出口门
+  C2Z3_EXIT_DOOR:
+    id: C2Z3_EXIT_DOOR
+    lines:
+      - speaker: ""
+        text: 你找到了正确的路径，抵达了顶层门。
+      - speaker: ""
+        text: 你通过了一个不该存在的连接。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z3_FOUND_PATH
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C2Z3_COMPLETED
+        flagValue: true
+

@@ -1,0 +1,110 @@
+# C3-Z7 断裂走廊对话数据
+dialogues:
+  # 裂缝1
+  C3Z7_CRACK_1:
+    id: C3Z7_CRACK_1
+    lines:
+      - speaker: ""
+        text: 地面上有明显的裂缝。
+      - speaker: 岑回
+        text: 路变了。
+      - speaker: 岑回
+        text: 是我写的，还是它自己裂的？
+      - speaker: ""
+        text: 在深度视野下，可以看到裂缝下方的"骨架断口"。
+
+  # 不稳定踏板
+  C3Z7_UNSTABLE_PLATFORM:
+    id: C3Z7_UNSTABLE_PLATFORM
+    lines:
+      - speaker: ""
+        text: 这块踏板看起来不太稳。
+      - speaker: ""
+        text: （踩上去……）
+      - speaker: ""
+        text: 脚下轻微回弹，你被送回了原处。
+      - speaker: 岑回
+        text: 走不通。需要找稳定的路径。
+      - speaker: ""
+        text: （用深度感知看看骨架结构）
+
+  # 介入选择
+  C3Z7_INTERVENTION_CHOICE:
+    id: C3Z7_INTERVENTION_CHOICE
+    lines:
+      - speaker: ""
+        text: 深度视野下，断口处出现【介入】选项。
+      - speaker: ""
+        text: 你可以"加固"这一段，但会增加结构负担。
+      - speaker: 系统
+        text: 建议：避免进一步写入。
+    choices:
+      - id: do_intervention
+        text: 加固（深度介入）
+        effects:
+          pDelta: 2
+          setFlag:
+            name: FLAG_EDGE_SCAR
+            value: 2
+        nextDialogueId: C3Z7_DO_INTERVENTION
+      - id: find_another_way
+        text: 找别的路
+        nextDialogueId: C3Z7_FIND_WAY
+
+  # 执行加固
+  C3Z7_DO_INTERVENTION:
+    id: C3Z7_DO_INTERVENTION
+    lines:
+      - speaker: ""
+        text: 你伸出手，在断口处写入稳定结构……
+      - speaker: ""
+        text: 路面暂时稳固了。
+      - speaker: ""
+        text: 但屏幕顶部的裂纹图标明显加深了。
+      - speaker: 系统
+        text: 警告：结构负担上升。
+      - speaker: ""
+        text: 你加固了路径，但裂纹更深了。
+    onComplete:
+      - type: card
+        cardId: CARD_C3_FRACTURE_SAMPLE
+      - type: flag
+        flagName: FLAG_C3Z7_PASSED
+        flagValue: true
+
+  # 找别的路
+  C3Z7_FIND_WAY:
+    id: C3Z7_FIND_WAY
+    lines:
+      - speaker: ""
+        text: 你在深度视野下仔细观察……
+      - speaker: ""
+        text: 找到了一条稳定的骨架路径。
+      - speaker: ""
+        text: 虽然慢一点，但不会新增伤痕。
+      - speaker: ""
+        text: 你绕过了伤痕。
+    onComplete:
+      - type: card
+        cardId: CARD_C3_FRACTURE_SAMPLE
+      - type: flag
+        flagName: FLAG_C3Z7_PASSED
+        flagValue: true
+
+  # 出口门
+  C3Z7_EXIT_DOOR:
+    id: C3Z7_EXIT_DOOR
+    lines:
+      - speaker: ""
+        text: 你穿过了断裂走廊。
+      - speaker: ""
+        text: 身后的路……不知道还能撑多久。
+      - speaker: 岑回
+        text: 这个世界……正在承受越来越多的"写入"。
+      - speaker: 岑回
+        text: 包括我的。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3_COMPLETE
+        flagValue: true
+

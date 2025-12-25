@@ -1,0 +1,111 @@
+# RV-08 C3-Z1 重返：时间回溯点
+# 时间干预变体 - 可回溯的关键节点
+id: RV-08
+title: 时间回溯点 [时间干预]
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 时间线主体
+  - id: main_timeline
+    type: zone
+    x: 375
+    y: 250
+    width: 400
+    height: 100
+    depth: 15
+    label: 主时间线
+    interactive:
+      cursor: true
+      testid: main-timeline
+      action:
+        type: dialogue
+        dialogueId: RV08_TIMELINE
+
+  # 关键节点T1
+  - id: node_t1
+    type: image
+    texture: px_fx_system_correct
+    x: 200
+    y: 400
+    scale: 0.6
+    depth: 10
+    label: 节点T1
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV08_NODE_T1
+
+  # 关键节点T2
+  - id: node_t2
+    type: image
+    texture: px_fx_system_correct
+    x: 375
+    y: 400
+    scale: 0.6
+    depth: 10
+    label: 节点T2
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV08_NODE_T2
+
+  # 关键节点T3（当前）
+  - id: node_t3
+    type: image
+    texture: px_fx_field_accept
+    x: 550
+    y: 400
+    scale: 0.6
+    depth: 10
+    label: NOW
+    labelOffset: [0, 60]
+
+  # 回溯控制面板
+  - id: rewind_control
+    type: zone
+    x: 375
+    y: 600
+    width: 300
+    height: 100
+    depth: 20
+    label: 回溯控制
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV08_REWIND_CONTROL
+
+  # 污染标记
+  - id: pollution_mark
+    type: image
+    texture: px_fx_scar
+    x: 500
+    y: 500
+    scale: 0.4
+    depth: 11
+    alpha: 0.5
+    condition:
+      flagTrue: FLAG_RV08_REWOUND
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z1
+

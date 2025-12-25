@@ -1,0 +1,129 @@
+# C5-Z2 纠偏中心外围对话数据
+dialogues:
+  # 门禁
+  C5Z2_GATE:
+    id: C5Z2_GATE
+    lines:
+      - speaker: ""
+        text: 门禁闸机。
+      - speaker: ""
+        text: 需要通行证。
+      - speaker: ""
+        text: （你的通行证有效）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z2_ENTERED
+        flagValue: true
+
+  # 公告屏幕
+  C5Z2_NOTICE_SCREEN:
+    id: C5Z2_NOTICE_SCREEN
+    lines:
+      - speaker: ""
+        text: 公告墙滚动显示：
+      - speaker: ""
+        text: 「纠偏队列：12项」
+      - speaker: ""
+        text: 「待结算：7项」
+      - speaker: ""
+        text: 「已收敛：5项」
+      - speaker: 岑回
+        text: （这些数字……是在说什么？）
+
+  # 提交记录
+  C5Z2_SUBMIT_RECORD:
+    id: C5Z2_SUBMIT_RECORD
+    lines:
+      - speaker: ""
+        text: 你把版本冲突记录交到提交窗口。
+      - speaker: ""
+        text: 系统回执出现——
+      - speaker: ""
+        text: 这次的格式不太一样。
+      - speaker: ""
+        text: 像是半字段表：
+      - speaker: ""
+        text: 「条目：版本冲突」
+      - speaker: ""
+        text: 「状态：待结算」
+      - speaker: ""
+        text: 「字段：＿」
+      - speaker: ""
+        text: 「备注：解释成本↑」
+      - speaker: 岑回
+        text: （这种格式……好像不是给人看的）
+    onComplete:
+      - type: card
+        cardId: CARD_C5_CORRECTION_RECEIPT
+      - type: flag
+        flagName: FLAG_C5Z2_SUBMITTED
+        flagValue: true
+
+  # 顾临对话
+  C5Z2_GULIN_TALK:
+    id: C5Z2_GULIN_TALK
+    lines:
+      - speaker: 顾临
+        text: 你带回来的东西……不太好结算。
+      - speaker: 顾临
+        text: 你知道这意味着什么吗？
+      - speaker: 顾临
+        text: 意味着它会在系统里停很久。
+      - speaker: 顾临
+        text: 停很久的东西，会把别的东西也拖慢。
+    choices:
+      - id: dont_settle
+        text: 那就别结算
+        effects:
+          rDelta: 1
+        nextDialogueId: C5Z2_DONT_SETTLE
+      - id: just_record
+        text: 我只是记录
+        nextDialogueId: C5Z2_JUST_RECORD
+      - id: fear_what
+        text: 你在怕系统，还是怕人？
+        nextDialogueId: C5Z2_FEAR_WHAT
+
+  # 别结算
+  C5Z2_DONT_SETTLE:
+    id: C5Z2_DONT_SETTLE
+    lines:
+      - speaker: 顾临
+        text: ……
+      - speaker: 顾临
+        text: 你说得轻松。
+      - speaker: 顾临
+        text: 但系统不会等。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z2_COMPLETE
+        flagValue: true
+
+  # 只是记录
+  C5Z2_JUST_RECORD:
+    id: C5Z2_JUST_RECORD
+    lines:
+      - speaker: 顾临
+        text: 记录也是参与。
+      - speaker: 顾临
+        text: 你带回来的每一个差异，都会让系统更难收敛。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z2_COMPLETE
+        flagValue: true
+
+  # 怕什么
+  C5Z2_FEAR_WHAT:
+    id: C5Z2_FEAR_WHAT
+    lines:
+      - speaker: 顾临
+        text: 我怕的是，城市开始读不下去。
+      - speaker: 顾临
+        text: ……
+      - speaker: 顾临
+        text: 到那时，所有人都会变成"无法归档"的存在。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z2_COMPLETE
+        flagValue: true
+

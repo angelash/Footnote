@@ -1,0 +1,146 @@
+# C0-Z4 维修局前台
+# 秩序语法第一次正面登场，顾临首次出场
+id: C0-Z4
+title: 维修局前台
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 前台窗口（核心交互）
+  - id: reception_window
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 400
+    scale: 0.7
+    depth: 10
+    label: 前台窗口
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      testid: reception-window
+      action:
+        type: dialogue
+        dialogueId: C0Z4_RECEPTION
+
+  # 任务板
+  - id: task_board
+    type: image
+    texture: px_item_archive
+    x: 180
+    y: 350
+    scale: 0.6
+    depth: 9
+    label: 任务板
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: task-board
+      action:
+        type: dialogue
+        dialogueId: C0Z4_TASKBOARD
+
+  # 顾临办公室门口
+  - id: gulin_door
+    type: image
+    texture: px_item_door
+    x: 580
+    y: 380
+    scale: 0.65
+    depth: 8
+    label: 顾临办公室
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: gulin-office
+      action:
+        type: dialogue
+        dialogueId: C0Z4_GULIN_TALK
+
+  # 前台职员NPC
+  - id: clerk_npc
+    type: image
+    texture: placeholder_char
+    x: 375
+    y: 320
+    scale: 1.0
+    depth: 12
+    tint: 0x88AA88
+
+  # 顾临剪影（门口可见）
+  - id: gulin_silhouette
+    type: sprite
+    texture: px_sprite_gulin_idle
+    x: 580
+    y: 300
+    scale: 0.6
+    depth: 7
+    alpha: 0.8
+    animation:
+      key: gulin_idle
+      frameRate: 4
+      repeat: -1
+
+  # 等候区座椅
+  - id: waiting_seats
+    type: image
+    texture: px_item_healing
+    x: 200
+    y: 600
+    scale: 0.5
+    depth: 6
+
+  # 信息栏（展示维修局规则）
+  - id: info_board
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 600
+    scale: 0.5
+    depth: 6
+    label: 规章制度
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        speaker: 系统
+        text: |
+          维修局行为准则：
+          1. 能用流程解决的，不用例外
+          2. 异常记录，等待指示
+          3. 复杂度是病，简洁是药
+
+  # 返回巷口
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回巷口
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C0-Z3
+
+  # 进入第一章（完成序章后解锁）
+  - id: exit_to_c1
+    type: zone
+    x: 375
+    y: 150
+    width: 200
+    height: 100
+    label: 出发巡检
+    condition:
+      flag: FLAG_C0_TASK_RECEIVED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z1
+

@@ -1,0 +1,172 @@
+# C0 序章 卡片数据
+# 包含序章所有可收集的卡片
+
+cards:
+  # ==================== 档案类卡片 ====================
+  CARD_C0_IDENTITY:
+    id: CARD_C0_IDENTITY
+    name: 身份识别卡
+    type: archive
+    chapter: C0
+    zone: C0-Z1
+    front:
+      - 维修局外勤身份凭证
+      - 持卡人：岑回
+      - 编号：EX-7749
+    detail:
+      - 通行级别：灰
+      - 有效期：本周期内有效
+      - 背面有一道细小的划痕
+      - 划痕下方似乎还有字迹...
+
+  CARD_C0_WORK_ORDER:
+    id: CARD_C0_WORK_ORDER
+    name: 今日工单
+    type: archive
+    chapter: C0
+    zone: C0-Z2
+    front:
+      - 维修局日常工单
+      - 任务编号：#WO-275-0041
+      - 地点：薄墙巷口
+    detail:
+      - 任务类型：例行修补
+      - 预估耗时：2小时
+      - 备注：无
+      - 审批人签章模糊不清
+
+  CARD_C0_MEAL_TICKET:
+    id: CARD_C0_MEAL_TICKET
+    name: 早餐券
+    type: item
+    chapter: C0
+    zone: C0-Z2
+    front:
+      - 维修局员工餐券
+      - 面值：1份标准早餐
+    detail:
+      - 使用范围：指定合作店铺
+      - 有效期：仅限当日
+      - 券面印着「知足常乐」
+
+  # ==================== 祷词类卡片 ====================
+  CARD_C0_MORNING_PRAYER:
+    id: CARD_C0_MORNING_PRAYER
+    name: 晨间祷词
+    type: prayer
+    chapter: C0
+    zone: C0-Z1
+    front:
+      - 每日必诵
+      - 平面永恒，收敛是福
+    detail:
+      - 第一节：感谢平面的稳定
+      - 第二节：感谢维修局的守护
+      - 第三节：愿世界可读性长存
+      - （背面有手写字迹：真的吗？）
+    fx:
+      - type: r_change
+        value: -1
+        condition:
+          rMin: 3
+
+  # ==================== C0-Z2 早餐小店卡片 ====================
+  CARD_C0_RECEIPT_STANDARD:
+    id: CARD_C0_RECEIPT_STANDARD
+    name: 早餐小票（固定套餐）
+    type: archive
+    chapter: C0
+    zone: C0-Z2
+    front:
+      - 早餐小票
+      - 项目：固定套餐
+      - 结算：已完成
+    detail:
+      - 店名：巷口食堂
+      - 消费时间：07:23
+      - 金额：已从餐券扣除
+      - 备注：节省了时间
+
+  CARD_C0_RECEIPT_SPECIAL:
+    id: CARD_C0_RECEIPT_SPECIAL
+    name: 早餐小票（今日特别）
+    type: archive
+    chapter: C0
+    zone: C0-Z2
+    front:
+      - 早餐小票
+      - 项目：今日特别
+      - 结算：无可用收益
+    detail:
+      - 店名：巷口食堂
+      - 消费时间：07:41
+      - 金额：已从餐券扣除
+      - 备注：等待了18分钟
+      - ——
+      - 但味道确实不错
+
+  # ==================== C0-Z3 薄墙巷口卡片 ====================
+  CARD_C0_ALLEY_RECORD:
+    id: CARD_C0_ALLEY_RECORD
+    name: 巷口记录
+    type: archive
+    chapter: C0
+    zone: C0-Z3
+    front:
+      - 异常记录
+      - 地点：薄墙巷口
+      - 状态：待确认
+    detail:
+      - 记录者：岑回
+      - 异常描述：墙体回声异常（主观）
+      - 系统判定：正常（已更正）
+      - ——
+      - 我确定听到了什么
+
+  # ==================== C0-Z4 维修局前台卡片 ====================
+  CARD_C0_TASK_SHEET:
+    id: CARD_C0_TASK_SHEET
+    name: 巡检任务单
+    type: archive
+    chapter: C0
+    zone: C0-Z4
+    front:
+      - 维修局巡检任务
+      - 路线：既定路线A
+      - 状态：已领取
+    detail:
+      - 要求：标注异常，无需处理
+      - 预计时长：4小时
+      - 注意事项：保持通讯畅通
+      - ——
+      - 路线版本：A-1（更正）
+
+  # ==================== 判决类卡片 ====================
+  CARD_C0_WARNING:
+    id: CARD_C0_WARNING
+    name: 警告通知
+    type: verdict
+    chapter: C0
+    zone: C0-Z4
+    front:
+      - 维修局行政警告
+      - 编号：WARN-7749-001
+    detail:
+      - 警告对象：岑回
+      - 事由：连续三次延迟提交维修报告
+      - 处罚：本周期绩效扣除10%
+      - 生效日期：即日起
+    states:
+      after_gulin_talk:
+        front:
+          - 维修局行政警告
+          - 编号：WARN-7749-001
+          - [已标注]
+        detail:
+          - 警告对象：岑回
+          - 事由：连续三次延迟提交维修报告
+          - 处罚：本周期绩效扣除10%
+          - 生效日期：即日起
+          - ——
+          - 顾临的手写注释：「规则就是规则，岑回。」
+

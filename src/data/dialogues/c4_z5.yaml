@@ -1,0 +1,143 @@
+# C4-Z5 阿棠碎片日记2对话数据
+dialogues:
+  # 坐下
+  C4Z5_SIT_DOWN:
+    id: C4Z5_SIT_DOWN
+    lines:
+      - speaker: ""
+        text: 你坐在走廊的长椅上。
+      - speaker: ""
+        text: 窗外的光线有些混乱。
+
+  # 阿棠对话
+  C4Z5_ATANG_TALK:
+    id: C4Z5_ATANG_TALK
+    lines:
+      - speaker: 阿棠
+        text: 你这次回来得更快。
+      - speaker: 岑回
+        text: ……什么意思？
+      - speaker: 阿棠
+        text: 你每次回来，墙上都会多一条"不属于任何原因"的痕。
+      - speaker: 阿棠
+        text: 我以前以为只有我看得见。现在你也看得见了。
+    choices:
+      - id: how_know
+        text: 你怎么知道我回去了？
+        nextDialogueId: C4Z5_HOW_KNOW
+      - id: how_much_remember
+        text: 你到底记得多少？
+        nextDialogueId: C4Z5_HOW_MUCH
+      - id: are_you_scared
+        text: 你害怕吗？
+        nextDialogueId: C4Z5_SCARED
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z5_TALKED
+        flagValue: true
+
+  # 怎么知道
+  C4Z5_HOW_KNOW:
+    id: C4Z5_HOW_KNOW
+    lines:
+      - speaker: 阿棠
+        text: 我不"知道"。
+      - speaker: 阿棠
+        text: 我只是感觉时间在你身上折过了。
+      - speaker: 阿棠
+        text: 折过的人，走路的节奏会不一样。
+
+  # 记得多少
+  C4Z5_HOW_MUCH:
+    id: C4Z5_HOW_MUCH
+    lines:
+      - speaker: 阿棠
+        text: 我不确定哪些是记得的，哪些是被告知的。
+      - speaker: 阿棠
+        text: 但我知道：他们一直把我更正成同一个答案。
+      - speaker: 阿棠
+        text: 累的是这个。
+
+  # 害怕吗
+  C4Z5_SCARED:
+    id: C4Z5_SCARED
+    lines:
+      - speaker: 阿棠
+        text: 我不怕。我只是累。
+      - speaker: 阿棠
+        text: 累的是他们一直把我更正成同一个答案。
+      - speaker: 岑回
+        text: ……
+
+  # 阿棠的纸条
+  C4Z5_ATANG_NOTE:
+    id: C4Z5_ATANG_NOTE
+    lines:
+      - speaker: ""
+        text: 阿棠递给你一张纸条。
+      - speaker: 阿棠
+        text: 帮我把这张纸条塞回墙缝里。
+      - speaker: 岑回
+        text: 为什么？
+      - speaker: 阿棠
+        text: 如果我不这么做，我会怀疑它从没存在过。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z5_HAS_NOTE
+        flagValue: true
+
+  # 窗边补丁
+  C4Z5_WINDOW_PATCH:
+    id: C4Z5_WINDOW_PATCH
+    lines:
+      - speaker: ""
+        text: 窗边的墙面上有一道淡淡的痕迹。
+      - speaker: ""
+        text: 形状与你在C4-Z3看到的补丁痕迹一致。
+      - speaker: 岑回
+        text: 这里也有……
+
+  # 墙缝
+  C4Z5_WALL_CRACK:
+    id: C4Z5_WALL_CRACK
+    lines:
+      - speaker: ""
+        text: 墙上有一道细小的裂缝。
+    choices:
+      - id: put_note
+        text: 把纸条塞进去
+        effects:
+          rDelta: 2
+          setFlag:
+            name: FLAG_HELPED_ATANG_PAPER
+            value: true
+        nextDialogueId: C4Z5_NOTE_DONE
+      - id: keep_note
+        text: 留着纸条
+        nextDialogueId: C4Z5_KEEP_NOTE
+
+  # 塞完纸条
+  C4Z5_NOTE_DONE:
+    id: C4Z5_NOTE_DONE
+    lines:
+      - speaker: ""
+        text: 你把纸条塞进了墙缝。
+      - speaker: ""
+        text: 系统提示：
+      - speaker: 系统
+        text: 无可用收益。
+      - speaker: ""
+        text: 阿棠看着你，轻轻点了点头。
+    onComplete:
+      - type: card
+        cardId: CARD_C4_FRAGMENT_DIARY_02
+
+  # 留着纸条
+  C4Z5_KEEP_NOTE:
+    id: C4Z5_KEEP_NOTE
+    lines:
+      - speaker: 阿棠
+        text: ……也好。
+      - speaker: 阿棠
+        text: 也许你需要它。
+

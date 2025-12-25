@@ -1,0 +1,141 @@
+# C4-Z6 栖蓝：无人需要的地图
+# 强无收益 + F21前奏
+id: C4-Z6
+title: 街角破墙
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 破墙面（贴图位置）
+  - id: broken_wall
+    type: image
+    texture: obj_crack
+    x: 350
+    y: 380
+    scale: 1.2
+    depth: 8
+    label: 破墙面
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z6_WALL_POSITION
+
+  # 地图卷
+  - id: map_scroll
+    type: image
+    texture: obj_map
+    x: 450
+    y: 480
+    scale: 0.6
+    depth: 10
+    label: 地图卷
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: map-scroll
+      action:
+        type: dialogue
+        dialogueId: C4Z6_MAP_SCROLL
+
+  # 糨糊/胶水
+  - id: glue_pot
+    type: image
+    texture: px_item_archive
+    x: 280
+    y: 520
+    scale: 0.4
+    depth: 9
+    label: 糨糊
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C4Z6_SAW_MAP
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z6_APPLY_GLUE
+
+  # 压平工具
+  - id: flatten_tool
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 500
+    scale: 0.35
+    depth: 9
+    label: 压平工具
+    labelOffset: [0, 45]
+    condition:
+      flagTrue: FLAG_C4Z6_GLUE_APPLIED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z6_FLATTEN
+
+  # 完成确认点
+  - id: complete_point
+    type: zone
+    x: 350
+    y: 380
+    width: 150
+    height: 120
+    label: 确认贴好
+    condition:
+      flagTrue: FLAG_C4Z6_FLATTENED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z6_COMPLETE
+
+  # 栖蓝
+  - id: qilan
+    type: image
+    texture: portrait_qilan_sad
+    x: 200
+    y: 420
+    scale: 0.4
+    depth: 12
+    label: 栖蓝
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: qilan
+      action:
+        type: dialogue
+        dialogueId: C4Z6_QILAN_TALK
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往礼堂街
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z7
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z5
+

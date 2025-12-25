@@ -1,0 +1,118 @@
+# C4-Z8 市政环：顾临的限制对话数据
+dialogues:
+  # 顾临限制对话
+  C4Z8_GULIN_RESTRICTION:
+    id: C4Z8_GULIN_RESTRICTION
+    lines:
+      - speaker: 顾临
+        text: 你用得太频繁了。
+      - speaker: 顾临
+        text: 解释成本上升得太快。
+      - speaker: 顾临
+        text: 我不是在惩罚你。
+      - speaker: 顾临
+        text: 我是让这座城还能继续被读下去。
+    choices:
+      - id: ask_fear
+        text: 你怕什么？
+        nextDialogueId: C4Z8_FEAR
+      - id: saved_people
+        text: 我救了人
+        nextDialogueId: C4Z8_SAVED
+      - id: for_whom
+        text: 你是在替谁说话？
+        nextDialogueId: C4Z8_FOR_WHOM
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z8_GULIN_SPOKE
+        flagValue: true
+
+  # 怕什么
+  C4Z8_FEAR:
+    id: C4Z8_FEAR
+    lines:
+      - speaker: 顾临
+        text: ……
+      - speaker: 顾临
+        text: 我怕有一天，系统无法再解释这座城。
+      - speaker: 顾临
+        text: 到那时，我们都会变成"无法归档"的存在。
+
+  # 救了人
+  C4Z8_SAVED:
+    id: C4Z8_SAVED
+    lines:
+      - speaker: 顾临
+        text: 我知道。
+      - speaker: 顾临
+        text: 所以我才更怕。
+      - speaker: 顾临
+        text: 救人是对的。但救太多……系统会受不了。
+
+  # 替谁说话
+  C4Z8_FOR_WHOM:
+    id: C4Z8_FOR_WHOM
+    lines:
+      - speaker: 顾临
+        text: 我只替记录说话。
+      - speaker: 顾临
+        text: 记录需要被维护，需要一致性。
+      - speaker: 顾临
+        text: 没有一致性，就没有这座城。
+
+  # 权限面板
+  C4Z8_PERMISSION_PANEL:
+    id: C4Z8_PERMISSION_PANEL
+    lines:
+      - speaker: ""
+        text: 权限面板显示：
+      - speaker: ""
+        text: 「写入权限：暂挂审核」
+      - speaker: ""
+        text: 「原因：解释成本超阈值」
+      - speaker: ""
+        text: 「建议：减少干预」
+      - speaker: 岑回
+        text: 我还能用吗？
+      - speaker: 顾临
+        text: 能。但在某些区域会受限。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z8_SHOW_RESTRICTED
+        flagValue: true
+      - type: card
+        cardId: CARD_C4_PERMISSION_CHANGE
+
+  # 介入禁用演示
+  C4Z8_INTERVENTION_DISABLED:
+    id: C4Z8_INTERVENTION_DISABLED
+    lines:
+      - speaker: ""
+        text: 深度视野下，【介入】按钮变灰。
+      - speaker: 系统
+        text: 写入权限：待审
+      - speaker: 岑回
+        text: （在这里无法介入了……）
+
+  # 离开
+  C4Z8_EXIT:
+    id: C4Z8_EXIT
+    lines:
+      - speaker: 顾临
+        text: 去吧。
+      - speaker: 顾临
+        text: 权限收紧，但你仍然能选择。
+      - speaker: 顾临
+        text: 只是……会更难。
+      - speaker: ""
+        text: 结算：
+      - speaker: 系统
+        text: 权限收紧。你仍然能选择，但会更难。
+    onComplete:
+      - type: flag
+        flagName: FLAG_INTERVENTION_RESTRICTED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C4_COMPLETE
+        flagValue: true
+

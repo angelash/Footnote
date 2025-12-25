@@ -1,0 +1,138 @@
+# C3-Z5 诊疗台：病例卡1对话数据
+dialogues:
+  # 问诊台
+  C3Z5_CONSULTATION:
+    id: C3Z5_CONSULTATION
+    lines:
+      - speaker: ""
+        text: 问诊台上放着一份症状清单。
+      - speaker: ""
+        text: 许澄正在整理病历。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z5_STARTED
+        flagValue: true
+
+  # 许澄对话
+  C3Z5_XUCHENG_TALK:
+    id: C3Z5_XUCHENG_TALK
+    lines:
+      - speaker: 许澄
+        text: 你最近有没有觉得，解释变得更费力？
+      - speaker: 岑回
+        text: ……什么意思？
+      - speaker: 许澄
+        text: 别逼自己把每件事都说清。
+      - speaker: 许澄
+        text: 有些东西被写进来，就很难擦掉。
+      - speaker: 岑回
+        text: （写进来……擦掉……）
+      - speaker: 许澄
+        text: 你最近用了多少次介入？
+    choices:
+      - id: answer_few
+        text: 不多
+        nextDialogueId: C3Z5_XUCHENG_FEW
+      - id: answer_some
+        text: 几次
+        nextDialogueId: C3Z5_XUCHENG_SOME
+      - id: answer_refuse
+        text: 不想说
+        nextDialogueId: C3Z5_XUCHENG_REFUSE
+
+  # 不多
+  C3Z5_XUCHENG_FEW:
+    id: C3Z5_XUCHENG_FEW
+    lines:
+      - speaker: 许澄
+        text: 那就好。
+      - speaker: 许澄
+        text: 继续保持克制。
+      - speaker: 许澄
+        text: 不是所有异常都需要你去"修"。
+
+  # 几次
+  C3Z5_XUCHENG_SOME:
+    id: C3Z5_XUCHENG_SOME
+    lines:
+      - speaker: 许澄
+        text: ……
+      - speaker: 许澄
+        text: 注意休息。
+      - speaker: 许澄
+        text: 如果开始觉得日期不确定，来找我。
+
+  # 不想说
+  C3Z5_XUCHENG_REFUSE:
+    id: C3Z5_XUCHENG_REFUSE
+    lines:
+      - speaker: 许澄
+        text: 没关系。
+      - speaker: 许澄
+        text: 但如果有异常感受，别自己扛。
+
+  # 症状清单
+  C3Z5_SYMPTOM_LIST:
+    id: C3Z5_SYMPTOM_LIST
+    lines:
+      - speaker: ""
+        text: 症状清单上列出三个选项：
+      - speaker: ""
+        text: □ 重复感
+      - speaker: ""
+        text: □ 日期不确定
+      - speaker: ""
+        text: □ 无法解释的空白记忆
+    choices:
+      - id: check_repeat
+        text: 勾选"重复感"
+        nextDialogueId: C3Z5_SYMPTOMS_DONE
+      - id: check_date
+        text: 勾选"日期不确定"
+        nextDialogueId: C3Z5_SYMPTOMS_DONE
+      - id: check_blank
+        text: 勾选"空白记忆"
+        nextDialogueId: C3Z5_SYMPTOMS_DONE
+      - id: check_none
+        text: 都不勾选
+        nextDialogueId: C3Z5_SYMPTOMS_DONE
+
+  # 症状完成
+  C3Z5_SYMPTOMS_DONE:
+    id: C3Z5_SYMPTOMS_DONE
+    lines:
+      - speaker: 许澄
+        text: 嗯。
+      - speaker: 许澄
+        text: 别过度解释自己的状态。
+      - speaker: 许澄
+        text: 有时候，不去想，反而更清醒。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z5_SYMPTOMS_DONE
+        flagValue: true
+
+  # 病例卡
+  C3Z5_MED_CARD:
+    id: C3Z5_MED_CARD
+    lines:
+      - speaker: ""
+        text: 许澄递给你一张病例卡。
+      - speaker: ""
+        text: 编号：MC-□□-17
+      - speaker: ""
+        text: 结论：建议休息 / 降低观察刺激
+      - speaker: ""
+        text: 末尾有一行极淡的字：「对齐：建议」
+      - speaker: 岑回
+        text: （这个编号……是什么意思？）
+    onComplete:
+      - type: card
+        cardId: CARD_C3_MED_CARD_01
+      - type: flag
+        flagName: FLAG_MED_CARD_01
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F14
+        foreshadowStage: deepen
+

@@ -1,0 +1,102 @@
+# C5-Z4 礼堂街：牧平的"页背风暴"
+# 预言回收
+id: C5-Z4
+title: 礼堂街
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 牧平
+  - id: muping
+    type: image
+    texture: portrait_muping_mysterious
+    x: 400
+    y: 400
+    scale: 0.45
+    depth: 12
+    label: 牧平
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: muping
+      action:
+        type: dialogue
+        dialogueId: C5Z4_MUPING_TALK
+
+  # 礼堂门
+  - id: hall_door
+    type: image
+    texture: obj_door
+    x: 375
+    y: 280
+    scale: 0.7
+    depth: 9
+    alpha: 0.8
+
+  # 抄本领取处
+  - id: prayer_scroll
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 450
+    scale: 0.5
+    depth: 10
+    label: 抄本
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_C5Z4_MUPING_SPOKE
+    interactive:
+      cursor: true
+      action:
+        type: card
+        cardId: CARD_C5_PRAYER_04
+
+  # 路灯
+  - id: street_lamp
+    type: image
+    texture: obj_lamp
+    x: 180
+    y: 350
+    scale: 0.55
+    depth: 10
+
+  # 椅子排
+  - id: chairs
+    type: image
+    texture: obj_chair
+    x: 300
+    y: 520
+    scale: 0.7
+    depth: 8
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往街角
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z5
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z3
+

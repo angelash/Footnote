@@ -1,0 +1,144 @@
+# C1-Z5 礼堂街夜谈
+# 牧平首次出场 - 神话壳第一次成型
+id: C1-Z5
+title: 礼堂街夜谈
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 路灯
+  - id: street_lamp
+    type: image
+    texture: obj_lamp
+    x: 180
+    y: 350
+    scale: 0.7
+    depth: 10
+
+  # 牧平
+  - id: muping
+    type: image
+    texture: portrait_muping_neutral
+    x: 400
+    y: 450
+    scale: 0.45
+    depth: 12
+    label: 牧平
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: muping
+      action:
+        type: dialogue
+        dialogueId: C1Z5_MUPING_TALK
+
+  # 聚会人群（远景）
+  - id: crowd_1
+    type: image
+    texture: placeholder_char
+    x: 280
+    y: 520
+    scale: 0.6
+    depth: 6
+    alpha: 0.6
+    tint: 0x666688
+
+  - id: crowd_2
+    type: image
+    texture: placeholder_char
+    x: 350
+    y: 540
+    scale: 0.55
+    depth: 6
+    alpha: 0.5
+    tint: 0x668866
+
+  - id: crowd_3
+    type: image
+    texture: placeholder_char
+    x: 480
+    y: 510
+    scale: 0.6
+    depth: 6
+    alpha: 0.55
+    tint: 0x886666
+
+  # 礼堂建筑（远景）
+  - id: hall_building
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 250
+    scale: 1.2
+    depth: 3
+    alpha: 0.7
+    tint: 0x445566
+
+  # 简易讲台
+  - id: podium
+    type: image
+    texture: px_item_archive
+    x: 400
+    y: 380
+    scale: 0.5
+    depth: 9
+
+  # 夜空装饰（星光效果）
+  - id: night_sky
+    type: image
+    texture: px_fx_field_accept
+    x: 375
+    y: 150
+    scale: 2.0
+    depth: 1
+    alpha: 0.3
+
+  # 祷文抄本位置
+  - id: prayer_note
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 480
+    scale: 0.4
+    depth: 8
+    label: 抄本
+    labelOffset: [0, 50]
+    condition:
+      flag: FLAG_C1Z5_STAYED
+    interactive:
+      cursor: true
+      action:
+        type: card
+        cardId: CARD_C1_PRAYER_01
+
+  # 出口 - 前往边缘断口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往边缘
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z6
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z4
+

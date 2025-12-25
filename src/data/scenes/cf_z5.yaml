@@ -1,0 +1,112 @@
+# CF-Z5 三结局选择
+# A/B/C执行脚本
+id: CF-Z5
+title: 平面尽头
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 结算面板背景
+  - id: panel_bg
+    type: image
+    texture: px_tiles_platform
+    x: 375
+    y: 400
+    scale: 2.0
+    depth: 8
+    alpha: 0.3
+
+  # 结局A按钮：继续收敛
+  - id: ending_a
+    type: image
+    texture: px_fx_system_correct
+    x: 250
+    y: 380
+    scale: 0.6
+    depth: 10
+    label: 继续收敛
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: ending-a
+      action:
+        type: dialogue
+        dialogueId: CFZ5_ENDING_A
+
+  # 结局B按钮：释放表示
+  - id: ending_b
+    type: image
+    texture: px_fx_glitch
+    x: 375
+    y: 380
+    scale: 0.6
+    depth: 10
+    label: 释放表示
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: ending-b
+      action:
+        type: dialogue
+        dialogueId: CFZ5_ENDING_B
+
+  # 结局C按钮：承载字段
+  - id: ending_c
+    type: image
+    texture: px_fx_field_accept
+    x: 500
+    y: 380
+    scale: 0.6
+    depth: 10
+    label: 承载字段
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: ending-c
+      action:
+        type: dialogue
+        dialogueId: CFZ5_ENDING_C
+
+  # 字段条显示
+  - id: field_display
+    type: zone
+    x: 375
+    y: 550
+    width: 200
+    height: 50
+    depth: 15
+    label: 字段：◦◦◦
+
+  # 代价说明
+  - id: cost_info
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 500
+    scale: 0.4
+    depth: 9
+    label: 长按查看代价
+    labelOffset: [0, 50]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ5_COST_INFO
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z4
+

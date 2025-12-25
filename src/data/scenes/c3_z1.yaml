@@ -1,0 +1,150 @@
+# C3-Z1 维修局：例外许可签发
+# 解锁深度介入
+id: C3-Z1
+title: 顾临办公室
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 办公室门
+  - id: office_door
+    type: image
+    texture: obj_door
+    x: 375
+    y: 280
+    scale: 0.7
+    depth: 10
+    label: 办公室
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: office-door
+      action:
+        type: dialogue
+        dialogueId: C3Z1_ENTER_OFFICE
+
+  # 顾临
+  - id: gulin
+    type: image
+    texture: portrait_gulin_stern
+    x: 450
+    y: 380
+    scale: 0.45
+    depth: 12
+    label: 顾临
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C3Z1_ENTERED
+    interactive:
+      cursor: true
+      testid: gulin
+      action:
+        type: dialogue
+        dialogueId: C3Z1_GULIN_TALK
+
+  # 许可文件夹
+  - id: permit_folder
+    type: image
+    texture: obj_filing_cabinet
+    x: 300
+    y: 450
+    scale: 0.5
+    depth: 9
+    label: 许可文件
+    labelOffset: [0, 65]
+    condition:
+      flagTrue: FLAG_C3Z1_GULIN_SPOKE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z1_PERMIT_FOLDER
+
+  # 例外条款标签
+  - id: exception_label
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 480
+    scale: 0.4
+    depth: 8
+    label: 例外条款
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C3Z1_READ_PERMIT
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z1_EXCEPTION_CLAUSE
+
+  # 出门任务单
+  - id: task_sheet
+    type: image
+    texture: px_item_archive
+    x: 200
+    y: 400
+    scale: 0.45
+    depth: 9
+    label: 任务单
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_DEPTH_INTERVENTION_UNLOCKED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z1_TASK_SHEET
+
+  # 办公桌
+  - id: office_desk
+    type: image
+    texture: obj_office_desk
+    x: 400
+    y: 500
+    scale: 0.7
+    depth: 7
+
+  # 文件柜
+  - id: cabinet
+    type: image
+    texture: obj_filing_cabinet
+    x: 600
+    y: 400
+    scale: 0.5
+    depth: 6
+    alpha: 0.8
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往边缘断口
+    condition:
+      flag: FLAG_DEPTH_INTERVENTION_UNLOCKED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z2
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z7
+

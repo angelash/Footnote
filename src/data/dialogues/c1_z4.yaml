@@ -1,0 +1,161 @@
+# C1-Z4 诊疗台候诊区对话数据
+dialogues:
+  # 问卷台
+  C1Z4_QUESTIONNAIRE:
+    id: C1Z4_QUESTIONNAIRE
+    lines:
+      - speaker: ""
+        text: 桌上放着一份问卷。
+      - speaker: ""
+        text: 「记忆一致性评估」
+      - speaker: 岑回
+        text: 看起来是强制要填的……
+    choices:
+      - id: start_questionnaire
+        text: 开始填写
+        nextDialogueId: C1Z4_Q1
+      - id: skip_questionnaire
+        text: 先看看其他
+        nextDialogueId: C1Z4_SKIP
+
+  # 问题1
+  C1Z4_Q1:
+    id: C1Z4_Q1
+    lines:
+      - speaker: 问卷
+        text: 问题1：您是否在同一天里见过两次相同的事？
+    choices:
+      - id: q1_yes
+        text: 是的
+        nextDialogueId: C1Z4_Q2
+      - id: q1_no
+        text: 没有
+        nextDialogueId: C1Z4_Q2
+      - id: q1_unsure
+        text: 不确定
+        nextDialogueId: C1Z4_Q2
+
+  # 问题2
+  C1Z4_Q2:
+    id: C1Z4_Q2
+    lines:
+      - speaker: 问卷
+        text: 问题2：您是否在熟悉的路上迷路？
+    choices:
+      - id: q2_yes
+        text: 是的
+        nextDialogueId: C1Z4_Q3
+      - id: q2_no
+        text: 没有
+        nextDialogueId: C1Z4_Q3
+      - id: q2_sometimes
+        text: 偶尔
+        nextDialogueId: C1Z4_Q3
+
+  # 问题3
+  C1Z4_Q3:
+    id: C1Z4_Q3
+    lines:
+      - speaker: 问卷
+        text: 问题3：您是否对某些日期感到不确定？
+    choices:
+      - id: q3_yes
+        text: 是的
+        nextDialogueId: C1Z4_RESULT
+      - id: q3_no
+        text: 没有
+        nextDialogueId: C1Z4_RESULT
+      - id: q3_always
+        text: 经常
+        nextDialogueId: C1Z4_RESULT
+
+  # 问卷结果（固定）
+  C1Z4_RESULT:
+    id: C1Z4_RESULT
+    lines:
+      - speaker: ""
+        text: （问卷自动提交……）
+      - speaker: ""
+        text: 评估结论：
+      - speaker: 系统
+        text: 状态稳定。无需干预。
+      - speaker: ""
+        text: 结论下方闪过一行小字：
+      - speaker: ""
+        text: 「已对齐」
+      - speaker: 岑回
+        text: ……无论我怎么回答，结论都一样。
+      - speaker: 岑回
+        text: 这问卷到底在测什么？
+    onComplete:
+      - type: card
+        cardId: CARD_C1_QUESTIONNAIRE
+      - type: flag
+        flagName: FLAG_C1Z4_QUESTIONNAIRE_DONE
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F14
+        foreshadowStage: plant
+
+  # 跳过问卷
+  C1Z4_SKIP:
+    id: C1Z4_SKIP
+    lines:
+      - speaker: 岑回
+        text: 先看看周围再说。
+
+  # 许澄对话
+  C1Z4_XUCHENG_TALK:
+    id: C1Z4_XUCHENG_TALK
+    lines:
+      - speaker: 许澄
+        text: 别强迫自己记住每一件事。
+      - speaker: 岑回
+        text: ……你是这里的医生？
+      - speaker: 许澄
+        text: 算是吧。我负责……帮助大家适应。
+      - speaker: 许澄
+        text: 不一致会让你很累。
+      - speaker: 岑回
+        text: 什么不一致？
+      - speaker: 许澄
+        text: （温柔地微笑）
+      - speaker: 许澄
+        text: 记忆和现实之间的不一致。
+      - speaker: 许澄
+        text: 别太在意。大多数人都会慢慢习惯的。
+      - speaker: 岑回
+        text: （习惯……什么？）
+
+  # 阿棠短暂对话
+  C1Z4_ATANG_BRIEF:
+    id: C1Z4_ATANG_BRIEF
+    lines:
+      - speaker: 阿棠
+        text: 你刚刚是不是又走了一遍？
+      - speaker: 岑回
+        text: 什么？
+      - speaker: ""
+        text: （她已经走开了）
+      - speaker: 岑回
+        text: ……又？
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F14
+        foreshadowStage: deepen
+
+  # 公告板
+  C1Z4_NOTICE_BOARD:
+    id: C1Z4_NOTICE_BOARD
+    lines:
+      - speaker: ""
+        text: 公告板上贴着几张通知：
+      - speaker: ""
+        text: 「记忆一致性检测已纳入常规健康评估」
+      - speaker: ""
+        text: 「如发现记忆异常，请及时就诊」
+      - speaker: ""
+        text: 「对齐服务免费提供」
+      - speaker: 岑回
+        text: 对齐……又是这个词。
+

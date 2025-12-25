@@ -1,0 +1,126 @@
+# C1-Z3 档案巷口旧地图摊
+# 宋岚首次正式出场
+id: C1-Z3
+title: 档案巷口
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 地图摊
+  - id: map_stall
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 450
+    scale: 0.9
+    depth: 10
+    label: 地图摊
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      testid: map-stall
+      action:
+        type: dialogue
+        dialogueId: C1Z3_MAP_STALL
+
+  # 宋岚
+  - id: songlan
+    type: image
+    texture: portrait_songlan_neutral
+    x: 400
+    y: 380
+    scale: 0.4
+    depth: 12
+    label: 宋岚
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: songlan
+      action:
+        type: dialogue
+        dialogueId: C1Z3_SONGLAN_TALK
+
+  # 旧地图堆
+  - id: old_maps
+    type: image
+    texture: px_item_archive
+    x: 250
+    y: 520
+    scale: 0.6
+    depth: 8
+    label: 旧地图
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C1Z3_OLD_MAPS
+
+  # 记录本
+  - id: notebook
+    type: image
+    texture: px_item_archive
+    x: 500
+    y: 500
+    scale: 0.5
+    depth: 9
+    label: 记录本
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C1Z3_NOTEBOOK
+
+  # 巷口装饰
+  - id: alley_sign
+    type: image
+    texture: px_item_sign
+    x: 150
+    y: 350
+    scale: 0.5
+    depth: 6
+    rotation: -0.1
+
+  # 路人
+  - id: passerby
+    type: image
+    texture: placeholder_char
+    x: 600
+    y: 650
+    scale: 0.7
+    depth: 5
+    alpha: 0.5
+    tint: 0x666666
+
+  # 出口 - 前往诊疗台
+  - id: exit_to_clinic
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往诊疗台
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z4
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z2
+

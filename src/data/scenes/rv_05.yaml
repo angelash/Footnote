@@ -1,0 +1,109 @@
+# RV-05 C1-Z3 重返：折叠楼梯间
+# 深度感知+深度介入组合变体 - 0.5层发现
+id: RV-05
+title: 折叠楼梯间 [深度组合]
+background:
+  texture: bg_c1z3
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+  tint: 0xddccff
+objects:
+  # 3F楼层
+  - id: floor_3
+    type: image
+    texture: px_tiles_platform
+    x: 200
+    y: 280
+    scale: 0.5
+    depth: 10
+    label: 3F
+    labelOffset: [0, 50]
+
+  # 2F楼层
+  - id: floor_2
+    type: image
+    texture: px_tiles_platform
+    x: 350
+    y: 380
+    scale: 0.5
+    depth: 10
+    label: 2F
+    labelOffset: [0, 50]
+
+  # 1F楼层
+  - id: floor_1
+    type: image
+    texture: px_tiles_platform
+    x: 200
+    y: 480
+    scale: 0.5
+    depth: 10
+    label: 1F
+    labelOffset: [0, 50]
+    interactive:
+      cursor: true
+      testid: floor-1
+      action:
+        type: dialogue
+        dialogueId: RV05_FLOOR_1
+
+  # 0.5F楼层（深度感知发现）
+  - id: floor_half
+    type: image
+    texture: px_tiles_platform
+    x: 350
+    y: 550
+    scale: 0.4
+    depth: 9
+    alpha: 0.6
+    label: 0.5F（隐藏）
+    labelOffset: [0, 45]
+    condition:
+      flagTrue: FLAG_RV05_HALF_FOUND
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV05_FLOOR_HALF
+
+  # 楼梯连接线
+  - id: stairs
+    type: image
+    texture: px_fx_glitch
+    x: 280
+    y: 400
+    scale: 1.5
+    depth: 8
+    alpha: 0.3
+
+  # 组合操作面板
+  - id: combo_panel
+    type: zone
+    x: 375
+    y: 700
+    width: 300
+    height: 100
+    depth: 20
+    label: 组合操作
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV05_COMBO
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z3
+

@@ -1,0 +1,153 @@
+# C4-Z1 坍塌后的生活区（重访）
+# 灾后漂移
+id: C4-Z1
+title: 坍塌后的生活区
+background:
+  texture: bg_collapse
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 封锁胶带
+  - id: barrier_tape
+    type: image
+    texture: obj_barrier
+    x: 300
+    y: 350
+    scale: 0.7
+    depth: 10
+    label: 封锁线
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: barrier-tape
+      action:
+        type: dialogue
+        dialogueId: C4Z1_BARRIER_TAPE
+
+  # 半塌的墙角
+  - id: collapsed_wall
+    type: image
+    texture: obj_crack
+    x: 500
+    y: 400
+    scale: 1.0
+    depth: 9
+    label: 塌墙
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z1_COLLAPSED_WALL
+
+  # 住户A
+  - id: resident_a
+    type: image
+    texture: portrait_chenjiang_neutral
+    x: 250
+    y: 480
+    scale: 0.35
+    depth: 12
+    label: 住户A
+    labelOffset: [0, 75]
+    interactive:
+      cursor: true
+      testid: resident-a
+      action:
+        type: dialogue
+        dialogueId: C4Z1_RESIDENT_DISPUTE
+
+  # 住户B
+  - id: resident_b
+    type: image
+    texture: portrait_qilan_neutral
+    x: 380
+    y: 490
+    scale: 0.35
+    depth: 12
+    label: 住户B
+    labelOffset: [0, 75]
+
+  # 临时公告板
+  - id: notice_board
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 320
+    scale: 0.6
+    depth: 11
+    label: 公告板
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: card
+        cardId: CARD_C4_TEMP_NOTICE
+
+  # 散落的物品（可帮助归整）
+  - id: scattered_items
+    type: image
+    texture: obj_old_books
+    x: 200
+    y: 550
+    scale: 0.5
+    depth: 8
+    label: 散落物品
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z1_HELP_RESIDENT
+
+  # 深度感知区域（骨架缺口）
+  - id: depth_bone_gap
+    type: zone
+    x: 500
+    y: 380
+    width: 150
+    height: 120
+    depth: 20
+    depthSenseTarget: true
+    showOnDepthSense: true
+
+  # 栖蓝远景（条件）
+  - id: qilan_distant
+    type: image
+    texture: portrait_qilan_sad
+    x: 650
+    y: 600
+    scale: 0.2
+    depth: 5
+    alpha: 0.4
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往校准室
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z2
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z7
+

@@ -1,0 +1,173 @@
+# C4-Z2 时间节点界面上线对话数据
+dialogues:
+  # 顾临对话
+  C4Z2_GULIN_TALK:
+    id: C4Z2_GULIN_TALK
+    lines:
+      - speaker: 顾临
+        text: 你会想用它纠正错误。
+      - speaker: 顾临
+        text: 别。
+      - speaker: 顾临
+        text: 你能做的，只是把错误搬到别处。
+    choices:
+      - id: ask_meaning
+        text: 那给我它有什么意义？
+        nextDialogueId: C4Z2_GULIN_MEANING
+      - id: ask_save
+        text: 如果我救得了人呢？
+        nextDialogueId: C4Z2_GULIN_SAVE
+      - id: promise_careful
+        text: 我只会在必要时用
+        nextDialogueId: C4Z2_GULIN_PROMISE
+
+  # 意义
+  C4Z2_GULIN_MEANING:
+    id: C4Z2_GULIN_MEANING
+    lines:
+      - speaker: 顾临
+        text: 意义不是系统给的。
+      - speaker: 顾临
+        text: 你自己决定它的意义。
+      - speaker: 顾临
+        text: 但代价……系统会记。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z2_TUTORIAL_START
+        flagValue: true
+
+  # 救人
+  C4Z2_GULIN_SAVE:
+    id: C4Z2_GULIN_SAVE
+    lines:
+      - speaker: 顾临
+        text: 救援优先，但账会变厚。
+      - speaker: 顾临
+        text: 每次回溯，都会增加解释成本。
+      - speaker: 顾临
+        text: 系统需要更多资源来维持……一致性。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z2_TUTORIAL_START
+        flagValue: true
+
+  # 承诺
+  C4Z2_GULIN_PROMISE:
+    id: C4Z2_GULIN_PROMISE
+    lines:
+      - speaker: 顾临
+        text: 希望你说到做到。
+      - speaker: 顾临
+        text: 现在，让我给你演示一次。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z2_TUTORIAL_START
+        flagValue: true
+
+  # 时间堆栈介绍
+  C4Z2_TIME_STACK_INTRO:
+    id: C4Z2_TIME_STACK_INTRO
+    lines:
+      - speaker: ""
+        text: 教学：点击右侧【时间堆栈】查看节点。
+      - speaker: ""
+        text: 回溯将增加解释成本。
+      - speaker: ""
+        text: 深度伤痕不会抹去。
+
+  # 演示台
+  C4Z2_DEMO_DESK:
+    id: C4Z2_DEMO_DESK
+    lines:
+      - speaker: ""
+        text: 演示台上放着一些小物件。
+      - speaker: 顾临
+        text: 点一下那枚螺丝。
+
+  # 螺丝演示
+  C4Z2_SCREW_DEMO:
+    id: C4Z2_SCREW_DEMO
+    lines:
+      - speaker: ""
+        text: 你碰了一下螺丝……
+      - speaker: ""
+        text: 它滚落到桌下。
+      - speaker: 顾临
+        text: 现在，打开时间堆栈。
+      - speaker: 顾临
+        text: 选择"刚才·螺丝未掉落"节点。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z2_SCREW_FALLEN
+        flagValue: true
+    choices:
+      - id: open_stack
+        text: 打开时间堆栈
+        nextDialogueId: C4Z2_ROLLBACK_DEMO
+
+  # 回溯演示
+  C4Z2_ROLLBACK_DEMO:
+    id: C4Z2_ROLLBACK_DEMO
+    lines:
+      - speaker: ""
+        text: 「时间干预（回溯）」
+      - speaker: ""
+        text: 警告：回溯不会抹去深度伤痕。
+      - speaker: ""
+        text: 警告：将增加解释成本。
+    choices:
+      - id: confirm_rollback
+        text: 按住确认（1秒）
+        nextDialogueId: C4Z2_ROLLBACK_DONE
+      - id: cancel
+        text: 取消
+        nextDialogueId: C4Z2_ROLLBACK_CANCEL
+
+  # 回溯完成
+  C4Z2_ROLLBACK_DONE:
+    id: C4Z2_ROLLBACK_DONE
+    lines:
+      - speaker: ""
+        text: ……
+      - speaker: ""
+        text: 螺丝回到了桌面。
+      - speaker: ""
+        text: 但桌角留下了一道极淡的擦痕。
+      - speaker: 顾临
+        text: 看到了吗？
+      - speaker: 顾临
+        text: 这就是代价。回溯不是抹除，是搬运。
+      - speaker: ""
+        text: （演示完成，授权终端亮起）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z2_ROLLBACK_DONE
+        flagValue: true
+      - type: card
+        cardId: CARD_C4_DEMO_RECEIPT
+
+  # 取消回溯
+  C4Z2_ROLLBACK_CANCEL:
+    id: C4Z2_ROLLBACK_CANCEL
+    lines:
+      - speaker: 顾临
+        text: 试试看。只是演示。
+
+  # 授权完成
+  C4Z2_AUTH_COMPLETE:
+    id: C4Z2_AUTH_COMPLETE
+    lines:
+      - speaker: 系统
+        text: 能力：时间干预 已上线。
+      - speaker: ""
+        text: （你获得了回溯至稳定节点的权限）
+    onComplete:
+      - type: card
+        cardId: CARD_C4_TIME_AUTH
+      - type: flag
+        flagName: FLAG_TIME_INTERVENTION_UNLOCKED
+        flagValue: true
+      - type: ability
+        abilityType: timeIntervention
+        unlock: true
+

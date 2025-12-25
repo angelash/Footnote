@@ -1,0 +1,166 @@
+# 重返变体卡片数据
+cards:
+  # RV-01 隐藏涂鸦
+  CARD_RV_GRAFFITI:
+    id: CARD_RV_GRAFFITI
+    title: 隐藏涂鸦
+    type: archive
+    content: |
+      "我们曾在这里"
+      "——在成为不存在之前"
+    flavorText: 墙记得它们曾经存在。
+    rarity: uncommon
+    foreshadowId: F04
+
+  # RV-02 旧招牌
+  CARD_RV_OLD_SIGN:
+    id: CARD_RV_OLD_SIGN
+    title: 旧招牌叠影
+    type: archive
+    content: |
+      "张记老面馆"
+      
+      店主换了三次，但墙记得第一任。
+    flavorText: 名字可以改，但痕迹不会消失。
+    rarity: common
+    foreshadowId: F08
+
+  # RV-03 回溯记录
+  CARD_RV_REWIND:
+    id: CARD_RV_REWIND
+    title: 回溯记录
+    type: archive
+    content: |
+      回溯目标：薄墙
+      原状态：有补丁
+      回溯状态：完整
+      
+      污染标记：已记录
+    flavorText: 每一次回溯都会留下痕迹。
+    rarity: uncommon
+
+  # RV-04 隐藏通道
+  CARD_RV_PASSAGE:
+    id: CARD_RV_PASSAGE
+    title: 隐藏通道记录
+    type: archive
+    content: |
+      发现位置：维修局档案室
+      遮挡物：档案柜
+      通道状态：可通行
+      
+      介入伤痕：已记录
+    flavorText: 被遮挡的不一定是不存在的。
+    rarity: rare
+
+  # RV-05 0.5层
+  CARD_RV_HALF_FLOOR:
+    id: CARD_RV_HALF_FLOOR
+    title: 0.5层发现记录
+    type: archive
+    content: |
+      位置：折叠楼梯间
+      层级：1F与2F之间
+      状态：被遗忘
+      
+      发现方式：深度感知+深度介入
+    flavorText: 被折叠的空间，被遗忘的存在。
+    rarity: rare
+    foreshadowId: F05
+
+  # RV-06 复合操作
+  CARD_RV_COMBO:
+    id: CARD_RV_COMBO
+    title: 复合操作记录
+    type: archive
+    content: |
+      操作序列：
+      1. 时间回溯到T-1
+      2. 深度介入修改V-A
+      3. 返回NOW查看结果
+      
+      结果：版本差异部分修正
+    flavorText: 三种能力的协同，可以改变更多。
+    rarity: epic
+
+  # RV-07 阿棠的前身
+  CARD_RV_ATANG_PAST:
+    id: CARD_RV_ATANG_PAST
+    title: 阿棠的旧物
+    type: archive
+    content: |
+      这些东西不属于"阿棠"。
+      它们属于"阿棠的前身"。
+      
+      那个人……是谁？
+    flavorText: 漂移者不是从一开始就漂移的。
+    rarity: rare
+    foreshadowId: F04
+
+  # RV-08 时间回溯
+  CARD_RV_TIME_REWIND:
+    id: CARD_RV_TIME_REWIND
+    title: 关键节点回溯
+    type: archive
+    content: |
+      回溯节点：已记录
+      污染增量：+1
+      
+      看到的内容：[已记录]
+    flavorText: 时间可以回溯，但代价不会消失。
+    rarity: uncommon
+
+  # RV-09 隐藏符文
+  CARD_RV_RUNES:
+    id: CARD_RV_RUNES
+    title: 古老符文
+    type: archive
+    content: |
+      这些符文不是牧平写的。
+      它们更古老。
+      
+      来源：未知
+    flavorText: 牧平只是抄录者。
+    rarity: rare
+    foreshadowId: F05
+
+  # RV-10 隐藏档案
+  CARD_RV_HIDDEN_ARCHIVE:
+    id: CARD_RV_HIDDEN_ARCHIVE
+    title: 被藏起的档案
+    type: archive
+    content: |
+      档案编号：[已涂抹]
+      内容：[部分可读]
+      
+      "……更正记录……不允许……"
+    flavorText: 有些东西被故意藏起来。
+    rarity: rare
+
+  # RV-11 和解记录
+  CARD_RV_RESOLVE:
+    id: CARD_RV_RESOLVE
+    title: 版本和解记录
+    type: archive
+    content: |
+      冲突版本：V-A / V-B
+      和解结果：烈度降低
+      
+      状态：和解者标记
+    flavorText: 冲突不一定要分出胜负。
+    rarity: epic
+
+  # RV-12 陈匠的坚守
+  CARD_RV_PERSISTENCE:
+    id: CARD_RV_PERSISTENCE
+    title: 陈匠的坚守
+    type: archive
+    content: |
+      灯塔：不存在于记录中
+      陈匠：每天点灯
+      
+      "对象不存在，但行为继续。"
+    flavorText: 坚守不需要被承认。
+    rarity: legendary
+    foreshadowId: F06
+

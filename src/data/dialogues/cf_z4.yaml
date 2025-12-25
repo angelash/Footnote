@@ -1,0 +1,70 @@
+# CF-Z4 保留之地对话数据
+dialogues:
+  # 栖蓝最后
+  CFZ4_QILAN_FINAL:
+    id: CFZ4_QILAN_FINAL
+    lines:
+      - speaker: 栖蓝
+        text: 你看。
+      - speaker: 栖蓝
+        text: 它还在。
+      - speaker: 栖蓝
+        text: 他们得承认一次。
+
+  # 空椅保留
+  CFZ4_CHAIR_PRESERVED:
+    id: CFZ4_CHAIR_PRESERVED
+    lines:
+      - speaker: ""
+        text: 街角空椅稳定存在。
+      - speaker: ""
+        text: 地面描边不再被清除。
+      - speaker: 系统
+        text: 条目：保留。
+      - speaker: ""
+        text: （世界保留了一件多余的事）
+    onComplete:
+      - type: card
+        cardId: CARD_CF_PRESERVE_PROOF
+      - type: flag
+        flagName: FLAG_F23_REALIZED
+        flagValue: true
+
+  # 封存抄录保留
+  CFZ4_ARCHIVE_PRESERVED:
+    id: CFZ4_ARCHIVE_PRESERVED
+    lines:
+      - speaker: ""
+        text: 版本库底层封条不再"已对齐"覆盖。
+      - speaker: ""
+        text: 抄录内容保持。
+      - speaker: 系统
+        text: 条目：保留。
+      - speaker: ""
+        text: （世界保留了一件多余的事）
+    onComplete:
+      - type: card
+        cardId: CARD_CF_PRESERVE_PROOF
+      - type: flag
+        flagName: FLAG_F23_REALIZED
+        flagValue: true
+
+  # 灯保留
+  CFZ4_LAMP_PRESERVED:
+    id: CFZ4_LAMP_PRESERVED
+    lines:
+      - speaker: ""
+        text: 那盏弱灯持续亮着。
+      - speaker: ""
+        text: 系统不再提示"对象不存在"。
+      - speaker: 系统
+        text: 条目：保留。
+      - speaker: ""
+        text: （世界保留了一件多余的事）
+    onComplete:
+      - type: card
+        cardId: CARD_CF_PRESERVE_PROOF
+      - type: flag
+        flagName: FLAG_F23_REALIZED
+        flagValue: true
+

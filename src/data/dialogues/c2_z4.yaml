@@ -1,0 +1,147 @@
+# C2-Z4 栖蓝的修补摊对话数据
+dialogues:
+  # 栖蓝对话
+  C2Z4_QILAN_TALK:
+    id: C2Z4_QILAN_TALK
+    lines:
+      - speaker: 栖蓝
+        text: 这条路以后可能也没人走。
+      - speaker: 栖蓝
+        text: 但路标歪着，看着难受。
+      - speaker: 栖蓝
+        text: 你别问有没有用。问了就做不下去了。
+    choices:
+      - id: ask_why
+        text: 为什么要做这种事？
+        nextDialogueId: C2Z4_QILAN_WHY
+      - id: help_her
+        text: 我帮你
+        nextDialogueId: C2Z4_QILAN_HELP
+      - id: busy
+        text: 我很忙
+        nextDialogueId: C2Z4_QILAN_BUSY
+
+  # 为什么
+  C2Z4_QILAN_WHY:
+    id: C2Z4_QILAN_WHY
+    lines:
+      - speaker: 栖蓝
+        text: 因为它曾经有用过。
+      - speaker: 栖蓝
+        text: 曾经有人沿着这个路标找到了方向。
+      - speaker: 栖蓝
+        text: 即使以后没人来，那个人的记忆还在。
+      - speaker: 岑回
+        text: ……
+
+  # 我帮你
+  C2Z4_QILAN_HELP:
+    id: C2Z4_QILAN_HELP
+    lines:
+      - speaker: 栖蓝
+        text: ……谢谢。
+      - speaker: 栖蓝
+        text: 钉子掉了，找一枚就行。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z4_AGREED_HELP
+        flagValue: true
+
+  # 我很忙
+  C2Z4_QILAN_BUSY:
+    id: C2Z4_QILAN_BUSY
+    lines:
+      - speaker: 栖蓝
+        text: 那就更应该快点做完。
+      - speaker: 栖蓝
+        text: 反正也花不了多少时间。
+
+  # 歪斜路标
+  C2Z4_CROOKED_SIGN:
+    id: C2Z4_CROOKED_SIGN
+    lines:
+      - speaker: ""
+        text: 路标歪斜着，指向一条几乎无人问津的小路。
+      - speaker: 岑回
+        text: 这个路标……确实歪得很厉害。
+
+  # 工具箱
+  C2Z4_TOOLBOX:
+    id: C2Z4_TOOLBOX
+    lines:
+      - speaker: ""
+        text: 工具箱里有一些简单的修补工具。
+      - speaker: 岑回
+        text: 锤子、螺丝刀……够用了。
+
+  # 钉子孔
+  C2Z4_NAIL_HOLE:
+    id: C2Z4_NAIL_HOLE
+    lines:
+      - speaker: ""
+        text: 地上有一个旧钉子孔。
+      - speaker: 岑回
+        text: 钉子从这里脱落的。
+      - speaker: ""
+        text: 附近地面上闪着微光……
+    choices:
+      - id: pick_nail
+        text: 捡起钉子
+        effects:
+          setFlag:
+            name: FLAG_C2Z4_HAS_NAIL
+            value: true
+        nextDialogueId: C2Z4_GOT_NAIL
+      - id: ignore_nail
+        text: 忽略
+        nextDialogueId: C2Z4_IGNORE_NAIL
+
+  # 得到钉子
+  C2Z4_GOT_NAIL:
+    id: C2Z4_GOT_NAIL
+    lines:
+      - speaker: ""
+        text: 你捡起了一枚旧钉子。
+      - speaker: 岑回
+        text: 可以用来修路标了。
+
+  # 忽略钉子
+  C2Z4_IGNORE_NAIL:
+    id: C2Z4_IGNORE_NAIL
+    lines:
+      - speaker: 岑回
+        text: （不管它了。）
+
+  # 完成修补
+  C2Z4_COMPLETE_REPAIR:
+    id: C2Z4_COMPLETE_REPAIR
+    lines:
+      - speaker: ""
+        text: 你用钉子固定好了路标。
+      - speaker: ""
+        text: 路标立起来了，指向远方的小路。
+      - speaker: 栖蓝
+        text: ……
+      - speaker: 栖蓝
+        text: 谢谢。
+      - speaker: ""
+        text: 系统提示：
+      - speaker: 系统
+        text: 无可用收益。
+      - speaker: 岑回
+        text: （无收益……但做完了，感觉好一点。）
+    onComplete:
+      - type: card
+        cardId: CARD_C2_REPAIR_RECORD
+      - type: flag
+        flagName: FLAG_C2Z4_SIGN_FIXED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_HELPED_QILAN_SIGN
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F05
+        foreshadowStage: plant
+    effects:
+      rDelta: 2
+

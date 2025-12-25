@@ -1,0 +1,103 @@
+# C0-Z1 宿舍走廊 对话数据
+# 序章第一个Zone的所有对话
+
+dialogues:
+  # ==================== 开场独白 ====================
+  CENHUI_MONO_01:
+    id: CENHUI_MONO_01
+    speaker: 岑回
+    text: 先按流程走。
+    expression: neutral
+    next: CENHUI_MONO_02
+
+  CENHUI_MONO_02:
+    id: CENHUI_MONO_02
+    speaker: 岑回
+    text: 七点二十，出门前检查。
+    expression: thinking
+    next: CENHUI_MONO_03
+
+  CENHUI_MONO_03:
+    id: CENHUI_MONO_03
+    speaker: 岑回
+    text: 身份卡、通讯器、维修工具包。
+    expression: neutral
+    next: null
+    trigger:
+      card: CARD_C0_IDENTITY
+
+  # ==================== 身份卡交互 ====================
+  IDENTITY_CARD_EXAMINE:
+    id: IDENTITY_CARD_EXAMINE
+    speaker: 系统
+    text: 身份识别卡正在载入...
+    next: IDENTITY_CARD_INFO
+    
+  IDENTITY_CARD_INFO:
+    id: IDENTITY_CARD_INFO
+    speaker: 系统
+    text: |
+      ▸ 姓名：岑回
+      ▸ 编号：EX-7749
+      ▸ 所属：维修局外勤
+      ▸ 通行级别：灰
+    next: null
+    trigger:
+      card: CARD_C0_IDENTITY
+
+  # ==================== 公告板交互 ====================
+  NOTICE_BOARD_LOOK:
+    id: NOTICE_BOARD_LOOK
+    speaker: 岑回
+    text: 公告板上贴满了通知，日期处有涂改痕迹...
+    expression: curious
+    next: NOTICE_BOARD_DETAIL
+
+  NOTICE_BOARD_DETAIL:
+    id: NOTICE_BOARD_DETAIL
+    speaker: 岑回
+    text: 「本周维修配额：17件」「严禁私自保留异常物件」
+    expression: thinking
+    next: NOTICE_BOARD_CHOICE
+    
+  NOTICE_BOARD_CHOICE:
+    id: NOTICE_BOARD_CHOICE
+    speaker: 系统
+    text: 是否仔细查看日期涂改处？
+    choices:
+      - label: 仔细查看
+        next: NOTICE_BOARD_EXAMINE
+        effect:
+          r: 1
+      - label: 算了，不重要
+        next: null
+
+  NOTICE_BOARD_EXAMINE:
+    id: NOTICE_BOARD_EXAMINE
+    speaker: 岑回
+    text: 涂改下面隐约能看到「第274周期」的字样...但现在显示的是「第275周期」。
+    expression: surprised
+    next: NOTICE_BOARD_EXAMINE_2
+    trigger:
+      foreshadow: [F02, plant]
+
+  NOTICE_BOARD_EXAMINE_2:
+    id: NOTICE_BOARD_EXAMINE_2
+    speaker: 岑回
+    text: 周期变更？维修局从不提这种事。
+    expression: thinking
+    next: null
+
+  # ==================== 邻居交互 ====================
+  NEIGHBOR_DOOR_KNOCK:
+    id: NEIGHBOR_DOOR_KNOCK
+    speaker: 系统
+    text: 邻居的门紧闭着，门上有一个褪色的号码牌。
+    next: NEIGHBOR_DOOR_KNOCK_2
+
+  NEIGHBOR_DOOR_KNOCK_2:
+    id: NEIGHBOR_DOOR_KNOCK_2
+    speaker: 岑回
+    text: 7750...从没见过这户人。
+    next: null
+

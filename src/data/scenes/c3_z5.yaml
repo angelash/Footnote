@@ -1,0 +1,136 @@
+# C3-Z5 诊疗台：病例卡1
+# 因果微颤 - 账本线铺垫
+id: C3-Z5
+title: 诊疗台
+background:
+  texture: bg_clinic
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 问诊台
+  - id: consultation_desk
+    type: image
+    texture: obj_desk
+    x: 375
+    y: 400
+    scale: 0.8
+    depth: 10
+    label: 问诊台
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: consultation-desk
+      action:
+        type: dialogue
+        dialogueId: C3Z5_CONSULTATION
+
+  # 症状清单
+  - id: symptom_list
+    type: image
+    texture: px_item_archive
+    x: 280
+    y: 480
+    scale: 0.5
+    depth: 9
+    label: 症状清单
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C3Z5_STARTED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z5_SYMPTOM_LIST
+
+  # 病例卡领取点
+  - id: med_card_point
+    type: image
+    texture: px_fx_system_correct
+    x: 480
+    y: 450
+    scale: 0.4
+    depth: 11
+    label: 病例卡
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C3Z5_SYMPTOMS_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z5_MED_CARD
+
+  # 许澄
+  - id: xucheng
+    type: image
+    texture: portrait_xucheng_professional
+    x: 550
+    y: 380
+    scale: 0.4
+    depth: 12
+    label: 许澄
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: xucheng
+      action:
+        type: dialogue
+        dialogueId: C3Z5_XUCHENG_TALK
+
+  # 医疗设备
+  - id: medical_equip
+    type: image
+    texture: obj_medical_equip
+    x: 200
+    y: 350
+    scale: 0.6
+    depth: 8
+
+  # 病床
+  - id: hospital_bed
+    type: image
+    texture: obj_hospital_bed
+    x: 180
+    y: 500
+    scale: 0.5
+    depth: 7
+
+  # 药品柜
+  - id: medicine_cabinet
+    type: image
+    texture: obj_medicine_cabinet
+    x: 620
+    y: 450
+    scale: 0.5
+    depth: 8
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往礼堂街
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z6
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z4
+

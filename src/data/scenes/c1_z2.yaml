@@ -1,0 +1,154 @@
+# C1-Z2 错门走廊
+# 结构异常（浅），门牌与空间逻辑不一致
+id: C1-Z2
+title: 错门走廊
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 门牌A - 17B（实际是储物间）
+  - id: door_17b
+    type: image
+    texture: px_item_door
+    x: 180
+    y: 400
+    scale: 0.7
+    depth: 10
+    label: 门牌 17B
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: door-17b
+      action:
+        type: dialogue
+        dialogueId: C1Z2_DOOR_17B
+
+  # 门牌B - 19A（脚印指向这里）
+  - id: door_19a
+    type: image
+    texture: px_item_door
+    x: 375
+    y: 380
+    scale: 0.7
+    depth: 10
+    label: 门牌 19A
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: door-19a
+      action:
+        type: dialogue
+        dialogueId: C1Z2_DOOR_19A
+
+  # 门牌C - 15C（声音传出）
+  - id: door_15c
+    type: image
+    texture: px_item_door
+    x: 570
+    y: 420
+    scale: 0.7
+    depth: 10
+    label: 门牌 15C
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: door-15c
+      action:
+        type: dialogue
+        dialogueId: C1Z2_DOOR_15C
+
+  # 地面脚印
+  - id: footprints
+    type: image
+    texture: px_fx_scar
+    x: 300
+    y: 550
+    scale: 0.6
+    depth: 5
+    alpha: 0.7
+    label: 脚印
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      testid: footprints
+      action:
+        type: dialogue
+        dialogueId: C1Z2_FOOTPRINTS
+
+  # 通风口
+  - id: vent
+    type: image
+    texture: px_item_archive
+    x: 520
+    y: 550
+    scale: 0.4
+    depth: 6
+    label: 通风口
+    labelOffset: [0, 50]
+    interactive:
+      cursor: true
+      testid: vent
+      action:
+        type: dialogue
+        dialogueId: C1Z2_VENT
+
+  # 住户NPC
+  - id: resident
+    type: image
+    texture: placeholder_char
+    x: 650
+    y: 600
+    scale: 0.9
+    depth: 8
+    tint: 0xAAAA99
+    label: 住户
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C1Z2_RESIDENT
+
+  # 走廊装饰
+  - id: corridor_light
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 250
+    scale: 0.4
+    depth: 3
+    alpha: 0.6
+
+  # 出口 - 前往地图摊
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 继续前进
+    condition:
+      flag: FLAG_C1Z2_SOLVED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z3
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z1
+

@@ -1,0 +1,128 @@
+# C3-Z6 礼堂街：牧平的警告对话数据
+dialogues:
+  # 牧平对话
+  C3Z6_MUPING_TALK:
+    id: C3Z6_MUPING_TALK
+    lines:
+      - speaker: 牧平
+        text: 看见只是风，写入才是墨。
+      - speaker: 牧平
+        text: 墨多了，纸会裂。
+      - speaker: 岑回
+        text: ……
+      - speaker: 牧平
+        text: 你救人也好，改路也好——你都在让这页纸变厚。
+      - speaker: 牧平
+        text: 厚的纸不一定更安全，它只是更难被折回去。
+    choices:
+      - id: do_nothing
+        text: 那我就什么都不做？
+        nextDialogueId: C3Z6_DO_NOTHING
+      - id: save_erased
+        text: 如果不写，人会被抹掉
+        nextDialogueId: C3Z6_SAVE_ERASED
+      - id: how_much_know
+        text: 你到底知道多少？
+        nextDialogueId: C3Z6_HOW_MUCH
+
+  # 什么都不做
+  C3Z6_DO_NOTHING:
+    id: C3Z6_DO_NOTHING
+    lines:
+      - speaker: 牧平
+        text: 不做不是答案。
+      - speaker: 牧平
+        text: 但做得太多，也不是。
+      - speaker: 牧平
+        text: 找到那个刚好的力度。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z6_MUPING_SPOKE
+        flagValue: true
+
+  # 人会被抹掉
+  C3Z6_SAVE_ERASED:
+    id: C3Z6_SAVE_ERASED
+    lines:
+      - speaker: 牧平
+        text: 所以你要学会写得"轻"。
+      - speaker: 牧平
+        text: 留下痕迹，但不要压垮这页纸。
+      - speaker: 牧平
+        text: 非最优，也可以保存。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z6_MUPING_SPOKE
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F23
+        foreshadowStage: deepen
+
+  # 你知道多少
+  C3Z6_HOW_MUCH:
+    id: C3Z6_HOW_MUCH
+    lines:
+      - speaker: 牧平
+        text: 我只知道纸背的风越来越大了。
+      - speaker: 牧平
+        text: 风大了，纸薄了，就容易撕。
+      - speaker: 牧平
+        text: 而你们每一次"修复"……都在让风变大。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z6_MUPING_SPOKE
+        flagValue: true
+
+  # 前排座位
+  C3Z6_FRONT_SEATS:
+    id: C3Z6_FRONT_SEATS
+    lines:
+      - speaker: ""
+        text: 你坐在前排，听完了牧平的话。
+      - speaker: ""
+        text: 周围的听众渐渐散去。
+      - speaker: 牧平
+        text: 走之前，把这个带上。
+      - speaker: ""
+        text: （他递给你一张抄本）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z6_MUPING_SPOKE
+        flagValue: true
+
+  # 额外椅子（可选无收益）
+  C3Z6_EXTRA_CHAIR:
+    id: C3Z6_EXTRA_CHAIR
+    lines:
+      - speaker: ""
+        text: 有一把椅子歪了。
+    choices:
+      - id: fix_chair
+        text: 扶正它
+        effects:
+          rDelta: 1
+        nextDialogueId: C3Z6_FIX_CHAIR
+      - id: ignore_chair
+        text: 不管它
+        nextDialogueId: C3Z6_IGNORE_CHAIR
+
+  # 扶正
+  C3Z6_FIX_CHAIR:
+    id: C3Z6_FIX_CHAIR
+    lines:
+      - speaker: ""
+        text: 你把椅子扶正了。
+      - speaker: ""
+        text: 没有人注意到。
+      - speaker: ""
+        text: 也没有奖励。
+      - speaker: ""
+        text: 但它现在摆好了。
+
+  # 不管
+  C3Z6_IGNORE_CHAIR:
+    id: C3Z6_IGNORE_CHAIR
+    lines:
+      - speaker: 岑回
+        text: （算了……）
+

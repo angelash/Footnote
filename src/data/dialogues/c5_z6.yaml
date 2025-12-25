@@ -1,0 +1,117 @@
+# C5-Z6 审计覆盖区对话数据
+dialogues:
+  # 进入审计区
+  C5Z6_ENTER_AUDIT:
+    id: C5Z6_ENTER_AUDIT
+    lines:
+      - speaker: ""
+        text: 你进入覆盖区——
+      - speaker: ""
+        text: 屏幕上方短暂出现一层半透明表格遮罩……
+      - speaker: ""
+        text: 「条目：观测」
+      - speaker: ""
+        text: 「残差：…」
+      - speaker: ""
+        text: 「字段：＿」
+      - speaker: ""
+        text: 「收敛：失败」
+      - speaker: ""
+        text: 「建议：降阶」
+      - speaker: ""
+        text: （遮罩消失，你恢复控制）
+      - speaker: 岑回
+        text: ……这是什么界面？
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z6_IN_AUDIT
+        flagValue: true
+
+  # 异常点1
+  C5Z6_ANOMALY_1:
+    id: C5Z6_ANOMALY_1
+    lines:
+      - speaker: ""
+        text: 异常点①：像缺口。
+      - speaker: ""
+        text: 你点击标注。
+      - speaker: 系统
+        text: 字段补全失败。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z6_ANOMALY_1_DONE
+        flagValue: true
+
+  # 异常点2
+  C5Z6_ANOMALY_2:
+    id: C5Z6_ANOMALY_2
+    lines:
+      - speaker: ""
+        text: 异常点②：像重复。
+      - speaker: ""
+        text: 你点击标注。
+      - speaker: 系统
+        text: 无法归类。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z6_ANOMALY_2_DONE
+        flagValue: true
+
+  # 异常点3
+  C5Z6_ANOMALY_3:
+    id: C5Z6_ANOMALY_3
+    lines:
+      - speaker: ""
+        text: 异常点③：像空白字段。
+      - speaker: ""
+        text: 你点击标注。
+      - speaker: 系统
+        text: 残差保留。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z6_ALL_MARKED
+        flagValue: true
+      - type: card
+        cardId: CARD_C5_AUDIT_SNAPSHOT
+
+  # 时间堆栈异化
+  C5Z6_TIME_STACK_ANOMALY:
+    id: C5Z6_TIME_STACK_ANOMALY
+    lines:
+      - speaker: ""
+        text: 你打开时间堆栈。
+      - speaker: ""
+        text: 其中一张节点卡的标题不对劲——
+      - speaker: ""
+        text: 「节点：◦◦ / ＿」
+      - speaker: ""
+        text: 你点击它。
+      - speaker: 系统
+        text: 无可回溯解释。
+      - speaker: 岑回
+        text: （原来时间节点也会出现……这种格式）
+    effects:
+      rDelta: 1
+      pDelta: 1
+
+  # 退出
+  C5Z6_EXIT:
+    id: C5Z6_EXIT
+    lines:
+      - speaker: ""
+        text: 你走向退出门。
+      - speaker: ""
+        text: 离开覆盖区后，屏幕底部残留一条提示……
+      - speaker: ""
+        text: 「收敛：失败」
+      - speaker: ""
+        text: （2秒后淡出）
+      - speaker: 岑回
+        text: 我穿过了一段……不属于我的界面。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z6_COMPLETE
+        flagValue: true
+    effects:
+      pDelta: 2
+

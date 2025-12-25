@@ -1,0 +1,123 @@
+# RV-11 C4-Z3 重返：冲突点
+# 三能力完全变体 - 版本冲突的真相
+id: RV-11
+title: 冲突点 [三能力]
+background:
+  texture: bg_collapse
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 三能力状态
+  - id: ability_status
+    type: zone
+    x: 375
+    y: 150
+    width: 350
+    height: 80
+    depth: 20
+    label: 三能力激活
+    interactive:
+      cursor: true
+      testid: ability-status
+      action:
+        type: dialogue
+        dialogueId: RV11_ABILITIES
+
+  # 冲突核心
+  - id: conflict_core
+    type: image
+    texture: obj_crack
+    x: 375
+    y: 400
+    scale: 1.0
+    depth: 10
+    label: 冲突核心
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV11_CORE
+
+  # 版本A真相（感知层）
+  - id: truth_a
+    type: image
+    texture: px_fx_scar
+    x: 250
+    y: 350
+    scale: 0.5
+    depth: 11
+    tint: 0xff6666
+    alpha: 0.7
+    label: 版本A真相
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV11_TRUTH_A
+
+  # 版本B真相（感知层）
+  - id: truth_b
+    type: image
+    texture: px_fx_scar
+    x: 500
+    y: 350
+    scale: 0.5
+    depth: 11
+    tint: 0x6666ff
+    alpha: 0.7
+    label: 版本B真相
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV11_TRUTH_B
+
+  # 时间线（时间层）
+  - id: timeline
+    type: zone
+    x: 375
+    y: 550
+    width: 400
+    height: 60
+    depth: 12
+    label: 时间线：冲突起源
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV11_TIMELINE
+
+  # 复合解决
+  - id: combo_resolve
+    type: zone
+    x: 375
+    y: 700
+    width: 300
+    height: 80
+    depth: 25
+    label: 复合解决
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV11_RESOLVE
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z3
+

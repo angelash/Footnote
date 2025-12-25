@@ -1,0 +1,114 @@
+# RV-12 C5-Z5 重返：陈匠灯塔
+# 时间干预变体 - 灯塔的前世今生
+id: RV-12
+title: 陈匠灯塔 [时间干预]
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 时间线
+  - id: lighthouse_timeline
+    type: zone
+    x: 375
+    y: 200
+    width: 400
+    height: 80
+    depth: 15
+    label: 灯塔时间线
+    interactive:
+      cursor: true
+      testid: lighthouse-timeline
+      action:
+        type: dialogue
+        dialogueId: RV12_TIMELINE
+
+  # 灯塔主体（三态叠影）
+  - id: lighthouse
+    type: image
+    texture: obj_oil_lamp
+    x: 375
+    y: 420
+    scale: 1.2
+    depth: 10
+    label: 灯塔（三态）
+    labelOffset: [0, 110]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV12_LIGHTHOUSE
+
+  # 过去状态（辉煌）
+  - id: past_state
+    type: image
+    texture: obj_oil_lamp
+    x: 250
+    y: 380
+    scale: 0.5
+    depth: 9
+    alpha: 0.4
+    label: 过去：辉煌
+    labelOffset: [0, 50]
+
+  # 现在状态（破败）
+  - id: present_state
+    type: image
+    texture: obj_oil_lamp
+    x: 500
+    y: 380
+    scale: 0.5
+    depth: 9
+    alpha: 0.4
+    tint: 0x888888
+    label: 现在：破败
+    labelOffset: [0, 50]
+
+  # 陈匠的坚守（深度感知揭示）
+  - id: chenjiang_persistence
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 600
+    scale: 0.5
+    depth: 11
+    alpha: 0.7
+    label: 陈匠的坚守
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV12_PERSISTENCE
+
+  # 回溯选项
+  - id: rewind_option
+    type: zone
+    x: 375
+    y: 750
+    width: 300
+    height: 80
+    depth: 20
+    label: 回溯选项
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV12_REWIND
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z5
+

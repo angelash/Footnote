@@ -1,0 +1,119 @@
+# C4-Z7 礼堂街：祷文抄本3
+# 隐喻接上回溯/对账
+id: C4-Z7
+title: 礼堂街
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 牧平
+  - id: muping
+    type: image
+    texture: portrait_muping_wise
+    x: 400
+    y: 380
+    scale: 0.45
+    depth: 12
+    label: 牧平
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: muping
+      action:
+        type: dialogue
+        dialogueId: C4Z7_MUPING_TALK
+
+  # 礼堂门
+  - id: hall_door
+    type: image
+    texture: obj_door
+    x: 375
+    y: 250
+    scale: 0.7
+    depth: 9
+    alpha: 0.8
+
+  # 座椅排
+  - id: chairs_row
+    type: image
+    texture: obj_chair
+    x: 300
+    y: 500
+    scale: 0.8
+    depth: 8
+
+  # 歪椅子（可帮忙摆正）
+  - id: tilted_chair
+    type: image
+    texture: obj_chair
+    x: 500
+    y: 520
+    scale: 0.6
+    depth: 8
+    rotation: 0.2
+    label: 歪椅子
+    labelOffset: [0, 65]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z7_TILTED_CHAIR
+
+  # 抄本领取处
+  - id: prayer_scroll
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 420
+    scale: 0.5
+    depth: 10
+    label: 抄本
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C4Z7_MUPING_SPOKE
+    interactive:
+      cursor: true
+      action:
+        type: card
+        cardId: CARD_C4_PRAYER_03
+
+  # 路灯
+  - id: street_lamp
+    type: image
+    texture: obj_lamp
+    x: 180
+    y: 350
+    scale: 0.55
+    depth: 10
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往市政环
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z8
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z6
+

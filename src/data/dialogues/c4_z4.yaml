@@ -1,0 +1,109 @@
+# C4-Z4 诊疗台病例卡2对话数据
+dialogues:
+  # 许澄对话
+  C4Z4_XUCHENG_TALK:
+    id: C4Z4_XUCHENG_TALK
+    lines:
+      - speaker: 许澄
+        text: 你开始把"修补"看见了。
+      - speaker: 许澄
+        text: 看见它，会让它变得更难隐藏。
+      - speaker: 许澄
+        text: 你可以不说，但别骗自己：你确实回去了。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z4_STARTED
+        flagValue: true
+
+  # 问诊台
+  C4Z4_CONSULTATION:
+    id: C4Z4_CONSULTATION
+    lines:
+      - speaker: ""
+        text: 问诊台上的症状清单更新了。
+      - speaker: 许澄
+        text: 看看有没有新的感受。
+
+  # 症状清单
+  C4Z4_SYMPTOM_LIST:
+    id: C4Z4_SYMPTOM_LIST
+    lines:
+      - speaker: ""
+        text: 新增症状选项：
+      - speaker: ""
+        text: □ 事件重复感增强
+      - speaker: ""
+        text: □ 解释变得费力
+      - speaker: ""
+        text: □ 对某些"补丁痕迹"敏感
+    choices:
+      - id: check_repeat
+        text: 勾选"事件重复感"
+        nextDialogueId: C4Z4_SYMPTOMS_DONE
+      - id: check_explain
+        text: 勾选"解释费力"
+        nextDialogueId: C4Z4_SYMPTOMS_DONE
+      - id: check_patch
+        text: 勾选"补丁敏感"
+        nextDialogueId: C4Z4_SYMPTOMS_DONE
+
+  # 症状完成
+  C4Z4_SYMPTOMS_DONE:
+    id: C4Z4_SYMPTOMS_DONE
+    lines:
+      - speaker: 许澄
+        text: 这些症状……都是正常的反应。
+      - speaker: 许澄
+        text: 回溯过的人，都会经历这个阶段。
+      - speaker: 许澄
+        text: 建议你减少回溯次数。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z4_SYMPTOMS_DONE
+        flagValue: true
+
+  # 病例卡
+  C4Z4_MED_CARD:
+    id: C4Z4_MED_CARD
+    lines:
+      - speaker: ""
+        text: 许澄递给你第二张病例卡。
+      - speaker: ""
+        text: 编号：MC-◦◦-断口
+      - speaker: ""
+        text: 结论：建议减少回溯
+      - speaker: ""
+        text: 注记：补丁痕迹敏感性↑
+      - speaker: ""
+        text: 末尾极淡：「对齐：待定」
+      - speaker: 岑回
+        text: （这个编号格式……和节点卡的刻度点很像）
+    onComplete:
+      - type: card
+        cardId: CARD_C4_MED_CARD_02
+      - type: flag
+        flagName: FLAG_MED_CARD_02
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F14
+        foreshadowStage: deepen
+
+  # 展示节点卡（可选）
+  C4Z4_SHOW_NODE_CARD:
+    id: C4Z4_SHOW_NODE_CARD
+    lines:
+      - speaker: ""
+        text: 你把节点卡片回执给许澄看。
+      - speaker: 许澄
+        text: ……
+      - speaker: ""
+        text: （她停顿了一下）
+      - speaker: 许澄
+        text: 这不是给人看的格式。
+      - speaker: 许澄
+        text: 你从哪里拿到的？
+      - speaker: 岑回
+        text: ……
+      - speaker: 许澄
+        text: 算了。我不该问。
+

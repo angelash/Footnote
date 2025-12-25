@@ -1,0 +1,152 @@
+# C4-Z3 边缘断口：第一次必须回溯的事件
+# 强制回溯教学 + 补丁一致性
+id: C4-Z3
+title: 断口通道
+background:
+  texture: bg_collapse
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 阈值门
+  - id: threshold_gate
+    type: image
+    texture: obj_door
+    x: 375
+    y: 250
+    scale: 0.8
+    depth: 10
+    label: 阈值门
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: threshold-gate
+      action:
+        type: dialogue
+        dialogueId: C4Z3_THRESHOLD_GATE
+
+  # 警报线圈
+  - id: alarm_coil
+    type: image
+    texture: px_fx_glitch
+    x: 300
+    y: 400
+    scale: 0.6
+    depth: 11
+    alpha: 0.7
+    label: 警报线圈
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z3_ALARM_COIL
+
+  # 坍塌点
+  - id: collapse_point
+    type: image
+    texture: obj_crack
+    x: 450
+    y: 350
+    scale: 1.2
+    depth: 9
+    label: 坍塌点
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C4Z3_ALARM_TRIGGERED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z3_COLLAPSE_BLOCKED
+
+  # 小开关（回溯后可用）
+  - id: safety_switch
+    type: image
+    texture: px_fx_system_correct
+    x: 200
+    y: 420
+    scale: 0.4
+    depth: 12
+    label: 安全开关
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C4Z3_ROLLBACK_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z3_SAFETY_SWITCH
+
+  # 补丁痕迹（回溯后出现）
+  - id: patch_mark
+    type: image
+    texture: px_fx_scar
+    x: 350
+    y: 380
+    scale: 0.5
+    depth: 8
+    alpha: 0.6
+    condition:
+      flagTrue: FLAG_C4Z3_ROLLBACK_DONE
+
+  # 深度伤痕（C3如有介入则显示）
+  - id: previous_scar
+    type: image
+    texture: obj_crack
+    x: 500
+    y: 450
+    scale: 0.7
+    depth: 7
+    alpha: 0.8
+    condition:
+      flagTrue: FLAG_HALL_SCAR
+
+  # 回溯节点提示
+  - id: rollback_hint
+    type: zone
+    x: 680
+    y: 650
+    width: 100
+    height: 60
+    depth: 20
+    label: 时间堆栈
+    condition:
+      flagTrue: FLAG_C4Z3_MUST_ROLLBACK
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z3_ROLLBACK_GUIDE
+
+  # 通过确认点
+  - id: pass_point
+    type: zone
+    x: 375
+    y: 220
+    width: 150
+    height: 80
+    label: 通过
+    condition:
+      flagTrue: FLAG_C4Z3_PASSED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z4
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z2
+

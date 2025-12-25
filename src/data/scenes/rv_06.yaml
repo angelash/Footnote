@@ -1,0 +1,127 @@
+# RV-06 C2-Z2 重返：版本交界处
+# 三能力完全变体 - 三层叠加视野
+id: RV-06
+title: 版本交界处 [三能力]
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 能力面板
+  - id: ability_panel
+    type: zone
+    x: 375
+    y: 150
+    width: 350
+    height: 80
+    depth: 20
+    label: 三能力激活
+    interactive:
+      cursor: true
+      testid: ability-panel
+      action:
+        type: dialogue
+        dialogueId: RV06_ABILITIES
+
+  # 感知层 - 版本差异
+  - id: perception_layer
+    type: image
+    texture: px_fx_glitch
+    x: 375
+    y: 350
+    scale: 1.0
+    depth: 10
+    alpha: 0.5
+    label: 感知层：版本差异
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV06_PERCEPTION
+
+  # V-A区域（红色）
+  - id: version_a
+    type: image
+    texture: px_fx_scar
+    x: 280
+    y: 400
+    scale: 0.6
+    depth: 11
+    tint: 0xff6666
+    label: V-A
+    labelOffset: [0, 55]
+
+  # V-B区域（蓝色）
+  - id: version_b
+    type: image
+    texture: px_fx_scar
+    x: 470
+    y: 400
+    scale: 0.6
+    depth: 11
+    tint: 0x6666ff
+    label: V-B
+    labelOffset: [0, 55]
+
+  # 介入层 - 结构标记
+  - id: intervention_layer
+    type: zone
+    x: 375
+    y: 500
+    width: 200
+    height: 60
+    depth: 12
+    label: 介入层：可修改点
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV06_INTERVENTION
+
+  # 时间层 - 时间线
+  - id: time_layer
+    type: zone
+    x: 375
+    y: 600
+    width: 300
+    height: 60
+    depth: 13
+    label: 时间层：T-2 ── T-1 ── NOW
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV06_TIME
+
+  # 复合操作
+  - id: combo_action
+    type: zone
+    x: 375
+    y: 750
+    width: 300
+    height: 80
+    depth: 25
+    label: 复合操作
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV06_COMBO
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z2
+

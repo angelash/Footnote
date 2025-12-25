@@ -1,0 +1,118 @@
+# CF-Z2 最后的无收益选择
+# 终局情绪核 - 三条多余仪式
+id: CF-Z2
+title: 最后的选择
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 栖蓝
+  - id: qilan
+    type: image
+    texture: portrait_qilan_neutral
+    x: 180
+    y: 400
+    scale: 0.45
+    depth: 12
+    label: 栖蓝
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: qilan
+      action:
+        type: dialogue
+        dialogueId: CFZ2_QILAN_TALK
+
+  # 仪式①：空椅占位
+  - id: ritual_chair
+    type: image
+    texture: obj_chair
+    x: 280
+    y: 480
+    scale: 0.6
+    depth: 10
+    alpha: 0.7
+    label: 空椅仪式
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ2_RITUAL_CHAIR
+
+  # 仪式②：版本库封存
+  - id: ritual_archive
+    type: image
+    texture: px_item_archive
+    x: 450
+    y: 450
+    scale: 0.6
+    depth: 10
+    label: 封存仪式
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ2_RITUAL_ARCHIVE
+
+  # 仪式③：点灯
+  - id: ritual_lamp
+    type: image
+    texture: obj_oil_lamp
+    x: 550
+    y: 500
+    scale: 0.5
+    depth: 10
+    alpha: 0.8
+    label: 点灯仪式
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ2_RITUAL_LAMP
+
+  # 宋岚远景（可选一句）
+  - id: songlan_distant
+    type: image
+    texture: portrait_songlan_neutral
+    x: 650
+    y: 400
+    scale: 0.25
+    depth: 5
+    alpha: 0.4
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往对视
+    condition:
+      flag: FLAG_FINAL_RITE_DONE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z3
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z1
+

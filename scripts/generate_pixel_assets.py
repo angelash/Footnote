@@ -654,6 +654,253 @@ def _asset_sprite_atang_idle_strip(img: Image.Image, rng: random.Random) -> None
 
     _outline_from_alpha(img, pal["K"])
 
+
+def _draw_walk_humanoid_frame_32(
+    img: Image.Image,
+    *,
+    ox: int,
+    leg_phase: int,  # 0-3: left forward, center, right forward, center
+    arm_swing: int,  # correlates with leg_phase
+    pal: Dict[str, Rgba],
+    suit: Rgba,
+    suit_shadow: Rgba,
+    accent: Rgba,
+    skin: Rgba,
+    hair: Rgba,
+    outline: Rgba,
+    rng: random.Random,
+) -> None:
+    """
+    32x32 人形行走帧。
+    """
+    # ---- Head ----
+    head_cx = ox + 16
+    head_cy = 8
+    _circle(img, head_cx, head_cy, 6, skin, fill=True)
+    _circle(img, head_cx, head_cy - 1, 6, hair, fill=False)
+    _rect(img, head_cx - 6, head_cy - 6, head_cx + 6, head_cy - 3, hair)
+
+    # ---- Facial features ----
+    eye_white = _mix(pal["W"], skin, 0.45)
+    pupil = outline
+    _rect(img, head_cx - 4, head_cy - 1, head_cx - 3, head_cy - 1, eye_white)
+    _rect(img, head_cx + 3, head_cy - 1, head_cx + 4, head_cy - 1, eye_white)
+    _put(img, head_cx - 4, head_cy, pupil)
+    _put(img, head_cx + 4, head_cy, pupil)
+    mouth = _mix(pal["M"], outline, 0.55)
+    _line(img, head_cx - 1, head_cy + 4, head_cx + 1, head_cy + 4, mouth)
+
+    # ---- Neck ----
+    _rect(img, head_cx - 1, head_cy + 6, head_cx + 1, head_cy + 7, skin)
+
+    # ---- Body / suit ----
+    body_top = 16
+    body_bottom = 25
+    _rect(img, head_cx - 7, body_top, head_cx + 7, body_bottom, suit)
+    _rect(img, head_cx - 7, body_bottom - 3, head_cx + 7, body_bottom, suit_shadow)
+
+    # collar
+    collar = _mix(suit_shadow, pal["W"], 0.1)
+    _line(img, head_cx - 2, body_top, head_cx - 5, body_top + 3, collar)
+    _line(img, head_cx + 2, body_top, head_cx + 5, body_top + 3, collar)
+
+    # badge
+    _rect(img, head_cx + 4, body_top + 2, head_cx + 6, body_top + 5, accent)
+
+    # ---- Arms (swing opposite to legs) ----
+    arm_offsets = [2, 0, -2, 0]
+    arm_y = arm_offsets[arm_swing % 4]
+    _rect(img, head_cx - 10, body_top + 2 + arm_y, head_cx - 8, body_top + 8 + arm_y, suit_shadow)
+    _rect(img, head_cx + 8, body_top + 2 - arm_y, head_cx + 10, body_top + 8 - arm_y, suit_shadow)
+    _rect(img, head_cx - 10, body_top + 9 + arm_y, head_cx - 9, body_top + 10 + arm_y, skin)
+    _rect(img, head_cx + 9, body_top + 9 - arm_y, head_cx + 10, body_top + 10 - arm_y, skin)
+
+    # ---- Legs (walk cycle) ----
+    leg_y0 = body_bottom + 1
+    leg_positions = [
+        ((-4, 0), (2, 2)),   # phase 0: left forward
+        ((-3, 1), (1, 1)),   # phase 1: transition
+        ((0, 2), (-2, 0)),   # phase 2: right forward
+        ((-1, 1), (-1, 1)),  # phase 3: transition
+    ]
+    left_leg, right_leg = leg_positions[leg_phase % 4]
+    # left leg
+    _rect(img, head_cx - 5 + left_leg[0], leg_y0, head_cx - 2 + left_leg[0], leg_y0 + 4 + left_leg[1], suit_shadow)
+    # right leg
+    _rect(img, head_cx + 2 + right_leg[0], leg_y0, head_cx + 5 + right_leg[0], leg_y0 + 4 + right_leg[1], suit_shadow)
+    # feet
+    _rect(img, head_cx - 5 + left_leg[0], leg_y0 + 4 + left_leg[1], head_cx - 2 + left_leg[0], leg_y0 + 5 + left_leg[1], outline)
+    _rect(img, head_cx + 2 + right_leg[0], leg_y0 + 4 + right_leg[1], head_cx + 5 + right_leg[0], leg_y0 + 5 + right_leg[1], outline)
+
+
+def _asset_sprite_cenhui_walk_strip(img: Image.Image, rng: random.Random) -> None:
+    """
+    256x32：8 帧 * 32x32 的岑回行走条带
+    配色与 idle 一致：灰色系制服 + 荧光绿（例外权限）
+    """
+    pal = _palette_footnote()
+    suit = _mix(pal["S"], pal["K"], 0.25)
+    suit_shadow = _mix(pal["M"], pal["K"], 0.35)
+    accent = pal["A"]
+    skin = _mix(pal["W"], pal["Y"], 0.15)
+    hair = _mix(pal["K"], pal["D"], 0.35)
+
+    for i in range(8):
+        _draw_walk_humanoid_frame_32(
+            img,
+            ox=i * 32,
+            leg_phase=i % 4,
+            arm_swing=(i + 2) % 4,  # arms swing opposite to legs
+            pal=pal,
+            suit=suit,
+            suit_shadow=suit_shadow,
+            accent=accent,
+            skin=skin,
+            hair=hair,
+            outline=pal["K"],
+            rng=rng,
+        )
+        # accessory
+        _accessory_cenhui(img, ox=i * 32, wobble=0, pal=pal, accent=accent)
+
+    _outline_from_alpha(img, pal["K"])
+
+
+# ============================
+# 资产绘制：背景/场景占位
+# ============================
+
+
+def _asset_bg_placeholder(img: Image.Image, rng: random.Random) -> None:
+    """
+    简易占位背景（94x167 base -> 750x1334 @ scale 8）
+    深色调 + 网格暗示 + 边缘渐变
+    """
+    pal = _palette_footnote()
+    base = pal["K"]
+    grid = _mix(pal["D"], pal["K"], 0.5)
+    accent_dim = _mix(pal["A"], pal["K"], 0.85)
+
+    # fill base
+    for y in range(img.height):
+        for x in range(img.width):
+            _put(img, x, y, base)
+
+    # subtle grid every 8px
+    for y in range(0, img.height, 8):
+        for x in range(img.width):
+            _put(img, x, y, grid)
+    for x in range(0, img.width, 8):
+        for y in range(img.height):
+            _put(img, x, y, grid)
+
+    # edge vignette (darker corners)
+    for y in range(img.height):
+        for x in range(img.width):
+            dx = min(x, img.width - 1 - x)
+            dy = min(y, img.height - 1 - y)
+            edge = min(dx, dy)
+            if edge < 4:
+                px = img.getpixel((x, y))
+                t = (4 - edge) / 4 * 0.3
+                img.putpixel((x, y), _mix(px, (0, 0, 0, 255), t))
+
+    # some random accent speckles
+    for _ in range(20):
+        x = rng.randint(10, img.width - 10)
+        y = rng.randint(10, img.height - 10)
+        _put(img, x, y, accent_dim)
+
+
+def _asset_hud_counter_bar(img: Image.Image, rng: random.Random) -> None:
+    """
+    HUD 计数器显示条占位（50x15 base）
+    用于显示 R/P/W 值
+    """
+    pal = _palette_footnote()
+    bg = _mix(pal["D"], pal["K"], 0.3)
+    border = _mix(pal["M"], pal["K"], 0.5)
+
+    # background
+    _rect(img, 0, 0, img.width - 1, img.height - 1, bg)
+    # border
+    for x in range(img.width):
+        _put(img, x, 0, border)
+        _put(img, x, img.height - 1, border)
+    for y in range(img.height):
+        _put(img, 0, y, border)
+        _put(img, img.width - 1, y, border)
+
+    # three slots for R/P/W (dividers)
+    slot_width = img.width // 3
+    for i in range(1, 3):
+        x = i * slot_width
+        for y in range(img.height):
+            _put(img, x, y, border)
+
+
+def _asset_hud_ability_slot(img: Image.Image, rng: random.Random) -> None:
+    """
+    能力槽占位（20x20 base）
+    可放置能力图标的容器
+    """
+    pal = _palette_footnote()
+    bg = _mix(pal["D"], pal["K"], 0.4)
+    border = _mix(pal["A"], pal["K"], 0.6)
+    inner = _mix(pal["A"], pal["K"], 0.85)
+
+    # rounded square
+    _rect(img, 2, 0, img.width - 3, img.height - 1, bg)
+    _rect(img, 0, 2, img.width - 1, img.height - 3, bg)
+    _rect(img, 1, 1, img.width - 2, img.height - 2, bg)
+
+    # border
+    for x in range(2, img.width - 2):
+        _put(img, x, 0, border)
+        _put(img, x, img.height - 1, border)
+    for y in range(2, img.height - 2):
+        _put(img, 0, y, border)
+        _put(img, img.width - 1, y, border)
+    # corners
+    _put(img, 1, 1, border)
+    _put(img, img.width - 2, 1, border)
+    _put(img, 1, img.height - 2, border)
+    _put(img, img.width - 2, img.height - 2, border)
+
+    # inner glow hint
+    _circle(img, img.width // 2, img.height // 2, 5, inner, fill=False)
+
+
+def _asset_dialogue_frame(img: Image.Image, rng: random.Random) -> None:
+    """
+    对话框头像框占位（28x28 base）
+    """
+    pal = _palette_footnote()
+    bg = _mix(pal["D"], pal["K"], 0.2)
+    border = _mix(pal["B"], pal["K"], 0.4)
+    inner_border = _mix(pal["B"], pal["W"], 0.2)
+
+    # outer rect
+    _rect(img, 0, 0, img.width - 1, img.height - 1, bg)
+
+    # double border
+    for x in range(img.width):
+        _put(img, x, 0, border)
+        _put(img, x, img.height - 1, border)
+        _put(img, x, 1, inner_border)
+        _put(img, x, img.height - 2, inner_border)
+    for y in range(img.height):
+        _put(img, 0, y, border)
+        _put(img, img.width - 1, y, border)
+        _put(img, 1, y, inner_border)
+        _put(img, img.width - 2, y, inner_border)
+
+    # corner accents
+    _put(img, 2, 2, _mix(pal["B"], pal["W"], 0.3))
+    _put(img, img.width - 3, 2, _mix(pal["B"], pal["W"], 0.3))
+    _put(img, 2, img.height - 3, _mix(pal["B"], pal["W"], 0.3))
+    _put(img, img.width - 3, img.height - 3, _mix(pal["B"], pal["W"], 0.3))
+
 def _asset_tiles_platform_basic(img: Image.Image, rng: random.Random) -> None:
     """
     64x16：4 个 16x16 tile（平台/墙体），可用于简单地编排 tilemap。
@@ -801,6 +1048,141 @@ def _seq_field_accept_frames(count: int) -> List[Callable[[Image.Image, random.R
     return [draw for _ in range(count)]
 
 
+def _seq_depth_perception_frames(count: int) -> List[Callable[[Image.Image, random.Random, int], None]]:
+    """深度感知边缘呼吸效果：荧光绿边框脉动。"""
+    pal = _palette_footnote()
+    a = pal["A"]  # accent-depth (green)
+    k = pal["K"]
+    w = pal["W"]
+
+    def draw(img: Image.Image, rng: random.Random, frame: int) -> None:
+        # breathing sine wave
+        import math
+        t = frame / max(1, count - 1)
+        intensity = 0.3 + 0.7 * (0.5 + 0.5 * math.sin(t * 2 * math.pi))
+        edge_color = _mix(a, w, intensity * 0.4)
+        dim_color = _mix(a, k, 0.7)
+
+        # edge glow (2px border that pulses)
+        border_width = 2
+        for y in range(img.height):
+            for x in range(img.width):
+                dx = min(x, img.width - 1 - x)
+                dy = min(y, img.height - 1 - y)
+                edge = min(dx, dy)
+                if edge < border_width:
+                    c = edge_color if edge == 0 else dim_color
+                    _put(img, x, y, c)
+
+        # corner accent dots
+        corner_r = 1
+        corners = [
+            (corner_r + 1, corner_r + 1),
+            (img.width - corner_r - 2, corner_r + 1),
+            (corner_r + 1, img.height - corner_r - 2),
+            (img.width - corner_r - 2, img.height - corner_r - 2),
+        ]
+        for cx, cy in corners:
+            _circle(img, cx, cy, corner_r, _mix(a, w, intensity * 0.6), fill=True)
+
+        # some scanning lines (subtle)
+        scan_y = int((t * img.height * 2) % img.height)
+        for x in range(img.width):
+            if 2 < x < img.width - 3:
+                _put(img, x, scan_y, _mix(a, k, 0.5))
+
+    return [draw for _ in range(count)]
+
+
+def _seq_depth_intervention_frames(count: int) -> List[Callable[[Image.Image, random.Random, int], None]]:
+    """深度介入效果：裂痕产生动画。"""
+    pal = _palette_footnote()
+    a = pal["A"]
+    k = pal["K"]
+    w = pal["W"]
+    m = pal["M"]
+
+    def draw(img: Image.Image, rng: random.Random, frame: int) -> None:
+        local = random.Random((rng.randint(0, 1_000_000) << 16) ^ frame)
+        t = frame / max(1, count - 1)
+
+        # growing crack from center
+        cx, cy = img.width // 2, img.height // 2
+        crack_len = int(6 * t)
+
+        # main crack
+        crack_color = _mix(k, m, 0.6)
+        glow_color = _mix(a, w, 0.3 * (1 - t))
+
+        if crack_len > 0:
+            # diagonal crack
+            _line(img, cx, cy, cx + crack_len, cy + crack_len, crack_color)
+            _line(img, cx + 1, cy, cx + crack_len + 1, cy + crack_len, glow_color)
+
+            # branches
+            if crack_len > 2:
+                _line(img, cx + 2, cy + 2, cx + 2 + crack_len // 2, cy, crack_color)
+                _line(img, cx + 3, cy + 3, cx + 3, cy + 3 + crack_len // 2, crack_color)
+
+        # impact point glow
+        _circle(img, cx, cy, 2 - int(t * 2), _mix(a, w, 0.5), fill=True)
+
+        # sparks
+        for _ in range(int(6 * (1 - t))):
+            sx = cx + local.randint(-crack_len - 2, crack_len + 2)
+            sy = cy + local.randint(-crack_len - 2, crack_len + 2)
+            _put(img, sx, sy, _mix(a, w, local.random() * 0.5))
+
+        _outline_from_alpha(img, k)
+
+    return [draw for _ in range(count)]
+
+
+def _seq_time_intervention_frames(count: int) -> List[Callable[[Image.Image, random.Random, int], None]]:
+    """时间干预回溯效果：红色波纹 + 倒带线条。"""
+    pal = _palette_footnote()
+    r = pal["R"]
+    k = pal["K"]
+    w = pal["W"]
+    b = pal["B"]
+
+    def draw(img: Image.Image, rng: random.Random, frame: int) -> None:
+        import math
+        t = frame / max(1, count - 1)
+
+        cx, cy = img.width // 2, img.height // 2
+
+        # concentric circles expanding/contracting
+        phase = t * 2 * math.pi
+        for ring in range(1, 8):
+            ring_r = int(ring + 3 * math.sin(phase + ring * 0.5))
+            if 0 < ring_r < min(img.width, img.height) // 2:
+                ring_color = _mix(r, w, 0.1 + 0.2 * math.sin(phase + ring))
+                _circle(img, cx, cy, ring_r, ring_color, fill=False)
+
+        # rewind arrows (<<)
+        arrow_x = int(img.width * 0.3 + 4 * math.sin(phase * 2))
+        arrow_color = _mix(r, w, 0.4)
+        # first arrow
+        _line(img, arrow_x, cy, arrow_x - 3, cy - 3, arrow_color)
+        _line(img, arrow_x, cy, arrow_x - 3, cy + 3, arrow_color)
+        # second arrow
+        _line(img, arrow_x + 4, cy, arrow_x + 1, cy - 3, arrow_color)
+        _line(img, arrow_x + 4, cy, arrow_x + 1, cy + 3, arrow_color)
+
+        # glitch noise (some blue/red offset)
+        local = random.Random((rng.randint(0, 1_000_000) << 16) ^ frame)
+        for _ in range(8):
+            gx = local.randint(2, img.width - 3)
+            gy = local.randint(2, img.height - 3)
+            gc = r if local.random() < 0.6 else b
+            _put(img, gx, gy, _mix(gc, w, 0.2))
+
+        _outline_from_alpha(img, k)
+
+    return [draw for _ in range(count)]
+
+
 def _save_sequence_frames(
     *,
     name: str,
@@ -875,6 +1257,13 @@ def _assets() -> List[PixelAsset]:
             draw=_asset_sprite_cenhui_idle_strip,
             scale_override=4,
         ),
+        # 岑回行走动画：8帧
+        PixelAsset(
+            path="sprites/px_sprite_cenhui_walk_strip.png",
+            base_size=(256, 32),  # 8 frames * 32x32
+            draw=_asset_sprite_cenhui_walk_strip,
+            scale_override=4,
+        ),
         PixelAsset(
             path="sprites/px_sprite_gulin_idle_strip.png",
             base_size=(128, 32),  # 4 frames * 32x32
@@ -889,6 +1278,34 @@ def _assets() -> List[PixelAsset]:
         ),
         PixelAsset(path="tiles/px_tiles_platform_basic.png", base_size=(64, 16), draw=_asset_tiles_platform_basic),
         PixelAsset(path="ui/px_ui_panel_9slice.png", base_size=(24, 24), draw=_asset_ui_panel_9slice),
+
+        # UI 占位资产
+        PixelAsset(
+            path="ui/px_hud_counter_bar.png",
+            base_size=(50, 15),
+            draw=_asset_hud_counter_bar,
+            scale_override=4,
+        ),
+        PixelAsset(
+            path="ui/px_hud_ability_slot.png",
+            base_size=(20, 20),
+            draw=_asset_hud_ability_slot,
+            scale_override=4,
+        ),
+        PixelAsset(
+            path="ui/px_dialogue_frame.png",
+            base_size=(28, 28),
+            draw=_asset_dialogue_frame,
+            scale_override=8,
+        ),
+
+        # 背景占位 (竖屏 750x1334 @ scale 8 from 94x167 base)
+        PixelAsset(
+            path="backgrounds/px_bg_placeholder.png",
+            base_size=(94, 167),
+            draw=_asset_bg_placeholder,
+            scale_override=8,
+        ),
     ]
 
 
@@ -929,7 +1346,7 @@ def main() -> None:
         print(f"  + {asset.path} ({img_scaled.width}x{img_scaled.height})")
 
     if args.with_sequences:
-        # loader / glitch / field_accept
+        # loader / glitch / field_accept / depth effects / time effects
         seq_count = max(2, args.sequence_frames)
         _save_sequence_frames(
             name="loader",
@@ -967,7 +1384,46 @@ def main() -> None:
             frame_count=seq_count,
             also_strip=True,
         )
-        print(f"  + sequences/* (frames={seq_count}, strip=3)")
+        # 深度感知边缘呼吸效果 (larger for overlay)
+        _save_sequence_frames(
+            name="depth_perception",
+            out_dir=out_dir,
+            base_size=(24, 24),
+            scale=scale,
+            max_colors=max_colors,
+            dither=dither,
+            rng=rng,
+            frame_draw=_seq_depth_perception_frames(seq_count)[0],
+            frame_count=seq_count,
+            also_strip=True,
+        )
+        # 深度介入裂痕效果
+        _save_sequence_frames(
+            name="depth_intervention",
+            out_dir=out_dir,
+            base_size=(16, 16),
+            scale=scale,
+            max_colors=max_colors,
+            dither=dither,
+            rng=rng,
+            frame_draw=_seq_depth_intervention_frames(seq_count)[0],
+            frame_count=seq_count,
+            also_strip=True,
+        )
+        # 时间干预回溯效果
+        _save_sequence_frames(
+            name="time_intervention",
+            out_dir=out_dir,
+            base_size=(16, 16),
+            scale=scale,
+            max_colors=max_colors,
+            dither=dither,
+            rng=rng,
+            frame_draw=_seq_time_intervention_frames(seq_count)[0],
+            frame_count=seq_count,
+            also_strip=True,
+        )
+        print(f"  + sequences/* (frames={seq_count}, strip=6)")
 
     print("-" * 50)
     print(f"[DONE] generated: {generated}")

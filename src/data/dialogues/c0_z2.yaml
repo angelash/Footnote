@@ -1,0 +1,103 @@
+# C0-Z2 早餐小店对话数据
+dialogues:
+  # 菜单板
+  C0Z2_MENU:
+    id: C0Z2_MENU
+    lines:
+      - speaker: 店主
+        text: 今天有固定套餐和今日特别。
+      - speaker: 店主
+        text: 套餐效率高，特别的……几乎没人点。
+    choices:
+      - id: order_standard
+        text: 固定套餐
+        effects:
+          setFlag:
+            name: FLAG_C0Z2_ORDER_STANDARD
+            value: true
+        nextDialogueId: C0Z2_ORDER_STANDARD
+      - id: order_special
+        text: 今日特别
+        effects:
+          rDelta: 1
+          setFlag:
+            name: FLAG_R_SOURCE_BREAKFAST
+            value: true
+        nextDialogueId: C0Z2_ORDER_SPECIAL
+
+  # 固定套餐对话
+  C0Z2_ORDER_STANDARD:
+    id: C0Z2_ORDER_STANDARD
+    lines:
+      - speaker: 店主
+        text: 老样子？
+      - speaker: 店主
+        text: 你们外勤都喜欢省事。
+      - speaker: 岑回
+        text: （快速吃完，节省了时间）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C0Z2_EATEN
+        flagValue: true
+
+  # 今日特别对话
+  C0Z2_ORDER_SPECIAL:
+    id: C0Z2_ORDER_SPECIAL
+    lines:
+      - speaker: 店主
+        text: 这个……几乎没人点。
+      - speaker: 店主
+        text: 要等一会儿。你确定？
+      - speaker: 岑回
+        text: 确定。
+      - speaker: ""
+        text: （等待中……）
+        delay: 2000
+      - speaker: 岑回
+        text: （味道不错，但确实耽误了时间）
+      - speaker: 系统
+        text: 结算：无可用收益
+    onComplete:
+      - type: flag
+        flagName: FLAG_C0Z2_EATEN
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C0Z2_SPECIAL
+        flagValue: true
+
+  # 靠窗座位
+  C0Z2_SEAT_WINDOW:
+    id: C0Z2_SEAT_WINDOW
+    lines:
+      - speaker: 岑回
+        text: 靠窗的位置，光线充足。
+      - speaker: 岑回
+        text: 适合快速用餐。
+
+  # 角落座位
+  C0Z2_SEAT_CORNER:
+    id: C0Z2_SEAT_CORNER
+    lines:
+      - speaker: 岑回
+        text: 角落的位置，旁边有一把空椅子。
+      - speaker: 岑回
+        text: 椅子很干净，有刚被擦拭的痕迹。
+      - speaker: 岑回
+        text: 但似乎没人会坐。
+
+  # 栖蓝路过
+  C0Z2_QILAN_PASSBY:
+    id: C0Z2_QILAN_PASSBY
+    lines:
+      - speaker: ???
+        text: 没人坐的椅子，也得擦干净。
+        portrait: qilan_neutral
+      - speaker: 岑回
+        text: ……
+      - speaker: 岑回
+        text: （那人已经走远了）
+    onComplete:
+      - type: flag
+        flagName: FLAG_MET_QILAN_C0
+        flagValue: true
+

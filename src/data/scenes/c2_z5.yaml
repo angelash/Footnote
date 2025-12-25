@@ -1,0 +1,126 @@
+# C2-Z5 诊疗台：阿棠的碎片日记1
+# 因果微颤
+id: C2-Z5
+title: 诊疗台候诊区
+background:
+  texture: bg_clinic
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 候诊座位
+  - id: waiting_seat
+    type: image
+    texture: obj_chair
+    x: 250
+    y: 500
+    scale: 0.8
+    depth: 8
+    label: 候诊座位
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: waiting-seat
+      action:
+        type: dialogue
+        dialogueId: C2Z5_SIT_DOWN
+
+  # 阿棠
+  - id: atang
+    type: image
+    texture: portrait_atang_dreamy
+    x: 400
+    y: 450
+    scale: 0.4
+    depth: 12
+    label: 阿棠
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: atang
+      action:
+        type: dialogue
+        dialogueId: C2Z5_ATANG_TALK
+
+  # 阿棠的纸条
+  - id: atang_note
+    type: image
+    texture: px_item_archive
+    x: 480
+    y: 530
+    scale: 0.35
+    depth: 9
+    label: 纸条
+    labelOffset: [0, 45]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z5_ATANG_NOTE
+
+  # 许澄诊室门
+  - id: xucheng_door
+    type: image
+    texture: px_item_door
+    x: 600
+    y: 350
+    scale: 0.6
+    depth: 11
+    label: 诊室
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z5_XUCHENG_DOOR
+
+  # 许澄（诊室门口）
+  - id: xucheng
+    type: image
+    texture: portrait_xucheng_professional
+    x: 550
+    y: 380
+    scale: 0.35
+    depth: 10
+    alpha: 0.9
+
+  # 其他候诊患者
+  - id: patient
+    type: image
+    texture: placeholder_char
+    x: 150
+    y: 550
+    scale: 0.7
+    depth: 7
+    alpha: 0.6
+    tint: 0x888888
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往礼堂街
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z6
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z4
+

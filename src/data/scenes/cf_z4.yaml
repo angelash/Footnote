@@ -1,0 +1,122 @@
+# CF-Z4 世界首次保存非最优解
+# F23正式落地
+id: CF-Z4
+title: 保留之地
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 栖蓝
+  - id: qilan
+    type: image
+    texture: portrait_qilan_smiling
+    x: 180
+    y: 400
+    scale: 0.45
+    depth: 12
+    label: 栖蓝
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: qilan
+      action:
+        type: dialogue
+        dialogueId: CFZ4_QILAN_FINAL
+
+  # 空椅（仪式①结果）
+  - id: preserved_chair
+    type: image
+    texture: obj_chair
+    x: 350
+    y: 450
+    scale: 0.8
+    depth: 10
+    label: 空椅（保留）
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_RITE_CHAIR
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ4_CHAIR_PRESERVED
+
+  # 封存抄录（仪式②结果）
+  - id: preserved_archive
+    type: image
+    texture: px_item_archive
+    x: 350
+    y: 450
+    scale: 0.7
+    depth: 10
+    label: 封存抄录（保留）
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_RITE_ARCHIVE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ4_ARCHIVE_PRESERVED
+
+  # 点亮的灯（仪式③结果）
+  - id: preserved_lamp
+    type: image
+    texture: obj_oil_lamp
+    x: 350
+    y: 450
+    scale: 0.7
+    depth: 10
+    label: 弱灯（保留）
+    labelOffset: [0, 65]
+    condition:
+      flagTrue: FLAG_RITE_LAMP
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ4_LAMP_PRESERVED
+
+  # 地面椅脚印（稳定）
+  - id: chair_footprint
+    type: image
+    texture: px_fx_scar
+    x: 350
+    y: 480
+    scale: 0.5
+    depth: 8
+    alpha: 0.6
+    condition:
+      flagTrue: FLAG_RITE_CHAIR
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往终局选择
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z5
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z3
+

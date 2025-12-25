@@ -1,0 +1,147 @@
+# C2-Z7 边缘断口：不存在的房间
+# 第2章高潮 - 只可看见，不能进入
+id: C2-Z7
+title: 边缘断口
+background:
+  texture: bg_collapse
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 封锁牌
+  - id: barrier_sign
+    type: image
+    texture: obj_barrier
+    x: 200
+    y: 500
+    scale: 0.7
+    depth: 12
+    label: 封锁
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z7_BARRIER
+
+  # 墙面（深度视野下显示巨型空间）
+  - id: wall_surface
+    type: image
+    texture: px_item_wall_segment
+    x: 375
+    y: 380
+    scale: 1.5
+    depth: 8
+    label: 墙面
+    labelOffset: [0, 120]
+    interactive:
+      cursor: true
+      testid: wall-surface
+      action:
+        type: dialogue
+        dialogueId: C2Z7_WALL_NORMAL
+
+  # 深度感知区域 - 显示隐藏空间
+  - id: depth_hidden_space
+    type: zone
+    x: 375
+    y: 380
+    width: 300
+    height: 250
+    depth: 20
+    depthSenseTarget: true
+    showOnDepthSense: true
+
+  # 门影轮廓点（深度感知触发后可见）
+  - id: door_outline
+    type: image
+    texture: px_fx_field_accept
+    x: 420
+    y: 350
+    scale: 0.6
+    depth: 15
+    alpha: 0
+    label: 门影
+    labelOffset: [0, 60]
+    condition:
+      abilityActive: depthPerception
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z7_DOOR_OUTLINE
+
+  # 提交记录点
+  - id: submit_record
+    type: image
+    texture: px_fx_system_correct
+    x: 550
+    y: 300
+    scale: 0.4
+    depth: 16
+    label: 提交记录
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C2Z7_SAW_SPACE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z7_SUBMIT
+
+  # 裂缝装饰
+  - id: crack_decor
+    type: image
+    texture: obj_crack
+    x: 300
+    y: 450
+    scale: 0.7
+    depth: 7
+
+  # 顾临通讯点（可选）
+  - id: gulin_comms
+    type: image
+    texture: px_item_archive
+    x: 150
+    y: 350
+    scale: 0.4
+    depth: 11
+    label: 通讯
+    labelOffset: [0, 50]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z7_GULIN_REMOTE
+
+  # 返回（第2章完成后返回主菜单或进入第3章）
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z6
+
+  # 前往第3章
+  - id: exit_to_c3
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 继续深入
+    condition:
+      flag: FLAG_C2_COMPLETE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z1
+

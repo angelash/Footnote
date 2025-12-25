@@ -1,0 +1,94 @@
+# RV-03 C0-Z3 重返：薄墙巷口
+# 时间干预变体 - 时间线与三态叠影
+id: RV-03
+title: 薄墙巷口 [时间干预]
+background:
+  texture: bg_c0z3
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 时间线显示
+  - id: timeline
+    type: zone
+    x: 375
+    y: 200
+    width: 400
+    height: 80
+    depth: 15
+    label: 时间线
+    interactive:
+      cursor: true
+      testid: timeline
+      action:
+        type: dialogue
+        dialogueId: RV03_TIMELINE
+
+  # 薄墙（三态叠影）
+  - id: thin_wall
+    type: image
+    texture: px_tiles_platform
+    x: 375
+    y: 400
+    scale: 1.2
+    depth: 10
+    label: 薄墙（三态）
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV03_THIN_WALL
+
+  # T1状态叠影（完整）
+  - id: wall_t1
+    type: image
+    texture: px_tiles_platform
+    x: 320
+    y: 420
+    scale: 0.4
+    depth: 9
+    alpha: 0.3
+    label: T1:完整
+
+  # T2状态叠影（开裂）
+  - id: wall_t2
+    type: image
+    texture: obj_crack
+    x: 380
+    y: 420
+    scale: 0.4
+    depth: 9
+    alpha: 0.4
+    label: T2:开裂
+
+  # 回溯选项面板
+  - id: rewind_panel
+    type: zone
+    x: 375
+    y: 600
+    width: 300
+    height: 100
+    depth: 20
+    label: 回溯选项
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV03_REWIND_CHOICE
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C0-Z3
+

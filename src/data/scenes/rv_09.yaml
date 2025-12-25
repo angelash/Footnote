@@ -1,0 +1,89 @@
+# RV-09 C3-Z4 重返：祈言堂
+# 深度感知变体 - 牧平的真实身份线索
+id: RV-09
+title: 祈言堂 [深度感知]
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+  tint: 0xccbbff
+objects:
+  # 祈言堂主体
+  - id: prayer_hall
+    type: image
+    texture: obj_altar
+    x: 375
+    y: 350
+    scale: 0.9
+    depth: 10
+    label: 祈言堂
+    labelOffset: [0, 100]
+
+  # 隐藏符文（深度感知可见）
+  - id: hidden_runes
+    type: image
+    texture: obj_rune
+    x: 300
+    y: 400
+    scale: 0.5
+    depth: 11
+    alpha: 0.6
+    label: 隐藏符文
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      testid: hidden-runes
+      action:
+        type: dialogue
+        dialogueId: RV09_RUNES
+
+  # 牧平的秘密（深度感知可见）
+  - id: muping_secret
+    type: image
+    texture: px_fx_scar
+    x: 450
+    y: 420
+    scale: 0.4
+    depth: 12
+    alpha: 0.5
+    label: 秘密痕迹
+    labelOffset: [0, 45]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV09_SECRET
+
+  # 预言来源
+  - id: prophecy_source
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 550
+    scale: 0.5
+    depth: 10
+    alpha: 0.7
+    label: 预言来源
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV09_PROPHECY
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z4
+

@@ -1,0 +1,135 @@
+# C5-Z3 许澄的抉择对话数据
+dialogues:
+  # 许澄对话
+  C5Z3_XUCHENG_TALK:
+    id: C5Z3_XUCHENG_TALK
+    lines:
+      - speaker: 许澄
+        text: 我能让你轻松一点。
+      - speaker: 许澄
+        text: 但轻松的代价是——你会变得更像他们需要的样子。
+      - speaker: 许澄
+        text: 你不是第一个想保留差异的人。
+      - speaker: 许澄
+        text: 你也不会是最后一个。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z3_STARTED
+        flagValue: true
+
+  # 疗程说明卡
+  C5Z3_TREATMENT_CARD:
+    id: C5Z3_TREATMENT_CARD
+    lines:
+      - speaker: ""
+        text: 疗程说明：
+      - speaker: ""
+        text: 「稳定疗程」
+      - speaker: ""
+        text: 效果：降低异常感知、减轻压力
+      - speaker: ""
+        text: 方式：对齐差异记忆
+      - speaker: ""
+        text: 代价：部分差异卡将被覆盖为"已对齐版本"
+      - speaker: ""
+        text: 编号格式与节点刻度点呼应……
+      - speaker: 岑回
+        text: （对齐……是什么意思？）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z3_READ_TREATMENT
+        flagValue: true
+
+  # 做出选择
+  C5Z3_MAKE_CHOICE:
+    id: C5Z3_MAKE_CHOICE
+    lines:
+      - speaker: ""
+        text: 你需要做出选择。
+    choices:
+      - id: accept
+        text: 我接受
+        nextDialogueId: C5Z3_ACCEPT
+      - id: refuse
+        text: 我拒绝
+        effects:
+          rDelta: 2
+        nextDialogueId: C5Z3_REFUSE
+      - id: ask_who
+        text: 你到底在帮谁？
+        nextDialogueId: C5Z3_ASK_WHO
+
+  # 接受
+  C5Z3_ACCEPT:
+    id: C5Z3_ACCEPT
+    lines:
+      - speaker: ""
+        text: 你接受了稳定疗程。
+      - speaker: 许澄
+        text: ……好。
+      - speaker: ""
+        text: （你感到一阵轻松，但也感到……少了一点什么）
+      - speaker: ""
+        text: 结算：
+      - speaker: 系统
+        text: 执行：稳定疗程
+      - speaker: 系统
+        text: 结果：差异已对齐
+      - speaker: 系统
+        text: 备注：解释成本↓
+      - speaker: ""
+        text: （你的一张差异卡被覆盖了）
+    onComplete:
+      - type: card
+        cardId: CARD_C5_TREATMENT_RECEIPT
+      - type: flag
+        flagName: FLAG_TREATMENT_ACCEPT
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C5Z3_COMPLETE
+        flagValue: true
+
+  # 拒绝
+  C5Z3_REFUSE:
+    id: C5Z3_REFUSE
+    lines:
+      - speaker: ""
+        text: 你拒绝了稳定疗程。
+      - speaker: 许澄
+        text: ……我理解。
+      - speaker: ""
+        text: （你感到更难受了，但你保住了一点东西）
+      - speaker: 许澄
+        text: 拿着这个。
+      - speaker: ""
+        text: （她递给你一张私人笔记）
+    onComplete:
+      - type: card
+        cardId: CARD_C5_XUCHENG_NOTE
+      - type: flag
+        flagName: FLAG_TREATMENT_REFUSE
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C5Z3_COMPLETE
+        flagValue: true
+
+  # 帮谁
+  C5Z3_ASK_WHO:
+    id: C5Z3_ASK_WHO
+    lines:
+      - speaker: 许澄
+        text: 我在帮"还活得下去的你"。
+      - speaker: 许澄
+        text: 不是最好的你，也不是最真实的你。
+      - speaker: 许澄
+        text: 只是……还能继续走下去的你。
+    choices:
+      - id: accept_after
+        text: 我接受
+        nextDialogueId: C5Z3_ACCEPT
+      - id: refuse_after
+        text: 我拒绝
+        effects:
+          rDelta: 2
+        nextDialogueId: C5Z3_REFUSE
+

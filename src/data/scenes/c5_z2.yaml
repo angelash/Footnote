@@ -1,0 +1,121 @@
+# C5-Z2 市政环：纠偏中心外围
+# 对齐语言显形
+id: C5-Z2
+title: 纠偏中心
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 门禁闸机
+  - id: gate
+    type: image
+    texture: obj_door
+    x: 375
+    y: 300
+    scale: 0.8
+    depth: 10
+    label: 门禁
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: gate
+      action:
+        type: dialogue
+        dialogueId: C5Z2_GATE
+
+  # 提交窗口
+  - id: submit_window
+    type: image
+    texture: obj_monitor
+    x: 300
+    y: 420
+    scale: 0.7
+    depth: 10
+    label: 提交窗口
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C5Z2_ENTERED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z2_SUBMIT_RECORD
+
+  # 屏幕公告墙
+  - id: notice_screen
+    type: image
+    texture: obj_monitor
+    x: 500
+    y: 350
+    scale: 0.6
+    depth: 9
+    label: 公告墙
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z2_NOTICE_SCREEN
+
+  # 顾临
+  - id: gulin
+    type: image
+    texture: portrait_gulin_tired
+    x: 450
+    y: 480
+    scale: 0.45
+    depth: 12
+    label: 顾临
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C5Z2_SUBMITTED
+    interactive:
+      cursor: true
+      testid: gulin
+      action:
+        type: dialogue
+        dialogueId: C5Z2_GULIN_TALK
+
+  # 职员
+  - id: clerk
+    type: image
+    texture: portrait_chenjiang_neutral
+    x: 200
+    y: 450
+    scale: 0.3
+    depth: 11
+    alpha: 0.7
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往诊疗台
+    condition:
+      flag: FLAG_C5Z2_COMPLETE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z3
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z1
+

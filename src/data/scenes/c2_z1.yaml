@@ -1,0 +1,151 @@
+# C2-Z1 维修局校准室
+# 解锁深度感知（只读）
+id: C2-Z1
+title: 维修局校准室
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 校准台A - 结构样本
+  - id: calibration_a
+    type: image
+    texture: px_item_archive
+    x: 200
+    y: 400
+    scale: 0.8
+    depth: 10
+    label: 校准台A
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: calibration-a
+      action:
+        type: dialogue
+        dialogueId: C2Z1_CALIBRATION_A
+
+  # 校准台B - 空腔样本
+  - id: calibration_b
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 450
+    scale: 0.8
+    depth: 10
+    label: 校准台B
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: calibration-b
+      action:
+        type: dialogue
+        dialogueId: C2Z1_CALIBRATION_B
+
+  # 校准台C - 断裂样本
+  - id: calibration_c
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 400
+    scale: 0.8
+    depth: 10
+    label: 校准台C
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: calibration-c
+      action:
+        type: dialogue
+        dialogueId: C2Z1_CALIBRATION_C
+
+  # 授权终端
+  - id: auth_terminal
+    type: image
+    texture: obj_monitor
+    x: 375
+    y: 280
+    scale: 0.7
+    depth: 12
+    label: 授权终端
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C2Z1_ALL_CALIBRATED
+    interactive:
+      cursor: true
+      testid: auth-terminal
+      action:
+        type: dialogue
+        dialogueId: C2Z1_AUTH_TERMINAL
+
+  # 顾临
+  - id: gulin
+    type: sprite
+    texture: px_sprite_gulin_idle
+    x: 150
+    y: 350
+    scale: 0.6
+    depth: 11
+    label: 顾临
+    labelOffset: [0, 75]
+    animation:
+      key: gulin_idle
+      frameRate: 4
+      repeat: -1
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z1_GULIN_TALK
+
+  # 校准员NPC
+  - id: technician
+    type: image
+    texture: placeholder_char
+    x: 600
+    y: 320
+    scale: 0.8
+    depth: 9
+    tint: 0x88AA88
+
+  # 设备装饰
+  - id: server_rack
+    type: image
+    texture: px_item_archive
+    x: 650
+    y: 450
+    scale: 0.6
+    depth: 5
+    alpha: 0.7
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 离开校准室
+    condition:
+      flag: FLAG_DEPTH_SENSE_UNLOCKED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z2
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C1-Z6
+

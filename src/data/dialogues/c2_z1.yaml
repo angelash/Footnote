@@ -1,0 +1,114 @@
+# C2-Z1 维修局校准室对话数据
+dialogues:
+  # 顾临对话
+  C2Z1_GULIN_TALK:
+    id: C2Z1_GULIN_TALK
+    lines:
+      - speaker: 顾临
+        text: 从今天开始，你会看到一些……不该被讨论的东西。
+      - speaker: 岑回
+        text: ……
+      - speaker: 顾临
+        text: 看见就记录。别动。
+      - speaker: 顾临
+        text: 城市不需要你证明自己，只需要你别让事情更复杂。
+      - speaker: 岑回
+        text: 我明白。
+      - speaker: 顾临
+        text: 去完成校准流程吧。
+
+  # 校准台A - 结构样本
+  C2Z1_CALIBRATION_A:
+    id: C2Z1_CALIBRATION_A
+    lines:
+      - speaker: 系统
+        text: 校准台A：结构样本
+      - speaker: ""
+        text: 提示：长按屏幕进入深度视野（只读）
+      - speaker: ""
+        text: （长按后……）
+      - speaker: ""
+        text: 在深度视野下，样本显示完整线框。
+      - speaker: ""
+        text: 状态：稳定
+      - speaker: 岑回
+        text: （完整的结构……）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z1_CALIBRATION_A
+        flagValue: true
+
+  # 校准台B - 空腔样本
+  C2Z1_CALIBRATION_B:
+    id: C2Z1_CALIBRATION_B
+    lines:
+      - speaker: 系统
+        text: 校准台B：空腔样本
+      - speaker: ""
+        text: （长按后……）
+      - speaker: ""
+        text: 在深度视野下，样本内部出现扭曲的空腔轮廓。
+      - speaker: 岑回
+        text: 表面完好，但里面是空的……
+      - speaker: ""
+        text: 状态：扭曲
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z1_CALIBRATION_B
+        flagValue: true
+
+  # 校准台C - 断裂样本
+  C2Z1_CALIBRATION_C:
+    id: C2Z1_CALIBRATION_C
+    lines:
+      - speaker: 系统
+        text: 校准台C：断裂样本
+      - speaker: ""
+        text: （长按后……）
+      - speaker: ""
+        text: 在深度视野下，样本显示断裂/缺口线框。
+      - speaker: 岑回
+        text: 这个……已经断了。
+      - speaker: ""
+        text: 状态：断裂
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z1_CALIBRATION_C
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C2Z1_ALL_CALIBRATED
+        flagValue: true
+
+  # 授权终端
+  C2Z1_AUTH_TERMINAL:
+    id: C2Z1_AUTH_TERMINAL
+    lines:
+      - speaker: 系统
+        text: 校准完成。
+      - speaker: 系统
+        text: 正在下发授权……
+      - speaker: ""
+        text: ……
+      - speaker: 系统
+        text: 授权：深度感知（只读）
+      - speaker: 系统
+        text: 权限：读取深度格（观测）
+      - speaker: 系统
+        text: 禁止：写入/介入
+      - speaker: ""
+        text: 备注闪烁：「观测将增加解释成本（已更正）」
+      - speaker: 岑回
+        text: （已更正……什么意思？）
+    onComplete:
+      - type: card
+        cardId: CARD_C2_DEPTH_AUTH
+      - type: flag
+        flagName: FLAG_DEPTH_SENSE_UNLOCKED
+        flagValue: true
+      - type: ability
+        abilityType: depthPerception
+        unlock: true
+      - type: foreshadow
+        foreshadowId: F03
+        foreshadowStage: deepen
+

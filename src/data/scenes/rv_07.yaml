@@ -1,0 +1,89 @@
+# RV-07 C2-Z3 重返：漂移者居所
+# 深度感知变体 - 阿棠的前身记忆
+id: RV-07
+title: 漂移者居所 [深度感知]
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+  tint: 0xccbbff
+objects:
+  # 居所主体
+  - id: dwelling
+    type: image
+    texture: obj_bed
+    x: 375
+    y: 400
+    scale: 0.8
+    depth: 10
+    label: 简陋居所
+    labelOffset: [0, 90]
+
+  # 阿棠的旧物（深度感知可见）
+  - id: atang_old_items
+    type: image
+    texture: px_item_archive
+    x: 280
+    y: 450
+    scale: 0.5
+    depth: 11
+    alpha: 0.6
+    label: 旧物叠影
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      testid: atang-old-items
+      action:
+        type: dialogue
+        dialogueId: RV07_OLD_ITEMS
+
+  # 前身记忆碎片
+  - id: memory_fragment
+    type: image
+    texture: px_fx_scar
+    x: 450
+    y: 420
+    scale: 0.4
+    depth: 12
+    alpha: 0.5
+    label: 记忆碎片
+    labelOffset: [0, 45]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV07_MEMORY
+
+  # 漂移痕迹
+  - id: drift_trace
+    type: image
+    texture: px_fx_glitch
+    x: 375
+    y: 550
+    scale: 0.8
+    depth: 9
+    alpha: 0.4
+    label: 漂移痕迹
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV07_DRIFT_TRACE
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z3
+

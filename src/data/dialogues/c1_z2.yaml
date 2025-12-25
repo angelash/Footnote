@@ -1,0 +1,192 @@
+# C1-Z2 错门走廊对话数据
+dialogues:
+  # 门牌17B（错误的门）
+  C1Z2_DOOR_17B:
+    id: C1Z2_DOOR_17B
+    lines:
+      - speaker: 岑回
+        text: 17B……这应该是目标房间。
+      - speaker: ""
+        text: （敲门）
+      - speaker: ""
+        text: 没有回应。
+    choices:
+      - id: try_open_17b
+        text: 试着推门
+        nextDialogueId: C1Z2_DOOR_17B_OPEN
+      - id: leave_17b
+        text: 算了
+        nextDialogueId: C1Z2_DOOR_17B_LEAVE
+
+  C1Z2_DOOR_17B_OPEN:
+    id: C1Z2_DOOR_17B_OPEN
+    lines:
+      - speaker: ""
+        text: （门开了）
+      - speaker: 岑回
+        text: ……这是储物间。
+      - speaker: 岑回
+        text: 门牌写的是17B，但里面完全不对。
+      - speaker: 岑回
+        text: 难道门牌是错的？
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z2_CHECKED_17B
+        flagValue: true
+
+  C1Z2_DOOR_17B_LEAVE:
+    id: C1Z2_DOOR_17B_LEAVE
+    lines:
+      - speaker: 岑回
+        text: （没人应门。先看看其他线索。）
+
+  # 门牌19A（正确路径）
+  C1Z2_DOOR_19A:
+    id: C1Z2_DOOR_19A
+    lines:
+      - speaker: 岑回
+        text: 19A……门牌编号和我要找的不一样。
+      - speaker: ""
+        text: 但是……
+      - speaker: 岑回
+        text: 地上的脚印，都指向这扇门。
+    choices:
+      - id: knock_19a
+        text: 敲门
+        condition:
+          flagTrue: FLAG_C1Z2_CHECKED_FOOTPRINTS
+        nextDialogueId: C1Z2_DOOR_19A_CORRECT
+      - id: skip_19a
+        text: 先不敲
+        nextDialogueId: C1Z2_DOOR_19A_SKIP
+
+  C1Z2_DOOR_19A_CORRECT:
+    id: C1Z2_DOOR_19A_CORRECT
+    lines:
+      - speaker: ""
+        text: （敲门）
+      - speaker: 住户声音
+        text: 请进。
+      - speaker: ""
+        text: （门开了。里面确实是你要找的地方。）
+      - speaker: 岑回
+        text: ……门牌是错的，但空间是对的。
+      - speaker: 岑回
+        text: 到底哪个才是真的？
+    onComplete:
+      - type: card
+        cardId: CARD_C1_CORRIDOR_NOTE
+      - type: flag
+        flagName: FLAG_C1Z2_SOLVED
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F02
+        foreshadowStage: plant
+
+  C1Z2_DOOR_19A_SKIP:
+    id: C1Z2_DOOR_19A_SKIP
+    lines:
+      - speaker: 岑回
+        text: 先收集更多线索再决定。
+
+  # 门牌15C（有声音）
+  C1Z2_DOOR_15C:
+    id: C1Z2_DOOR_15C
+    lines:
+      - speaker: 岑回
+        text: 15C……
+      - speaker: ""
+        text: 从门缝里传来说话声。
+      - speaker: 岑回
+        text: 有人住在里面。
+    choices:
+      - id: knock_15c
+        text: 敲门
+        nextDialogueId: C1Z2_DOOR_15C_KNOCK
+      - id: listen_15c
+        text: 仔细听
+        nextDialogueId: C1Z2_DOOR_15C_LISTEN
+
+  C1Z2_DOOR_15C_KNOCK:
+    id: C1Z2_DOOR_15C_KNOCK
+    lines:
+      - speaker: ""
+        text: （敲门）
+      - speaker: ""
+        text: 声音停了。
+      - speaker: ""
+        text: 没人开门。
+
+  C1Z2_DOOR_15C_LISTEN:
+    id: C1Z2_DOOR_15C_LISTEN
+    lines:
+      - speaker: ""
+        text: （仔细听……）
+      - speaker: 门内声音
+        text: ……不是这个号码……
+      - speaker: 门内声音
+        text: ……又改了……
+      - speaker: 岑回
+        text: 他们也在困惑门牌的问题。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z2_CHECKED_15C
+        flagValue: true
+
+  # 脚印
+  C1Z2_FOOTPRINTS:
+    id: C1Z2_FOOTPRINTS
+    lines:
+      - speaker: 岑回
+        text: 地上有脚印……
+      - speaker: 岑回
+        text: 很多人走过的痕迹。
+      - speaker: ""
+        text: 它们都指向写着"19A"的那扇门。
+      - speaker: 岑回
+        text: 如果大家都走那边……也许那才是真正的入口。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z2_CHECKED_FOOTPRINTS
+        flagValue: true
+
+  # 通风口
+  C1Z2_VENT:
+    id: C1Z2_VENT
+    lines:
+      - speaker: 岑回
+        text: 通风口……
+      - speaker: ""
+        text: 从15C的方向传来说话声。
+      - speaker: 岑回
+        text: 那边有人住，但门牌又不对。
+      - speaker: 岑回
+        text: 这走廊的编号系统完全乱了。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z2_CHECKED_VENT
+        flagValue: true
+
+  # 住户
+  C1Z2_RESIDENT:
+    id: C1Z2_RESIDENT
+    lines:
+      - speaker: 住户
+        text: 你也在找门？
+      - speaker: 岑回
+        text: 是的，我找17B。
+      - speaker: 住户
+        text: 17B……应该在走廊尽头。
+      - speaker: 住户
+        text: 不对，是在中间。
+      - speaker: 住户
+        text: 等等，我记得是在左边……
+      - speaker: 岑回
+        text: ……你自己也不确定。
+      - speaker: 住户
+        text: 门牌换过太多次了。谁都记不清了。
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F04
+        foreshadowStage: plant
+

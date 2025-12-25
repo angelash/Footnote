@@ -1,0 +1,149 @@
+# C3-Z4 栖蓝：空椅子
+# 强无收益 + 终局情感锚
+id: C3-Z4
+title: 小院街角
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 空椅子
+  - id: empty_chair
+    type: image
+    texture: obj_chair
+    x: 350
+    y: 420
+    scale: 0.8
+    depth: 10
+    rotation: 0.15
+    label: 空椅子
+    labelOffset: [0, 85]
+    interactive:
+      cursor: true
+      testid: empty-chair
+      action:
+        type: dialogue
+        dialogueId: C3Z4_EMPTY_CHAIR
+
+  # 修正后的椅子（条件显示）
+  - id: fixed_chair
+    type: image
+    texture: obj_chair
+    x: 350
+    y: 420
+    scale: 0.8
+    depth: 10
+    rotation: 0
+    visible: false
+    condition:
+      flagTrue: FLAG_EMPTY_CHAIR_SET
+
+  # 擦拭布
+  - id: cleaning_cloth
+    type: image
+    texture: px_item_archive
+    x: 450
+    y: 500
+    scale: 0.35
+    depth: 9
+    label: 擦拭布
+    labelOffset: [0, 45]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z4_CLOTH
+
+  # 椅脚松动点
+  - id: chair_leg
+    type: image
+    texture: px_fx_scar
+    x: 380
+    y: 480
+    scale: 0.3
+    depth: 8
+    label: 椅脚
+    labelOffset: [0, 40]
+    condition:
+      flagTrue: FLAG_C3Z4_CLEANED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z4_CHAIR_LEG
+
+  # 小灯座
+  - id: lamp_stand
+    type: image
+    texture: obj_oil_lamp
+    x: 250
+    y: 450
+    scale: 0.5
+    depth: 9
+    label: 小灯座
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z4_LAMP_STAND
+
+  # 栖蓝
+  - id: qilan
+    type: image
+    texture: portrait_qilan_sad
+    x: 550
+    y: 400
+    scale: 0.4
+    depth: 12
+    label: 栖蓝
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: qilan
+      action:
+        type: dialogue
+        dialogueId: C3Z4_QILAN_TALK
+
+  # 陈匠远处路过（条件）
+  - id: chenjiang_passing
+    type: image
+    texture: portrait_chenjiang_neutral
+    x: 650
+    y: 550
+    scale: 0.25
+    depth: 5
+    alpha: 0.5
+    condition:
+      flagTrue: FLAG_C3Z2_RESCUED
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往诊疗台
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z5
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z3
+

@@ -1,0 +1,109 @@
+# RV-01 C0-Z1 重返：宿舍走廊
+# 深度感知变体 - 隐藏涂鸦与脚印痕迹
+id: RV-01
+title: 宿舍走廊 [深度感知]
+background:
+  texture: bg_c0z1
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+  # 蓝紫色调叠加滤镜
+  tint: 0xccbbff
+objects:
+  # 公告板（同位置）
+  - id: bulletin_board
+    type: image
+    texture: obj_monitor
+    x: 375
+    y: 350
+    scale: 0.8
+    depth: 10
+    label: 公告板
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV01_BULLETIN
+
+  # 隐藏涂鸦（深度感知可见）
+  - id: hidden_graffiti
+    type: image
+    texture: px_fx_scar
+    x: 320
+    y: 400
+    scale: 0.6
+    depth: 11
+    alpha: 0.7
+    label: 隐藏涂鸦
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      testid: hidden-graffiti
+      action:
+        type: dialogue
+        dialogueId: RV01_GRAFFITI
+
+  # 身份卡（同位置）
+  - id: id_card
+    type: image
+    texture: px_item_archive
+    x: 400
+    y: 550
+    scale: 0.5
+    depth: 10
+    label: 身份卡
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV01_ID_CARD
+
+  # 脚印痕迹（深度感知可见）
+  - id: footprints
+    type: image
+    texture: px_fx_scar
+    x: 450
+    y: 600
+    scale: 0.4
+    depth: 9
+    alpha: 0.5
+    label: 脚印痕迹
+    labelOffset: [0, 45]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV01_FOOTPRINTS
+
+  # 消失的房间入口（深度感知可见）
+  - id: vanished_door
+    type: zone
+    x: 550
+    y: 450
+    width: 80
+    height: 120
+    depth: 8
+    label: ???
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV01_VANISHED_DOOR
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C0-Z1
+

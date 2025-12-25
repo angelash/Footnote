@@ -130,5 +130,30 @@ document.body.addEventListener('touchmove', (e) => {
   }
 }, { passive: false });
 
+// PWA Service Worker 注册
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('[PWA] Service Worker 注册成功:', registration.scope);
+      
+      // 检查更新
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('[PWA] 发现新版本，刷新页面以更新');
+              // 可以在这里显示更新提示
+            }
+          });
+        }
+      });
+    } catch (error) {
+      console.warn('[PWA] Service Worker 注册失败:', error);
+    }
+  });
+}
+
 export { game };
 

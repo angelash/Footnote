@@ -1,0 +1,131 @@
+# C5-Z7 "此行为在当前模型中无意义"
+# F21核弹落地
+id: C5-Z7
+title: 判词之地
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 微任务A：空白标签
+  - id: blank_label
+    type: image
+    texture: px_fx_field_accept
+    x: 250
+    y: 400
+    scale: 0.4
+    depth: 10
+    label: 空白标签
+    labelOffset: [0, 50]
+    interactive:
+      cursor: true
+      testid: blank-label
+      action:
+        type: dialogue
+        dialogueId: C5Z7_TASK_A
+
+  # 微任务B：椅脚印描边
+  - id: chair_outline
+    type: image
+    texture: px_fx_scar
+    x: 400
+    y: 450
+    scale: 0.5
+    depth: 9
+    alpha: 0.5
+    label: 椅脚印
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z7_TASK_B
+
+  # 微任务C：版本卡
+  - id: version_card_slot
+    type: image
+    texture: px_item_archive
+    x: 520
+    y: 380
+    scale: 0.45
+    depth: 10
+    label: 版本库底层
+    labelOffset: [0, 55]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z7_TASK_C
+
+  # 墙面（贴标签位置）
+  - id: wall_surface
+    type: image
+    texture: px_tiles_platform
+    x: 250
+    y: 350
+    scale: 0.8
+    depth: 7
+    alpha: 0.6
+
+  # 栖蓝（F21后出现一句话）
+  - id: qilan
+    type: image
+    texture: portrait_qilan_neutral
+    x: 180
+    y: 480
+    scale: 0.35
+    depth: 12
+    label: 栖蓝
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_F21_TRIGGERED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z7_QILAN_FINAL
+
+  # F21判词触发点
+  - id: f21_trigger
+    type: zone
+    x: 375
+    y: 550
+    width: 150
+    height: 80
+    depth: 15
+    visible: false
+    condition:
+      flagTrue: FLAG_C5Z7_TASKS_DONE
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往终章
+    condition:
+      flag: FLAG_F21_TRIGGERED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z1
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z6
+

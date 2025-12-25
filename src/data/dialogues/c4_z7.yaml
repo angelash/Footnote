@@ -1,0 +1,94 @@
+# C4-Z7 礼堂街：祷文抄本3对话数据
+dialogues:
+  # 牧平对话
+  C4Z7_MUPING_TALK:
+    id: C4Z7_MUPING_TALK
+    lines:
+      - speaker: 牧平
+        text: 你把纸折回去，折痕还在。
+      - speaker: 牧平
+        text: 折痕不是惩罚，是记号。
+      - speaker: 牧平
+        text: 记号多了，纸会学会另一种形状。
+      - speaker: 牧平
+        text: 到那时，你以为的"更正"，就更正不动了。
+    choices:
+      - id: ask_meaning
+        text: 这是什么意思？
+        nextDialogueId: C4Z7_ASK_MEANING
+      - id: accept_wisdom
+        text: 我明白了
+        nextDialogueId: C4Z7_ACCEPT
+      - id: still_confused
+        text: 我还是不懂
+        nextDialogueId: C4Z7_CONFUSED
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z7_MUPING_SPOKE
+        flagValue: true
+
+  # 什么意思
+  C4Z7_ASK_MEANING:
+    id: C4Z7_ASK_MEANING
+    lines:
+      - speaker: 牧平
+        text: 你回去越多次，痕迹越深。
+      - speaker: 牧平
+        text: 深到一定程度……
+      - speaker: 牧平
+        text: 它就不再是你的决定，而是纸本身的形状。
+
+  # 明白了
+  C4Z7_ACCEPT:
+    id: C4Z7_ACCEPT
+    lines:
+      - speaker: 牧平
+        text: 明白是好的。
+      - speaker: 牧平
+        text: 但更好的是：做得少一点。
+
+  # 不懂
+  C4Z7_CONFUSED:
+    id: C4Z7_CONFUSED
+    lines:
+      - speaker: 牧平
+        text: 不懂也没关系。
+      - speaker: 牧平
+        text: 有些事，做过了才懂。
+      - speaker: 牧平
+        text: 我只是希望你懂的时候，还来得及。
+
+  # 歪椅子
+  C4Z7_TILTED_CHAIR:
+    id: C4Z7_TILTED_CHAIR
+    lines:
+      - speaker: ""
+        text: 有一把椅子歪了。
+    choices:
+      - id: fix_chair
+        text: 扶正它
+        effects:
+          rDelta: 1
+        nextDialogueId: C4Z7_FIX_CHAIR
+      - id: ignore
+        text: 不管它
+        nextDialogueId: C4Z7_IGNORE
+
+  # 扶正
+  C4Z7_FIX_CHAIR:
+    id: C4Z7_FIX_CHAIR
+    lines:
+      - speaker: ""
+        text: 你把椅子扶正了。
+      - speaker: ""
+        text: 没有奖励。但它现在摆好了。
+      - speaker: 牧平
+        text: （他看了你一眼，轻轻点头）
+
+  # 不管
+  C4Z7_IGNORE:
+    id: C4Z7_IGNORE
+    lines:
+      - speaker: 岑回
+        text: （算了……）
+

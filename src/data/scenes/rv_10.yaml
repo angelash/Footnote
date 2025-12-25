@@ -1,0 +1,102 @@
+# RV-10 C4-Z1 重返：档案巷
+# 深度介入变体 - 可改变的档案排列
+id: RV-10
+title: 档案巷 [深度介入]
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 结构网格
+  - id: structure_grid
+    type: image
+    texture: px_fx_glitch
+    x: 375
+    y: 400
+    scale: 2.0
+    depth: 5
+    alpha: 0.2
+
+  # 档案架A（可移动）
+  - id: archive_a
+    type: image
+    texture: obj_bookshelf
+    x: 250
+    y: 400
+    scale: 0.6
+    depth: 10
+    label: 档案架A
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: archive-a
+      action:
+        type: dialogue
+        dialogueId: RV10_ARCHIVE_A
+
+  # 档案架B（可移动）
+  - id: archive_b
+    type: image
+    texture: obj_bookshelf
+    x: 500
+    y: 400
+    scale: 0.6
+    depth: 10
+    label: 档案架B
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV10_ARCHIVE_B
+
+  # 隐藏档案（移动后可见）
+  - id: hidden_archive
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 450
+    scale: 0.5
+    depth: 8
+    alpha: 0.8
+    label: 隐藏档案
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_RV10_MOVED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV10_HIDDEN
+
+  # 介入控制
+  - id: intervention_control
+    type: zone
+    x: 375
+    y: 650
+    width: 300
+    height: 80
+    depth: 20
+    label: 深度介入
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV10_INTERVENE
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z1
+

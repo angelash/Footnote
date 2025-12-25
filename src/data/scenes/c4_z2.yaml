@@ -1,0 +1,150 @@
+# C4-Z2 维修局：时间节点界面上线
+# 解锁时间干预
+id: C4-Z2
+title: 校准室（时间）
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 顾临
+  - id: gulin
+    type: image
+    texture: portrait_gulin_stern
+    x: 450
+    y: 350
+    scale: 0.45
+    depth: 12
+    label: 顾临
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: gulin
+      action:
+        type: dialogue
+        dialogueId: C4Z2_GULIN_TALK
+
+  # 时间堆栈按钮提示
+  - id: time_stack_hint
+    type: image
+    texture: px_fx_glitch
+    x: 680
+    y: 650
+    scale: 0.5
+    depth: 15
+    alpha: 0.6
+    label: 时间堆栈
+    labelOffset: [-80, 0]
+    condition:
+      flagTrue: FLAG_C4Z2_TUTORIAL_START
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z2_TIME_STACK_INTRO
+
+  # 演示台
+  - id: demo_desk
+    type: image
+    texture: obj_desk
+    x: 300
+    y: 450
+    scale: 0.7
+    depth: 9
+    label: 演示台
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z2_DEMO_DESK
+
+  # 螺丝（演示用）
+  - id: demo_screw
+    type: image
+    texture: px_fx_scar
+    x: 320
+    y: 420
+    scale: 0.2
+    depth: 11
+    label: 螺丝
+    labelOffset: [0, 30]
+    condition:
+      flagFalse: FLAG_C4Z2_SCREW_FALLEN
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z2_SCREW_DEMO
+
+  # 桌角擦痕（回溯后出现）
+  - id: desk_scratch
+    type: image
+    texture: px_fx_scar
+    x: 280
+    y: 480
+    scale: 0.15
+    depth: 10
+    alpha: 0.5
+    condition:
+      flagTrue: FLAG_C4Z2_ROLLBACK_DONE
+
+  # 授权终端
+  - id: auth_terminal
+    type: image
+    texture: obj_monitor
+    x: 550
+    y: 450
+    scale: 0.6
+    depth: 10
+    label: 授权终端
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_C4Z2_ROLLBACK_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z2_AUTH_COMPLETE
+
+  # 校准设备
+  - id: calibration_equip
+    type: image
+    texture: obj_medical_equip
+    x: 200
+    y: 380
+    scale: 0.5
+    depth: 8
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往边缘断口
+    condition:
+      flag: FLAG_TIME_INTERVENTION_UNLOCKED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z3
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z1
+

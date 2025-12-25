@@ -1,0 +1,104 @@
+# 第1章卡片数据
+cards:
+  # C1-Z1 通行证
+  CARD_C1_PERMIT:
+    id: CARD_C1_PERMIT
+    title: 通行证
+    type: archive
+    content: |
+      持证人：岑回
+      居住区域：居住环（标准）
+      通行范围：外围区（有限）
+      
+      版本：C1-许可-02
+      更正：已应用
+    flavorText: 手续完成了，但总觉得有什么被改过。
+    rarity: common
+    foreshadowId: F03
+
+  # C1-Z2 走廊便签
+  CARD_C1_CORRIDOR_NOTE:
+    id: CARD_C1_CORRIDOR_NOTE
+    title: 走廊便签
+    type: archive
+    content: |
+      门牌更换通知（复印件）
+      
+      致住户：
+      因区域编号调整，门牌将于……
+      
+      （关键行字迹模糊，无法辨认）
+      
+      ……请以新编号为准。
+    flavorText: 被更正过的痕迹，总是这样模糊。
+    rarity: uncommon
+    foreshadowId: F02
+
+  # C1-Z3 版本地图
+  CARD_C1_VERSION_MAP_01:
+    id: CARD_C1_VERSION_MAP_01
+    title: 被更正的地图-01
+    type: archive
+    content: |
+      区域：东三街 × 巷口
+      
+      版本A：主街宽12单位
+      版本B：主街宽10单位
+      
+      差异：2单位消失
+      原因：未记录
+    flavorText: 同一个地方，两条街道位置略错开。
+    rarity: rare
+    foreshadowId: F12
+
+  # C1-Z4 问卷副本
+  CARD_C1_QUESTIONNAIRE:
+    id: CARD_C1_QUESTIONNAIRE
+    title: 问卷副本
+    type: archive
+    content: |
+      记忆一致性评估
+      
+      问题1：您是否在同一天里见过两次相同的事？
+      问题2：您是否在熟悉的路上迷路？
+      问题3：您是否对某些日期感到不确定？
+      
+      评估结论：状态稳定。无需干预。
+      
+      编号：MC-4721-X
+      对齐：已应用
+    flavorText: 无论怎么回答，结论都是一样的。
+    rarity: uncommon
+    foreshadowId: F14
+
+  # C1-Z5 祷文抄本
+  CARD_C1_PRAYER_01:
+    id: CARD_C1_PRAYER_01
+    title: 祷文抄本-01
+    type: prayer
+    content: |
+      纸页不恨你
+      它只会承受不住
+      别往一页纸上写太多
+      空 是被留下的
+    flavorText: 诗性的文字背后，似乎藏着什么。
+    rarity: rare
+    foreshadowId: F15
+
+  # C1-Z6 坍塌报告
+  CARD_C1_COLLAPSE_REPORT:
+    id: CARD_C1_COLLAPSE_REPORT
+    title: 坍塌报告
+    type: verdict
+    content: |
+      事件：边缘区域结构异常
+      类型：小规模坍塌
+      状态：已封锁
+      
+      处理方式：标注、围挡
+      原因分析：【访问受限】
+      
+      后续：等待系统更正
+    flavorText: 不处理，只是标注。为什么？
+    rarity: uncommon
+

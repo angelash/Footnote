@@ -1,0 +1,110 @@
+# C2-Z5 诊疗台：阿棠的碎片日记1对话数据
+dialogues:
+  # 坐下触发
+  C2Z5_SIT_DOWN:
+    id: C2Z5_SIT_DOWN
+    lines:
+      - speaker: ""
+        text: 你坐在候诊座位上。
+      - speaker: ""
+        text: 旁边坐着一个看起来有些恍惚的女孩。
+      - speaker: ""
+        text: 她突然转向你。
+
+  # 阿棠对话
+  C2Z5_ATANG_TALK:
+    id: C2Z5_ATANG_TALK
+    lines:
+      - speaker: 阿棠
+        text: 你今天看起来像昨天。
+      - speaker: 岑回
+        text: ……什么？
+      - speaker: 阿棠
+        text: 你别去边缘断口……那里以后会坏掉。
+      - speaker: 岑回
+        text: "以后"？
+      - speaker: 阿棠
+        text: 我不是在猜。我记得。
+    choices:
+      - id: ask_know
+        text: 你认识我？
+        nextDialogueId: C2Z5_ATANG_KNOW
+      - id: ask_yesterday
+        text: 你说的"昨天"是哪一天？
+        nextDialogueId: C2Z5_ATANG_YESTERDAY
+      - id: dismiss
+        text: 别乱说
+        nextDialogueId: C2Z5_ATANG_DISMISS
+
+  # 你认识我
+  C2Z5_ATANG_KNOW:
+    id: C2Z5_ATANG_KNOW
+    lines:
+      - speaker: 阿棠
+        text: 你也不确定，对吧？
+      - speaker: ""
+        text: （她没有解释更多）
+      - speaker: 岑回
+        text: ……
+
+  # 哪一天
+  C2Z5_ATANG_YESTERDAY:
+    id: C2Z5_ATANG_YESTERDAY
+    lines:
+      - speaker: 阿棠
+        text: 你也不确定，对吧？
+      - speaker: 阿棠
+        text: 我们可能都不确定。
+      - speaker: 岑回
+        text: ……
+    effects:
+      rDelta: 1
+
+  # 别乱说
+  C2Z5_ATANG_DISMISS:
+    id: C2Z5_ATANG_DISMISS
+    lines:
+      - speaker: 阿棠
+        text: 你也不确定，对吧？
+      - speaker: ""
+        text: （她转过头，不再说话）
+
+  # 阿棠的纸条
+  C2Z5_ATANG_NOTE:
+    id: C2Z5_ATANG_NOTE
+    lines:
+      - speaker: ""
+        text: 地上掉落一张纸条。
+      - speaker: ""
+        text: 看起来是阿棠的字迹。
+      - speaker: ""
+        text: 上面写着：
+      - speaker: ""
+        text: "有人把今天折了一下。"
+      - speaker: ""
+        text: "我捡到了一次重复。"
+      - speaker: 岑回
+        text: ……这是什么意思？
+    onComplete:
+      - type: card
+        cardId: CARD_C2_FRAGMENT_DIARY_01
+
+  # 许澄诊室
+  C2Z5_XUCHENG_DOOR:
+    id: C2Z5_XUCHENG_DOOR
+    lines:
+      - speaker: ""
+        text: 诊室门开了，许澄走出来。
+      - speaker: 许澄
+        text: 她的叙述会让你焦虑。
+      - speaker: 岑回
+        text: 她说的……是真的吗？
+      - speaker: 许澄
+        text: 你只需要把今天过完。
+      - speaker: 许澄
+        text: 不一致不一定是危险，危险的是你把它当成真相。
+      - speaker: 岑回
+        text: ……
+      - speaker: ""
+        text: 你听见了一个不该提前出现的句子。
+

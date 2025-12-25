@@ -1,0 +1,738 @@
+# 重返变体对话数据
+dialogues:
+  # ============ RV-01 宿舍走廊 ============
+  RV01_BULLETIN:
+    id: RV01_BULLETIN
+    lines:
+      - speaker: ""
+        text: 公告板上的内容和以前一样。
+      - speaker: ""
+        text: 但深度感知下，你注意到了以前没看到的东西……
+
+  RV01_GRAFFITI:
+    id: RV01_GRAFFITI
+    lines:
+      - speaker: ""
+        text: 隐藏涂鸦（深度感知可见）：
+      - speaker: ""
+        text: "我们曾在这里"
+      - speaker: ""
+        text: "——在成为不存在之前"
+      - speaker: 岑回
+        text: （这是谁写的……？）
+    onComplete:
+      - type: card
+        cardId: CARD_RV_GRAFFITI
+
+  RV01_ID_CARD:
+    id: RV01_ID_CARD
+    lines:
+      - speaker: ""
+        text: 身份卡还在原来的位置。
+      - speaker: ""
+        text: 但现在你能看到更多细节……
+
+  RV01_FOOTPRINTS:
+    id: RV01_FOOTPRINTS
+    lines:
+      - speaker: ""
+        text: 脚印痕迹（深度感知可见）。
+      - speaker: ""
+        text: 指向一个……消失的房间入口？
+      - speaker: ""
+        text: 该入口在普通视野中是墙面。
+      - speaker: 岑回
+        text: （这里曾经有一扇门……）
+
+  RV01_VANISHED_DOOR:
+    id: RV01_VANISHED_DOOR
+    lines:
+      - speaker: ""
+        text: 这里是一面墙。
+      - speaker: ""
+        text: 但深度感知显示……这里曾经是一扇门。
+      - speaker: ""
+        text: 门后面住着谁？
+      - speaker: ""
+        text: 为什么门不见了？
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F04
+        foreshadowStage: deepen
+
+  # ============ RV-02 早餐小店 ============
+  RV02_OLD_SIGN:
+    id: RV02_OLD_SIGN
+    lines:
+      - speaker: ""
+        text: 旧招牌叠影（深度感知可见）：
+      - speaker: ""
+        text: "张记老面馆"
+      - speaker: ""
+        text: 店主换了三次，但墙记得第一任。
+    onComplete:
+      - type: card
+        cardId: CARD_RV_OLD_SIGN
+
+  RV02_OLD_PHOTO:
+    id: RV02_OLD_PHOTO
+    lines:
+      - speaker: ""
+        text: 旧照片（深度感知可见）。
+      - speaker: ""
+        text: 照片中有两个人。
+      - speaker: ""
+        text: 一个是年轻的店主。
+      - speaker: ""
+        text: 一个……面容被涂抹。
+      - speaker: 岑回
+        text: （被涂抹的人是谁……？）
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F08
+        foreshadowStage: deepen
+
+  RV02_SHOPKEEPER:
+    id: RV02_SHOPKEEPER
+    lines:
+      - speaker: ""
+        text: 店主不在。
+      - speaker: ""
+        text: 但你感觉到……这个位置曾经站过很多人。
+
+  # ============ RV-03 薄墙巷口 ============
+  RV03_TIMELINE:
+    id: RV03_TIMELINE
+    lines:
+      - speaker: ""
+        text: 时间线显示：
+      - speaker: ""
+        text: T1: 薄墙完整
+      - speaker: ""
+        text: T2: 薄墙开裂
+      - speaker: ""
+        text: NOW: 薄墙有补丁
+
+  RV03_THIN_WALL:
+    id: RV03_THIN_WALL
+    lines:
+      - speaker: ""
+        text: 薄墙（三态叠影）。
+      - speaker: ""
+        text: 过去、现在、潜在状态同时显示。
+      - speaker: ""
+        text: 你可以选择回溯到哪个时间点。
+
+  RV03_REWIND_CHOICE:
+    id: RV03_REWIND_CHOICE
+    lines:
+      - speaker: ""
+        text: 回溯到哪个时间点？
+    choices:
+      - id: rewind_t1
+        text: T1（薄墙完整）
+        nextDialogueId: RV03_REWIND_T1
+      - id: rewind_t2
+        text: T2（薄墙开裂）
+        nextDialogueId: RV03_REWIND_T2
+      - id: no_rewind
+        text: 不回溯
+        nextDialogueId: RV03_NO_REWIND
+
+  RV03_REWIND_T1:
+    id: RV03_REWIND_T1
+    lines:
+      - speaker: ""
+        text: 你回溯到T1……
+      - speaker: ""
+        text: 薄墙恢复完整状态。
+      - speaker: ""
+        text: 新的对话选项出现。
+      - speaker: ""
+        text: 但你留下了"回溯污染"标记。
+    onComplete:
+      - type: card
+        cardId: CARD_RV_REWIND
+
+  RV03_REWIND_T2:
+    id: RV03_REWIND_T2
+    lines:
+      - speaker: ""
+        text: 你回溯到T2……
+      - speaker: ""
+        text: 薄墙开裂，你可以从裂缝窥视另一侧。
+      - speaker: ""
+        text: 你发现了隐藏信息……
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F03
+        foreshadowStage: deepen
+
+  RV03_NO_REWIND:
+    id: RV03_NO_REWIND
+    lines:
+      - speaker: ""
+        text: 你选择不回溯。
+      - speaker: ""
+        text: 保持现状。
+      - speaker: ""
+        text: 获得"观察者"标记。
+
+  # ============ RV-04 维修局 ============
+  RV04_CABINET:
+    id: RV04_CABINET
+    lines:
+      - speaker: ""
+        text: 档案柜（可移动）。
+      - speaker: ""
+        text: 深度介入可以移动它……
+      - speaker: ""
+        text: 但移动会留下伤痕。
+
+  RV04_HIDDEN_PASSAGE:
+    id: RV04_HIDDEN_PASSAGE
+    lines:
+      - speaker: ""
+        text: 隐藏通道入口！
+      - speaker: ""
+        text: 被档案柜挡了不知多久……
+      - speaker: ""
+        text: 通道通往哪里？
+    onComplete:
+      - type: card
+        cardId: CARD_RV_PASSAGE
+
+  RV04_INTERVENE:
+    id: RV04_INTERVENE
+    lines:
+      - speaker: ""
+        text: 深度介入：移动档案柜？
+      - speaker: ""
+        text: ⚠️ 介入会留下伤痕
+    choices:
+      - id: move
+        text: 移动
+        nextDialogueId: RV04_MOVE
+      - id: dont_move
+        text: 不动
+        nextDialogueId: RV04_CANCEL
+
+  RV04_MOVE:
+    id: RV04_MOVE
+    lines:
+      - speaker: ""
+        text: 你移动了档案柜……
+      - speaker: ""
+        text: 伤痕留下。
+      - speaker: ""
+        text: 但隐藏通道显露了。
+    onComplete:
+      - type: flag
+        flagName: FLAG_RV04_CABINET_MOVED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_RV04_INTERVENED
+        flagValue: true
+
+  RV04_CANCEL:
+    id: RV04_CANCEL
+    lines:
+      - speaker: 岑回
+        text: （还是不动了……）
+
+  # ============ RV-05 折叠楼梯间 ============
+  RV05_FLOOR_1:
+    id: RV05_FLOOR_1
+    lines:
+      - speaker: ""
+        text: 1F楼层。
+      - speaker: ""
+        text: 深度感知显示……存在一个0.5F！
+      - speaker: 岑回
+        text: （0.5层？这是什么意思……）
+    onComplete:
+      - type: flag
+        flagName: FLAG_RV05_HALF_FOUND
+        flagValue: true
+
+  RV05_FLOOR_HALF:
+    id: RV05_FLOOR_HALF
+    lines:
+      - speaker: ""
+        text: 0.5F（隐藏层）。
+      - speaker: ""
+        text: 深度介入可以展开通往这里的路……
+
+  RV05_COMBO:
+    id: RV05_COMBO
+    lines:
+      - speaker: ""
+        text: 组合操作：
+      - speaker: ""
+        text: 深度感知：发现0.5F存在
+      - speaker: ""
+        text: 深度介入：展开通往0.5F的路
+    choices:
+      - id: execute
+        text: 执行
+        nextDialogueId: RV05_EXECUTE
+      - id: cancel
+        text: 取消
+        nextDialogueId: RV05_CANCEL
+
+  RV05_EXECUTE:
+    id: RV05_EXECUTE
+    lines:
+      - speaker: ""
+        text: 你展开了通往0.5F的路……
+      - speaker: ""
+        text: 一个被遗忘的空间显现。
+    onComplete:
+      - type: card
+        cardId: CARD_RV_HALF_FLOOR
+      - type: foreshadow
+        foreshadowId: F05
+        foreshadowStage: deepen
+
+  RV05_CANCEL:
+    id: RV05_CANCEL
+    lines:
+      - speaker: 岑回
+        text: （算了……）
+
+  # ============ RV-06 版本交界处 ============
+  RV06_ABILITIES:
+    id: RV06_ABILITIES
+    lines:
+      - speaker: ""
+        text: 三能力激活中：
+      - speaker: ""
+        text: ● 深度感知  ● 深度介入  ● 时间干预
+
+  RV06_PERCEPTION:
+    id: RV06_PERCEPTION
+    lines:
+      - speaker: ""
+        text: 感知层：版本差异高亮。
+      - speaker: ""
+        text: V-A（红色）与 V-B（蓝色）的差异清晰可见。
+
+  RV06_INTERVENTION:
+    id: RV06_INTERVENTION
+    lines:
+      - speaker: ""
+        text: 介入层：结构可修改点。
+      - speaker: ""
+        text: 某些结构可以被改变……
+
+  RV06_TIME:
+    id: RV06_TIME
+    lines:
+      - speaker: ""
+        text: 时间层：时间线节点。
+      - speaker: ""
+        text: T-2 ── T-1 ── NOW
+
+  RV06_COMBO:
+    id: RV06_COMBO
+    lines:
+      - speaker: ""
+        text: 复合操作：
+      - speaker: ""
+        text: 回溯到T-1 → 介入修改V-A → 返回NOW查看结果
+    choices:
+      - id: execute_combo
+        text: 执行复合操作
+        nextDialogueId: RV06_EXECUTE
+      - id: cancel
+        text: 取消
+        nextDialogueId: RV06_CANCEL
+
+  RV06_EXECUTE:
+    id: RV06_EXECUTE
+    lines:
+      - speaker: ""
+        text: 你执行了复合操作……
+      - speaker: ""
+        text: 时间回溯……结构介入……返回当下……
+      - speaker: ""
+        text: 版本冲突的部分差异被修正了。
+    onComplete:
+      - type: card
+        cardId: CARD_RV_COMBO
+
+  RV06_CANCEL:
+    id: RV06_CANCEL
+    lines:
+      - speaker: 岑回
+        text: （还是观察就好……）
+
+  # ============ RV-07 漂移者居所 ============
+  RV07_OLD_ITEMS:
+    id: RV07_OLD_ITEMS
+    lines:
+      - speaker: ""
+        text: 阿棠的旧物（深度感知可见）。
+      - speaker: ""
+        text: 这些东西……不属于"阿棠"。
+      - speaker: ""
+        text: 它们属于"阿棠的前身"。
+    onComplete:
+      - type: card
+        cardId: CARD_RV_ATANG_PAST
+
+  RV07_MEMORY:
+    id: RV07_MEMORY
+    lines:
+      - speaker: ""
+        text: 记忆碎片。
+      - speaker: ""
+        text: 模糊的画面……另一个身份……
+      - speaker: ""
+        text: 阿棠曾经是谁？
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F04
+        foreshadowStage: collect
+
+  RV07_DRIFT_TRACE:
+    id: RV07_DRIFT_TRACE
+    lines:
+      - speaker: ""
+        text: 漂移痕迹。
+      - speaker: ""
+        text: 这里记录了每一次"对不上"的时刻……
+
+  # ============ RV-08 时间回溯点 ============
+  RV08_TIMELINE:
+    id: RV08_TIMELINE
+    lines:
+      - speaker: ""
+        text: 主时间线。
+      - speaker: ""
+        text: 三个关键节点可以回溯。
+
+  RV08_NODE_T1:
+    id: RV08_NODE_T1
+    lines:
+      - speaker: ""
+        text: 节点T1：事件起点。
+      - speaker: ""
+        text: 回溯这里可以看到事情的开始……
+
+  RV08_NODE_T2:
+    id: RV08_NODE_T2
+    lines:
+      - speaker: ""
+        text: 节点T2：关键转折。
+      - speaker: ""
+        text: 回溯这里可以改变某些选择……
+
+  RV08_REWIND_CONTROL:
+    id: RV08_REWIND_CONTROL
+    lines:
+      - speaker: ""
+        text: 回溯控制。
+      - speaker: ""
+        text: 选择要回溯的节点。
+      - speaker: ""
+        text: ⚠️ 回溯会增加污染
+    choices:
+      - id: rewind_t1
+        text: 回溯T1
+        nextDialogueId: RV08_DO_REWIND
+      - id: rewind_t2
+        text: 回溯T2
+        nextDialogueId: RV08_DO_REWIND
+      - id: no_rewind
+        text: 不回溯
+        nextDialogueId: RV08_CANCEL
+
+  RV08_DO_REWIND:
+    id: RV08_DO_REWIND
+    lines:
+      - speaker: ""
+        text: 时间回溯中……
+      - speaker: ""
+        text: 污染增加。
+      - speaker: ""
+        text: 但你看到了更多……
+    onComplete:
+      - type: flag
+        flagName: FLAG_RV08_REWOUND
+        flagValue: true
+      - type: card
+        cardId: CARD_RV_TIME_REWIND
+
+  RV08_CANCEL:
+    id: RV08_CANCEL
+    lines:
+      - speaker: 岑回
+        text: （观察就好……）
+
+  # ============ RV-09 祈言堂 ============
+  RV09_RUNES:
+    id: RV09_RUNES
+    lines:
+      - speaker: ""
+        text: 隐藏符文（深度感知可见）。
+      - speaker: ""
+        text: 这些符文……不是牧平写的。
+      - speaker: ""
+        text: 它们更古老。
+    onComplete:
+      - type: card
+        cardId: CARD_RV_RUNES
+
+  RV09_SECRET:
+    id: RV09_SECRET
+    lines:
+      - speaker: ""
+        text: 秘密痕迹。
+      - speaker: ""
+        text: 牧平的真实身份……
+      - speaker: ""
+        text: 他不只是一个"平面信徒"。
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F05
+        foreshadowStage: collect
+
+  RV09_PROPHECY:
+    id: RV09_PROPHECY
+    lines:
+      - speaker: ""
+        text: 预言来源。
+      - speaker: ""
+        text: 牧平的预言不是他自己写的……
+      - speaker: ""
+        text: 他只是"抄录者"。
+
+  # ============ RV-10 档案巷 ============
+  RV10_ARCHIVE_A:
+    id: RV10_ARCHIVE_A
+    lines:
+      - speaker: ""
+        text: 档案架A。
+      - speaker: ""
+        text: 深度介入可以重新排列它……
+
+  RV10_ARCHIVE_B:
+    id: RV10_ARCHIVE_B
+    lines:
+      - speaker: ""
+        text: 档案架B。
+      - speaker: ""
+        text: 里面的档案有些不对劲……
+
+  RV10_HIDDEN:
+    id: RV10_HIDDEN
+    lines:
+      - speaker: ""
+        text: 隐藏档案！
+      - speaker: ""
+        text: 这份档案被故意藏起来……
+      - speaker: ""
+        text: 里面记录了什么？
+    onComplete:
+      - type: card
+        cardId: CARD_RV_HIDDEN_ARCHIVE
+
+  RV10_INTERVENE:
+    id: RV10_INTERVENE
+    lines:
+      - speaker: ""
+        text: 深度介入：重新排列档案架？
+    choices:
+      - id: rearrange
+        text: 重新排列
+        nextDialogueId: RV10_REARRANGE
+      - id: cancel
+        text: 不动
+        nextDialogueId: RV10_CANCEL
+
+  RV10_REARRANGE:
+    id: RV10_REARRANGE
+    lines:
+      - speaker: ""
+        text: 你重新排列了档案架……
+      - speaker: ""
+        text: 隐藏档案显露。
+    onComplete:
+      - type: flag
+        flagName: FLAG_RV10_MOVED
+        flagValue: true
+
+  RV10_CANCEL:
+    id: RV10_CANCEL
+    lines:
+      - speaker: 岑回
+        text: （保持原样……）
+
+  # ============ RV-11 冲突点 ============
+  RV11_ABILITIES:
+    id: RV11_ABILITIES
+    lines:
+      - speaker: ""
+        text: 三能力全部激活。
+      - speaker: ""
+        text: 版本冲突的真相即将揭示……
+
+  RV11_CORE:
+    id: RV11_CORE
+    lines:
+      - speaker: ""
+        text: 冲突核心。
+      - speaker: ""
+        text: 两个版本的差异在这里最为明显……
+
+  RV11_TRUTH_A:
+    id: RV11_TRUTH_A
+    lines:
+      - speaker: ""
+        text: 版本A的真相：
+      - speaker: ""
+        text: 这个版本被"更正"过多次……
+      - speaker: ""
+        text: 每一次更正都留下了痕迹。
+
+  RV11_TRUTH_B:
+    id: RV11_TRUTH_B
+    lines:
+      - speaker: ""
+        text: 版本B的真相：
+      - speaker: ""
+        text: 这个版本保留了更多"原始信息"……
+      - speaker: ""
+        text: 但代价是"不可收敛"。
+
+  RV11_TIMELINE:
+    id: RV11_TIMELINE
+    lines:
+      - speaker: ""
+        text: 时间线：冲突起源。
+      - speaker: ""
+        text: 冲突发生在某一次"强制更正"之后……
+
+  RV11_RESOLVE:
+    id: RV11_RESOLVE
+    lines:
+      - speaker: ""
+        text: 复合解决：
+      - speaker: ""
+        text: 你可以尝试"和解"两个版本……
+      - speaker: ""
+        text: 但这需要付出代价。
+    choices:
+      - id: resolve
+        text: 尝试和解
+        nextDialogueId: RV11_DO_RESOLVE
+      - id: cancel
+        text: 不干预
+        nextDialogueId: RV11_CANCEL
+
+  RV11_DO_RESOLVE:
+    id: RV11_DO_RESOLVE
+    lines:
+      - speaker: ""
+        text: 你尝试和解两个版本……
+      - speaker: ""
+        text: 冲突没有完全消除，但烈度降低了。
+      - speaker: ""
+        text: 你留下了"和解者"标记。
+    onComplete:
+      - type: card
+        cardId: CARD_RV_RESOLVE
+
+  RV11_CANCEL:
+    id: RV11_CANCEL
+    lines:
+      - speaker: 岑回
+        text: （让冲突保持原样……）
+
+  # ============ RV-12 陈匠灯塔 ============
+  RV12_TIMELINE:
+    id: RV12_TIMELINE
+    lines:
+      - speaker: ""
+        text: 灯塔时间线：
+      - speaker: ""
+        text: 过去：辉煌（灯塔是城市的标志）
+      - speaker: ""
+        text: 现在：破败（灯塔被遗忘）
+      - speaker: ""
+        text: 潜在：……（取决于你的选择）
+
+  RV12_LIGHTHOUSE:
+    id: RV12_LIGHTHOUSE
+    lines:
+      - speaker: ""
+        text: 灯塔（三态叠影）。
+      - speaker: ""
+        text: 过去、现在、潜在状态同时可见。
+      - speaker: ""
+        text: 陈匠一直守在这里……
+
+  RV12_PERSISTENCE:
+    id: RV12_PERSISTENCE
+    lines:
+      - speaker: ""
+        text: 陈匠的坚守（深度感知揭示）：
+      - speaker: ""
+        text: 他知道灯塔"不存在于记录中"。
+      - speaker: ""
+        text: 但他仍然每天点灯。
+      - speaker: ""
+        text: "对象不存在，但行为继续。"
+    onComplete:
+      - type: card
+        cardId: CARD_RV_PERSISTENCE
+      - type: foreshadow
+        foreshadowId: F06
+        foreshadowStage: collect
+
+  RV12_REWIND:
+    id: RV12_REWIND
+    lines:
+      - speaker: ""
+        text: 回溯选项：
+      - speaker: ""
+        text: 你可以回溯到灯塔辉煌的时代……
+      - speaker: ""
+        text: 看看它曾经是什么样子。
+    choices:
+      - id: rewind_past
+        text: 回溯到过去
+        nextDialogueId: RV12_PAST
+      - id: no_rewind
+        text: 保持现在
+        nextDialogueId: RV12_STAY
+
+  RV12_PAST:
+    id: RV12_PAST
+    lines:
+      - speaker: ""
+        text: 你回溯到灯塔辉煌的时代……
+      - speaker: ""
+        text: 灯塔高耸，灯火明亮。
+      - speaker: ""
+        text: 人们仰望它，把它当作方向。
+      - speaker: ""
+        text: 然后……
+      - speaker: ""
+        text: 某一天，它被"更正"了。
+      - speaker: ""
+        text: 从记录中消失。
+      - speaker: ""
+        text: 但陈匠记得。
+
+  RV12_STAY:
+    id: RV12_STAY
+    lines:
+      - speaker: ""
+        text: 你选择保持现在。
+      - speaker: ""
+        text: 灯塔依然破败，但灯依然亮着。
+      - speaker: 岑回
+        text: （这就是陈匠的坚守……）
+

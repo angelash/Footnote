@@ -1,0 +1,139 @@
+# C4-Z8 市政环：顾临的限制
+# 权限收紧
+id: C4-Z8
+title: 市政走廊
+background:
+  texture: bg_server_room
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 顾临
+  - id: gulin
+    type: image
+    texture: portrait_gulin_displeased
+    x: 450
+    y: 380
+    scale: 0.45
+    depth: 12
+    label: 顾临
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: gulin
+      action:
+        type: dialogue
+        dialogueId: C4Z8_GULIN_RESTRICTION
+
+  # 市政走廊装饰
+  - id: corridor_pillar_1
+    type: image
+    texture: px_tiles_platform
+    x: 200
+    y: 400
+    scale: 1.0
+    depth: 7
+    alpha: 0.6
+
+  - id: corridor_pillar_2
+    type: image
+    texture: px_tiles_platform
+    x: 550
+    y: 400
+    scale: 1.0
+    depth: 7
+    alpha: 0.6
+
+  # 权限面板
+  - id: permission_panel
+    type: image
+    texture: obj_monitor
+    x: 300
+    y: 450
+    scale: 0.6
+    depth: 10
+    label: 权限面板
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_C4Z8_GULIN_SPOKE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z8_PERMISSION_PANEL
+
+  # 介入测试点（变灰演示）
+  - id: intervention_test
+    type: zone
+    x: 400
+    y: 520
+    width: 100
+    height: 80
+    depth: 15
+    depthSenseTarget: true
+    label: 【介入】(待审)
+    condition:
+      flagTrue: FLAG_C4Z8_SHOW_RESTRICTED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z8_INTERVENTION_DISABLED
+
+  # 市政职员
+  - id: clerk
+    type: image
+    texture: portrait_chenjiang_neutral
+    x: 180
+    y: 480
+    scale: 0.3
+    depth: 11
+    alpha: 0.7
+
+  # 离开点
+  - id: exit_point
+    type: zone
+    x: 375
+    y: 250
+    width: 150
+    height: 80
+    label: 离开
+    condition:
+      flagTrue: FLAG_INTERVENTION_RESTRICTED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C4Z8_EXIT
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C4-Z7
+
+  # 前往第5章
+  - id: exit_to_c5
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 继续前进
+    condition:
+      flag: FLAG_C4_COMPLETE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z1
+

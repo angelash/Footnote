@@ -1,0 +1,132 @@
+# CF-Z1 模型边界：冗余字段区
+# F22正式落地 - 冗余字段条不可关闭
+id: CF-Z1
+title: 冗余字段区
+background:
+  texture: bg_collapse
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 覆盖区入口
+  - id: audit_entrance
+    type: zone
+    x: 375
+    y: 350
+    width: 200
+    height: 100
+    depth: 10
+    label: 进入冗余字段区
+    interactive:
+      cursor: true
+      testid: audit-entrance
+      action:
+        type: dialogue
+        dialogueId: CFZ1_ENTER
+
+  # 异常点A：空白字段
+  - id: anomaly_a
+    type: image
+    texture: px_fx_field_accept
+    x: 250
+    y: 420
+    scale: 0.6
+    depth: 9
+    label: 空白字段
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_CFZ1_ENTERED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ1_ANOMALY_A
+
+  # 异常点B：重复事件
+  - id: anomaly_b
+    type: image
+    texture: px_fx_glitch
+    x: 400
+    y: 450
+    scale: 0.5
+    depth: 9
+    alpha: 0.8
+    label: 重复事件
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_CFZ1_A_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ1_ANOMALY_B
+
+  # 异常点C：无收益残差
+  - id: anomaly_c
+    type: image
+    texture: px_fx_scar
+    x: 520
+    y: 400
+    scale: 0.7
+    depth: 9
+    alpha: 0.6
+    label: 无收益残差
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_CFZ1_B_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ1_ANOMALY_C
+
+  # 时间堆栈异化提示
+  - id: time_stack_hint
+    type: zone
+    x: 680
+    y: 650
+    width: 100
+    height: 60
+    depth: 20
+    label: 时间堆栈
+    condition:
+      flagTrue: FLAG_CFZ1_ENTERED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: CFZ1_TIME_STACK
+
+  # 出口门
+  - id: exit_door
+    type: image
+    texture: obj_door
+    x: 375
+    y: 250
+    scale: 0.7
+    depth: 10
+    label: 出口
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_CFZ1_ALL_DONE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: CF-Z2
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C5-Z7
+

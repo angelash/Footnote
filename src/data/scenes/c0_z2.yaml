@@ -1,0 +1,101 @@
+# C0-Z2 早餐小店
+# 无收益选择第一次出现
+id: C0-Z2
+title: 早餐小店
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 菜单板
+  - id: menu_board
+    type: image
+    texture: px_item_archive
+    x: 200
+    y: 350
+    scale: 0.6
+    depth: 10
+    label: 菜单板
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: menu-board
+      action:
+        type: dialogue
+        dialogueId: C0Z2_MENU
+
+  # 座位A（靠窗）- 固定套餐
+  - id: seat_window
+    type: image
+    texture: px_item_healing
+    x: 180
+    y: 600
+    scale: 0.5
+    depth: 8
+    label: 靠窗座位
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: seat-window
+      action:
+        type: dialogue
+        dialogueId: C0Z2_SEAT_WINDOW
+
+  # 座位B（角落）- 今日特别
+  - id: seat_corner
+    type: image
+    texture: px_item_healing
+    x: 550
+    y: 620
+    scale: 0.5
+    depth: 8
+    label: 角落座位
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: seat-corner
+      action:
+        type: dialogue
+        dialogueId: C0Z2_SEAT_CORNER
+
+  # 店主位置（使用通用占位符）
+  - id: shopkeeper
+    type: image
+    texture: placeholder_char
+    x: 380
+    y: 400
+    scale: 1.2
+    depth: 12
+    tint: 0xAAAA88
+
+  # 栖蓝路过位置（触发区域）
+  - id: qilan_trigger
+    type: zone
+    x: 600
+    y: 700
+    width: 150
+    height: 200
+    trigger:
+      type: once
+      action:
+        type: dialogue
+        dialogueId: C0Z2_QILAN_PASSBY
+
+  # 出口
+  - id: exit_door
+    type: image
+    texture: px_item_door
+    x: 375
+    y: 200
+    scale: 0.6
+    depth: 5
+    label: 出口
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C0-Z3
+

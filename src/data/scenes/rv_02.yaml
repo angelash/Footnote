@@ -1,0 +1,96 @@
+# RV-02 C0-Z2 重返：早餐小店
+# 深度感知变体 - 旧招牌叠影与旧照片
+id: RV-02
+title: 早餐小店 [深度感知]
+background:
+  texture: bg_c0z2
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+  tint: 0xccbbff
+objects:
+  # 现招牌
+  - id: current_sign
+    type: image
+    texture: obj_sign
+    x: 375
+    y: 280
+    scale: 0.7
+    depth: 10
+    label: 早餐小店
+    labelOffset: [0, 70]
+
+  # 旧招牌叠影（深度感知可见）
+  - id: old_sign
+    type: image
+    texture: obj_sign
+    x: 375
+    y: 300
+    scale: 0.65
+    depth: 9
+    alpha: 0.4
+    label: 旧招牌叠影
+    labelOffset: [0, 65]
+    interactive:
+      cursor: true
+      testid: old-sign
+      action:
+        type: dialogue
+        dialogueId: RV02_OLD_SIGN
+
+  # 柜台
+  - id: counter
+    type: image
+    texture: obj_desk
+    x: 375
+    y: 450
+    scale: 0.8
+    depth: 10
+
+  # 旧照片轮廓（深度感知可见）
+  - id: old_photo
+    type: image
+    texture: px_item_archive
+    x: 450
+    y: 420
+    scale: 0.4
+    depth: 11
+    alpha: 0.6
+    label: 旧照片轮廓
+    labelOffset: [0, 50]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV02_OLD_PHOTO
+
+  # 店主位置
+  - id: shopkeeper_spot
+    type: zone
+    x: 300
+    y: 400
+    width: 100
+    height: 100
+    depth: 12
+    label: 店主位置
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: RV02_SHOPKEEPER
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C0-Z2
+

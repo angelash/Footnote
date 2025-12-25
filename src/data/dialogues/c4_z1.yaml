@@ -1,0 +1,86 @@
+# C4-Z1 坍塌后的生活区对话数据
+dialogues:
+  # 封锁胶带
+  C4Z1_BARRIER_TAPE:
+    id: C4Z1_BARRIER_TAPE
+    lines:
+      - speaker: ""
+        text: 封锁胶带上有日期标注。
+      - speaker: ""
+        text: 但仔细看……日期似乎被涂改过。
+      - speaker: 岑回
+        text: 这封锁线是昨天拉的，还是前天？
+      - speaker: ""
+        text: （答案似乎不止一个）
+
+  # 塌墙
+  C4Z1_COLLAPSED_WALL:
+    id: C4Z1_COLLAPSED_WALL
+    lines:
+      - speaker: ""
+        text: 墙角半塌，留下不规则的缺口。
+      - speaker: ""
+        text: 在深度视野下，可以看到骨架缺口呈现"被折过的线条"。
+      - speaker: 岑回
+        text: 这种形状……像是补丁痕迹。
+      - speaker: ""
+        text: （与后续回溯留下的痕迹相似）
+
+  # 住户争执
+  C4Z1_RESIDENT_DISPUTE:
+    id: C4Z1_RESIDENT_DISPUTE
+    lines:
+      - speaker: 住户A
+        text: 昨天你来过。
+      - speaker: 住户B
+        text: 他昨天根本没出现。
+      - speaker: 住户A
+        text: 我明明看到了！
+      - speaker: 住户B
+        text: 昨天封锁线都没拉，他怎么可能进来？
+      - speaker: 岑回
+        text: ……
+      - speaker: ""
+        text: （他们说的是同一天吗？）
+
+  # 帮助住户
+  C4Z1_HELP_RESIDENT:
+    id: C4Z1_HELP_RESIDENT
+    lines:
+      - speaker: ""
+        text: 散落的物品——衣服、碗碟、一些旧照片。
+      - speaker: 住户A
+        text: ……你能帮我收拾一下吗？
+    choices:
+      - id: help_tidy
+        text: 帮忙归整
+        effects:
+          rDelta: 1
+          setFlag:
+            name: FLAG_HELPED_RESIDENT
+            value: true
+        nextDialogueId: C4Z1_HELP_DONE
+      - id: no_time
+        text: 我还有任务
+        nextDialogueId: C4Z1_NO_HELP
+
+  # 帮忙完成
+  C4Z1_HELP_DONE:
+    id: C4Z1_HELP_DONE
+    lines:
+      - speaker: ""
+        text: 你帮住户把散落的东西归整好。
+      - speaker: 住户A
+        text: 谢谢……
+      - speaker: ""
+        text: （没有奖励，但你做了。）
+
+  # 没有帮忙
+  C4Z1_NO_HELP:
+    id: C4Z1_NO_HELP
+    lines:
+      - speaker: 岑回
+        text: 抱歉，我还有任务。
+      - speaker: 住户A
+        text: ……没关系。
+

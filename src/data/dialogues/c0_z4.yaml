@@ -1,0 +1,145 @@
+# C0-Z4 维修局前台对话数据
+dialogues:
+  # 前台接待
+  C0Z4_RECEPTION:
+    id: C0Z4_RECEPTION
+    lines:
+      - speaker: 前台职员
+        text: 外勤报到？
+      - speaker: 岑回
+        text: 是的。来领任务单。
+      - speaker: 前台职员
+        text: 今天路线按既定走。任务单在任务板上。
+      - speaker: 前台职员
+        text: 顾主管有话要说，去门口等一下。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C0Z4_CHECKED_IN
+        flagValue: true
+
+  # 任务板
+  C0Z4_TASKBOARD:
+    id: C0Z4_TASKBOARD
+    lines:
+      - speaker: 岑回
+        text: （查看任务板……）
+      - speaker: ""
+        text: |
+          巡检任务单
+          路线：既定路线A
+          要求：标注异常，无需处理
+      - speaker: 岑回
+        text: （路线A下方有一行小字闪过）
+      - speaker: ""
+        text: 版本：A-1（更正）
+        delay: 200
+      - speaker: 岑回
+        text: ……又是"更正"。
+    onComplete:
+      - type: card
+        cardId: CARD_C0_TASK_SHEET
+      - type: foreshadow
+        foreshadowId: F03
+        foreshadowStage: deepen
+
+  # 顾临对话
+  C0Z4_GULIN_TALK:
+    id: C0Z4_GULIN_TALK
+    lines:
+      - speaker: 顾临
+        text: 今天路线按既定走。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 能用流程解决的，就别用例外。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 城市不需要更多复杂度。
+        portrait: gulin_neutral
+    choices:
+      - id: response_obey
+        text: 明白。
+        nextDialogueId: C0Z4_GULIN_OBEY
+      - id: response_date
+        text: 昨晚公告板日期不对。
+        condition:
+          flagTrue: FLAG_SEEN_NOTICE
+        nextDialogueId: C0Z4_GULIN_DATE
+      - id: response_wall
+        text: 我听到墙里是空的。
+        condition:
+          flagTrue: FLAG_HEARD_WALL_ECHO
+        nextDialogueId: C0Z4_GULIN_WALL
+
+  # 顾临回应 - 顺从
+  C0Z4_GULIN_OBEY:
+    id: C0Z4_GULIN_OBEY
+    lines:
+      - speaker: 顾临
+        text: 嗯。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 去吧。有问题记录在案，不要自己处理。
+        portrait: gulin_neutral
+    onComplete:
+      - type: flag
+        flagName: FLAG_C0_TASK_RECEIVED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C0_END
+        flagValue: true
+
+  # 顾临回应 - 日期问题
+  C0Z4_GULIN_DATE:
+    id: C0Z4_GULIN_DATE
+    lines:
+      - speaker: 顾临
+        text: 记录就好。
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: 别把主观当成事实。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 事实以记录为准。
+        portrait: gulin_neutral
+      - speaker: 岑回
+        text: ……明白了。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C0_TASK_RECEIVED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C0_END
+        flagValue: true
+      - type: flag
+        flagName: FLAG_QUESTIONED_DATE
+        flagValue: true
+
+  # 顾临回应 - 墙壁问题
+  C0Z4_GULIN_WALL:
+    id: C0Z4_GULIN_WALL
+    lines:
+      - speaker: 顾临
+        text: 听到？
+        portrait: gulin_surprised
+      - speaker: 顾临
+        text: 记录就好。
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: 感知异常和结构异常是两回事。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 系统判定正常，就是正常。
+        portrait: gulin_neutral
+      - speaker: 岑回
+        text: ……明白了。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C0_TASK_RECEIVED
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C0_END
+        flagValue: true
+      - type: flag
+        flagName: FLAG_QUESTIONED_WALL
+        flagValue: true
+

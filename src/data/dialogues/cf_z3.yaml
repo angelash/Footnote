@@ -1,0 +1,167 @@
+# CF-Z3 对视走廊对话数据
+dialogues:
+  # 进入
+  CFZ3_ENTER:
+    id: CFZ3_ENTER
+    lines:
+      - speaker: ""
+        text: 你进入对视走廊。
+      - speaker: ""
+        text: 系统不再给"建议"，只给"判定"：
+      - speaker: 系统
+        text: 收敛：失败。
+      - speaker: 系统
+        text: 解释：不足。
+      - speaker: 系统
+        text: 字段：待定义。
+      - speaker: ""
+        text: ——屏幕短暂黑了0.2秒——
+      - speaker: ""
+        text: 像"刷新抽象层级"。
+      - speaker: ""
+        text: 恢复后，场景仍是2D走廊，但UI细节变了：
+      - speaker: ""
+        text: 文字更短，更像标签。某些提示末尾出现刻度点◦
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ3_ENTERED
+        flagValue: true
+
+  # 格式区域1
+  CFZ3_FORMAT_1:
+    id: CFZ3_FORMAT_1
+    lines:
+      - speaker: ""
+        text: 格式坠落区域①。
+      - speaker: ""
+        text: UI语法变化：标签更短。
+      - speaker: ""
+        text: 「◦」
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ3_FORMAT_1_DONE
+        flagValue: true
+
+  # 格式区域2
+  CFZ3_FORMAT_2:
+    id: CFZ3_FORMAT_2
+    lines:
+      - speaker: ""
+        text: 格式坠落区域②。
+      - speaker: ""
+        text: UI语法变化：提示更原始。
+      - speaker: ""
+        text: 「◦◦」
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ3_FORMAT_2_DONE
+        flagValue: true
+
+  # 格式区域3
+  CFZ3_FORMAT_3:
+    id: CFZ3_FORMAT_3
+    lines:
+      - speaker: ""
+        text: 格式坠落区域③。
+      - speaker: ""
+        text: UI语法变化：像降到基础层。
+      - speaker: ""
+        text: 「◦◦◦」
+      - speaker: ""
+        text: （现在可以点击底部字段条）
+    onComplete:
+      - type: flag
+        flagName: FLAG_CFZ3_ALL_FORMAT_DONE
+        flagValue: true
+
+  # 字段定义（核心交互）
+  CFZ3_FIELD_DEFINE:
+    id: CFZ3_FIELD_DEFINE
+    lines:
+      - speaker: ""
+        text: 你点击字段条「字段：＿（待定义）」
+      - speaker: ""
+        text: 弹出"字段刻度板"：
+      - speaker: ""
+        text: 「＿ ＿ ＿ ＿ ＿」
+      - speaker: ""
+        text: 新增刻度将提高解释成本。
+    choices:
+      - id: add_point_1
+        text: 点击添加刻度点
+        nextDialogueId: CFZ3_ADD_POINT_1
+
+  # 添加刻度点1
+  CFZ3_ADD_POINT_1:
+    id: CFZ3_ADD_POINT_1
+    lines:
+      - speaker: ""
+        text: 你点击空位——
+      - speaker: ""
+        text: 出现「◦」
+      - speaker: ""
+        text: 但0.3秒后回弹消失……被系统纠正了。
+    choices:
+      - id: add_point_2
+        text: 再次点击
+        nextDialogueId: CFZ3_ADD_POINT_2
+
+  # 添加刻度点2
+  CFZ3_ADD_POINT_2:
+    id: CFZ3_ADD_POINT_2
+    lines:
+      - speaker: ""
+        text: 你再次点击——
+      - speaker: ""
+        text: 出现「◦◦」
+      - speaker: ""
+        text: 回弹只消一个，留下一个「◦」
+    choices:
+      - id: add_point_3
+        text: 第三次点击
+        nextDialogueId: CFZ3_ADD_POINT_3
+
+  # 添加刻度点3
+  CFZ3_ADD_POINT_3:
+    id: CFZ3_ADD_POINT_3
+    lines:
+      - speaker: ""
+        text: 你第三次点击——
+      - speaker: ""
+        text: 出现「◦◦◦」
+      - speaker: ""
+        text: 不再回弹。
+      - speaker: ""
+        text: ——屏幕极轻微震动——
+      - speaker: ""
+        text: 然后恢复平稳。
+      - speaker: 系统
+        text: 字段已接受。
+      - speaker: ""
+        text: 屏幕上方闪现一次更高层读写格式（0.6秒）：
+      - speaker: ""
+        text: 「观测：反向」
+      - speaker: ""
+        text: 「残差：结构化」
+      - speaker: ""
+        text: 「收敛：降阶」
+      - speaker: ""
+        text: 「结果：非最优解 允许」
+      - speaker: ""
+        text: 然后全部消失。
+      - speaker: ""
+        text: 走廊尽头那张纸条——原本会被抹掉——现在稳定存在。
+      - speaker: ""
+        text: 冗余字段条变为：「字段：◦◦◦」（永久）
+    onComplete:
+      - type: card
+        cardId: CARD_CF_FIELD_ACCEPTED
+      - type: flag
+        flagName: FLAG_FIELD_ACCEPTED
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F22
+        foreshadowStage: collect
+    effects:
+      pDelta: 1
+

@@ -1,0 +1,115 @@
+# C4-Z3 第一次必须回溯的事件对话数据
+dialogues:
+  # 阈值门
+  C4Z3_THRESHOLD_GATE:
+    id: C4Z3_THRESHOLD_GATE
+    lines:
+      - speaker: ""
+        text: 阈值门。必须通过这里。
+      - speaker: 岑回
+        text: 前面有警报系统……
+
+  # 警报线圈
+  C4Z3_ALARM_COIL:
+    id: C4Z3_ALARM_COIL
+    lines:
+      - speaker: ""
+        text: 你触碰了警报线圈——
+      - speaker: 系统
+        text: 警报已触发。倒计时开始。
+      - speaker: ""
+        text: （红色脉冲条开始闪烁）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z3_ALARM_TRIGGERED
+        flagValue: true
+
+  # 坍塌封死
+  C4Z3_COLLAPSE_BLOCKED:
+    id: C4Z3_COLLAPSE_BLOCKED
+    lines:
+      - speaker: ""
+        text: 你跑向前方——
+      - speaker: ""
+        text: 坍塌点崩落，路被封死了！
+      - speaker: 系统
+        text: 路径不可达。
+      - speaker: 系统
+        text: 建议：选择稳定节点。
+      - speaker: ""
+        text: （打开时间堆栈，选择回溯点）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z3_MUST_ROLLBACK
+        flagValue: true
+
+  # 回溯引导
+  C4Z3_ROLLBACK_GUIDE:
+    id: C4Z3_ROLLBACK_GUIDE
+    lines:
+      - speaker: ""
+        text: 时间堆栈中显示一个节点：
+      - speaker: ""
+        text: 「断口·警报前」
+    choices:
+      - id: rollback_alarm
+        text: 回溯到警报前
+        effects:
+          pDelta: 3
+        nextDialogueId: C4Z3_ROLLBACK_SUCCESS
+      - id: try_again
+        text: 再试试别的
+        nextDialogueId: C4Z3_NO_OTHER_WAY
+
+  # 回溯成功
+  C4Z3_ROLLBACK_SUCCESS:
+    id: C4Z3_ROLLBACK_SUCCESS
+    lines:
+      - speaker: ""
+        text: 已执行回溯。
+      - speaker: ""
+        text: 你回到了触发警报之前。
+      - speaker: ""
+        text: 但墙面上出现了一条小小的补丁标记……
+      - speaker: 岑回
+        text: 我回来了……但墙没有恢复。
+      - speaker: ""
+        text: （之前深度写入的裂纹依然存在）
+      - speaker: ""
+        text: 现在你知道有个安全开关可以关闭警报。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z3_ROLLBACK_DONE
+        flagValue: true
+      - type: flag
+        flagName: FLAG_TIME_PATCH_MARK_SEEN
+        flagValue: true
+
+  # 没有其他办法
+  C4Z3_NO_OTHER_WAY:
+    id: C4Z3_NO_OTHER_WAY
+    lines:
+      - speaker: 系统
+        text: 当前时间线无可用路径。
+      - speaker: ""
+        text: （必须回溯）
+
+  # 安全开关
+  C4Z3_SAFETY_SWITCH:
+    id: C4Z3_SAFETY_SWITCH
+    lines:
+      - speaker: ""
+        text: 你用"未来的知识"找到了安全开关。
+      - speaker: ""
+        text: 关闭它，警报线圈失效。
+      - speaker: 岑回
+        text: 这次应该能过去了。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C4Z3_PASSED
+        flagValue: true
+      - type: card
+        cardId: CARD_C4_NODE_RECEIPT_01
+      - type: card
+        cardId: CARD_C4_EDGE_RECORD_02
+

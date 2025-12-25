@@ -1,0 +1,103 @@
+# C2-Z2 薄墙巷口（重访）对话数据
+dialogues:
+  # 薄墙检查
+  C2Z2_THIN_WALL:
+    id: C2Z2_THIN_WALL
+    lines:
+      - speaker: 岑回
+        text: 这面墙……我来过这里。
+      - speaker: 岑回
+        text: 当时我听到了回声。
+      - speaker: ""
+        text: （尝试用深度感知查看……）
+    choices:
+      - id: use_depth
+        text: 使用深度感知
+        nextDialogueId: C2Z2_DEPTH_VIEW
+      - id: just_look
+        text: 只是观察
+        nextDialogueId: C2Z2_NORMAL_VIEW
+
+  # 深度视野查看
+  C2Z2_DEPTH_VIEW:
+    id: C2Z2_DEPTH_VIEW
+    lines:
+      - speaker: ""
+        text: （激活深度感知……）
+      - speaker: ""
+        text: 墙面后方出现空腔轮廓。
+      - speaker: 岑回
+        text: ！
+      - speaker: 岑回
+        text: 原来不是我听错。
+      - speaker: 岑回
+        text: 那为什么他们说正常？
+      - speaker: ""
+        text: 系统提示闪烁：
+      - speaker: 系统
+        text: 结构：正常（已更正）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z2_SAW_CAVITY
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F01
+        foreshadowStage: recover
+
+  # 普通视野
+  C2Z2_NORMAL_VIEW:
+    id: C2Z2_NORMAL_VIEW
+    lines:
+      - speaker: ""
+        text: 从表面看，这只是一面普通的墙。
+      - speaker: 岑回
+        text: ……但我记得那回声。
+
+  # 墙根裂缝
+  C2Z2_WALL_CRACK:
+    id: C2Z2_WALL_CRACK
+    lines:
+      - speaker: ""
+        text: 墙根有一条细小的裂缝。
+      - speaker: 岑回
+        text: 在深度视野下，裂缝延伸到墙体内部……
+      - speaker: 岑回
+        text: 连通着那个空腔。
+
+  # 提交记录
+  C2Z2_SUBMIT_RECORD:
+    id: C2Z2_SUBMIT_RECORD
+    lines:
+      - speaker: ""
+        text: 是否提交深度观测记录？
+    choices:
+      - id: submit_yes
+        text: 提交记录
+        effects:
+          setFlag:
+            name: FLAG_REPORTED_CAVITY
+            value: true
+        nextDialogueId: C2Z2_SUBMIT_DONE
+      - id: submit_no
+        text: 暂不提交
+        nextDialogueId: C2Z2_SUBMIT_SKIP
+
+  # 提交完成
+  C2Z2_SUBMIT_DONE:
+    id: C2Z2_SUBMIT_DONE
+    lines:
+      - speaker: 系统
+        text: 记录已提交。
+      - speaker: ""
+        text: 异常已确认。
+    onComplete:
+      - type: card
+        cardId: CARD_C2_DEPTH_FRAGMENT_01
+
+  # 跳过提交
+  C2Z2_SUBMIT_SKIP:
+    id: C2Z2_SUBMIT_SKIP
+    lines:
+      - speaker: 岑回
+        text: （先不提交……）
+

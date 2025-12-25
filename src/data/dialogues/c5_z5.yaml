@@ -1,0 +1,176 @@
+# C5-Z5 空椅子的消失与归来对话数据
+dialogues:
+  # 空位置
+  C5Z5_EMPTY_POSITION:
+    id: C5Z5_EMPTY_POSITION
+    lines:
+      - speaker: ""
+        text: 椅子原本的位置。
+      - speaker: ""
+        text: 现在什么都没有了。
+      - speaker: 系统
+        text: 对象：不存在。
+      - speaker: 岑回
+        text: ……它不见了。
+    onComplete:
+      - type: card
+        cardId: CARD_C5_CHAIR_CORRECTED
+
+  # 椅脚印
+  C5Z5_FOOTPRINT:
+    id: C5Z5_FOOTPRINT
+    lines:
+      - speaker: ""
+        text: 长按后，你看到地面上淡淡的椅脚印。
+      - speaker: ""
+        text: 它曾经在这里。
+      - speaker: ""
+        text: 痕迹还在，但"存在"已被更正。
+
+  # 栖蓝对话
+  C5Z5_QILAN_TALK:
+    id: C5Z5_QILAN_TALK
+    lines:
+      - speaker: 栖蓝
+        text: 你看，它不见了。
+      - speaker: 栖蓝
+        text: 他们连"拿走"都不需要。
+      - speaker: 栖蓝
+        text: 他们只要更正一句。
+      - speaker: 栖蓝
+        text: 你要走就走。我不拦你。
+      - speaker: 栖蓝
+        text: 但如果你留下……就把它留得更难一点。
+    choices:
+      - id: stay
+        text: 我留下
+        nextDialogueId: C5Z5_STAY
+      - id: useless
+        text: 这没用
+        nextDialogueId: C5Z5_USELESS
+      - id: who_they
+        text: 他们是谁？
+        nextDialogueId: C5Z5_WHO_THEY
+
+  # 我留下
+  C5Z5_STAY:
+    id: C5Z5_STAY
+    lines:
+      - speaker: 栖蓝
+        text: ……谢谢。
+      - speaker: 栖蓝
+        text: 工具箱在旁边。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z5_STAY
+        flagValue: true
+
+  # 没用
+  C5Z5_USELESS:
+    id: C5Z5_USELESS
+    lines:
+      - speaker: 栖蓝
+        text: 没用是他们的词。
+      - speaker: 栖蓝
+        text: 我不用他们的词。
+
+  # 他们是谁
+  C5Z5_WHO_THEY:
+    id: C5Z5_WHO_THEY
+    lines:
+      - speaker: 栖蓝
+        text: 我不知道。
+      - speaker: 栖蓝
+        text: 但我知道：他们在更正。
+      - speaker: 栖蓝
+        text: 更正到最后，什么都不会剩下。
+
+  # 工具箱
+  C5Z5_TOOLBOX:
+    id: C5Z5_TOOLBOX
+    lines:
+      - speaker: ""
+        text: 栖蓝的工具箱。里面有粉笔、木板……
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z5_TOOLBOX_OPEN
+        flagValue: true
+
+  # 粉笔
+  C5Z5_CHALK:
+    id: C5Z5_CHALK
+    lines:
+      - speaker: ""
+        text: 你拿起粉笔，在椅脚印处描边。
+      - speaker: ""
+        text: 白色的粉笔线在地面上留下痕迹。
+      - speaker: ""
+        text: （第1步完成：描边）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z5_OUTLINED
+        flagValue: true
+
+  # 木板
+  C5Z5_WOOD_PLANK:
+    id: C5Z5_WOOD_PLANK
+    lines:
+      - speaker: ""
+        text: 你拿起木板。
+      - speaker: ""
+        text: 这不是真的椅子。
+      - speaker: ""
+        text: 但它可以占住那个位置。
+    choices:
+      - id: place_plank
+        text: 摆放替代椅
+        effects:
+          rDelta: 2
+        nextDialogueId: C5Z5_PLACE_CHAIR
+      - id: give_up
+        text: 算了
+        nextDialogueId: C5Z5_GIVE_UP
+
+  # 放置替代椅
+  C5Z5_PLACE_CHAIR:
+    id: C5Z5_PLACE_CHAIR
+    lines:
+      - speaker: ""
+        text: 你把木板摆在描边的位置上。
+      - speaker: ""
+        text: 它不是椅子。但它在那里占着位置。
+      - speaker: ""
+        text: （如果R足够高……）
+      - speaker: ""
+        text: 木板的影子似乎变得……像一把椅子。
+      - speaker: 系统
+        text: 对象：……
+      - speaker: 系统
+        text: ……已记录。
+      - speaker: ""
+        text: （系统停顿了一下才回应）
+      - speaker: ""
+        text: 结算：
+      - speaker: 系统
+        text: 无可用收益。
+      - speaker: ""
+        text: 小字（淡出）：解释成本↑
+    onComplete:
+      - type: card
+        cardId: CARD_C5_CHAIR_PLACEHOLDER
+      - type: flag
+        flagName: FLAG_CHAIR_PLACEHOLDER
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F23
+        foreshadowStage: deepen
+
+  # 放弃
+  C5Z5_GIVE_UP:
+    id: C5Z5_GIVE_UP
+    lines:
+      - speaker: 岑回
+        text: （也许……这真的没用）
+      - speaker: ""
+        text: 你接受了更正。
+

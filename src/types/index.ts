@@ -92,6 +92,8 @@ export interface IDialogue {
   id: string;
   speaker: string;
   text: string;
+  /** 角色表情，影响立绘显示 */
+  expression?: 'neutral' | 'smiling' | 'sad' | 'angry' | 'surprised' | 'thinking' | 'stressed' | 'confused' | 'curious' | 'dreamy' | 'excited' | 'scared' | 'focused' | 'hopeful' | 'kind' | 'tired' | 'displeased' | 'stern' | 'worried' | 'mysterious' | 'serene' | 'wise' | 'comforting' | 'concerned' | 'determined' | 'professional' | 'understanding' | 'melancholy' | 'resigned' | 'serious' | 'warm';
   next?: string | null;
   choices?: IDialogueChoice[];
   trigger?: IDialogueTrigger;

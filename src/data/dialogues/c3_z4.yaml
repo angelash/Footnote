@@ -1,0 +1,181 @@
+# C3-Z4 栖蓝：空椅子对话数据
+dialogues:
+  # 栖蓝对话
+  C3Z4_QILAN_TALK:
+    id: C3Z4_QILAN_TALK
+    lines:
+      - speaker: 栖蓝
+        text: 他以前坐这儿。
+      - speaker: 栖蓝
+        text: 现在没人坐了。
+      - speaker: 栖蓝
+        text: 但空着也得摆好。
+      - speaker: 栖蓝
+        text: 不然像是我先把他抹掉。
+    choices:
+      - id: who_is_he
+        text: 他是谁？
+        nextDialogueId: C3Z4_WHO_IS_HE
+      - id: is_useful
+        text: 这有用吗？
+        nextDialogueId: C3Z4_IS_USEFUL
+      - id: help_her
+        text: 我帮你
+        nextDialogueId: C3Z4_HELP_HER
+
+  # 他是谁
+  C3Z4_WHO_IS_HE:
+    id: C3Z4_WHO_IS_HE
+    lines:
+      - speaker: 栖蓝
+        text: ……
+      - speaker: 栖蓝
+        text: 我不记得了。
+      - speaker: 栖蓝
+        text: 但我记得他坐在这儿。
+      - speaker: 栖蓝
+        text: 记得他在，就够了。
+
+  # 有用吗
+  C3Z4_IS_USEFUL:
+    id: C3Z4_IS_USEFUL
+    lines:
+      - speaker: 栖蓝
+        text: 没用。
+      - speaker: 栖蓝
+        text: 但我需要它在。
+      - speaker: 岑回
+        text: ……
+      - speaker: 栖蓝
+        text: 不是所有事都需要有用。
+
+  # 我帮你
+  C3Z4_HELP_HER:
+    id: C3Z4_HELP_HER
+    lines:
+      - speaker: 栖蓝
+        text: ……谢谢。
+      - speaker: 栖蓝
+        text: 先擦干净，再扶正，最后修椅脚。
+      - speaker: 栖蓝
+        text: 就这样。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z4_AGREED
+        flagValue: true
+
+  # 空椅子
+  C3Z4_EMPTY_CHAIR:
+    id: C3Z4_EMPTY_CHAIR
+    lines:
+      - speaker: ""
+        text: 一把空椅子，歪斜地靠在墙边。
+      - speaker: ""
+        text: 上面落了一层薄薄的灰。
+      - speaker: 岑回
+        text: 这椅子……放在这里很久了。
+
+  # 擦拭布
+  C3Z4_CLOTH:
+    id: C3Z4_CLOTH
+    lines:
+      - speaker: ""
+        text: 你拿起擦拭布，开始清理椅子上的灰尘。
+      - speaker: ""
+        text: 灰尘下面，木纹依然清晰。
+      - speaker: ""
+        text: （椅子擦干净了）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z4_CLEANED
+        flagValue: true
+
+  # 椅脚
+  C3Z4_CHAIR_LEG:
+    id: C3Z4_CHAIR_LEG
+    lines:
+      - speaker: ""
+        text: 椅脚有些松动。
+      - speaker: ""
+        text: 你用力拧紧了它。
+      - speaker: ""
+        text: （椅子稳固了）
+    choices:
+      - id: finish_chair
+        text: 把椅子扶正
+        nextDialogueId: C3Z4_FINISH_CHAIR
+
+  # 完成修复
+  C3Z4_FINISH_CHAIR:
+    id: C3Z4_FINISH_CHAIR
+    lines:
+      - speaker: ""
+        text: 你把椅子扶正，摆放整齐。
+      - speaker: ""
+        text: 它静静地立在那里，像是在等待某个人。
+      - speaker: 栖蓝
+        text: 谢谢。
+      - speaker: ""
+        text: 系统提示：
+      - speaker: 系统
+        text: 无可用收益。
+      - speaker: 岑回
+        text: （没有奖励……但做完了，心里好像轻了一点。）
+    onComplete:
+      - type: card
+        cardId: CARD_C3_EMPTY_CHAIR
+      - type: flag
+        flagName: FLAG_EMPTY_CHAIR_SET
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F23
+        foreshadowStage: plant
+    effects:
+      rDelta: 2
+
+  # 小灯座
+  C3Z4_LAMP_STAND:
+    id: C3Z4_LAMP_STAND
+    lines:
+      - speaker: ""
+        text: 椅子旁边有一个小灯座，但没有灯芯。
+      - speaker: 岑回
+        text: 如果有灯芯的话……
+    choices:
+      - id: use_wick
+        text: 使用旧灯芯（需要卡片：旧灯芯）
+        condition:
+          hasCard: CARD_C3_OLD_WICK
+        nextDialogueId: C3Z4_LIGHT_LAMP
+      - id: no_wick
+        text: 没有灯芯
+        nextDialogueId: C3Z4_NO_WICK
+
+  # 点亮灯
+  C3Z4_LIGHT_LAMP:
+    id: C3Z4_LIGHT_LAMP
+    lines:
+      - speaker: ""
+        text: 你把陈匠给你的旧灯芯放进灯座。
+      - speaker: ""
+        text: 一点微光亮起。
+      - speaker: ""
+        text: 画面暖了一瞬。
+      - speaker: 栖蓝
+        text: ……
+      - speaker: ""
+        text: 她没有说话，但眼眶红了。
+      - speaker: ""
+        text: （没有奖励，但你知道这是对的）
+    onComplete:
+      - type: flag
+        flagName: FLAG_LAMP_LIT
+        flagValue: true
+
+  # 没有灯芯
+  C3Z4_NO_WICK:
+    id: C3Z4_NO_WICK
+    lines:
+      - speaker: 岑回
+        text: （也许以后能找到……）
+

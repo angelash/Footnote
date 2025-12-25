@@ -1,0 +1,148 @@
+# C1-Z3 档案巷口旧地图摊对话数据
+dialogues:
+  # 地图摊
+  C1Z3_MAP_STALL:
+    id: C1Z3_MAP_STALL
+    lines:
+      - speaker: 岑回
+        text: 这里摆着很多旧地图……
+      - speaker: 岑回
+        text: 看起来不像是普通的地图摊。
+      - speaker: ""
+        text: 摊主抬起头，目光锐利。
+
+  # 宋岚对话（核心）
+  C1Z3_SONGLAN_TALK:
+    id: C1Z3_SONGLAN_TALK
+    lines:
+      - speaker: 宋岚
+        text: 别信路标，信脚印。
+      - speaker: 岑回
+        text: ……什么？
+      - speaker: 宋岚
+        text: 同一个地方，记两次。
+      - speaker: 宋岚
+        text: 你看到的不是错，是版本差异。
+    choices:
+      - id: ask_what
+        text: 你在说什么？
+        nextDialogueId: C1Z3_SONGLAN_EXPLAIN
+      - id: just_buy
+        text: 我只是来买地图
+        nextDialogueId: C1Z3_SONGLAN_MAP
+      - id: want_know
+        text: 我想知道哪里不对
+        nextDialogueId: C1Z3_SONGLAN_TRUTH
+
+  # 宋岚解释
+  C1Z3_SONGLAN_EXPLAIN:
+    id: C1Z3_SONGLAN_EXPLAIN
+    lines:
+      - speaker: 宋岚
+        text: 你以后会需要它。
+      - speaker: ""
+        text: （她递过来一张卡片）
+      - speaker: 宋岚
+        text: 这是记录，不是地图。
+    onComplete:
+      - type: card
+        cardId: CARD_C1_VERSION_MAP_01
+
+  # 想买地图
+  C1Z3_SONGLAN_MAP:
+    id: C1Z3_SONGLAN_MAP
+    lines:
+      - speaker: 宋岚
+        text: 地图不卖，记录才卖。
+      - speaker: ""
+        text: （她递过来一张卡片）
+      - speaker: 宋岚
+        text: 这张免费。
+      - speaker: 宋岚
+        text: 下次带你的观察来换。
+    onComplete:
+      - type: card
+        cardId: CARD_C1_VERSION_MAP_01
+
+  # 想知道真相
+  C1Z3_SONGLAN_TRUTH:
+    id: C1Z3_SONGLAN_TRUTH
+    lines:
+      - speaker: 宋岚
+        text: 你以后会需要它。
+      - speaker: 宋岚
+        text: 把你今天见到的门牌、脚印、声音——记下来。给我。
+    choices:
+      - id: accept_quest
+        text: 好，我记下来
+        effects:
+          rDelta: 1
+          setFlag:
+            name: FLAG_C1Z3_RECORD_QUEST
+            value: true
+        nextDialogueId: C1Z3_ACCEPT_QUEST
+      - id: refuse_quest
+        text: 我没有时间做这个
+        nextDialogueId: C1Z3_REFUSE_QUEST
+
+  # 接受记录任务
+  C1Z3_ACCEPT_QUEST:
+    id: C1Z3_ACCEPT_QUEST
+    lines:
+      - speaker: 宋岚
+        text: 完成后来找我。
+      - speaker: ""
+        text: （她递过来一张卡片）
+      - speaker: 宋岚
+        text: 这是初始记录。
+      - speaker: 宋岚
+        text: 不解释。你看就好。
+    onComplete:
+      - type: card
+        cardId: CARD_C1_VERSION_MAP_01
+      - type: foreshadow
+        foreshadowId: F12
+        foreshadowStage: plant
+
+  # 拒绝任务
+  C1Z3_REFUSE_QUEST:
+    id: C1Z3_REFUSE_QUEST
+    lines:
+      - speaker: 宋岚
+        text: 随你。
+      - speaker: ""
+        text: （她还是递过来一张卡片）
+      - speaker: 宋岚
+        text: 但这个你收着。
+    onComplete:
+      - type: card
+        cardId: CARD_C1_VERSION_MAP_01
+
+  # 旧地图
+  C1Z3_OLD_MAPS:
+    id: C1Z3_OLD_MAPS
+    lines:
+      - speaker: 岑回
+        text: 这些地图……
+      - speaker: 岑回
+        text: 同一个地方，为什么有这么多版本？
+      - speaker: ""
+        text: 仔细看，每张地图上同一条街的位置都略有不同。
+      - speaker: 岑回
+        text: 难道……街道的位置也会变？
+
+  # 记录本
+  C1Z3_NOTEBOOK:
+    id: C1Z3_NOTEBOOK
+    lines:
+      - speaker: 岑回
+        text: 这是她的记录本……
+      - speaker: ""
+        text: 密密麻麻的字迹，记录着各种门牌、路标的变化。
+      - speaker: 岑回
+        text: 她在追踪什么？
+      - speaker: ""
+        text: 有一行字被画了圈：
+      - speaker: ""
+        text: 「版本差异 ≠ 错误。差异 = 被改写的证据。」
+

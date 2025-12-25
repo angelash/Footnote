@@ -1,0 +1,170 @@
+# CF-Z2 最后的无收益选择对话数据
+dialogues:
+  # 栖蓝对话
+  CFZ2_QILAN_TALK:
+    id: CFZ2_QILAN_TALK
+    lines:
+      - speaker: 栖蓝
+        text: 他们说没用。
+      - speaker: 栖蓝
+        text: 没用不是事实，是一种删法。
+      - speaker: 栖蓝
+        text: 你要是愿意，就把它留得更难一点。
+      - speaker: 栖蓝
+        text: 让他们抹掉的时候，得多花一次力气。
+
+  # 仪式①：空椅
+  CFZ2_RITUAL_CHAIR:
+    id: CFZ2_RITUAL_CHAIR
+    lines:
+      - speaker: ""
+        text: 空椅仪式。
+      - speaker: ""
+        text: 三步：
+      - speaker: ""
+        text: 1. 给椅脚印描边
+      - speaker: ""
+        text: 2. 把椅子摆正
+      - speaker: ""
+        text: 3. 在旁边放一张纸条
+    choices:
+      - id: do_chair_rite
+        text: 执行仪式
+        effects:
+          rDelta: 3
+        nextDialogueId: CFZ2_CHAIR_DONE
+      - id: skip
+        text: 选择其他仪式
+        nextDialogueId: CFZ2_SKIP
+
+  # 空椅仪式完成
+  CFZ2_CHAIR_DONE:
+    id: CFZ2_CHAIR_DONE
+    lines:
+      - speaker: ""
+        text: 你完成了空椅仪式。
+      - speaker: ""
+        text: 描边……摆正……放纸条……
+      - speaker: 系统
+        text: 无可用收益。
+      - speaker: ""
+        text: （但你做了）
+      - speaker: ""
+        text: 底部字段条更新：
+      - speaker: ""
+        text: 「字段：＿（待定义）」
+    onComplete:
+      - type: card
+        cardId: CARD_CF_CHAIR_FINAL
+      - type: flag
+        flagName: FLAG_RITE_CHAIR
+        flagValue: true
+      - type: flag
+        flagName: FLAG_FINAL_RITE_DONE
+        flagValue: true
+
+  # 仪式②：版本库封存
+  CFZ2_RITUAL_ARCHIVE:
+    id: CFZ2_RITUAL_ARCHIVE
+    lines:
+      - speaker: ""
+        text: 封存仪式。
+      - speaker: ""
+        text: 三步：
+      - speaker: ""
+        text: 1. 翻出抄录卡
+      - speaker: ""
+        text: 2. 放入版本库底层
+      - speaker: ""
+        text: 3. 用封条封存（封条上是刻度点◦◦◦）
+    choices:
+      - id: do_archive_rite
+        text: 执行仪式
+        effects:
+          rDelta: 3
+        nextDialogueId: CFZ2_ARCHIVE_DONE
+      - id: skip
+        text: 选择其他仪式
+        nextDialogueId: CFZ2_SKIP
+
+  # 封存仪式完成
+  CFZ2_ARCHIVE_DONE:
+    id: CFZ2_ARCHIVE_DONE
+    lines:
+      - speaker: ""
+        text: 你完成了封存仪式。
+      - speaker: ""
+        text: 翻出……放入……封存……
+      - speaker: 系统
+        text: 条目：不可归档。残差保留。
+      - speaker: ""
+        text: 底部字段条更新：
+      - speaker: ""
+        text: 「字段：＿（待定义）」
+    onComplete:
+      - type: card
+        cardId: CARD_CF_ARCHIVE_FINAL
+      - type: flag
+        flagName: FLAG_RITE_ARCHIVE
+        flagValue: true
+      - type: flag
+        flagName: FLAG_FINAL_RITE_DONE
+        flagValue: true
+
+  # 仪式③：点灯
+  CFZ2_RITUAL_LAMP:
+    id: CFZ2_RITUAL_LAMP
+    lines:
+      - speaker: ""
+        text: 点灯仪式。
+      - speaker: ""
+        text: 两步：
+      - speaker: ""
+        text: 1. 放入旧灯芯
+      - speaker: ""
+        text: 2. 点亮
+    choices:
+      - id: do_lamp_rite
+        text: 执行仪式
+        effects:
+          rDelta: 3
+        nextDialogueId: CFZ2_LAMP_DONE
+      - id: skip
+        text: 选择其他仪式
+        nextDialogueId: CFZ2_SKIP
+
+  # 点灯仪式完成
+  CFZ2_LAMP_DONE:
+    id: CFZ2_LAMP_DONE
+    lines:
+      - speaker: ""
+        text: 你完成了点灯仪式。
+      - speaker: ""
+        text: 放入……点亮……
+      - speaker: ""
+        text: 灯光很弱，但非常稳定。
+      - speaker: ""
+        text: 对比之前一切都在抖，这盏灯稳得异常。
+      - speaker: 系统
+        text: 对象：不存在。行为：执行。
+      - speaker: ""
+        text: 底部字段条更新：
+      - speaker: ""
+        text: 「字段：＿（待定义）」
+    onComplete:
+      - type: card
+        cardId: CARD_CF_LAMP_FINAL
+      - type: flag
+        flagName: FLAG_RITE_LAMP
+        flagValue: true
+      - type: flag
+        flagName: FLAG_FINAL_RITE_DONE
+        flagValue: true
+
+  # 跳过
+  CFZ2_SKIP:
+    id: CFZ2_SKIP
+    lines:
+      - speaker: 岑回
+        text: （选择其他的……）
+

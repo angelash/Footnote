@@ -1,0 +1,136 @@
+# C5-Z7 F21核弹落地对话数据
+dialogues:
+  # 微任务A
+  C5Z7_TASK_A:
+    id: C5Z7_TASK_A
+    lines:
+      - speaker: ""
+        text: 审计覆盖区掉落的空白标签。
+    choices:
+      - id: paste_label
+        text: 贴回墙上
+        nextDialogueId: C5Z7_TASK_A_DONE
+      - id: leave_label
+        text: 不管它
+        nextDialogueId: C5Z7_TASK_SKIP
+
+  # 任务A完成
+  C5Z7_TASK_A_DONE:
+    id: C5Z7_TASK_A_DONE
+    lines:
+      - speaker: ""
+        text: 你把空白标签贴回墙上。
+      - speaker: ""
+        text: （无奖励）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z7_TASK_A_DONE
+        flagValue: true
+
+  # 微任务B
+  C5Z7_TASK_B:
+    id: C5Z7_TASK_B
+    lines:
+      - speaker: ""
+        text: 栖蓝那块椅脚印描边，有些模糊了。
+    choices:
+      - id: redraw
+        text: 重新描一遍
+        nextDialogueId: C5Z7_TASK_B_DONE
+      - id: leave_it
+        text: 不管它
+        nextDialogueId: C5Z7_TASK_SKIP
+
+  # 任务B完成
+  C5Z7_TASK_B_DONE:
+    id: C5Z7_TASK_B_DONE
+    lines:
+      - speaker: ""
+        text: 你重新描了一遍椅脚印。
+      - speaker: ""
+        text: （无奖励）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z7_TASK_B_DONE
+        flagValue: true
+
+  # 微任务C
+  C5Z7_TASK_C:
+    id: C5Z7_TASK_C
+    lines:
+      - speaker: ""
+        text: 版本库的最底层。
+      - speaker: ""
+        text: 宋岚说过：把差异保留得更久一点。
+    choices:
+      - id: put_card
+        text: 放入版本卡
+        nextDialogueId: C5Z7_TASK_C_DONE
+      - id: dont_put
+        text: 不放
+        nextDialogueId: C5Z7_TASK_SKIP
+
+  # 任务C完成
+  C5Z7_TASK_C_DONE:
+    id: C5Z7_TASK_C_DONE
+    lines:
+      - speaker: ""
+        text: 你把版本卡放进最底层。
+      - speaker: ""
+        text: （纯仪式感）
+      - speaker: ""
+        text: （无奖励）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z7_TASK_C_DONE
+        flagValue: true
+      - type: flag
+        flagName: FLAG_C5Z7_TASKS_DONE
+        flagValue: true
+      - type: dialogue
+        dialogueId: C5Z7_F21_TRIGGER
+
+  # 跳过任务
+  C5Z7_TASK_SKIP:
+    id: C5Z7_TASK_SKIP
+    lines:
+      - speaker: 岑回
+        text: （……算了）
+
+  # F21触发
+  C5Z7_F21_TRIGGER:
+    id: C5Z7_F21_TRIGGER
+    lines:
+      - speaker: ""
+        text: ……
+      - speaker: ""
+        text: 结算卡直接出现：
+      - speaker: 系统
+        text: 此行为在当前模型中无意义。
+      - speaker: ""
+        text: ——
+      - speaker: ""
+        text: （极淡、小字、1秒后淡出）
+      - speaker: ""
+        text: 新增字段将提高解释成本。
+    onComplete:
+      - type: card
+        cardId: CARD_C5_F21_JUDGMENT
+      - type: flag
+        flagName: FLAG_F21_TRIGGERED
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F21
+        foreshadowStage: collect
+    effects:
+      rDelta: 1
+
+  # 栖蓝最后一句
+  C5Z7_QILAN_FINAL:
+    id: C5Z7_QILAN_FINAL
+    lines:
+      - speaker: 栖蓝
+        text: 你看，"无意义"是他们的词。
+      - speaker: ""
+        text: （她不再说话）
+

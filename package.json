@@ -21,8 +21,8 @@
     "generate:pixel-assets:128": "python scripts/generate_pixel_assets.py --out-dir assets/images/pixel --scale 8 --max-colors 24 --with-sequences --sequence-frames 12"
   },
   "dependencies": {
-    "phaser": "^3.70.0",
     "idb": "^8.0.0",
+    "phaser": "^3.70.0",
     "yaml": "^2.3.4"
   },
   "devDependencies": {
@@ -36,6 +36,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.0.1",
     "prettier": "^3.1.0",
+    "terser": "^5.44.1",
     "tsx": "^4.6.0",
     "typescript": "^5.3.2",
     "vite": "^5.0.4",
@@ -54,4 +55,3 @@
   "license": "UNLICENSED",
   "private": true
 }
-

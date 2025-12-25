@@ -1,0 +1,184 @@
+# C2-Z3 许澄诊疗室
+# 深度视野解谜
+id: C2-Z3
+title: 许澄诊疗室
+background:
+  texture: bg_c2z3_clinic  # 使用WebP背景
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 楼梯段1（真实）
+  - id: stair_segment_1
+    type: image
+    texture: px_tiles_platform
+    x: 200
+    y: 600
+    scale: 1.0
+    depth: 8
+    label: 第一段楼梯
+    labelOffset: [0, 80]
+
+  # 楼梯段2（虚构 - 深度感知可见）
+  - id: stair_segment_2_fake
+    type: image
+    texture: px_tiles_platform
+    x: 375
+    y: 450
+    scale: 1.0
+    depth: 8
+    alpha: 0.9
+    label: 第二段楼梯
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z3_FAKE_STAIR
+
+  # 楼梯段3（真实）
+  - id: stair_segment_3
+    type: image
+    texture: px_tiles_platform
+    x: 550
+    y: 300
+    scale: 1.0
+    depth: 8
+    label: 第三段楼梯
+    labelOffset: [0, 80]
+
+  # 深度感知显示区（虚构结构标记）
+  - id: depth_fake_marker
+    type: zone
+    x: 375
+    y: 450
+    width: 150
+    height: 100
+    depth: 20
+    depthSenseTarget: true
+    showOnDepthSense: true
+    depthSenseTexture: px_fx_glitch
+
+  # 宋岚
+  - id: songlan
+    type: image
+    texture: portrait_songlan_neutral
+    x: 150
+    y: 400
+    scale: 0.4
+    depth: 12
+    label: 宋岚
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: songlan
+      action:
+        type: dialogue
+        dialogueId: C2Z3_SONGLAN_GUIDE
+
+  # 诊疗门
+  - id: top_door
+    type: image
+    texture: obj_door  # WebP物件
+    x: 550
+    y: 200
+    scale: 0.6
+    depth: 10
+    label: 出口
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_C2Z3_FOUND_PATH
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z3_EXIT_DOOR
+
+  # 病床
+  - id: hospital_bed
+    type: image
+    texture: obj_hospital_bed  # WebP物件
+    x: 400
+    y: 650
+    scale: 0.7
+    depth: 7
+
+  # 药品柜
+  - id: medicine_cabinet
+    type: image
+    texture: obj_medicine_cabinet  # WebP物件
+    x: 650
+    y: 400
+    scale: 0.6
+    depth: 8
+    label: 药品柜
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        speaker: 岑回
+        text: 整齐排列的药品，每一瓶都有详细的标注。
+
+  # 医疗设备（可动物件 - 显示器闪烁）
+  - id: medical_monitor
+    type: sprite
+    texture: anim_monitor_frame_0  # 使用第一帧作为初始纹理
+    x: 200
+    y: 350
+    scale: 0.8
+    depth: 9
+    animation:
+      key: webp_monitor  # 动画键名
+      frameRate: 3
+      repeat: -1
+
+  # 记录差异任务点
+  - id: record_diff_point
+    type: image
+    texture: obj_old_books  # WebP物件
+    x: 280
+    y: 550
+    scale: 0.5
+    depth: 9
+    label: 记录差异
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C2Z3_TRIGGERED_FAKE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z3_RECORD_DIFF
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 550
+    y: 180
+    width: 150
+    height: 80
+    label: 继续前进
+    condition:
+      flag: FLAG_C2Z3_COMPLETED
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z4
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 200
+    y: 700
+    width: 150
+    height: 80
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z2
+

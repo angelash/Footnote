@@ -1,0 +1,128 @@
+# C3-Z3 宋岚的版本库对话数据
+dialogues:
+  # 宋岚对话
+  C3Z3_SONGLAN_TALK:
+    id: C3Z3_SONGLAN_TALK
+    lines:
+      - speaker: 宋岚
+        text: 听说你从"不存在"里带出来一个人。
+      - speaker: 岑回
+        text: ……你怎么知道的？
+      - speaker: 宋岚
+        text: 版本库里没有这条记录。
+      - speaker: 宋岚
+        text: 这才是最危险的：不是异常，是无法对齐的差异。
+    choices:
+      - id: what_want
+        text: 你想要我做什么？
+        nextDialogueId: C3Z3_WHAT_WANT
+      - id: just_save
+        text: 我只是救人
+        nextDialogueId: C3Z3_JUST_SAVE
+      - id: if_erase
+        text: 如果他们把它抹掉呢？
+        nextDialogueId: C3Z3_IF_ERASE
+
+  # 你想要什么
+  C3Z3_WHAT_WANT:
+    id: C3Z3_WHAT_WANT
+    lines:
+      - speaker: 宋岚
+        text: 把你知道的差异，留在更多地方。
+      - speaker: 宋岚
+        text: 版本库收集所有的"被更正"。
+      - speaker: 宋岚
+        text: 只有足够多的差异存在，它们才更难被一次性抹掉。
+
+  # 只是救人
+  C3Z3_JUST_SAVE:
+    id: C3Z3_JUST_SAVE
+    lines:
+      - speaker: 宋岚
+        text: 救人本身就是一种差异。
+      - speaker: 宋岚
+        text: 你把"不存在"的人带进了记录。
+      - speaker: 宋岚
+        text: 这种差异最难被消化。
+
+  # 如果抹掉
+  C3Z3_IF_ERASE:
+    id: C3Z3_IF_ERASE
+    lines:
+      - speaker: 宋岚
+        text: 那就让抹掉变得更难。
+      - speaker: 宋岚
+        text: 你把差异留在更多地方。
+      - speaker: 宋岚
+        text: 他们可以更正一处，但更正不了每一处。
+
+  # 地图墙
+  C3Z3_MAP_WALL:
+    id: C3Z3_MAP_WALL
+    lines:
+      - speaker: ""
+        text: 地图墙上挂着三张不同版本的地图。
+      - speaker: ""
+        text: 它们看起来几乎相同，但……
+      - speaker: 岑回
+        text: 等等，这里——
+      - speaker: ""
+        text: "门影区域"在三张地图上的显示不同：
+      - speaker: ""
+        text: V1：一个小空白
+      - speaker: ""
+        text: V2：空白被涂抹
+      - speaker: ""
+        text: V3：空白位置被写成"墙"
+      - speaker: 岑回
+        text: 他们一直在"更正"这个区域的记录……
+    onComplete:
+      - type: flag
+        flagName: FLAG_C3Z3_SAW_MAPS
+        flagValue: true
+      - type: card
+        cardId: CARD_C3_VERSION_MAP_03
+
+  # 差异标注台
+  C3Z3_ANNOTATION_DESK:
+    id: C3Z3_ANNOTATION_DESK
+    lines:
+      - speaker: ""
+        text: 标注台上有一个简单的界面。
+      - speaker: ""
+        text: 「请选择要标注的差异点」
+    choices:
+      - id: mark_v1_blank
+        text: 标注V1的空白
+        nextDialogueId: C3Z3_MARK_DONE
+      - id: mark_v2_smear
+        text: 标注V2的涂抹
+        nextDialogueId: C3Z3_MARK_DONE
+      - id: mark_v3_wall
+        text: 标注V3的"墙"
+        nextDialogueId: C3Z3_MARK_DONE
+
+  # 标注完成
+  C3Z3_MARK_DONE:
+    id: C3Z3_MARK_DONE
+    lines:
+      - speaker: 系统
+        text: 差异已保存。
+      - speaker: ""
+        text: 奖励：无。
+      - speaker: 宋岚
+        text: 这就够了。
+      - speaker: 宋岚
+        text: 每一个被记录的差异，都是对"唯一版本"的反驳。
+    onComplete:
+      - type: card
+        cardId: CARD_C3_DIFF_RECEIPT
+      - type: flag
+        flagName: FLAG_VERSION_DIFF_SUBMITTED
+        flagValue: true
+      - type: foreshadow
+        foreshadowId: F12
+        foreshadowStage: deepen
+    effects:
+      rDelta: 1
+

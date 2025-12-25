@@ -1,0 +1,159 @@
+# C3-Z2 不存在的房间（可进入）
+# 第一次介入 + 救援陈匠
+id: C3-Z2
+title: 不存在的房间
+background:
+  texture: bg_collapse
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 门影轮廓（深度视野可见）
+  - id: door_outline
+    type: image
+    texture: px_fx_field_accept
+    x: 375
+    y: 350
+    scale: 0.8
+    depth: 15
+    alpha: 0.3
+    label: 门影
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: door-outline
+      action:
+        type: dialogue
+        dialogueId: C3Z2_DOOR_OUTLINE
+
+  # 维护通道盖板（2D绕行解法）
+  - id: maintenance_hatch
+    type: image
+    texture: px_item_archive
+    x: 200
+    y: 500
+    scale: 0.6
+    depth: 10
+    label: 维护通道
+    labelOffset: [0, 70]
+    interactive:
+      cursor: true
+      testid: maintenance-hatch
+      action:
+        type: dialogue
+        dialogueId: C3Z2_MAINTENANCE_HATCH
+
+  # 介入热点（深度感知下可见）
+  - id: intervention_point
+    type: zone
+    x: 400
+    y: 350
+    width: 100
+    height: 80
+    depth: 20
+    depthSenseTarget: true
+    label: 【介入】
+    condition:
+      abilityActive: depthPerception
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z2_INTERVENTION_CHOICE
+
+  # 被困者位置（进入后可见）
+  - id: chenjiang_position
+    type: image
+    texture: portrait_chenjiang_hopeful
+    x: 450
+    y: 400
+    scale: 0.4
+    depth: 12
+    label: 陈匠
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C3Z2_ENTERED_ROOM
+    interactive:
+      cursor: true
+      testid: chenjiang
+      action:
+        type: dialogue
+        dialogueId: C3Z2_CHENJIANG_TALK
+
+  # 旧灯
+  - id: old_lamp
+    type: image
+    texture: obj_oil_lamp
+    x: 550
+    y: 450
+    scale: 0.5
+    depth: 9
+    condition:
+      flagTrue: FLAG_C3Z2_ENTERED_ROOM
+
+  # 封锁线
+  - id: barrier
+    type: image
+    texture: obj_barrier
+    x: 250
+    y: 400
+    scale: 0.5
+    depth: 8
+    rotation: 0.1
+
+  # 裂缝
+  - id: crack_decor
+    type: image
+    texture: obj_crack
+    x: 320
+    y: 480
+    scale: 0.6
+    depth: 7
+
+  # 撤离点
+  - id: evacuation_point
+    type: zone
+    x: 375
+    y: 250
+    width: 150
+    height: 80
+    label: 撤离
+    condition:
+      flagTrue: FLAG_C3Z2_RESCUED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z2_EVACUATION
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往版本库
+    condition:
+      flag: FLAG_C3Z2_COMPLETE
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z3
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z1
+

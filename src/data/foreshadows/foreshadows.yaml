@@ -1,0 +1,176 @@
+# 伏笔系统数据
+# 包含所有需要追踪的伏笔及其触发条件
+
+foreshadows:
+  # ==================== F01: 岑回身份异常 ====================
+  F01:
+    id: F01
+    name: 例外处理器
+    description: 岑回的真实身份远非普通维修员
+    stages:
+      plant:
+        zoneId: C0-Z1
+        dialogueId: CENHUI_MONO_01
+      deepen:
+        zoneId: C2-Z3
+        dialogueId: GULIN_REVEAL_01
+        condition:
+          zoneVisited: C2-Z1
+      resolve:
+        zoneId: C5-Z5
+        condition:
+          rMin: 6
+
+  # ==================== F02: 周期重置痕迹 ====================
+  F02:
+    id: F02
+    name: 周期涂改
+    description: 世界经历过周期重置，但官方从不承认
+    stages:
+      plant:
+        zoneId: C0-Z1
+        dialogueId: NOTICE_BOARD_EXAMINE
+      deepen:
+        zoneId: C1-Z4
+        condition:
+          hasCard: CARD_C1_OLD_RECORD
+      resolve:
+        zoneId: C4-Z2
+        condition:
+          abilityUnlocked: TIME_INTERVENTION
+
+  # ==================== F03: 顾临的矛盾 ====================
+  F03:
+    id: F03
+    name: 收敛者的动摇
+    description: 顾临表面坚定，内心却有裂痕
+    stages:
+      plant:
+        zoneId: C0-Z4
+        dialogueId: GULIN_INTRO_01
+      deepen:
+        zoneId: C2-Z6
+        dialogueId: GULIN_DOUBT_01
+        condition:
+          rMin: 3
+      resolve:
+        zoneId: C5-Z3
+        condition:
+          zoneCompleted: C5-Z2
+
+  # ==================== F04: 宋岚的记录 ====================
+  F04:
+    id: F04
+    name: 版本差异
+    description: 宋岚记录的「异常」暗示着更大的真相
+    stages:
+      plant:
+        zoneId: C1-Z2
+        dialogueId: SONGLAN_FIRST_MEET
+      deepen:
+        zoneId: C3-Z1
+        dialogueId: SONGLAN_ARCHIVE_01
+        condition:
+          hasCard: CARD_C2_FRAGMENT
+      resolve:
+        zoneId: C4-Z5
+        condition:
+          abilityUnlocked: DEPTH_PERCEPTION
+
+  # ==================== F05: 阿棠的来历 ====================
+  F05:
+    id: F05
+    name: 对账失败
+    description: 阿棠是系统无法解释的存在
+    stages:
+      plant:
+        zoneId: C1-Z5
+        dialogueId: ATANG_APPEAR_01
+      deepen:
+        zoneId: C3-Z4
+        dialogueId: ATANG_MEMORY_01
+        condition:
+          zoneVisited: C3-Z1
+      resolve:
+        zoneId: C5-Z1
+        condition:
+          rMin: 5
+          zoneCompleted: C4-Z8
+
+  # ==================== F06: 许澄的边界 ====================
+  F06:
+    id: F06
+    name: 对齐与减伤
+    description: 许澄在帮助和顺从之间寻找平衡
+    stages:
+      plant:
+        zoneId: C1-Z6
+        dialogueId: XUCHENG_CLINIC_01
+      deepen:
+        zoneId: C3-Z6
+        dialogueId: XUCHENG_DILEMMA_01
+        condition:
+          hasCard: CARD_C3_MEDICINE
+      resolve:
+        zoneId: C5-Z4
+        condition:
+          pMin: 50
+
+  # ==================== F07: 牧平的信仰 ====================
+  F07:
+    id: F07
+    name: 平面信徒
+    description: 牧平的「迷信」实则是远古的技术残响
+    stages:
+      plant:
+        zoneId: C2-Z1
+        dialogueId: MUPING_PRAYER_01
+      deepen:
+        zoneId: C3-Z7
+        dialogueId: MUPING_TRUTH_01
+        condition:
+          hasCard: CARD_C3_RELIC
+      resolve:
+        zoneId: CF-Z2
+        condition:
+          abilityUnlocked: TIME_INTERVENTION
+          zoneCompleted: C5-Z7
+
+  # ==================== F08: 栖蓝的多余 ====================
+  F08:
+    id: F08
+    name: 无收益残差
+    description: 栖蓝的存在本身就在挑战系统
+    stages:
+      plant:
+        zoneId: C2-Z4
+        dialogueId: QILAN_FIRST_01
+      deepen:
+        zoneId: C4-Z1
+        dialogueId: QILAN_PURPOSE_01
+        condition:
+          rMin: 4
+      resolve:
+        zoneId: CF-Z3
+        condition:
+          rMin: 8
+
+  # ==================== F09: 陈匠的坚持 ====================
+  F09:
+    id: F09
+    name: 点灯者
+    description: 陈匠为不存在的人点灯
+    stages:
+      plant:
+        zoneId: C2-Z5
+        dialogueId: CHENJIANG_LAMP_01
+      deepen:
+        zoneId: C4-Z4
+        dialogueId: CHENJIANG_REASON_01
+        condition:
+          zoneCompleted: C4-Z3
+      resolve:
+        zoneId: CF-Z4
+        condition:
+          zoneCompleted: CF-Z3
+

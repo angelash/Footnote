@@ -1,0 +1,115 @@
+# C2-Z6 礼堂街：祷文抄本2
+# 神话与深度视野的第一次对接
+id: C2-Z6
+title: 礼堂街
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 路灯
+  - id: street_lamp
+    type: image
+    texture: obj_lamp
+    x: 180
+    y: 350
+    scale: 0.7
+    depth: 10
+
+  # 牧平
+  - id: muping
+    type: image
+    texture: portrait_muping_serene
+    x: 400
+    y: 450
+    scale: 0.45
+    depth: 12
+    label: 牧平
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: muping
+      action:
+        type: dialogue
+        dialogueId: C2Z6_MUPING_TALK
+
+  # 祷文抄本位置
+  - id: prayer_scroll
+    type: image
+    texture: px_item_archive
+    x: 300
+    y: 520
+    scale: 0.4
+    depth: 9
+    label: 抄本
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C2Z6_TALKED_MUPING
+    interactive:
+      cursor: true
+      action:
+        type: card
+        cardId: CARD_C2_PRAYER_02
+
+  # 聚会人群
+  - id: crowd_1
+    type: image
+    texture: placeholder_char
+    x: 280
+    y: 550
+    scale: 0.55
+    depth: 6
+    alpha: 0.5
+    tint: 0x666688
+
+  - id: crowd_2
+    type: image
+    texture: placeholder_char
+    x: 500
+    y: 530
+    scale: 0.6
+    depth: 6
+    alpha: 0.45
+    tint: 0x668866
+
+  # 礼堂建筑
+  - id: hall_building
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 250
+    scale: 1.2
+    depth: 3
+    alpha: 0.6
+    tint: 0x445566
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往边缘断口
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z7
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z5
+

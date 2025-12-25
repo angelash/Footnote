@@ -1,0 +1,145 @@
+# C2-Z4 栖蓝的修补摊
+# 无收益链正式起点
+id: C2-Z4
+title: 修补摊
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 歪斜路标
+  - id: crooked_sign
+    type: image
+    texture: px_item_sign
+    x: 350
+    y: 400
+    scale: 0.8
+    depth: 10
+    rotation: 0.3
+    label: 歪斜路标
+    labelOffset: [0, 90]
+    interactive:
+      cursor: true
+      testid: crooked-sign
+      action:
+        type: dialogue
+        dialogueId: C2Z4_CROOKED_SIGN
+
+  # 修正后的路标（条件显示）
+  - id: fixed_sign
+    type: image
+    texture: px_item_sign
+    x: 350
+    y: 400
+    scale: 0.8
+    depth: 10
+    rotation: 0
+    visible: false
+    condition:
+      flagTrue: FLAG_C2Z4_SIGN_FIXED
+
+  # 工具箱
+  - id: toolbox
+    type: image
+    texture: px_item_wrench
+    x: 500
+    y: 500
+    scale: 0.6
+    depth: 9
+    label: 工具箱
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z4_TOOLBOX
+
+  # 地上的旧钉子孔
+  - id: nail_hole
+    type: image
+    texture: px_fx_scar
+    x: 380
+    y: 480
+    scale: 0.3
+    depth: 5
+    label: 钉子孔
+    labelOffset: [0, 40]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z4_NAIL_HOLE
+
+  # 栖蓝
+  - id: qilan
+    type: image
+    texture: portrait_qilan_neutral
+    x: 200
+    y: 420
+    scale: 0.4
+    depth: 12
+    label: 栖蓝
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: qilan
+      action:
+        type: dialogue
+        dialogueId: C2Z4_QILAN_TALK
+
+  # 修补摊物品
+  - id: repair_items
+    type: image
+    texture: px_item_archive
+    x: 250
+    y: 520
+    scale: 0.5
+    depth: 8
+    alpha: 0.8
+
+  # 完成确认点
+  - id: complete_point
+    type: zone
+    x: 350
+    y: 400
+    width: 100
+    height: 100
+    label: 完成修补
+    condition:
+      flagTrue: FLAG_C2Z4_HAS_NAIL
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z4_COMPLETE_REPAIR
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往诊疗台
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z5
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C2-Z3
+

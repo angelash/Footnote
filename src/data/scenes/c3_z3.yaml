@@ -1,0 +1,118 @@
+# C3-Z3 档案巷：宋岚的版本库
+# 真相密度提升
+id: C3-Z3
+title: 宋岚的版本库
+background:
+  texture: px_bg_placeholder
+  x: 0
+  y: 0
+  origin: [0, 0]
+  displaySize: [750, 1334]
+objects:
+  # 地图墙（可滑动对比）
+  - id: map_wall
+    type: image
+    texture: obj_map
+    x: 375
+    y: 380
+    scale: 0.9
+    depth: 10
+    label: 地图墙
+    labelOffset: [0, 100]
+    interactive:
+      cursor: true
+      testid: map-wall
+      action:
+        type: dialogue
+        dialogueId: C3Z3_MAP_WALL
+
+  # 差异标注台
+  - id: annotation_desk
+    type: image
+    texture: obj_desk
+    x: 250
+    y: 500
+    scale: 0.6
+    depth: 9
+    label: 标注台
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_C3Z3_SAW_MAPS
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z3_ANNOTATION_DESK
+
+  # 宋岚
+  - id: songlan
+    type: image
+    texture: portrait_songlan_serious
+    x: 550
+    y: 420
+    scale: 0.4
+    depth: 12
+    label: 宋岚
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: songlan
+      action:
+        type: dialogue
+        dialogueId: C3Z3_SONGLAN_TALK
+
+  # 版本档案柜
+  - id: version_cabinet
+    type: image
+    texture: obj_filing_cabinet
+    x: 150
+    y: 400
+    scale: 0.6
+    depth: 8
+
+  # 旧书堆
+  - id: old_books
+    type: image
+    texture: obj_old_books
+    x: 500
+    y: 550
+    scale: 0.5
+    depth: 7
+
+  # 台灯
+  - id: desk_lamp
+    type: image
+    texture: obj_lamp
+    x: 200
+    y: 350
+    scale: 0.4
+    depth: 11
+
+  # 出口
+  - id: exit_forward
+    type: zone
+    x: 375
+    y: 180
+    width: 200
+    height: 100
+    label: 前往修补摊
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z4
+
+  # 返回
+  - id: exit_back
+    type: zone
+    x: 375
+    y: 1200
+    width: 200
+    height: 100
+    label: 返回
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C3-Z2
+

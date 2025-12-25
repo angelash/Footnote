@@ -1,49 +1,123 @@
+# ===========================
 # Dependencies
+# ===========================
 node_modules/
 .pnp
 .pnp.js
 
+# ===========================
 # Build outputs
+# ===========================
 dist/
 build/
 *.tsbuildinfo
 
-# IDE
+# ===========================
+# IDE & Editors
+# ===========================
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
+*.sublime-project
+*.sublime-workspace
 
-# OS
+# ===========================
+# OS generated files
+# ===========================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
 
+# ===========================
 # Testing
+# ===========================
 coverage/
 playwright-report/
 test-results/
+.nyc_output/
 
+# ===========================
 # Environment
+# ===========================
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
 
+# ===========================
 # Logs
+# ===========================
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
+# ===========================
 # Temporary files
+# ===========================
 *.tmp
 *.temp
 .cache/
+tmp/
+temp/
 
-# Package manager locks (keep one)
+# ===========================
+# Python
+# ===========================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+env/
+.env/
+ENV/
+*.egg-info/
+.eggs/
+
+# ===========================
+# Backup & Generated Assets
+# ===========================
+assets/bak/
+
+# ===========================
+# Generated content (experiments)
+# ===========================
+text2pic/generated/
+text2pic/temp_serve/
+comics/generated/
+comics/output/
+comics/processed/
+
+# ===========================
+# Local development
+# ===========================
+*.local
+.turbo/
+
+# ===========================
+# Package manager locks
+# Keep one, comment out the rest
+# ===========================
 # package-lock.json
 # yarn.lock
 # pnpm-lock.yaml
 
-__pycache__
+# ===========================
+# Misc
+# ===========================
+*.generated.*
+*.bak
+*.backup

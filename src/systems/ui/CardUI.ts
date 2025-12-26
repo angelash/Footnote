@@ -7,23 +7,24 @@
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
+import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 import type { ICard } from '@/types';
 
 // ==================== 配置常量 ====================
 
 const CONFIG = {
   /** 卡片宽度 */
-  CARD_WIDTH: 320,
+  CARD_WIDTH: UI.CARD.NORMAL.WIDTH,
   /** 卡片高度 */
-  CARD_HEIGHT: 480,
+  CARD_HEIGHT: UI.CARD.NORMAL.HEIGHT,
   /** 卡片圆角 */
-  CARD_RADIUS: 16,
+  CARD_RADIUS: UI.RADIUS.XL,
   /** 获取动画时长 */
-  OBTAIN_ANIMATION_DURATION: 800,
+  OBTAIN_ANIMATION_DURATION: UI.ANIMATION.EFFECT,
   /** 翻转动画时长 */
-  FLIP_DURATION: 300,
+  FLIP_DURATION: UI.ANIMATION.NORMAL,
   /** 内容区域内边距 */
-  CONTENT_PADDING: 30,
+  CONTENT_PADDING: UI.SPACING.XL,
   /** 内容最大高度 */
   CONTENT_MAX_HEIGHT: 280,
 };
@@ -231,7 +232,7 @@ export class CardUI {
       -CONFIG.CARD_WIDTH / 2 + 15,
       -CONFIG.CARD_HEIGHT / 2 + 15,
       '',
-      { fontSize: '24px' }
+      { fontSize: UI_FONT_SIZE.ICON }
     );
     this._cardContainer.add(this._cardTypeIcon);
 
@@ -242,7 +243,7 @@ export class CardUI {
       '',
       {
         ...TEXT_STYLES.TITLE,
-        fontSize: '24px',
+        fontSize: UI_FONT_SIZE.SECTION,
         wordWrap: { width: CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2 },
       }
     ).setOrigin(0.5);
@@ -255,9 +256,9 @@ export class CardUI {
       '',
       {
         ...TEXT_STYLES.BODY,
-        fontSize: '16px',
+        fontSize: UI_FONT_SIZE.SMALL,
         wordWrap: { width: CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2, useAdvancedWrap: true },
-        lineSpacing: 8,
+        lineSpacing: UI.LINE_SPACING.LOOSE,
         align: 'center',
       }
     ).setOrigin(0.5, 0);
@@ -273,7 +274,7 @@ export class CardUI {
       '点击翻转',
       {
         ...TEXT_STYLES.MUTED,
-        fontSize: '16px',
+        fontSize: UI_FONT_SIZE.SMALL,
       }
     ).setOrigin(0.5);
     this._cardContainer.add(this._flipHint);
@@ -325,7 +326,7 @@ export class CardUI {
     closeCircle.strokeCircle(0, 0, 16);
 
     const closeX = this._scene.add.text(0, 0, '×', {
-      fontSize: '20px',
+      fontSize: UI_FONT_SIZE.NORMAL,
       color: '#999999',
     }).setOrigin(0.5);
 

@@ -11,6 +11,7 @@ import {
   getZoneTypeColors,
   getObjectIcon,
 } from '@/config/assetMode.config';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 // ==================== 类型定义 ====================
 
@@ -117,7 +118,7 @@ export class BillboardFactory {
     if (this._config.showTypeLabel && role) {
       const roleText = this._scene.add
         .text(0, -height / 2 - 8, `[${role}]`, {
-          fontSize: '12px',
+          fontSize: UI_FONT_SIZE.TINY,
           color: '#686868',
           fontFamily: 'Noto Sans SC, sans-serif',
         })
@@ -136,7 +137,7 @@ export class BillboardFactory {
     // 角色首字母
     const initial = this._scene.add
       .text(0, 0, name.charAt(0), {
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#000000',
         fontStyle: 'bold',
       })
@@ -188,7 +189,7 @@ export class BillboardFactory {
     // 图标
     const iconText = this._scene.add
       .text(0, -5, icon, {
-        fontSize: '20px',
+        fontSize: UI_FONT_SIZE.NORMAL,
       })
       .setOrigin(0.5);
     container.add(iconText);
@@ -196,7 +197,7 @@ export class BillboardFactory {
     // 名称（在下方）
     const nameText = this._scene.add
       .text(0, height / 2 + 12, name, {
-        fontSize: '13px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: interactive ? '#00FFAA' : '#A8A6A3',
         fontFamily: 'Noto Sans SC, sans-serif',
       })
@@ -207,7 +208,7 @@ export class BillboardFactory {
     if (this._config.showTypeLabel) {
       const typeLabel = this._scene.add
         .text(0, -height / 2 - 10, `[${type}]`, {
-          fontSize: '11px',
+          fontSize: UI_FONT_SIZE.TINY,
           color: '#686868',
           fontFamily: 'Noto Sans SC, sans-serif',
         })
@@ -296,7 +297,7 @@ export class BillboardFactory {
       35,
       `${chapterLabel}${zoneId}\n${zoneName}\n[${zoneType}]`,
       {
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#686868',
         lineSpacing: 6,
         fontFamily: 'Noto Sans SC, sans-serif',
@@ -325,7 +326,7 @@ export class BillboardFactory {
       for (let x = gridSize; x < width; x += gridSize * 2) {
         const label = this._scene.add
           .text(x, height - 15, `${x}`, {
-            fontSize: '11px',
+            fontSize: UI_FONT_SIZE.TINY,
             color: '#444444',
           })
           .setOrigin(0.5);
@@ -334,7 +335,7 @@ export class BillboardFactory {
       for (let y = gridSize; y < height; y += gridSize * 2) {
         const label = this._scene.add
           .text(15, y, `${y}`, {
-            fontSize: '11px',
+            fontSize: UI_FONT_SIZE.TINY,
             color: '#444444',
           })
           .setOrigin(0.5);
@@ -387,7 +388,7 @@ export class BillboardFactory {
     // 标注
     const label = this._scene.add
       .text(-boxWidth / 2 + 10, -boxHeight / 2 - 15, '[对话框]', {
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#686868',
       })
       .setOrigin(0, 1);
@@ -422,7 +423,7 @@ export class BillboardFactory {
 
     const label = this._scene.add
       .text(0, 0, text, {
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: `#${color.toString(16).padStart(6, '0')}`,
         fontFamily: 'Noto Sans SC, sans-serif',
       })
@@ -461,7 +462,7 @@ export class BillboardFactory {
     // 标注
     const label = this._scene.add
       .text(0, -height / 2 - 15, '[卡片]', {
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#686868',
       })
       .setOrigin(0.5, 1);
@@ -500,7 +501,7 @@ export class BillboardFactory {
 
       const titleText = this._scene.add
         .text(0, -height / 2 + 20, title, {
-          fontSize: '14px',
+          fontSize: UI_FONT_SIZE.TINY,
           color: '#E8E6E3',
           fontFamily: 'Noto Sans SC, sans-serif',
         })
@@ -567,7 +568,7 @@ export class BillboardFactory {
     // 标签
     const text = this._scene.add
       .text(0, 25, label, {
-        fontSize: '13px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#00FFAA',
         fontFamily: 'Noto Sans SC, sans-serif',
       })
@@ -598,7 +599,7 @@ export class BillboardFactory {
     // 标签
     const label = this._scene.add
       .text(0, -20, '[深度感知]', {
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#00FFAA',
       })
       .setOrigin(0.5);
@@ -626,7 +627,7 @@ export class BillboardFactory {
     // 标签
     const label = this._scene.add
       .text(0, 60, '[深度介入]', {
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#FF00FF',
       })
       .setOrigin(0.5);
@@ -660,7 +661,7 @@ export class BillboardFactory {
     // 标签
     const label = this._scene.add
       .text(0, 55, '[时间干预]', {
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#FFD700',
       })
       .setOrigin(0.5);
@@ -692,7 +693,7 @@ export class BillboardFactory {
     // 标签
     const label = this._scene.add
       .text(0, 25, '[伤痕]', {
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#FF4444',
       })
       .setOrigin(0.5);
@@ -718,7 +719,7 @@ export class BillboardFactory {
 
     const label = this._scene.add
       .text(0, 35, '[特效]', {
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#4A9EFF',
       })
       .setOrigin(0.5);

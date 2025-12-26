@@ -6,22 +6,23 @@
 
 import Phaser from 'phaser';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
+import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 
 // ==================== 配置常量 ====================
 
 const CONFIG = {
   /** Toast宽度 */
-  WIDTH: 400,
+  WIDTH: UI.TOAST.WIDTH,
   /** Toast高度 */
-  HEIGHT: 60,
+  HEIGHT: UI.TOAST.HEIGHT,
   /** 显示时长(ms) */
-  DURATION: 3000,
+  DURATION: UI.TOAST.DURATION,
   /** 动画时长(ms) */
-  ANIMATION_DURATION: 300,
+  ANIMATION_DURATION: UI.ANIMATION.NORMAL,
   /** 最大同时显示数量 */
   MAX_VISIBLE: 3,
   /** Toast间距 */
-  SPACING: 10,
+  SPACING: UI.SPACING.SM,
   /** 顶部边距 */
   MARGIN_TOP: 80,
 };
@@ -228,7 +229,7 @@ export class ToastManager {
       -CONFIG.WIDTH / 2 + 20,
       0,
       this._getTypeIcon(type),
-      { fontSize: '24px' }
+      { fontSize: UI_FONT_SIZE.ICON }
     ).setOrigin(0, 0.5);
 
     // 消息文字
@@ -238,7 +239,7 @@ export class ToastManager {
       message,
       {
         ...TEXT_STYLES.BODY,
-        fontSize: '16px',
+        fontSize: UI_FONT_SIZE.SMALL,
         wordWrap: { width: CONFIG.WIDTH - 80 },
       }
     ).setOrigin(0, 0.5);
@@ -264,7 +265,7 @@ export class ToastManager {
       -CONFIG.WIDTH / 2 + 20,
       0,
       '🏆',
-      { fontSize: '32px' }
+      { fontSize: UI_FONT_SIZE.ICON_LARGE }
     ).setOrigin(0, 0.5);
 
     // 标题
@@ -274,7 +275,7 @@ export class ToastManager {
       title,
       {
         ...TEXT_STYLES.TITLE,
-        fontSize: '16px',
+        fontSize: UI_FONT_SIZE.SMALL,
         color: '#FFD700',
       }
     ).setOrigin(0, 0.5);
@@ -286,7 +287,7 @@ export class ToastManager {
       description,
       {
         ...TEXT_STYLES.MUTED,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
       }
     ).setOrigin(0, 0.5);
 

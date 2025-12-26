@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
+import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 import { CharacterId, getPortraitKey as getCharacterPortraitKey, type CharacterExpression } from '@/config/characters.config';
 import type { IDialogue, IDialogueChoice } from '@/types';
 
@@ -18,17 +19,17 @@ const CONFIG = {
   /** 对话框宽度 */
   BOX_WIDTH: 700,
   /** 对话框高度 */
-  BOX_HEIGHT: 200,
+  BOX_HEIGHT: UI.DIALOGUE.BOX_HEIGHT,
   /** 对话框底部边距 */
-  BOX_MARGIN_BOTTOM: 100,
+  BOX_MARGIN_BOTTOM: UI.DIALOGUE.BOX_MARGIN_BOTTOM,
   /** 立绘宽度 */
   PORTRAIT_WIDTH: 200,
   /** 立绘高度 */
   PORTRAIT_HEIGHT: 300,
   /** 选项按钮高度 */
-  CHOICE_HEIGHT: 50,
+  CHOICE_HEIGHT: UI.DIALOGUE.CHOICE_HEIGHT,
   /** 选项间距 */
-  CHOICE_SPACING: 10,
+  CHOICE_SPACING: UI.DIALOGUE.CHOICE_SPACING,
 };
 
 // ==================== 类型定义 ====================
@@ -251,7 +252,7 @@ export class DialogueUI {
       '',
       {
         ...TEXT_STYLES.SPEAKER,
-        fontSize: '18px',
+        fontSize: UI_FONT_SIZE.SMALL,
         color: '#00FFAA',
       }
     );
@@ -264,9 +265,9 @@ export class DialogueUI {
       '',
       {
         ...TEXT_STYLES.DIALOGUE,
-        fontSize: '16px',
+        fontSize: UI_FONT_SIZE.SMALL,
         wordWrap: { width: CONFIG.BOX_WIDTH - 40 },
-        lineSpacing: 8,
+        lineSpacing: UI.LINE_SPACING.LOOSE,
       }
     );
     this._container.add(this._dialogueText);
@@ -277,7 +278,7 @@ export class DialogueUI {
       height - CONFIG.BOX_MARGIN_BOTTOM - 20,
       '▼',
       {
-        fontSize: '18px',
+        fontSize: UI_FONT_SIZE.SMALL,
         color: '#686868',
       }
     );
@@ -406,7 +407,7 @@ export class DialogueUI {
     // 文字
     const label = this._scene.add.text(0, 0, text, {
       ...TEXT_STYLES.BODY,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
     }).setOrigin(0.5);
 
     container.add([bg, label]);

@@ -14,37 +14,73 @@ alwaysApply: true
 
 ### 1. 字体大小检查
 
-每个 UI 界面必须检查以下元素的字体大小：
+#### 统一UI常量规范（2025-12-26 新增）
+
+> ⚠️ **禁止在代码中硬编码字体大小、间距、尺寸等UI参数！**
+> 
+> **必须使用 `src/config/ui.config.ts` 中定义的统一常量。**
 
 ```typescript
-// 标准字体尺寸参考（基于 1080x1920 分辨率）
-const FONT_SIZE = {
-  TITLE: '36px',    // 主标题
-  SECTION: '28px',  // 章节标题
-  NORMAL: '20px',   // 正常文本
-  SMALL: '16px',    // 小字体
-  TINY: '14px',     // 最小字体
-};
+// 导入方式
+import { UI, UI_FONT_SIZE } from '@/config/ui.config';
+
+// 使用示例
+fontSize: UI_FONT_SIZE.NORMAL     // 正确 ✅
+fontSize: '20px'                  // 错误 ❌
+
+// 可用常量
+UI_FONT_SIZE = {
+  HUGE: '48px',      // 超大标题
+  TITLE: '36px',     // 大标题
+  SECTION: '28px',   // 区块标题
+  NORMAL: '20px',    // 正文
+  SMALL: '16px',     // 小字体
+  TINY: '14px',      // 最小字体（绝对下限）
+  ICON: '24px',      // 图标文字
+  ICON_LARGE: '32px' // 大图标
+}
+
+// 其他可用常量
+UI.SPACING          // 间距: XS(4), SM(8), MD(16), LG(24), XL(32), XXL(48)
+UI.RADIUS           // 圆角: SM(4), MD(8), LG(12), XL(16)
+UI.BUTTON           // 按钮尺寸: SM, MD, LG
+UI.PANEL            // 面板尺寸: SM, MD, LG, FULL
+UI.CARD             // 卡片尺寸: THUMB, NORMAL, LARGE
+UI.DIALOGUE         // 对话框尺寸
+UI.TOAST            // Toast尺寸
+UI.ANIMATION        // 动画时长: FAST(150), NORMAL(300), SLOW(500)
+UI.DEPTH            // Z-Index层级
+UI.ALPHA            // 透明度
+UI.LINE_WIDTH       // 线宽
+UI.LINE_SPACING     // 行高
 ```
 
 **检查要点：**
 - [ ] 主标题是否清晰可读（≥28px）
 - [ ] 正文内容是否清晰可读（≥16px）
-- [ ] 辅助信息是否可读（≥12px）
-- [ ] **绝对最小字体：不得小于 12px**
-- [ ] 所有硬编码的字体大小是否使用常量
+- [ ] 辅助信息是否可读（≥14px）
+- [ ] **绝对最小字体：不得小于 14px (UI_FONT_SIZE.TINY)**
+- [ ] **所有字体大小必须使用 UI_FONT_SIZE 常量**
+- [ ] **所有间距、尺寸必须使用 UI.SPACING/PANEL/CARD 常量**
 - [ ] **不要遗漏任何文本元素**
 
 ### 字体修复黑名单
 
 以下字体大小需要立即修复：
-- `9px` → 至少改为 `11px`
-- `10px` → 至少改为 `12px`
-- `11px` → 考虑改为 `12px` 或 `13px`
+- `9px` → 使用 `UI_FONT_SIZE.TINY`
+- `10px` → 使用 `UI_FONT_SIZE.TINY`
+- `11px` → 使用 `UI_FONT_SIZE.TINY`
+- `12px` → 使用 `UI_FONT_SIZE.TINY`
+- `13px` → 使用 `UI_FONT_SIZE.TINY`
+- 其他硬编码值 → 替换为对应的 `UI_FONT_SIZE` 常量
 
 **全局搜索命令**：
 ```bash
-grep -r "fontSize.*'9px'\|fontSize.*'10px'\|fontSize.*'11px'" src/ --include="*.ts"
+# 搜索所有硬编码字体（Windows PowerShell）
+Select-String -Path "src\**\*.ts" -Pattern "fontSize.*'[0-9]+px'" -Recurse
+
+# 搜索所有硬编码字体（Unix/Git Bash）
+grep -r "fontSize.*'[0-9]\+px'" src/ --include="*.ts"
 ```
 
 ### 2. 布局检查
@@ -234,3 +270,51 @@ ls -la src/scenes/preview/
 - **检查范围不能只限于预览场景**，必须全局扫描
 - **使用 grep 命令全局搜索**小字体是最可靠的方法
 - **用户提到的每一个要求都要记录到 MDC**
+
+## UI常量化改造记录（2025-12-26）
+
+### 背景
+用户要求"字体大小应该制定一套固定变量规范，可以统一调整"。
+
+### 实施内容
+1. **创建统一配置文件** `src/config/ui.config.ts`
+   - `UI_FONT_SIZE`: 字体大小常量（HUGE/TITLE/SECTION/NORMAL/SMALL/TINY/ICON/ICON_LARGE）
+   - `UI_SPACING`: 间距常量（XS/SM/MD/LG/XL/XXL）
+   - `UI_RADIUS`: 圆角常量
+   - `UI_BUTTON`: 按钮尺寸
+   - `UI_PANEL`: 面板尺寸
+   - `UI_CARD`: 卡片尺寸
+   - `UI_DIALOGUE`: 对话框尺寸
+   - `UI_TOAST`: Toast尺寸
+   - `UI_ANIMATION`: 动画时长
+   - `UI_DEPTH`: Z-Index层级
+   - `UI_ALPHA`: 透明度
+   - `UI_LINE_WIDTH`: 线宽
+   - `UI_LINE_SPACING`: 行高
+   - `UI`: 统一导出对象
+   - `createFontStyle()`: 辅助函数
+   - `UI_TEXT_STYLES`: 预定义文字样式
+
+2. **改造的文件**
+   - `CardUI.ts`: 使用 UI.CARD.NORMAL, UI_FONT_SIZE, UI.ANIMATION
+   - `DialogueUI.ts`: 使用 UI.DIALOGUE, UI_FONT_SIZE, UI.LINE_SPACING
+   - `InventoryUI.ts`: 使用 UI.PANEL, UI.CARD.THUMB, UI_FONT_SIZE, UI.SPACING
+   - `PauseMenu.ts`: 使用 UI.BUTTON, UI.PANEL, UI_FONT_SIZE
+   - `ToastManager.ts`: 使用 UI.TOAST, UI.ANIMATION, UI_FONT_SIZE
+   - `BillboardFactory.ts`: 使用 UI_FONT_SIZE
+
+### 优势
+- **统一调整**：修改 `ui.config.ts` 即可全局生效
+- **类型安全**：TypeScript 类型检查
+- **可维护性**：集中管理，避免魔法数字
+- **一致性**：强制所有UI使用相同规范
+
+### 使用规范
+```typescript
+// ✅ 正确用法
+import { UI, UI_FONT_SIZE } from '@/config/ui.config';
+fontSize: UI_FONT_SIZE.NORMAL
+
+// ❌ 错误用法（禁止硬编码）
+fontSize: '20px'
+```

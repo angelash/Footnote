@@ -7,22 +7,23 @@
 import Phaser from 'phaser';
 import { narrativeEngine, CardCategory } from '@/systems/narrative';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
+import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 import type { ICard as INarrativeCard } from '@/systems/narrative';
 
 // ==================== 配置常量 ====================
 
 const CONFIG = {
   /** 面板宽度 */
-  PANEL_WIDTH: 650,
+  PANEL_WIDTH: UI.PANEL.MD.WIDTH + 100,
   /** 面板高度 */
-  PANEL_HEIGHT: 900,
+  PANEL_HEIGHT: 1000,
   /** 卡片缩略图大小 */
-  CARD_THUMB_WIDTH: 140,
-  CARD_THUMB_HEIGHT: 180,
+  CARD_THUMB_WIDTH: UI.CARD.THUMB.WIDTH,
+  CARD_THUMB_HEIGHT: UI.CARD.THUMB.HEIGHT,
   /** 每行卡片数 */
-  CARDS_PER_ROW: 4,
+  CARDS_PER_ROW: 3,
   /** 卡片间距 */
-  CARD_SPACING: 15,
+  CARD_SPACING: UI.SPACING.LG,
 };
 
 // ==================== 类型定义 ====================
@@ -133,7 +134,7 @@ export class InventoryUI {
     // 标题
     const title = this._scene.add.text(0, -CONFIG.PANEL_HEIGHT / 2 + 40, '卡片收藏', {
       ...TEXT_STYLES.TITLE,
-      fontSize: '28px',
+      fontSize: UI_FONT_SIZE.SECTION,
     }).setOrigin(0.5);
     panel.add(title);
 
@@ -163,7 +164,7 @@ export class InventoryUI {
     bg.strokeCircle(0, 0, 18);
 
     const x = this._scene.add.text(0, 0, '×', {
-      fontSize: '24px',
+      fontSize: UI_FONT_SIZE.ICON,
       color: '#888888',
     }).setOrigin(0.5);
 
@@ -223,7 +224,7 @@ export class InventoryUI {
     
     const text = this._scene.add.text(0, 0, label, {
       ...TEXT_STYLES.BODY,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
     }).setOrigin(0.5);
     text.setName('text');
 
@@ -266,7 +267,7 @@ export class InventoryUI {
 
     const statsText = this._scene.add.text(0, y, `已收集: ${obtainedCount} / ${totalCards}`, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
     }).setOrigin(0.5);
     statsText.setName('statsText');
     panel.add(statsText);
@@ -296,7 +297,7 @@ export class InventoryUI {
     if (cards.length === 0) {
       const emptyText = this._scene.add.text(0, 100, '暂无卡片', {
         ...TEXT_STYLES.MUTED,
-        fontSize: '18px',
+        fontSize: UI_FONT_SIZE.NORMAL,
       }).setOrigin(0.5);
       this._cardsContainer.add(emptyText);
       return;
@@ -333,13 +334,13 @@ export class InventoryUI {
       -CONFIG.CARD_THUMB_WIDTH / 2 + 10,
       -CONFIG.CARD_THUMB_HEIGHT / 2 + 10,
       this._getCategoryIcon(card.category),
-      { fontSize: '18px' }
+      { fontSize: UI_FONT_SIZE.SMALL }
     );
 
     // 卡片标题
     const title = this._scene.add.text(0, 0, card.title, {
       ...TEXT_STYLES.BODY,
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       wordWrap: { width: CONFIG.CARD_THUMB_WIDTH - 20 },
       align: 'center',
     }).setOrigin(0.5);
@@ -351,7 +352,7 @@ export class InventoryUI {
       card.chapter,
       {
         ...TEXT_STYLES.MUTED,
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
       }
     ).setOrigin(0.5);
 
@@ -367,7 +368,7 @@ export class InventoryUI {
         -CONFIG.CARD_THUMB_HEIGHT / 2 + 10,
         'NEW',
         {
-          fontSize: '12px',
+          fontSize: UI_FONT_SIZE.TINY,
           color: '#FFD700',
           backgroundColor: '#000000',
           padding: { x: 4, y: 2 },

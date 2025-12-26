@@ -8,21 +8,22 @@ import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { saveManager } from '@/systems/save';
 import { TEXT_STYLES, COLORS, SCENES } from '@/config/game.config';
+import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 import type { IGameSettings } from '@/systems/save';
 
 // ==================== 配置常量 ====================
 
 const CONFIG = {
   /** 菜单宽度 */
-  MENU_WIDTH: 400,
+  MENU_WIDTH: 450,
   /** 按钮高度 */
-  BUTTON_HEIGHT: 50,
+  BUTTON_HEIGHT: UI.BUTTON.LG.HEIGHT,
   /** 按钮间距 */
-  BUTTON_SPACING: 15,
+  BUTTON_SPACING: UI.SPACING.LG,
   /** 设置面板宽度 */
-  SETTINGS_WIDTH: 500,
+  SETTINGS_WIDTH: UI.PANEL.MD.WIDTH,
   /** 滑块宽度 */
-  SLIDER_WIDTH: 200,
+  SLIDER_WIDTH: 250,
 };
 
 // ==================== 类型定义 ====================
@@ -139,7 +140,7 @@ export class PauseMenu {
     // 标题
     const title = this._scene.add.text(0, -200, '暂停', {
       ...TEXT_STYLES.TITLE,
-      fontSize: '36px',
+      fontSize: UI_FONT_SIZE.TITLE,
     }).setOrigin(0.5);
     this._mainMenuContainer.add(title);
 
@@ -168,7 +169,7 @@ export class PauseMenu {
     // 标题
     const title = this._scene.add.text(0, -250, '设置', {
       ...TEXT_STYLES.TITLE,
-      fontSize: '32px',
+      fontSize: UI_FONT_SIZE.SECTION,
     }).setOrigin(0.5);
     this._settingsContainer.add(title);
 
@@ -186,7 +187,7 @@ export class PauseMenu {
     // 文字速度
     const speedLabel = this._scene.add.text(-CONFIG.SETTINGS_WIDTH / 2 + 30, 60, '文字速度', {
       ...TEXT_STYLES.BODY,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
     });
     this._settingsContainer.add(speedLabel);
 
@@ -211,7 +212,7 @@ export class PauseMenu {
     // 自动播放
     const autoPlayLabel = this._scene.add.text(-CONFIG.SETTINGS_WIDTH / 2 + 30, 130, '自动播放', {
       ...TEXT_STYLES.BODY,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
     });
     this._settingsContainer.add(autoPlayLabel);
 
@@ -248,7 +249,7 @@ export class PauseMenu {
     // 文字
     const label = this._scene.add.text(0, 0, text, {
       ...TEXT_STYLES.BODY,
-      fontSize: '18px',
+      fontSize: UI_FONT_SIZE.NORMAL,
     }).setOrigin(0.5);
 
     container.add([bg, label]);
@@ -281,7 +282,7 @@ export class PauseMenu {
     // 标签
     const labelText = this._scene.add.text(-CONFIG.SETTINGS_WIDTH / 2 + 30, y, label, {
       ...TEXT_STYLES.BODY,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
     });
     this._settingsContainer.add(labelText);
 
@@ -309,7 +310,7 @@ export class PauseMenu {
       CONFIG.SETTINGS_WIDTH / 2 - 10,
       y,
       `${Math.round(value * 100)}%`,
-      { ...TEXT_STYLES.BODY, fontSize: '16px' }
+      { ...TEXT_STYLES.BODY, fontSize: UI_FONT_SIZE.SMALL }
     ).setOrigin(1, 0.5);
     this._settingsContainer.add(valueText);
 
@@ -380,7 +381,7 @@ export class PauseMenu {
 
     const label = this._scene.add.text(20, 0, text, {
       ...TEXT_STYLES.BODY,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
       color: selected ? '#00FFAA' : '#A8A6A3',
     }).setOrigin(0, 0.5);
 

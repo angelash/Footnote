@@ -41,7 +41,7 @@ export class GameScene extends Phaser.Scene {
 
   // 输入
   private _cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private _moveKeys!: { w: Phaser.Input.Keyboard.Key; a: Phaser.Input.Keyboard.Key; s: Phaser.Input.Keyboard.Key; d: Phaser.Input.Keyboard.Key };
+  private _moveKeys!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
   private _moveSpeed: number = 200;
 
   // 玩家状态
@@ -1062,11 +1062,11 @@ export class GameScene extends Phaser.Scene {
     // 方向键 + WASD（安全初始化，处理键盘不可用的情况）
     if (this.input.keyboard) {
       this._cursors = this.input.keyboard.createCursorKeys();
-      this._moveKeys = this.input.keyboard.addKeys('W,A,S,D') as unknown as {
-        w: Phaser.Input.Keyboard.Key;
-        a: Phaser.Input.Keyboard.Key;
-        s: Phaser.Input.Keyboard.Key;
-        d: Phaser.Input.Keyboard.Key;
+      this._moveKeys = this.input.keyboard.addKeys('W,A,S,D') as {
+        W: Phaser.Input.Keyboard.Key;
+        A: Phaser.Input.Keyboard.Key;
+        S: Phaser.Input.Keyboard.Key;
+        D: Phaser.Input.Keyboard.Key;
       };
 
       // ESC键打开/关闭暂停菜单
@@ -1143,10 +1143,10 @@ export class GameScene extends Phaser.Scene {
       vy = this._touchMoveDirection.y;
     } else if (this._cursors && this._moveKeys) {
       // 键盘输入
-      const left = this._cursors.left?.isDown || this._moveKeys.a?.isDown;
-      const right = this._cursors.right?.isDown || this._moveKeys.d?.isDown;
-      const up = this._cursors.up?.isDown || this._moveKeys.w?.isDown;
-      const down = this._cursors.down?.isDown || this._moveKeys.s?.isDown;
+      const left = this._cursors.left?.isDown || this._moveKeys.A?.isDown;
+      const right = this._cursors.right?.isDown || this._moveKeys.D?.isDown;
+      const up = this._cursors.up?.isDown || this._moveKeys.W?.isDown;
+      const down = this._cursors.down?.isDown || this._moveKeys.S?.isDown;
 
       if (left) vx -= 1;
       if (right) vx += 1;

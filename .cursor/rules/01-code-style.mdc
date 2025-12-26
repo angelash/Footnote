@@ -210,3 +210,60 @@ import { formatText } from './utils';
 // 类型导入
 import type { IWorldState } from '@/systems/world';
 ```
+
+## 外部库使用规范
+
+### 核心原则
+
+1. **查文档，不猜测**：使用外部库 API 前必须确认行为
+2. **类型先行**：为外部 API 返回值定义明确的类型
+3. **封装隔离**：通过 wrapper 统一调用方式
+
+### 常见陷阱防范
+
+- **大小写敏感**：API 返回的键名、枚举值可能有特定格式
+- **异步时序**：注意 Promise、回调的执行顺序
+- **副作用**：某些 API 调用会修改全局状态
+- **版本差异**：同一 API 不同版本可能行为不同
+
+### 最佳实践
+
+```typescript
+// ✅ 为外部 API 返回值定义类型
+interface IMoveKeys {
+  W: Phaser.Input.Keyboard.Key;
+  A: Phaser.Input.Keyboard.Key;
+  S: Phaser.Input.Keyboard.Key;
+  D: Phaser.Input.Keyboard.Key;
+}
+const keys = this.input.keyboard.addKeys('W,A,S,D') as IMoveKeys;
+
+// ❌ 直接使用 any 或假设结构
+const keys = this.input.keyboard.addKeys('W,A,S,D');
+keys.w.isDown; // 可能 undefined
+```
+
+## 调试与排错原则
+
+### 问题定位流程
+
+1. **复现**：确保能稳定复现问题
+2. **隔离**：最小化复现条件
+3. **追溯**：从现象追溯到根因
+4. **验证**：修复后确认问题解决
+
+### 调试检查清单
+
+遇到"功能不工作"时，按顺序检查：
+
+- [ ] **代码是否执行到？**（添加 console.log）
+- [ ] **变量值是否符合预期？**（打印关键变量）
+- [ ] **类型是否正确？**（运行时类型 vs 编译时类型）
+- [ ] **调用顺序是否正确？**（异步、生命周期）
+- [ ] **上下文是否正确？**（场景、状态、权限）
+
+### 修复后必做
+
+1. **添加回归测试**防止问题复现
+2. **更新文档**记录踩坑点（写入 MDC 或注释）
+3. **考虑是否有类似问题**需要排查

@@ -6,454 +6,102 @@ alwaysApply: false
 
 # 测试规范
 
-## 测试框架
+## 核心原则
 
-### 单元测试: Vitest
+### 测试质量检查清单
+
+每个测试用例必须回答：
+- [ ] **测试了什么功能？**（描述清晰）
+- [ ] **预期结果是什么？**（有断言）
+- [ ] **如何验证结果？**（断言具体）
+- [ ] **测试在正确的上下文执行吗？**（场景/状态）
+- [ ] **测试能检测到 Bug 吗？**（不是假阳性）
+
+### 测试必须验证效果
+
+❌ **错误**：只验证"不崩溃"
 ```typescript
-// vitest.config.ts
-import { defineConfig } from 'vitest/config';
-
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    include: ['src/**/*.test.ts', 'tests/unit/**/*.ts'],
-    coverage: {
-      reporter: ['text', 'html'],
-      exclude: ['node_modules/', 'tests/'],
-    },
-  },
-});
+// 只按键，不验证效果
+await page.keyboard.press('KeyW');
+await page.waitForTimeout(200);
+// 没有断言！
 ```
 
-### E2E测试: Playwright
+✅ **正确**：验证状态变化
 ```typescript
-// playwright.config.ts
-import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './tests/e2e',
-  use: {
-    baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
-  },
-  webServer: {
-    command: 'npm run dev',
-    port: 5173,
-    reuseExistingServer: !process.env.CI,
-  },
-});
+const initialPos = getPlayerPosition();
+await page.keyboard.press('KeyW');
+const newPos = getPlayerPosition();
+expect(newPos.y).toBeLessThan(initialPos.y); // 断言位置变化
 ```
 
-## 单元测试规范
+### 测试必须在正确上下文执行
 
-### 文件命名
-```
-src/
-  systems/
-    narrative/
-      DialogueManager.ts
-      DialogueManager.test.ts  # 同目录测试文件
-tests/
-  unit/
-    systems/
-      WorldState.test.ts       # 或集中测试目录
-```
+- 移动测试 → 必须在 **GameScene** 执行，不是 MenuScene
+- 对话测试 → 必须先**触发对话**，不是空状态
+- 能力测试 → 必须先**解锁能力**，不是初始状态
 
-### 测试结构
+## 测试分层
+
+### 单元测试（Vitest）
+- **目标**：核心逻辑、纯函数、状态计算
+- **位置**：`tests/unit/` 或同目录 `*.test.ts`
+- **Mock**：隔离 Phaser、IndexedDB 等外部依赖
+
+### E2E测试（Playwright）
+- **目标**：完整用户流程、多系统协作
+- **位置**：`tests/e2e/`
+- **原则**：模拟真实用户操作，验证可见结果
+
+## 覆盖率要求
+
+| 层级 | 目标覆盖率 | 系统 |
+|------|-----------|------|
+| **核心系统** | ≥80% | WorldState, NarrativeEngine, DialogueManager, CardSystem, SaveManager |
+| **游戏逻辑** | ≥70% | ZoneManager, AbilitySystem, InputSystem |
+| **UI组件** | ≥50% | DialogueBox, CardViewer, InventoryUI |
+
+### E2E 必须覆盖
+
+- [ ] 全部主线流程（C0-C5 + 终章）
+- [ ] 三结局路径（A/B/C）
+- [ ] 关键分支选择
+- [ ] 伏笔触发和回收
+
+## 测试命名规范
+
 ```typescript
-// DialogueManager.test.ts
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { DialogueManager } from './DialogueManager';
-
-describe('DialogueManager', () => {
-  let manager: DialogueManager;
-
-  beforeEach(() => {
-    manager = new DialogueManager();
-  });
-
-  describe('start', () => {
-    it('应该加载指定对话并触发start事件', async () => {
-      const onStart = vi.fn();
-      manager.on('start', onStart);
-
-      await manager.start('C0_Z1_ENTRY');
-
-      expect(onStart).toHaveBeenCalledWith(
-        expect.objectContaining({ id: 'C0_Z1_ENTRY' })
-      );
-    });
-
-    it('应该在对话不存在时抛出错误', async () => {
-      await expect(manager.start('INVALID_ID'))
-        .rejects.toThrow('Dialogue not found');
-    });
-  });
-
-  describe('choose', () => {
-    it('应该正确处理分支选择', async () => {
-      await manager.start('C0_Z1_CHOICE_1');
-      await manager.choose(0);
-
-      expect(manager.getCurrentDialogue().id).toBe('C0_Z1_FLOW');
-    });
-
-    it('选择无收益选项应增加R值', async () => {
-      const worldState = { counters: { r: 0, p: 0, w: 100 } };
-      manager = new DialogueManager({ worldState });
-
-      await manager.start('C0_Z1_CHOICE_1');
-      await manager.choose(1);  // 选择"先看看周围"
-
-      expect(worldState.counters.r).toBe(1);
-    });
+describe('系统/模块名', () => {
+  describe('功能分组', () => {
+    it('应该 + 具体行为', () => {});
+    it('当 X 时应该 Y', () => {});
+    it('不应该 + 错误行为', () => {});
   });
 });
 ```
 
-### Mock规范
+## 测试ID属性规范
+
+Phaser 对象使用 `setData` 添加测试标识：
 ```typescript
-// 模拟Phaser场景
-vi.mock('phaser', () => ({
-  Scene: class MockScene {
-    add = { image: vi.fn(), text: vi.fn() };
-    load = { image: vi.fn(), yaml: vi.fn() };
-    events = { emit: vi.fn(), on: vi.fn() };
-  },
-}));
-
-// 模拟IndexedDB
-vi.mock('./IndexedDBAdapter', () => ({
-  IndexedDBAdapter: {
-    get: vi.fn().mockResolvedValue(null),
-    set: vi.fn().mockResolvedValue(undefined),
-  },
-}));
-
-// 模拟数据加载
-vi.mock('@/data/dialogues', () => ({
-  dialogues: {
-    C0_Z1_ENTRY: {
-      speaker: 'CENHUI',
-      text: 'CENHUI_MONO_01',
-      next: 'C0_Z1_CHOICE_1',
-    },
-  },
-}));
-```
-
-## 核心系统测试用例
-
-### WorldState 测试
-```typescript
-describe('WorldState', () => {
-  describe('R值计算', () => {
-    it('完成无收益行为应增加R', () => {
-      const state = new WorldState();
-      state.recordAction({ type: 'no_reward', id: 'signpost_fix', rValue: 2 });
-      expect(state.counters.r).toBe(2);
-    });
-
-    it('R≥3时应触发系统停顿标记', () => {
-      const state = new WorldState();
-      state.counters.r = 3;
-      expect(state.shouldShowSystemPause()).toBe(true);
-    });
-
-    it('R≥6时应触发F21弱版', () => {
-      const state = new WorldState();
-      state.counters.r = 6;
-      expect(state.shouldTriggerF21Weak()).toBe(true);
-    });
-  });
-
-  describe('P值计算', () => {
-    it('深度介入应增加P值', () => {
-      const state = new WorldState();
-      state.useAbility('DEPTH_INTERVENTION');
-      expect(state.counters.p).toBe(2);
-    });
-
-    it('时间干预应增加更多P值', () => {
-      const state = new WorldState();
-      state.useAbility('TIME_INTERVENTION');
-      expect(state.counters.p).toBe(3);
-    });
-  });
-
-  describe('结局判定', () => {
-    it('低干预应得到结局A', () => {
-      const state = new WorldState();
-      state.counters = { r: 2, p: 5, w: 80 };
-      expect(state.determineEnding()).toBe('A_STABLE_PLANE');
-    });
-
-    it('高压力低可读性应得到结局B', () => {
-      const state = new WorldState();
-      state.counters = { r: 5, p: 25, w: 20 };
-      expect(state.determineEnding()).toBe('B_RELEASE_TRUTH');
-    });
-
-    it('特定条件应触发隐藏结局C', () => {
-      const state = new WorldState();
-      state.counters = { r: 12, p: 18, w: 35 };
-      expect(state.determineEnding()).toBe('C_BECOME_SYSTEM');
-    });
-  });
-});
-```
-
-### 伏笔系统测试
-```typescript
-describe('ForeshadowTracker', () => {
-  describe('伏笔触发', () => {
-    it('应按顺序触发伏笔阶段', () => {
-      const tracker = new ForeshadowTracker();
-
-      // 首次投放
-      tracker.trigger('F01', 'plant');
-      expect(tracker.getState('F01').planted).toBe(true);
-
-      // 加深
-      tracker.trigger('F01', 'deepen');
-      expect(tracker.getState('F01').deepened).toBe(true);
-    });
-
-    it('不应跳过前置阶段', () => {
-      const tracker = new ForeshadowTracker();
-
-      // 未plant直接deepen应失败
-      expect(tracker.canTrigger('F01', 'deepen')).toBe(false);
-    });
-  });
-
-  describe('终局验证', () => {
-    it('应检测未回收的伏笔', () => {
-      const tracker = new ForeshadowTracker();
-      tracker.trigger('F01', 'plant');
-      tracker.trigger('F01', 'deepen');
-      // F01未resolve
-
-      const result = tracker.validateEndgame();
-      expect(result.valid).toBe(false);
-      expect(result.unresolvedForeshadows).toContain('F01');
-    });
-  });
-});
-```
-
-### 卡片系统测试
-```typescript
-describe('CardSystem', () => {
-  describe('卡片收集', () => {
-    it('应正确收集卡片', () => {
-      const system = new CardSystem();
-      system.collect('CARD_C0_01');
-
-      expect(system.has('CARD_C0_01')).toBe(true);
-      expect(system.getAll().length).toBe(1);
-    });
-
-    it('不应重复收集同一卡片', () => {
-      const system = new CardSystem();
-      system.collect('CARD_C0_01');
-      system.collect('CARD_C0_01');
-
-      expect(system.getAll().length).toBe(1);
-    });
-  });
-
-  describe('卡片状态', () => {
-    it('接受疗程应覆盖卡片状态', () => {
-      const system = new CardSystem();
-      system.collect('CARD_C5_02');
-      system.updateState('CARD_C5_02', 'aligned');
-
-      const card = system.get('CARD_C5_02');
-      expect(card.currentState).toBe('aligned');
-    });
-  });
-});
-```
-
-## E2E测试规范
-
-### 测试ID属性
-```typescript
-// 组件中添加测试ID
-<div data-testid="dialogue-box">
-  <span data-testid="dialogue-speaker">{speaker}</span>
-  <p data-testid="dialogue-text">{text}</p>
-</div>
-
-// 或Phaser对象
 button.setData('testid', 'start-button');
 ```
 
-### 流程测试示例
+E2E 通过 `evaluate` 访问游戏状态：
 ```typescript
-// tests/e2e/prologue.spec.ts
-import { test, expect } from '@playwright/test';
-
-test.describe('序章流程', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/');
-    // 跳过启动动画
-    await page.click('[data-testid="skip-intro"]');
-  });
-
-  test('C0-Z1: 宿舍走廊基本流程', async ({ page }) => {
-    // 进入游戏
-    await page.click('[data-testid="start-game"]');
-
-    // 等待场景加载
-    await expect(page.locator('[data-testid="zone-title"]'))
-      .toHaveText('宿舍走廊');
-
-    // 查看身份卡
-    await page.click('[data-testid="identity-card"]');
-    await expect(page.locator('[data-testid="card-popup"]'))
-      .toBeVisible();
-    await expect(page.locator('[data-testid="card-title"]'))
-      .toContainText('岑回');
-
-    // 关闭卡片
-    await page.click('[data-testid="card-close"]');
-
-    // 验证卡片已收集
-    await page.click('[data-testid="inventory-button"]');
-    await expect(page.locator('[data-testid="card-list"]'))
-      .toContainText('身份识别卡');
-  });
-
-  test('C0-Z2: 无收益选择应增加R值', async ({ page }) => {
-    await page.click('[data-testid="start-game"]');
-
-    // 导航到C0-Z2
-    await page.click('[data-testid="exit-to-c0z2"]');
-
-    // 选择"今日特别"（无收益选项）
-    await page.click('[data-testid="order-special"]');
-
-    // 验证R值增加（需要开发者工具或状态显示）
-    const rValue = await page.evaluate(() => {
-      return window.__DEBUG_STATE__?.counters.r;
-    });
-    expect(rValue).toBe(1);
-  });
-});
+const state = await page.evaluate(() => window.__DEBUG_STATE__);
 ```
 
-### 全流程回归测试
-```typescript
-// tests/e2e/full-playthrough.spec.ts
-test.describe('全流程测试', () => {
-  test('结局A路径', async ({ page }) => {
-    // 序章
-    await playPrologue(page);
+## 回归测试原则
 
-    // 第1章 - 最小干预
-    await playChapter1(page, { intervention: 'minimal' });
+发现 Bug 后：
+1. **先写失败的测试**复现 Bug
+2. 修复代码使测试通过
+3. 测试文件添加注释说明 Bug 来源
+4. 确保 CI 包含该测试防止回归
 
-    // 第2章 - 只使用深度感知
-    await playChapter2(page, { useDepthIntervention: false });
+## 参考文件
 
-    // ... 后续章节
-
-    // 验证结局A
-    await expect(page.locator('[data-testid="ending-title"]'))
-      .toContainText('平面稳定');
-  });
-
-  test('结局B路径', async ({ page }) => {
-    // 高干预路径
-    // ...
-  });
-
-  test('结局C路径（隐藏结局）', async ({ page }) => {
-    // 特定条件路径
-    // ...
-  });
-});
-```
-
-## 自动化测试脚本
-
-### ChromeMCP 集成
-```typescript
-// scripts/run-e2e-with-mcp.ts
-import { chromium } from 'playwright';
-
-async function runWithChromeMCP() {
-  // 启动开发服务器
-  const server = await startDevServer();
-
-  // 连接到ChromeMCP管理的浏览器
-  const browser = await chromium.connectOverCDP('http://localhost:9222');
-
-  try {
-    const page = await browser.newPage();
-    await page.goto('http://localhost:5173');
-
-    // 运行测试场景
-    await runTestScenarios(page);
-
-    console.log('✅ 所有测试通过');
-  } catch (error) {
-    console.error('❌ 测试失败:', error);
-    process.exit(1);
-  } finally {
-    await browser.close();
-    server.close();
-  }
-}
-```
-
-### WindowsMCP 回归测试
-```typescript
-// scripts/regression-test.ts
-import { exec } from 'child_process';
-
-async function runRegressionWithWindowsMCP() {
-  // 构建生产版本
-  await execPromise('npm run build');
-
-  // 启动本地服务器
-  await execPromise('npx serve dist -p 8080 &');
-
-  // 通过WindowsMCP执行测试
-  // WindowsMCP会处理浏览器启动和截图对比
-  await execPromise('npx playwright test --project=regression');
-
-  console.log('回归测试完成');
-}
-```
-
-## 测试覆盖率要求
-
-### 核心系统 (≥80%)
-- WorldState
-- NarrativeEngine
-- DialogueManager
-- CardSystem
-- ForeshadowTracker
-- SaveManager
-
-### 游戏逻辑 (≥70%)
-- ZoneManager
-- AbilitySystem
-- TimeSystem
-- DepthSystem
-
-### UI组件 (≥50%)
-- DialogueBox
-- CardViewer
-- TimelineUI
-- InventoryUI
-
-### E2E覆盖
-- 全部主线流程
-- 三结局路径
-- 关键分支选择
-- 伏笔触发和回收
+- 单元测试示例：`tests/unit/scenes/GameScene.test.ts`
+- E2E 测试示例：`tests/e2e/game.spec.ts`
+- 测试配置：`vitest.config.ts`, `playwright.config.ts`

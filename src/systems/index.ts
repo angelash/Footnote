@@ -96,3 +96,7 @@ export type { IGameSettings, ISaveData, ISaveMetadata } from './save';
 
 // 资源管理器
 export { assetManager, AssetGroup } from './assets';
+
+// 白盒开发系统
+export { BillboardFactory, assetResolver } from './whitebox';
+export type { IBillboardConfig, ICharacterBillboardConfig, IZoneBillboardConfig, IResolvedAsset } from './whitebox';

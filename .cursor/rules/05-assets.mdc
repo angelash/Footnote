@@ -156,3 +156,63 @@ bg_c0z1__750x1334__v001.webp             # 背景
 | `docs/art/场景设计规范.md` | Kit套件、拼装语法 |
 | `docs/art/角色设计规范.md` | Lock Pack、序列帧 |
 | `docs/art/质量控制与验收标准.md` | QC规则 |
+| `docs/whitebox-development-guide.md` | 白盒开发流程指南 |
+
+---
+
+## 白盒开发模式
+
+### 核心理念
+
+```
+功能版（白盒）→ 验证玩法 → 正式资源替换 → 发布版
+```
+
+### 资源模式切换
+
+修改 `src/config/assetMode.config.ts` 中的 `CURRENT_ASSET_MODE`:
+
+```typescript
+// 白盒开发
+export const CURRENT_ASSET_MODE = WHITEBOX_CONFIG;
+
+// 混合模式（逐步替换）
+export const CURRENT_ASSET_MODE = HYBRID_CONFIG;
+
+// 正式发布
+export const CURRENT_ASSET_MODE = PRODUCTION_CONFIG;
+```
+
+### 白盒资源类型
+
+| 资源类型 | 白盒表现 | 关键类 |
+|----------|----------|--------|
+| 背景 | 纯色块+网格+Zone信息 | `BillboardFactory.createBackground()` |
+| 角色 | 文字Billboard+颜色标识 | `BillboardFactory.createCharacter()` |
+| 物件 | 图标+名称+边框 | `BillboardFactory.createObject()` |
+| UI | 线框绘制 | `BillboardFactory.createDialogueBox()` 等 |
+| 特效 | 几何动画 | `BillboardFactory.createEffect()` |
+
+### 使用AssetResolver
+
+```typescript
+import { assetResolver } from '@/systems/whitebox';
+
+// 初始化（在Scene.create中）
+assetResolver.init(this);
+
+// 解析资源（自动选择白盒或正式资源）
+const bg = assetResolver.resolveBackground(this, zoneConfig, 'bg_c0z1');
+const char = assetResolver.resolveCharacter(this, charConfig, 'sprite_cenhui');
+const obj = assetResolver.resolveObject(this, objConfig, 'obj_desk');
+```
+
+### 替换优先级
+
+1. **背景** → 视觉冲击最大
+2. **角色头像** → 对话沉浸感
+3. **音频** → 氛围营造
+4. **角色精灵** → 场景表现力
+5. **UI** → 完整体验
+6. **物件** → 细节打磨
+7. **特效** → 能力表现力

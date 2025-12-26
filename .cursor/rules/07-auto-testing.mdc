@@ -1,0 +1,362 @@
+---
+description: 自动化测试验收开发流程规范
+globs: ["**/tests/**/*.ts", "**/systems/debug/**/*.ts"]
+alwaysApply: false
+---
+
+# 自学习全自动测试验收开发流程
+
+## 核心理念
+
+通过「内挂接口 + 自动化测试脚本 + 迭代修复」实现：
+1. **AI 自主推进游戏流程**：使用调试命令模拟玩家行为
+2. **自动发现问题**：测试脚本验证预期结果
+3. **持续改进**：每轮迭代丰富测试用例
+
+## 架构设计
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   MCP Browser   │────▶│  __DEBUG__ API  │────▶│   游戏系统      │
+│   (控制端)      │     │  (内挂接口)     │     │   (被测对象)    │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │
+        │                       ▼                       │
+        │               ┌─────────────────┐             │
+        │               │   测试脚本      │             │
+        │               │   (YAML/TS)     │             │
+        │               └─────────────────┘             │
+        │                       │                       │
+        ▼                       ▼                       ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         测试报告 & 日志                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## 内挂接口 (`__DEBUG__`)
+
+### 暴露方式
+
+游戏启动后，通过 `window.__DEBUG__` 访问所有调试命令：
+
+```javascript
+// 浏览器控制台
+__DEBUG__.teleport('C1-Z1')     // 传送
+__DEBUG__.setR(5)               // 设置R值
+__DEBUG__.unlockAllAbilities()  // 解锁所有能力
+__DEBUG__.getGameState()        // 获取完整状态
+```
+
+### 核心命令分类
+
+| 类别 | 命令 | 说明 |
+|------|------|------|
+| Zone | `teleport(zoneId)` | 传送到指定 Zone |
+| Zone | `gotoChapter(chapter)` | 跳转到章节起点 |
+| 计数器 | `setR(value)` / `setP(value)` | 设置计数器值 |
+| 计数器 | `addR(delta)` / `addP(delta)` | 增减计数器值 |
+| 能力 | `unlockAbility(type)` | 解锁单个能力 |
+| 能力 | `unlockAllAbilities()` | 解锁所有能力 |
+| 卡片 | `obtainCard(cardId)` | 获得卡片 |
+| 对话 | `triggerDialogue(id)` | 触发对话 |
+| 对话 | `skipDialogue()` | 跳过当前对话 |
+| 玩家 | `movePlayer(x, y)` | 瞬移玩家 |
+| 玩家 | `navigateTo(x, y)` | 自动导航 |
+| 状态 | `getGameState()` | 获取完整状态 |
+| 状态 | `reset()` | 重置游戏 |
+
+### 状态查询
+
+```javascript
+// 获取完整游戏状态
+const state = __DEBUG__.getGameState();
+// 返回: { counters, abilities, flags, currentZone, cards, scars, ... }
+
+// 获取玩家位置
+const pos = __DEBUG__.getPlayerPosition();
+// 返回: { x: 375, y: 600 }
+```
+
+## 测试脚本规范
+
+### 脚本结构
+
+```typescript
+interface ITestScript {
+  name: string;           // 测试名称
+  description?: string;   // 测试描述
+  setup?: ITestStep[];    // 前置步骤
+  steps: ITestStep[];     // 测试步骤
+  cleanup?: ITestStep[];  // 清理步骤
+}
+
+interface ITestStep {
+  action: string;                    // 执行的命令
+  params?: Record<string, unknown>;  // 命令参数
+  expect?: IExpectation;             // 期望结果
+  delay?: number;                    // 步骤后延迟(ms)
+}
+
+interface IExpectation {
+  type: 'counter' | 'flag' | 'zone' | 'card' | 'ability' | 'position';
+  target: string;         // 检查目标
+  operator: 'eq' | 'gt' | 'lt' | 'gte' | 'lte' | 'contains' | 'exists';
+  value: unknown;         // 期望值
+}
+```
+
+### 示例脚本
+
+```typescript
+const PROLOGUE_TEST: ITestScript = {
+  name: '序章流程测试',
+  setup: [
+    { action: 'reset' },
+  ],
+  steps: [
+    // 验证初始状态
+    {
+      action: 'wait',
+      params: { ms: 500 },
+      expect: { type: 'zone', target: 'current', operator: 'eq', value: 'C0-Z1' },
+    },
+    // 获取身份卡
+    {
+      action: 'obtainCard',
+      params: { cardId: 'CARD_C0_01' },
+      expect: { type: 'card', target: 'CARD_C0_01', operator: 'exists', value: true },
+    },
+    // 传送并验证
+    {
+      action: 'teleport',
+      params: { zoneId: 'C0-Z2' },
+      delay: 500,
+      expect: { type: 'zone', target: 'current', operator: 'eq', value: 'C0-Z2' },
+    },
+  ],
+};
+```
+
+## 迭代测试流程
+
+### 标准流程
+
+```
+┌─────────────────┐
+│ 1. 执行测试脚本 │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌─────────────────┐
+│ 2. 测试通过？   │──否─▶│ 3. 分析失败原因 │
+└────────┬────────┘     └────────┬────────┘
+         │是                      │
+         │                        ▼
+         │              ┌─────────────────┐
+         │              │ 4. 修复问题     │
+         │              └────────┬────────┘
+         │                        │
+         │              ┌─────────┘
+         ▼              ▼
+┌─────────────────────────────────┐
+│ 5. 评估测试用例是否需要丰富    │
+└────────┬────────────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│ 6. 继续下一轮   │
+└─────────────────┘
+```
+
+### 测试用例丰富原则
+
+每轮迭代后思考：
+
+- [ ] 是否覆盖了新发现的边界条件？
+- [ ] 是否需要添加回归测试？
+- [ ] 是否有遗漏的功能路径？
+- [ ] 是否需要更细粒度的断言？
+
+### 问题修复检查清单
+
+修复问题后：
+
+- [ ] 添加针对性回归测试
+- [ ] 更新相关 MDC 规范（如果是规范问题）
+- [ ] 记录问题和解决方案到测试日志
+
+## MCP 浏览器测试集成
+
+### 使用 browser_evaluate 执行命令
+
+```javascript
+// 在 Cursor 中通过 MCP 执行
+mcp_cursor-browser-extension_browser_evaluate({
+  function: "() => __DEBUG__.teleport('C1-Z1')"
+})
+
+// 获取游戏状态
+mcp_cursor-browser-extension_browser_evaluate({
+  function: "() => JSON.stringify(__DEBUG__.getGameState())"
+})
+```
+
+### 使用 browser_snapshot 验证 UI
+
+```javascript
+// 截图验证游戏画面
+mcp_cursor-browser-extension_browser_snapshot()
+
+// 检查特定元素
+mcp_cursor-browser-extension_browser_evaluate({
+  function: "() => document.querySelector('[data-testid=\"zone-title\"]')?.textContent"
+})
+```
+
+### 完整测试示例
+
+```javascript
+// 1. 导航到游戏
+mcp_cursor-browser-extension_browser_navigate({ url: 'http://localhost:5173' })
+
+// 2. 等待游戏加载
+mcp_cursor-browser-extension_browser_wait_for({ text: '开始游戏' })
+
+// 3. 点击开始
+mcp_cursor-browser-extension_browser_click({ element: '开始游戏按钮', ref: '...' })
+
+// 4. 执行测试命令
+mcp_cursor-browser-extension_browser_evaluate({
+  function: "() => __DEBUG__.runTest(window.PROLOGUE_TEST)"
+})
+
+// 5. 获取测试结果
+mcp_cursor-browser-extension_browser_evaluate({
+  function: "() => JSON.stringify(__DEBUG__.getTestResults())"
+})
+```
+
+## 测试套件分类
+
+### 冒烟测试（快速验证）
+
+```
+执行时间: < 30秒
+覆盖范围: 核心功能（移动、能力、计数器）
+使用场景: 每次代码变更后
+```
+
+### 章节测试（功能验证）
+
+```
+执行时间: 2-5分钟
+覆盖范围: 单个章节的完整流程
+使用场景: 功能开发完成后
+```
+
+### 完整测试（回归测试）
+
+```
+执行时间: 10-20分钟
+覆盖范围: 所有章节 + 所有结局
+使用场景: 发布前验证
+```
+
+## 测试报告格式
+
+```
+═══════════════════════════════════════════════════════════════
+测试报告: 完整功能测试
+═══════════════════════════════════════════════════════════════
+总计: 6 | 通过: 5 | 失败: 1
+通过率: 83.3%
+------------------------------------------------------------
+✅ 1. 玩家移动测试 (523ms)
+✅ 2. 能力系统测试 (234ms)
+✅ 3. R值阈值测试 (456ms)
+✅ 4. 序章流程测试 (1234ms)
+❌ 5. 第一章流程测试 (2345ms)
+   ❌ teleport: Zone C1-Z3 未解锁
+✅ 6. 结局条件测试 (567ms)
+═══════════════════════════════════════════════════════════════
+```
+
+## 最佳实践
+
+### 1. 测试独立性
+
+每个测试脚本应该是独立的，通过 `setup` 步骤准备环境：
+
+```typescript
+setup: [
+  { action: 'reset' },  // 总是从干净状态开始
+  { action: 'gotoChapter', params: { chapter: 'C2' } },
+]
+```
+
+### 2. 断言具体化
+
+不要只验证"不崩溃"，要验证具体的状态变化：
+
+```typescript
+// ❌ 不好
+{ action: 'setR', params: { value: 5 } }
+
+// ✅ 好
+{
+  action: 'setR',
+  params: { value: 5 },
+  expect: { type: 'counter', target: 'R', operator: 'eq', value: 5 },
+}
+```
+
+### 3. 适当的延迟
+
+给游戏状态变化足够的时间：
+
+```typescript
+{
+  action: 'teleport',
+  params: { zoneId: 'C1-Z1' },
+  delay: 500,  // 等待场景加载
+}
+```
+
+### 4. 错误处理
+
+测试脚本应该能够处理预期的错误：
+
+```typescript
+// 测试错误情况
+{
+  action: 'teleport',
+  params: { zoneId: 'INVALID_ZONE' },
+  expect: { type: 'zone', target: 'current', operator: 'eq', value: 'C0-Z1' },  // 应该保持原位
+}
+```
+
+## 文件位置索引
+
+| 文件 | 说明 |
+|------|------|
+| `src/systems/debug/DebugCommands.ts` | 内挂接口实现 |
+| `tests/auto/TestRunner.ts` | 测试脚本和运行器 |
+| `tests/e2e/game.spec.ts` | Playwright E2E 测试 |
+| `tests/unit/scenes/GameScene.test.ts` | 单元测试 |
+
+## 调试命令快速参考
+
+```javascript
+// 帮助
+__DEBUG__.help()
+
+// 快速跳转
+__DEBUG__.gotoChapter('C3')          // 跳到第3章
+__DEBUG__.setupEnding('B')           // 设置结局B条件
+
+// 常用查询
+__DEBUG__.getGameState()             // 完整状态
+__DEBUG__.getPlayerPosition()        // 玩家位置
+__DEBUG__.getCommandHistory()        // 命令历史
+__DEBUG__.getTestResults()           // 测试结果
+```

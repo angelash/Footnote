@@ -11,7 +11,7 @@ import { worldState } from '@/systems/world';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { 
   DialogueUI, CardUI, ToastManager, AbilitySystem, PauseMenu, InventoryUI, 
-  saveManager, assetManager,
+  saveManager, assetManager, debugCommands,
   RedundantFieldBar, DepthEffects, ForeshadowManager, EndingEffects, EndingType,
   TouchControls, TutorialManager, AchievementManager
 } from '@/systems';
@@ -95,6 +95,9 @@ export class GameScene extends Phaser.Scene {
 
     // 设置资源管理器场景引用
     assetManager.setScene(this);
+
+    // 设置调试命令场景引用
+    debugCommands.setScene(this);
 
     // 按需加载当前章节资源
     const currentChapter = this._currentZoneId.split('-')[0];

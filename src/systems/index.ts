@@ -75,6 +75,16 @@ export type { SupportedLocale } from './i18n/I18nManager';
 export { performanceMonitor, PerformanceMonitor } from './debug/PerformanceMonitor';
 export type { IPerformanceMetrics, ILoadMetrics } from './debug/PerformanceMonitor';
 
+// 调试命令系统
+export { debugCommands } from './debug/DebugCommands';
+export type {
+  ICommandResult,
+  ITestStep,
+  IExpectation,
+  ITestScript,
+  ITestResult,
+} from './debug/DebugCommands';
+
 // 可访问性
 export { a11yManager } from './accessibility/A11yManager';
 export type { IA11ySettings } from './accessibility/A11yManager';

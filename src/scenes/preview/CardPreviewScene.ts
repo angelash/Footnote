@@ -40,7 +40,7 @@ export class CardPreviewScene extends BasePreviewScene {
   }
 
   protected createContent(width: number, height: number): void {
-    let currentY = 20;
+    let currentY = 30;
 
     // 获取示例卡片
     const sampleCards = this.getSampleCards();
@@ -48,22 +48,22 @@ export class CardPreviewScene extends BasePreviewScene {
     // 统计
     const stats = this.add.text(width / 2, currentY, `${Object.keys(CARD_TYPE_CONFIG).length} 种卡片类型`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 40;
+    currentY += 55;
 
     // 卡片类型说明
     const typeSection = this.createSectionTitle(30, currentY, '卡片类型');
     this.contentContainer.add(typeSection);
-    currentY += 35;
+    currentY += 55;
 
-    // 类型网格
+    // 类型网格 - 放大尺寸
     const typeItems = Object.entries(CARD_TYPE_CONFIG);
-    const typeWidth = 150;
-    const typeHeight = 60;
-    const typePadding = 10;
+    const typeWidth = 230;
+    const typeHeight = 90;
+    const typePadding = 20;
     const typesPerRow = 4;
 
     typeItems.forEach(([type, config], index) => {
@@ -77,22 +77,22 @@ export class CardPreviewScene extends BasePreviewScene {
     });
 
     const typeRows = Math.ceil(typeItems.length / typesPerRow);
-    currentY += typeRows * (typeHeight + typePadding) + 30;
+    currentY += typeRows * (typeHeight + typePadding) + 40;
 
     // 分隔线
     const divider1 = this.createDivider(currentY, width);
     this.contentContainer.add(divider1);
-    currentY += 30;
+    currentY += 40;
 
     // 示例卡片
     const cardSection = this.createSectionTitle(30, currentY, '示例卡片');
     this.contentContainer.add(cardSection);
-    currentY += 35;
+    currentY += 55;
 
-    // 卡片网格
-    const cardWidth = 200;
-    const cardHeight = 280;
-    const cardPadding = 20;
+    // 卡片网格 - 放大尺寸
+    const cardWidth = 300;
+    const cardHeight = 400;
+    const cardPadding = 30;
     const cardsPerRow = 3;
 
     sampleCards.forEach((card, index) => {
@@ -176,27 +176,27 @@ export class CardPreviewScene extends BasePreviewScene {
     const bg = this.add.graphics();
     const colorValue = Phaser.Display.Color.HexStringToColor(config.color).color;
     bg.fillStyle(colorValue, 0.1);
-    bg.fillRoundedRect(0, 0, width, height, 8);
-    bg.lineStyle(1, colorValue, 0.5);
-    bg.strokeRoundedRect(0, 0, width, height, 8);
+    bg.fillRoundedRect(0, 0, width, height, 10);
+    bg.lineStyle(2, colorValue, 0.5);
+    bg.strokeRoundedRect(0, 0, width, height, 10);
     container.add(bg);
 
-    const icon = this.add.text(15, height / 2, config.icon, {
-      fontSize: '24px',
+    const icon = this.add.text(20, height / 2, config.icon, {
+      fontSize: '36px',
     }).setOrigin(0, 0.5);
     container.add(icon);
 
-    const name = this.add.text(50, height / 2 - 8, config.name, {
+    const name = this.add.text(70, height / 2 - 12, config.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: config.color,
       fontStyle: 'bold',
     });
     container.add(name);
 
-    const typeText = this.add.text(50, height / 2 + 10, type, {
+    const typeText = this.add.text(70, height / 2 + 18, type, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '10px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     });
     container.add(typeText);
@@ -218,27 +218,27 @@ export class CardPreviewScene extends BasePreviewScene {
     // 卡片背景
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
-    bg.fillRoundedRect(0, 0, width, height, 12);
+    bg.fillRoundedRect(0, 0, width, height, 16);
     bg.lineStyle(2, colorValue, 0.8);
-    bg.strokeRoundedRect(0, 0, width, height, 12);
+    bg.strokeRoundedRect(0, 0, width, height, 16);
     container.add(bg);
 
     // 顶部装饰条
     const topBar = this.add.graphics();
     topBar.fillStyle(colorValue, 0.3);
-    topBar.fillRoundedRect(0, 0, width, 40, { tl: 12, tr: 12, bl: 0, br: 0 });
+    topBar.fillRoundedRect(0, 0, width, 60, { tl: 16, tr: 16, bl: 0, br: 0 });
     container.add(topBar);
 
     // 类型图标
-    const icon = this.add.text(width / 2, 22, config.icon, {
-      fontSize: '20px',
+    const icon = this.add.text(width / 2, 32, config.icon, {
+      fontSize: '32px',
     }).setOrigin(0.5);
     container.add(icon);
 
     // 卡片标题
-    const title = this.add.text(width / 2, 60, card.title, {
+    const title = this.add.text(width / 2, 90, card.title, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '16px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#E8E6E3',
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -247,12 +247,12 @@ export class CardPreviewScene extends BasePreviewScene {
     // 类型标签
     const typeBadge = this.add.graphics();
     typeBadge.fillStyle(colorValue, 0.2);
-    typeBadge.fillRoundedRect(width / 2 - 30, 80, 60, 20, 4);
+    typeBadge.fillRoundedRect(width / 2 - 50, 120, 100, 32, 6);
     container.add(typeBadge);
 
-    const typeText = this.add.text(width / 2, 90, config.name, {
+    const typeText = this.add.text(width / 2, 136, config.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: config.color,
     }).setOrigin(0.5);
     container.add(typeText);
@@ -260,31 +260,31 @@ export class CardPreviewScene extends BasePreviewScene {
     // 分隔线
     const divider = this.add.graphics();
     divider.lineStyle(1, 0x2A2A30, 1);
-    divider.lineBetween(15, 110, width - 15, 110);
+    divider.lineBetween(20, 165, width - 20, 165);
     container.add(divider);
 
     // 卡片内容
-    const content = this.add.text(15, 120, card.content, {
+    const content = this.add.text(20, 180, card.content, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#A8A6A3',
-      wordWrap: { width: width - 30 },
-      lineSpacing: 4,
+      wordWrap: { width: width - 40 },
+      lineSpacing: 8,
     });
     container.add(content);
 
     // 章节信息
-    const chapterText = this.add.text(width / 2, height - 25, card.chapter, {
+    const chapterText = this.add.text(width / 2, height - 45, card.chapter, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     container.add(chapterText);
 
     // 卡片ID
-    const idText = this.add.text(width / 2, height - 10, card.id, {
+    const idText = this.add.text(width / 2, height - 18, card.id, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '9px',
+      fontSize: this.FONT_SIZE.TINY,
       color: '#3A3A40',
     }).setOrigin(0.5);
     container.add(idText);
@@ -344,35 +344,35 @@ export class CardPreviewScene extends BasePreviewScene {
     this.previewContainer.add(overlay);
 
     // 放大的卡片
-    const cardWidth = 350;
-    const cardHeight = 500;
+    const cardWidth = 500;
+    const cardHeight = 700;
     const cardX = width / 2 - cardWidth / 2;
     const cardY = height / 2 - cardHeight / 2;
 
     // 卡片背景
     const cardBg = this.add.graphics();
     cardBg.fillStyle(0x141419, 1);
-    cardBg.fillRoundedRect(cardX, cardY, cardWidth, cardHeight, 16);
+    cardBg.fillRoundedRect(cardX, cardY, cardWidth, cardHeight, 20);
     cardBg.lineStyle(3, colorValue, 1);
-    cardBg.strokeRoundedRect(cardX, cardY, cardWidth, cardHeight, 16);
+    cardBg.strokeRoundedRect(cardX, cardY, cardWidth, cardHeight, 20);
     this.previewContainer.add(cardBg);
 
     // 顶部装饰
     const topBar = this.add.graphics();
     topBar.fillStyle(colorValue, 0.3);
-    topBar.fillRoundedRect(cardX, cardY, cardWidth, 70, { tl: 16, tr: 16, bl: 0, br: 0 });
+    topBar.fillRoundedRect(cardX, cardY, cardWidth, 100, { tl: 20, tr: 20, bl: 0, br: 0 });
     this.previewContainer.add(topBar);
 
     // 类型图标
-    const icon = this.add.text(width / 2, cardY + 35, config.icon, {
-      fontSize: '36px',
+    const icon = this.add.text(width / 2, cardY + 50, config.icon, {
+      fontSize: '48px',
     }).setOrigin(0.5);
     this.previewContainer.add(icon);
 
     // 标题
-    const title = this.add.text(width / 2, cardY + 95, card.title, {
+    const title = this.add.text(width / 2, cardY + 135, card.title, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '24px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#E8E6E3',
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -381,12 +381,12 @@ export class CardPreviewScene extends BasePreviewScene {
     // 类型标签
     const typeBadge = this.add.graphics();
     typeBadge.fillStyle(colorValue, 0.2);
-    typeBadge.fillRoundedRect(width / 2 - 45, cardY + 120, 90, 28, 6);
+    typeBadge.fillRoundedRect(width / 2 - 65, cardY + 175, 130, 40, 8);
     this.previewContainer.add(typeBadge);
 
-    const typeText = this.add.text(width / 2, cardY + 134, config.name, {
+    const typeText = this.add.text(width / 2, cardY + 195, config.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: config.color,
     }).setOrigin(0.5);
     this.previewContainer.add(typeText);
@@ -394,37 +394,37 @@ export class CardPreviewScene extends BasePreviewScene {
     // 分隔线
     const divider = this.add.graphics();
     divider.lineStyle(1, 0x2A2A30, 1);
-    divider.lineBetween(cardX + 25, cardY + 165, cardX + cardWidth - 25, cardY + 165);
+    divider.lineBetween(cardX + 35, cardY + 235, cardX + cardWidth - 35, cardY + 235);
     this.previewContainer.add(divider);
 
     // 内容
-    const content = this.add.text(cardX + 25, cardY + 185, card.content, {
+    const content = this.add.text(cardX + 35, cardY + 265, card.content, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '16px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#A8A6A3',
-      wordWrap: { width: cardWidth - 50 },
-      lineSpacing: 8,
+      wordWrap: { width: cardWidth - 70 },
+      lineSpacing: 12,
     });
     this.previewContainer.add(content);
 
     // 底部信息
-    const chapterText = this.add.text(width / 2, cardY + cardHeight - 45, `章节: ${card.chapter}`, {
+    const chapterText = this.add.text(width / 2, cardY + cardHeight - 70, `章节: ${card.chapter}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '13px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
     }).setOrigin(0.5);
     this.previewContainer.add(chapterText);
 
-    const idText = this.add.text(width / 2, cardY + cardHeight - 22, card.id, {
+    const idText = this.add.text(width / 2, cardY + cardHeight - 35, card.id, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     this.previewContainer.add(idText);
 
     // 关闭按钮
-    const closeBtn = this.add.text(cardX + cardWidth - 30, cardY + 25, '✕', {
-      fontSize: '24px',
+    const closeBtn = this.add.text(cardX + cardWidth - 40, cardY + 35, '✕', {
+      fontSize: '36px',
       color: '#A8A6A3',
     }).setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
@@ -434,9 +434,9 @@ export class CardPreviewScene extends BasePreviewScene {
     this.previewContainer.add(closeBtn);
 
     // 底部提示
-    const tipText = this.add.text(width / 2, height - 30, '点击空白处或按 ESC 关闭', {
+    const tipText = this.add.text(width / 2, height - 40, '点击空白处或按 ESC 关闭', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     this.previewContainer.add(tipText);

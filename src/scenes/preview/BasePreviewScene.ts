@@ -12,8 +12,8 @@ import Phaser from 'phaser';
 import { COLORS, TEXT_STYLES } from '@/config/game.config';
 
 export abstract class BasePreviewScene extends Phaser.Scene {
-  protected headerHeight = 120;
-  protected footerHeight = 80;
+  protected headerHeight = 160;
+  protected footerHeight = 100;
   protected headerContainer!: Phaser.GameObjects.Container;
   protected contentContainer!: Phaser.GameObjects.Container;
   protected scrollY = 0;
@@ -21,14 +21,14 @@ export abstract class BasePreviewScene extends Phaser.Scene {
   protected title: string = '预览';
   protected subtitle: string = '';
   
-  // 字体大小常量（放大后的尺寸）
+  // 字体大小常量（大幅放大后的尺寸）
   protected readonly FONT_SIZE = {
-    TITLE: '32px',
-    SUBTITLE: '18px',
-    SECTION: '24px',
-    NORMAL: '18px',
-    SMALL: '14px',
-    TINY: '12px',
+    TITLE: '48px',
+    SUBTITLE: '28px',
+    SECTION: '40px',
+    NORMAL: '28px',
+    SMALL: '24px',
+    TINY: '20px',
   };
 
   create(): void {
@@ -93,11 +93,11 @@ export abstract class BasePreviewScene extends Phaser.Scene {
     this.headerContainer.add(headerBg);
 
     // 返回按钮
-    const backBtn = this.createBackButton(30, this.headerHeight / 2);
+    const backBtn = this.createBackButton(40, this.headerHeight / 2);
     this.headerContainer.add(backBtn);
 
     // 标题
-    const titleText = this.add.text(width / 2, 35, this.title, {
+    const titleText = this.add.text(width / 2, 50, this.title, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.TITLE,
       color: '#00FFAA',
@@ -107,7 +107,7 @@ export abstract class BasePreviewScene extends Phaser.Scene {
 
     // 副标题
     if (this.subtitle) {
-      const subtitleText = this.add.text(width / 2, 78, this.subtitle, {
+      const subtitleText = this.add.text(width / 2, 105, this.subtitle, {
         fontFamily: 'Noto Sans SC',
         fontSize: this.FONT_SIZE.SUBTITLE,
         color: '#686868',
@@ -118,8 +118,8 @@ export abstract class BasePreviewScene extends Phaser.Scene {
 
   protected createBackButton(x: number, y: number): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
-    const btnWidth = 120;
-    const btnHeight = 50;
+    const btnWidth = 160;
+    const btnHeight = 65;
 
     const bg = this.add.graphics();
     bg.fillStyle(0x1E1E24, 1);

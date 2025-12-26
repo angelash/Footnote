@@ -46,8 +46,8 @@ export class CharacterPreviewScene extends BasePreviewScene {
     // 角色列表
     const characters = Object.values(CHARACTERS);
     const cardWidth = width - 80;
-    const cardHeight = 160;
-    const cardPadding = 20;
+    const cardHeight = 200;
+    const cardPadding = 25;
 
     characters.forEach((character, index) => {
       const y = currentY + index * (cardHeight + cardPadding);
@@ -108,16 +108,16 @@ export class CharacterPreviewScene extends BasePreviewScene {
     }
 
     // 角色名称
-    const nameText = this.add.text(150, 25, character.name, {
+    const nameText = this.add.text(160, 30, character.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '24px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#E8E6E3',
       fontStyle: 'bold',
     });
     container.add(nameText);
 
     // 角色称号
-    const titleText = this.add.text(150, 58, character.title, {
+    const titleText = this.add.text(160, 75, character.title, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.NORMAL,
       color: '#00FFAA',
@@ -125,7 +125,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
     container.add(titleText);
 
     // 表情数量
-    const expressionCount = this.add.text(150, 90, `${character.expressions.length} 种表情`, {
+    const expressionCount = this.add.text(160, 115, `${character.expressions.length} 种表情`, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
@@ -133,7 +133,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
     container.add(expressionCount);
 
     // 表情列表预览（小图标）
-    const expressionPreview = this.add.text(150, 118, character.expressions.slice(0, 5).join(' · ') + (character.expressions.length > 5 ? ' ...' : ''), {
+    const expressionPreview = this.add.text(160, 150, character.expressions.slice(0, 5).join(' · ') + (character.expressions.length > 5 ? ' ...' : ''), {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
@@ -141,7 +141,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
     container.add(expressionPreview);
 
     // 查看按钮
-    const viewBtn = this.add.text(width - 80, height / 2, '查看 →', {
+    const viewBtn = this.add.text(width - 100, height / 2, '查看 →', {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.NORMAL,
       color: '#4A9EFF',
@@ -199,23 +199,23 @@ export class CharacterPreviewScene extends BasePreviewScene {
     // 角色名
     const nameText = this.add.text(30, 25, `${character.name} (${character.nameEn})`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '24px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#00FFAA',
       fontStyle: 'bold',
     });
     this.previewContainer.add(nameText);
 
     // 称号
-    const titleText = this.add.text(30, 58, character.title, {
+    const titleText = this.add.text(30, 70, character.title, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#A8A6A3',
     });
     this.previewContainer.add(titleText);
 
     // 关闭按钮
-    const closeBtn = this.add.text(width - 40, 35, '✕', {
-      fontSize: '28px',
+    const closeBtn = this.add.text(width - 40, 45, '✕', {
+      fontSize: '36px',
       color: '#A8A6A3',
     }).setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
@@ -225,9 +225,9 @@ export class CharacterPreviewScene extends BasePreviewScene {
     this.previewContainer.add(closeBtn);
 
     // 表情网格
-    const cardWidth = 140;
-    const cardHeight = 180;
-    const padding = 15;
+    const cardWidth = 180;
+    const cardHeight = 220;
+    const padding = 20;
     const startX = 30;
     const startY = 120;
     const cardsPerRow = Math.floor((width - 60) / (cardWidth + padding));
@@ -245,19 +245,19 @@ export class CharacterPreviewScene extends BasePreviewScene {
     // 对话预览按钮
     const dialoguePreviewBtn = this.add.graphics();
     dialoguePreviewBtn.fillStyle(0x4A9EFF, 0.2);
-    dialoguePreviewBtn.fillRoundedRect(width / 2 - 100, height - 80, 200, 40, 8);
+    dialoguePreviewBtn.fillRoundedRect(width / 2 - 140, height - 100, 280, 55, 10);
     dialoguePreviewBtn.lineStyle(2, 0x4A9EFF, 1);
-    dialoguePreviewBtn.strokeRoundedRect(width / 2 - 100, height - 80, 200, 40, 8);
+    dialoguePreviewBtn.strokeRoundedRect(width / 2 - 140, height - 100, 280, 55, 10);
     this.previewContainer.add(dialoguePreviewBtn);
 
-    const dialogueBtnText = this.add.text(width / 2, height - 60, '💬 预览对话框效果', {
+    const dialogueBtnText = this.add.text(width / 2, height - 72, '💬 预览对话框效果', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#4A9EFF',
     }).setOrigin(0.5);
     this.previewContainer.add(dialogueBtnText);
 
-    const dialogueHitArea = this.add.rectangle(width / 2, height - 60, 200, 40, 0x000000, 0)
+    const dialogueHitArea = this.add.rectangle(width / 2, height - 72, 280, 55, 0x000000, 0)
       .setInteractive({ useHandCursor: true });
     dialogueHitArea.on('pointerover', () => dialogueBtnText.setColor('#00FFAA'));
     dialogueHitArea.on('pointerout', () => dialogueBtnText.setColor('#4A9EFF'));
@@ -265,9 +265,9 @@ export class CharacterPreviewScene extends BasePreviewScene {
     this.previewContainer.add(dialogueHitArea);
 
     // 底部提示
-    const tipText = this.add.text(width / 2, height - 25, '点击表情查看 | 按 ESC 关闭', {
+    const tipText = this.add.text(width / 2, height - 30, '点击表情查看 | 按 ESC 关闭', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     this.previewContainer.add(tipText);
@@ -335,9 +335,9 @@ export class CharacterPreviewScene extends BasePreviewScene {
     }
 
     // 表情名
-    const expressionText = this.add.text(width / 2, height - 20, expression, {
+    const expressionText = this.add.text(width / 2, height - 25, expression, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#A8A6A3',
     }).setOrigin(0.5);
     container.add(expressionText);

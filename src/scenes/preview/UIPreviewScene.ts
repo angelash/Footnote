@@ -90,9 +90,9 @@ export class UIPreviewScene extends BasePreviewScene {
     this.contentContainer.add(screenTitle);
     currentY += 50;
 
-    // 界面卡片网格 - 增大卡片
-    const cardWidth = 300;
-    const cardHeight = 180;
+    // 界面卡片网格 - 大尺寸卡片
+    const cardWidth = 320;
+    const cardHeight = 220;
     const cardsPerRow = 3;
 
     uiScreens.forEach((screen, index) => {
@@ -187,26 +187,26 @@ export class UIPreviewScene extends BasePreviewScene {
     container.add(bg);
 
     // 图标
-    const icon = this.add.text(width / 2, 45, screen.icon, {
-      fontSize: '48px',
+    const icon = this.add.text(width / 2, 55, screen.icon, {
+      fontSize: '56px',
     }).setOrigin(0.5);
     container.add(icon);
 
     // 名称
-    const name = this.add.text(width / 2, 100, screen.name, {
+    const name = this.add.text(width / 2, 120, screen.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#00FFAA',
       fontStyle: 'bold',
     }).setOrigin(0.5);
     container.add(name);
 
     // 描述
-    const desc = this.add.text(width / 2, 130, screen.description, {
+    const desc = this.add.text(width / 2, 160, screen.description, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
-      wordWrap: { width: width - 30 },
+      wordWrap: { width: width - 40 },
       align: 'center',
     }).setOrigin(0.5, 0);
     container.add(desc);
@@ -763,13 +763,13 @@ export class UIPreviewScene extends BasePreviewScene {
     // 头部背景
     const headerBg = this.add.graphics();
     headerBg.fillStyle(0x141419, 0.95);
-    headerBg.fillRect(0, 0, width, 70);
+    headerBg.fillRect(0, 0, width, 100);
     this._uiPreviewContainer.add(headerBg);
 
     // 返回按钮
-    const backBtn = this.add.text(20, 25, '← 返回列表', {
+    const backBtn = this.add.text(20, 30, '← 返回列表', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#4A9EFF',
     }).setInteractive({ useHandCursor: true });
 
@@ -779,19 +779,19 @@ export class UIPreviewScene extends BasePreviewScene {
     this._uiPreviewContainer.add(backBtn);
 
     // 标题
-    const title = this.add.text(width / 2, 20, 
+    const title = this.add.text(width / 2, 18, 
       `${screen?.icon || '🎨'} ${screen?.name || screenId}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '18px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#00FFAA',
       fontStyle: 'bold',
     }).setOrigin(0.5, 0);
     this._uiPreviewContainer.add(title);
 
     // 描述
-    const desc = this.add.text(width / 2, 45, screen?.description || '', {
+    const desc = this.add.text(width / 2, 60, screen?.description || '', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
     }).setOrigin(0.5, 0);
     this._uiPreviewContainer.add(desc);

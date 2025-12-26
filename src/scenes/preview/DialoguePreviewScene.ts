@@ -39,31 +39,31 @@ export class DialoguePreviewScene extends BasePreviewScene {
   }
 
   protected createContent(width: number, height: number): void {
-    let currentY = 20;
+    let currentY = 30;
 
     const sequences = this.getSampleDialogues();
 
     // 统计
     const stats = this.add.text(width / 2, currentY, `${sequences.length} 个对话序列`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 40;
+    currentY += 50;
 
     // 说明
     const description = this.add.text(width / 2, currentY, '点击对话可预览完整流程，支持选项分支', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     this.contentContainer.add(description);
-    currentY += 40;
+    currentY += 50;
 
-    // 对话列表
-    const itemHeight = 100;
-    const itemPadding = 15;
+    // 对话列表 - 放大卡片
+    const itemHeight = 150;
+    const itemPadding = 20;
 
     sequences.forEach((sequence, index) => {
       const y = currentY + index * (itemHeight + itemPadding);
@@ -150,63 +150,63 @@ export class DialoguePreviewScene extends BasePreviewScene {
     // 背景
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
-    bg.fillRoundedRect(0, 0, width, height, 12);
+    bg.fillRoundedRect(0, 0, width, height, 14);
     bg.lineStyle(1, 0x2A2A30, 1);
-    bg.strokeRoundedRect(0, 0, width, height, 12);
+    bg.strokeRoundedRect(0, 0, width, height, 14);
     container.add(bg);
 
     // 章节标签
     const chapterBadge = this.add.graphics();
     chapterBadge.fillStyle(0x00FFAA, 0.2);
-    chapterBadge.fillRoundedRect(15, 15, 40, 20, 4);
+    chapterBadge.fillRoundedRect(20, 20, 60, 32, 6);
     container.add(chapterBadge);
 
-    const chapterText = this.add.text(35, 25, sequence.chapter, {
+    const chapterText = this.add.text(50, 36, sequence.chapter, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#00FFAA',
     }).setOrigin(0.5);
     container.add(chapterText);
 
     // 对话名称
-    const nameText = this.add.text(70, 15, sequence.name, {
+    const nameText = this.add.text(100, 18, sequence.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '16px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#E8E6E3',
       fontStyle: 'bold',
     });
     container.add(nameText);
 
     // 对话ID
-    const idText = this.add.text(70, 38, sequence.id, {
+    const idText = this.add.text(100, 52, sequence.id, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     });
     container.add(idText);
 
     // 对话行数
-    const lineCount = this.add.text(70, 58, `${sequence.lines.length} 行对话`, {
+    const lineCount = this.add.text(100, 82, `${sequence.lines.length} 行对话`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
     });
     container.add(lineCount);
 
     // 预览首行
     const firstLine = sequence.lines[0];
-    const previewText = this.add.text(70, 78, `"${firstLine.text.substring(0, 30)}${firstLine.text.length > 30 ? '...' : ''}"`, {
+    const previewText = this.add.text(100, 115, `"${firstLine.text.substring(0, 40)}${firstLine.text.length > 40 ? '...' : ''}"`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
       fontStyle: 'italic',
     });
     container.add(previewText);
 
     // 播放按钮
-    const playBtn = this.add.text(width - 60, height / 2, '▶ 播放', {
+    const playBtn = this.add.text(width - 80, height / 2, '▶ 播放', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#00FFAA',
     }).setOrigin(0.5);
     container.add(playBtn);
@@ -250,25 +250,25 @@ export class DialoguePreviewScene extends BasePreviewScene {
     this.previewContainer.add(overlay);
 
     // 标题
-    const titleText = this.add.text(width / 2, 30, `${sequence.chapter} - ${sequence.name}`, {
+    const titleText = this.add.text(width / 2, 40, `${sequence.chapter} - ${sequence.name}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '18px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#00FFAA',
       fontStyle: 'bold',
     }).setOrigin(0.5);
     this.previewContainer.add(titleText);
 
     // 进度指示
-    const progressText = this.add.text(width / 2, 55, `1 / ${sequence.lines.length}`, {
+    const progressText = this.add.text(width / 2, 85, `1 / ${sequence.lines.length}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.previewContainer.add(progressText);
 
     // 关闭按钮
-    const closeBtn = this.add.text(width - 40, 30, '✕', {
-      fontSize: '24px',
+    const closeBtn = this.add.text(width - 50, 40, '✕', {
+      fontSize: '36px',
       color: '#A8A6A3',
     }).setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
@@ -278,44 +278,44 @@ export class DialoguePreviewScene extends BasePreviewScene {
     this.previewContainer.add(closeBtn);
 
     // 头像区域
-    const portraitContainer = this.add.container(width / 2, 280);
+    const portraitContainer = this.add.container(width / 2, 350);
     this.previewContainer.add(portraitContainer);
 
     // 对话框
     const dialogueBox = this.add.graphics();
     dialogueBox.fillStyle(0x141419, 0.95);
-    dialogueBox.fillRoundedRect(30, height - 300, width - 60, 200, 12);
-    dialogueBox.lineStyle(1, 0x2A2A30, 1);
-    dialogueBox.strokeRoundedRect(30, height - 300, width - 60, 200, 12);
+    dialogueBox.fillRoundedRect(30, height - 400, width - 60, 280, 16);
+    dialogueBox.lineStyle(2, 0x2A2A30, 1);
+    dialogueBox.strokeRoundedRect(30, height - 400, width - 60, 280, 16);
     this.previewContainer.add(dialogueBox);
 
     // 说话者名称
-    const speakerText = this.add.text(60, height - 280, '', {
+    const speakerText = this.add.text(60, height - 375, '', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '16px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#00FFAA',
       fontStyle: 'bold',
     });
     this.previewContainer.add(speakerText);
 
     // 对话文本
-    const dialogueText = this.add.text(60, height - 250, '', {
+    const dialogueText = this.add.text(60, height - 335, '', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '15px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#E8E6E3',
       wordWrap: { width: width - 120 },
-      lineSpacing: 6,
+      lineSpacing: 10,
     });
     this.previewContainer.add(dialogueText);
 
     // 选项容器
-    const choicesContainer = this.add.container(width / 2, height - 130);
+    const choicesContainer = this.add.container(width / 2, height - 180);
     this.previewContainer.add(choicesContainer);
 
     // 继续提示
-    const continueHint = this.add.text(width - 60, height - 115, '点击继续 →', {
+    const continueHint = this.add.text(width - 70, height - 140, '点击继续 →', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(1, 0.5);
     this.previewContainer.add(continueHint);
@@ -393,20 +393,20 @@ export class DialoguePreviewScene extends BasePreviewScene {
       
       if (this.textures.exists(portraitKey)) {
         const portrait = this.add.image(0, 0, portraitKey);
-        portrait.setDisplaySize(150, 150);
+        portrait.setDisplaySize(200, 200);
         portraitContainer.add(portrait);
       } else {
         // 显示占位
         const placeholder = this.add.text(0, 0, '👤', {
-          fontSize: '64px',
+          fontSize: '80px',
         }).setOrigin(0.5);
         portraitContainer.add(placeholder);
       }
 
       // 表情标签
-      const expressionLabel = this.add.text(0, 90, expression, {
+      const expressionLabel = this.add.text(0, 110, expression, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '11px',
+        fontSize: this.FONT_SIZE.SMALL,
         color: '#686868',
       }).setOrigin(0.5);
       portraitContainer.add(expressionLabel);
@@ -417,41 +417,41 @@ export class DialoguePreviewScene extends BasePreviewScene {
       continueHint.setVisible(false);
       
       line.choices.forEach((choice, index) => {
-        const choiceY = index * 45 - (line.choices!.length - 1) * 22.5;
+        const choiceY = index * 60 - (line.choices!.length - 1) * 30;
         
         const choiceBg = this.add.graphics();
         choiceBg.fillStyle(0x1E1E24, 1);
-        choiceBg.fillRoundedRect(-150, choiceY - 15, 300, 35, 6);
+        choiceBg.fillRoundedRect(-200, choiceY - 22, 400, 50, 8);
         choiceBg.lineStyle(1, 0x3A3A40, 1);
-        choiceBg.strokeRoundedRect(-150, choiceY - 15, 300, 35, 6);
+        choiceBg.strokeRoundedRect(-200, choiceY - 22, 400, 50, 8);
         choicesContainer.add(choiceBg);
 
         const choiceText = this.add.text(0, choiceY, choice.text, {
           fontFamily: 'Noto Sans SC',
-          fontSize: '14px',
+          fontSize: this.FONT_SIZE.NORMAL,
           color: '#A8A6A3',
         }).setOrigin(0.5);
         choicesContainer.add(choiceText);
 
         // 选项交互
-        const hitArea = this.add.rectangle(0, choiceY, 300, 35, 0x000000, 0);
+        const hitArea = this.add.rectangle(0, choiceY, 400, 50, 0x000000, 0);
         hitArea.setInteractive({ useHandCursor: true });
         
         hitArea.on('pointerover', () => {
           choiceBg.clear();
           choiceBg.fillStyle(0x2A2A30, 1);
-          choiceBg.fillRoundedRect(-150, choiceY - 15, 300, 35, 6);
+          choiceBg.fillRoundedRect(-200, choiceY - 22, 400, 50, 8);
           choiceBg.lineStyle(2, 0x00FFAA, 1);
-          choiceBg.strokeRoundedRect(-150, choiceY - 15, 300, 35, 6);
+          choiceBg.strokeRoundedRect(-200, choiceY - 22, 400, 50, 8);
           choiceText.setColor('#00FFAA');
         });
 
         hitArea.on('pointerout', () => {
           choiceBg.clear();
           choiceBg.fillStyle(0x1E1E24, 1);
-          choiceBg.fillRoundedRect(-150, choiceY - 15, 300, 35, 6);
+          choiceBg.fillRoundedRect(-200, choiceY - 22, 400, 50, 8);
           choiceBg.lineStyle(1, 0x3A3A40, 1);
-          choiceBg.strokeRoundedRect(-150, choiceY - 15, 300, 35, 6);
+          choiceBg.strokeRoundedRect(-200, choiceY - 22, 400, 50, 8);
           choiceText.setColor('#A8A6A3');
         });
 

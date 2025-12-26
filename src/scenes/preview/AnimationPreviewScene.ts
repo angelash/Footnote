@@ -29,7 +29,7 @@ export class AnimationPreviewScene extends BasePreviewScene {
   }
 
   protected createContent(width: number, height: number): void {
-    let currentY = 20;
+    let currentY = 30;
 
     // 获取动画列表
     const animations = this.getAnimationList();
@@ -37,16 +37,16 @@ export class AnimationPreviewScene extends BasePreviewScene {
     // 统计
     const stats = this.add.text(width / 2, currentY, `共 ${animations.length} 个动画`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 40;
+    currentY += 55;
 
-    // 动画卡片
+    // 动画卡片 - 放大尺寸
     const cardWidth = width - 60;
-    const cardHeight = 180;
-    const cardPadding = 20;
+    const cardHeight = 250;
+    const cardPadding = 25;
 
     animations.forEach((anim, index) => {
       const y = currentY + index * (cardHeight + cardPadding);
@@ -103,35 +103,35 @@ export class AnimationPreviewScene extends BasePreviewScene {
     container.add(bg);
 
     // 动画名称
-    const nameText = this.add.text(20, 15, anim.name, {
+    const nameText = this.add.text(25, 18, anim.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '18px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#E8E6E3',
       fontStyle: 'bold',
     });
     container.add(nameText);
 
     // 动画键名
-    const keyText = this.add.text(20, 42, anim.key, {
+    const keyText = this.add.text(25, 58, anim.key, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
     });
     container.add(keyText);
 
     // 帧数信息
-    const frameInfo = this.add.text(20, 62, `${anim.asset.frameCount} 帧`, {
+    const frameInfo = this.add.text(25, 88, `${anim.asset.frameCount} 帧`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A9EFF',
     });
     container.add(frameInfo);
 
-    // 帧预览区域
-    const framePreviewX = 20;
-    const framePreviewY = 90;
-    const frameSize = 70;
-    const framePadding = 10;
+    // 帧预览区域 - 放大帧
+    const framePreviewX = 25;
+    const framePreviewY = 125;
+    const frameSize = 90;
+    const framePadding = 15;
 
     anim.asset.frames.forEach((frameUrl, index) => {
       const fx = framePreviewX + index * (frameSize + framePadding);
@@ -143,9 +143,9 @@ export class AnimationPreviewScene extends BasePreviewScene {
       container.add(frameBg);
 
       // 帧编号
-      const frameNum = this.add.text(fx + frameSize / 2, framePreviewY + frameSize + 8, `#${index + 1}`, {
+      const frameNum = this.add.text(fx + frameSize / 2, framePreviewY + frameSize + 12, `#${index + 1}`, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '10px',
+        fontSize: this.FONT_SIZE.SMALL,
         color: '#4A4A4A',
       }).setOrigin(0.5);
       container.add(frameNum);
@@ -154,14 +154,14 @@ export class AnimationPreviewScene extends BasePreviewScene {
       const frameKey = `${anim.key}_frame_${index}`;
       if (this.textures.exists(frameKey)) {
         const frameImg = this.add.image(fx + frameSize / 2, framePreviewY + frameSize / 2, frameKey);
-        const scale = Math.min((frameSize - 10) / frameImg.width, (frameSize - 10) / frameImg.height);
+        const scale = Math.min((frameSize - 15) / frameImg.width, (frameSize - 15) / frameImg.height);
         frameImg.setScale(scale);
         container.add(frameImg);
       } else {
         // 加载
         this.load.image(frameKey, frameUrl);
         const loading = this.add.text(fx + frameSize / 2, framePreviewY + frameSize / 2, '⏳', {
-          fontSize: '20px',
+          fontSize: '28px',
         }).setOrigin(0.5);
         container.add(loading);
       }
@@ -171,9 +171,9 @@ export class AnimationPreviewScene extends BasePreviewScene {
     this.load.start();
 
     // 播放按钮
-    const playBtn = this.add.text(width - 80, height / 2, '▶ 播放', {
+    const playBtn = this.add.text(width - 100, height / 2, '▶ 播放', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#00FFAA',
     }).setOrigin(0.5);
     container.add(playBtn);
@@ -218,9 +218,9 @@ export class AnimationPreviewScene extends BasePreviewScene {
     this.previewContainer.add(overlay);
 
     // 标题
-    const titleText = this.add.text(width / 2, 50, anim.name, {
+    const titleText = this.add.text(width / 2, 60, anim.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '24px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#00FFAA',
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -230,15 +230,15 @@ export class AnimationPreviewScene extends BasePreviewScene {
     this.createAnimationSpritesheet(anim, width / 2, height / 2);
 
     // 控制按钮
-    const controlY = height - 100;
+    const controlY = height - 130;
 
     // 播放/暂停按钮
-    const playPauseBtn = this.add.text(width / 2 - 80, controlY, '⏸ 暂停', {
+    const playPauseBtn = this.add.text(width / 2 - 120, controlY, '⏸ 暂停', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '16px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#4A9EFF',
       backgroundColor: '#1E1E24',
-      padding: { x: 15, y: 8 },
+      padding: { x: 20, y: 12 },
     }).setOrigin(0.5);
     playPauseBtn.setInteractive({ useHandCursor: true });
     let isPlaying = true;
@@ -259,12 +259,12 @@ export class AnimationPreviewScene extends BasePreviewScene {
 
     // 速度控制
     let speed = 1;
-    const speedText = this.add.text(width / 2 + 80, controlY, `速度: ${speed}x`, {
+    const speedText = this.add.text(width / 2 + 120, controlY, `速度: ${speed}x`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '16px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#FFD700',
       backgroundColor: '#1E1E24',
-      padding: { x: 15, y: 8 },
+      padding: { x: 20, y: 12 },
     }).setOrigin(0.5);
     speedText.setInteractive({ useHandCursor: true });
     speedText.on('pointerdown', () => {
@@ -278,8 +278,8 @@ export class AnimationPreviewScene extends BasePreviewScene {
     this.previewContainer.add(speedText);
 
     // 关闭按钮
-    const closeBtn = this.add.text(width - 40, 30, '✕', {
-      fontSize: '28px',
+    const closeBtn = this.add.text(width - 50, 40, '✕', {
+      fontSize: '36px',
       color: '#A8A6A3',
     }).setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
@@ -289,9 +289,9 @@ export class AnimationPreviewScene extends BasePreviewScene {
     this.previewContainer.add(closeBtn);
 
     // 帧信息
-    const frameInfoText = this.add.text(width / 2, height - 40, `${anim.asset.frameCount} 帧 | 按 ESC 关闭`, {
+    const frameInfoText = this.add.text(width / 2, height - 50, `${anim.asset.frameCount} 帧 | 按 ESC 关闭`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     this.previewContainer.add(frameInfoText);
@@ -329,7 +329,7 @@ export class AnimationPreviewScene extends BasePreviewScene {
       // 显示加载中
       const loadingText = this.add.text(x, y, '加载中...', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '18px',
+        fontSize: this.FONT_SIZE.NORMAL,
         color: '#686868',
       }).setOrigin(0.5);
       this.previewContainer.add(loadingText);

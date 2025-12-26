@@ -34,7 +34,7 @@ interface IFlatObject {
 }
 
 // 分页配置
-const PAGE_SIZE = 30; // 每页显示物件数量
+const PAGE_SIZE = 20; // 每页显示物件数量（大尺寸卡片需减少数量）
 
 export class ObjectPreviewScene extends BasePreviewScene {
   protected title = '📦 物件预览';
@@ -225,8 +225,8 @@ export class ObjectPreviewScene extends BasePreviewScene {
       { id: 'decoration', name: '装饰物件', icon: '🏛️', color: '#686868' },
     ];
 
-    const tabWidth = 200;
-    const tabHeight = 50;
+    const tabWidth = 230;
+    const tabHeight = 60;
     const totalWidth = tabs.length * tabWidth + (tabs.length - 1) * 15;
     const startX = (width - totalWidth) / 2;
 
@@ -357,9 +357,9 @@ export class ObjectPreviewScene extends BasePreviewScene {
 
       currentY += 45;
 
-      // 物件卡片 - 改为2列布局，增大卡片
+      // 物件卡片 - 改为2列布局，大尺寸卡片
       const cardWidth = (width - 120) / 2;
-      const cardHeight = 150;
+      const cardHeight = 180;
 
       objects.forEach((item, index) => {
         const col = index % 2;
@@ -442,16 +442,16 @@ export class ObjectPreviewScene extends BasePreviewScene {
     // 类型图标
     const iconBg = this.add.graphics();
     iconBg.fillStyle(typeColor, 0.2);
-    iconBg.fillCircle(35, 35, 22);
+    iconBg.fillCircle(40, 40, 28);
     container.add(iconBg);
 
-    const icon = this.add.text(35, 35, typeIcon, {
-      fontSize: '24px',
+    const icon = this.add.text(40, 40, typeIcon, {
+      fontSize: '32px',
     }).setOrigin(0.5);
     container.add(icon);
 
     // 物件ID
-    const idText = this.add.text(70, 20, obj.id, {
+    const idText = this.add.text(85, 22, obj.id, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.NORMAL,
       color: '#E8E6E3',
@@ -460,7 +460,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
     container.add(idText);
 
     // 类型标签
-    const typeLabel = this.add.text(70, 45, typeName, {
+    const typeLabel = this.add.text(85, 55, typeName, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.SMALL,
       color: `#${typeColor.toString(16).padStart(6, '0')}`,
@@ -468,16 +468,16 @@ export class ObjectPreviewScene extends BasePreviewScene {
     container.add(typeLabel);
 
     // 纹理键
-    const textureText = this.add.text(15, 80, `🖼️ ${obj.texture}`, {
+    const textureText = this.add.text(18, 95, `🖼️ ${obj.texture}`, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
     });
-    textureText.setWordWrapWidth(width - 30);
+    textureText.setWordWrapWidth(width - 35);
     container.add(textureText);
 
     // 位置信息
-    const posText = this.add.text(15, height - 28, `📍 (${obj.x}, ${obj.y})`, {
+    const posText = this.add.text(18, height - 35, `📍 (${obj.x}, ${obj.y})`, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
@@ -486,7 +486,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
 
     // 缩放信息
     if (typeof obj.scale === 'number') {
-      const scaleText = this.add.text(width - 15, height - 28, `×${obj.scale}`, {
+      const scaleText = this.add.text(width - 18, height - 35, `×${obj.scale}`, {
         fontFamily: 'Noto Sans SC',
         fontSize: this.FONT_SIZE.SMALL,
         color: '#4A4A4A',
@@ -553,7 +553,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
     // 标题
     const title = this.add.text(panelX + 30, panelY + 25, `📦 物件详情 - ${obj.id}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '22px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#00FFAA',
       fontStyle: 'bold',
     });
@@ -561,7 +561,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
 
     // 关闭按钮
     const closeBtn = this.add.text(panelX + panelWidth - 40, panelY + 25, '✕', {
-      fontSize: '28px',
+      fontSize: '36px',
       color: '#686868',
     }).setInteractive({ useHandCursor: true });
     closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));

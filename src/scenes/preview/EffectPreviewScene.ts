@@ -72,7 +72,7 @@ export class EffectPreviewScene extends BasePreviewScene {
   }
 
   protected createContent(width: number, height: number): void {
-    let currentY = 20;
+    let currentY = 30;
 
     const categories = this.getEffectCategories();
 
@@ -80,11 +80,11 @@ export class EffectPreviewScene extends BasePreviewScene {
     const totalEffects = Object.keys(ALL_EFFECTS).length;
     const stats = this.add.text(width / 2, currentY, `共 ${totalEffects} 个特效`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 40;
+    currentY += 60;
 
     // 分类展示
     categories.forEach((category) => {
@@ -94,12 +94,12 @@ export class EffectPreviewScene extends BasePreviewScene {
       const sectionTitle = this.createSectionTitle(30, currentY, `${category.name} (${category.effects.length})`);
       sectionTitle.setColor(category.color);
       this.contentContainer.add(sectionTitle);
-      currentY += 35;
+      currentY += 55;
 
-      // 特效卡片
-      const cardWidth = 200;
-      const cardHeight = 180;
-      const cardPadding = 15;
+      // 特效卡片 - 放大卡片尺寸
+      const cardWidth = 320;
+      const cardHeight = 260;
+      const cardPadding = 25;
       const cardsPerRow = 3;
 
       category.effects.forEach((effect, index) => {
@@ -244,28 +244,28 @@ export class EffectPreviewScene extends BasePreviewScene {
     // 预览区域背景
     const previewBg = this.add.graphics();
     previewBg.fillStyle(0x0A0A0F, 1);
-    previewBg.fillRoundedRect(10, 10, width - 20, height - 60, 6);
+    previewBg.fillRoundedRect(15, 15, width - 30, height - 90, 8);
     container.add(previewBg);
 
     // 加载特效图片
     if (this.textures.exists(effect.key)) {
-      const effectImg = this.add.image(width / 2, (height - 50) / 2 + 5, effect.key);
-      const scale = Math.min((width - 30) / effectImg.width, (height - 70) / effectImg.height);
+      const effectImg = this.add.image(width / 2, (height - 80) / 2 + 10, effect.key);
+      const scale = Math.min((width - 50) / effectImg.width, (height - 110) / effectImg.height);
       effectImg.setScale(scale);
       container.add(effectImg);
     } else {
       // 加载
       this.load.image(effect.key, effect.url);
-      const loading = this.add.text(width / 2, (height - 50) / 2 + 5, '⏳', {
-        fontSize: '32px',
+      const loading = this.add.text(width / 2, (height - 80) / 2 + 10, '⏳', {
+        fontSize: '48px',
       }).setOrigin(0.5);
       container.add(loading);
 
       this.load.once('complete', () => {
         loading.destroy();
         if (this.textures.exists(effect.key)) {
-          const effectImg = this.add.image(width / 2, (height - 50) / 2 + 5, effect.key);
-          const scale = Math.min((width - 30) / effectImg.width, (height - 70) / effectImg.height);
+          const effectImg = this.add.image(width / 2, (height - 80) / 2 + 10, effect.key);
+          const scale = Math.min((width - 50) / effectImg.width, (height - 110) / effectImg.height);
           effectImg.setScale(scale);
           container.add(effectImg);
         }
@@ -274,18 +274,18 @@ export class EffectPreviewScene extends BasePreviewScene {
     }
 
     // 特效名称
-    const nameText = this.add.text(width / 2, height - 35, effect.name, {
+    const nameText = this.add.text(width / 2, height - 55, effect.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '13px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: accentColor,
       fontStyle: 'bold',
     }).setOrigin(0.5);
     container.add(nameText);
 
     // 特效键名
-    const keyText = this.add.text(width / 2, height - 15, effect.key, {
+    const keyText = this.add.text(width / 2, height - 25, effect.key, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '10px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     container.add(keyText);
@@ -354,14 +354,14 @@ export class EffectPreviewScene extends BasePreviewScene {
     // 信息面板
     const infoPanel = this.add.graphics();
     infoPanel.fillStyle(0x141419, 0.95);
-    infoPanel.fillRoundedRect(20, 20, width - 40, 100, 8);
-    infoPanel.lineStyle(1, Phaser.Display.Color.HexStringToColor(accentColor).color, 0.5);
-    infoPanel.strokeRoundedRect(20, 20, width - 40, 100, 8);
+    infoPanel.fillRoundedRect(20, 20, width - 40, 140, 12);
+    infoPanel.lineStyle(2, Phaser.Display.Color.HexStringToColor(accentColor).color, 0.5);
+    infoPanel.strokeRoundedRect(20, 20, width - 40, 140, 12);
     this.previewContainer.add(infoPanel);
 
-    const nameText = this.add.text(40, 35, effect.name, {
+    const nameText = this.add.text(45, 40, effect.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '20px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: accentColor,
       fontStyle: 'bold',
     });
@@ -369,9 +369,9 @@ export class EffectPreviewScene extends BasePreviewScene {
 
     // 描述
     if (effect.description) {
-      const descText = this.add.text(40, 62, effect.description, {
+      const descText = this.add.text(45, 85, effect.description, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '13px',
+        fontSize: this.FONT_SIZE.NORMAL,
         color: '#A8A6A3',
       });
       this.previewContainer.add(descText);
@@ -379,26 +379,26 @@ export class EffectPreviewScene extends BasePreviewScene {
 
     // 动画状态标签
     const animConfig = this._animationConfigs.get(effect.key);
-    const animLabel = this.add.text(40, 90, 
+    const animLabel = this.add.text(45, 125, 
       animConfig 
         ? `🎬 动画: ${animConfig.frameCount}帧 @ ${animConfig.frameRate}fps | ${animConfig.repeat === -1 ? '循环' : `播放${animConfig.repeat + 1}次`}`
         : '📷 静态图片', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
     });
     this.previewContainer.add(animLabel);
 
-    const keyText = this.add.text(width - 50, 90, effect.key, {
+    const keyText = this.add.text(width - 50, 125, effect.key, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '10px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(1, 0);
     this.previewContainer.add(keyText);
 
     // 关闭按钮
-    const closeBtn = this.add.text(width - 50, 45, '✕', {
-      fontSize: '28px',
+    const closeBtn = this.add.text(width - 55, 55, '✕', {
+      fontSize: '36px',
       color: '#A8A6A3',
     }).setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
@@ -411,9 +411,9 @@ export class EffectPreviewScene extends BasePreviewScene {
     this._createControlPanel(effect, accentColor, width, height);
 
     // 底部提示
-    const tipText = this.add.text(width / 2, height - 25, '按 ESC 关闭 | 点击「重播」重新播放动画', {
+    const tipText = this.add.text(width / 2, height - 30, '按 ESC 关闭 | 点击「重播」重新播放动画', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5);
     this.previewContainer.add(tipText);
@@ -688,7 +688,7 @@ export class EffectPreviewScene extends BasePreviewScene {
   private _createVerdictFlash(x: number, y: number, color: number, _config: IAnimationConfig): void {
     const verdictText = this.add.text(x, y, '「判定」', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '36px',
+      fontSize: '48px',
       color: `#${color.toString(16).padStart(6, '0')}`,
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -864,28 +864,28 @@ export class EffectPreviewScene extends BasePreviewScene {
    */
   private _createPlaceholderEffect(x: number, y: number, name: string, color: string): void {
     const placeholder = this.add.graphics();
-    placeholder.lineStyle(2, Phaser.Display.Color.HexStringToColor(color).color, 0.5);
-    placeholder.strokeRoundedRect(x - 80, y - 80, 160, 160, 12);
+    placeholder.lineStyle(3, Phaser.Display.Color.HexStringToColor(color).color, 0.5);
+    placeholder.strokeRoundedRect(x - 120, y - 120, 240, 240, 16);
     placeholder.lineStyle(1, 0x2A2A30, 0.5);
-    placeholder.lineBetween(x - 80, y - 80, x + 80, y + 80);
-    placeholder.lineBetween(x + 80, y - 80, x - 80, y + 80);
+    placeholder.lineBetween(x - 120, y - 120, x + 120, y + 120);
+    placeholder.lineBetween(x + 120, y - 120, x - 120, y + 120);
     this.previewContainer.add(placeholder);
 
-    const icon = this.add.text(x, y - 20, '✨', {
-      fontSize: '48px',
+    const icon = this.add.text(x, y - 30, '✨', {
+      fontSize: '64px',
     }).setOrigin(0.5);
     this.previewContainer.add(icon);
 
-    const text = this.add.text(x, y + 30, '资源待制作', {
+    const text = this.add.text(x, y + 45, '资源待制作', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.previewContainer.add(text);
 
-    const nameText = this.add.text(x, y + 55, name, {
+    const nameText = this.add.text(x, y + 80, name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: color,
     }).setOrigin(0.5);
     this.previewContainer.add(nameText);
@@ -904,22 +904,22 @@ export class EffectPreviewScene extends BasePreviewScene {
    * 创建控制面板
    */
   private _createControlPanel(effect: IEffectItem, accentColor: string, width: number, height: number): void {
-    const panelY = height - 80;
-    const panelWidth = 300;
+    const panelY = height - 100;
+    const panelWidth = 450;
     const panelX = (width - panelWidth) / 2;
 
     // 面板背景
     const panel = this.add.graphics();
     panel.fillStyle(0x141419, 0.9);
-    panel.fillRoundedRect(panelX, panelY, panelWidth, 50, 8);
+    panel.fillRoundedRect(panelX, panelY, panelWidth, 65, 10);
     panel.lineStyle(1, 0x2A2A30, 1);
-    panel.strokeRoundedRect(panelX, panelY, panelWidth, 50, 8);
+    panel.strokeRoundedRect(panelX, panelY, panelWidth, 65, 10);
     this.previewContainer.add(panel);
 
     // 重播按钮
-    const replayBtn = this.add.text(panelX + 50, panelY + 25, '🔄 重播', {
+    const replayBtn = this.add.text(panelX + 75, panelY + 32, '🔄 重播', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#A8A6A3',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     replayBtn.on('pointerover', () => replayBtn.setColor(accentColor));
@@ -933,9 +933,9 @@ export class EffectPreviewScene extends BasePreviewScene {
 
     // 暂停/播放按钮
     let isPaused = false;
-    const pauseBtn = this.add.text(panelX + 150, panelY + 25, '⏸️ 暂停', {
+    const pauseBtn = this.add.text(panelX + 225, panelY + 32, '⏸️ 暂停', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#A8A6A3',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     pauseBtn.on('pointerover', () => pauseBtn.setColor(accentColor));
@@ -955,9 +955,9 @@ export class EffectPreviewScene extends BasePreviewScene {
     this.previewContainer.add(pauseBtn);
 
     // 信息按钮
-    const infoBtn = this.add.text(panelX + 250, panelY + 25, 'ℹ️ 信息', {
+    const infoBtn = this.add.text(panelX + 375, panelY + 32, 'ℹ️ 信息', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#A8A6A3',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     infoBtn.on('pointerover', () => infoBtn.setColor(accentColor));

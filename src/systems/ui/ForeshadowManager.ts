@@ -313,7 +313,7 @@ export class ForeshadowManager {
 
     const descText = this._scene.add.text(0, 28, foreshadow.description, {
       fontFamily: 'monospace',
-      fontSize: '12px',
+      fontSize: '14px',
       color: '#aaaaaa',
     });
     descText.setOrigin(0.5);

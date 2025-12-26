@@ -144,7 +144,7 @@ export class TouchControls {
     // 标签
     const label = this._scene.add.text(0, 50, '交互', {
       fontFamily: 'monospace',
-      fontSize: '12px',
+      fontSize: '14px',
       color: '#aaaacc',
     });
     label.setOrigin(0.5);
@@ -196,7 +196,7 @@ export class TouchControls {
       // 快捷键提示
       const hint = this._scene.add.text(0, -35, `${index + 1}`, {
         fontFamily: 'monospace',
-        fontSize: '10px',
+        fontSize: '12px',
         color: '#666666',
       });
       hint.setOrigin(0.5);

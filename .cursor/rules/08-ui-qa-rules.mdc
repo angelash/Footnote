@@ -1,0 +1,236 @@
+---
+description: UI质量检查和规则自更新规范
+globs: ["**/scenes/**/*.ts", "**/systems/ui/**/*.ts", "**/*.mdc"]
+alwaysApply: true
+---
+
+# UI质量检查和规则自更新规范
+
+## 核心原则
+
+> ⚠️ **AI 必须逐项检查所有 UI 元素，不得遗漏任何细节**
+
+## UI 开发检查清单
+
+### 1. 字体大小检查
+
+每个 UI 界面必须检查以下元素的字体大小：
+
+```typescript
+// 标准字体尺寸参考（基于 1080x1920 分辨率）
+const FONT_SIZE = {
+  TITLE: '36px',    // 主标题
+  SECTION: '28px',  // 章节标题
+  NORMAL: '20px',   // 正常文本
+  SMALL: '16px',    // 小字体
+  TINY: '14px',     // 最小字体
+};
+```
+
+**检查要点：**
+- [ ] 主标题是否清晰可读（≥28px）
+- [ ] 正文内容是否清晰可读（≥16px）
+- [ ] 辅助信息是否可读（≥12px）
+- [ ] **绝对最小字体：不得小于 12px**
+- [ ] 所有硬编码的字体大小是否使用常量
+- [ ] **不要遗漏任何文本元素**
+
+### 字体修复黑名单
+
+以下字体大小需要立即修复：
+- `9px` → 至少改为 `11px`
+- `10px` → 至少改为 `12px`
+- `11px` → 考虑改为 `12px` 或 `13px`
+
+**全局搜索命令**：
+```bash
+grep -r "fontSize.*'9px'\|fontSize.*'10px'\|fontSize.*'11px'" src/ --include="*.ts"
+```
+
+### 2. 布局检查
+
+**检查要点：**
+- [ ] 文字是否超出容器边界
+- [ ] 元素间距是否合理
+- [ ] 内容是否居中或对齐正确
+- [ ] 滚动区域内容是否完整显示
+- [ ] 响应不同屏幕尺寸是否正常
+
+### 3. 文字超框问题处理
+
+当文本可能超出容器时，必须：
+
+```typescript
+// 1. 使用 wordWrap 自动换行
+const text = scene.add.text(x, y, content, {
+  wordWrap: { width: containerWidth - padding * 2, useAdvancedWrap: true },
+});
+
+// 2. 必要时使用遮罩裁剪
+const mask = graphics.createGeometryMask();
+text.setMask(mask);
+
+// 3. 或限制显示行数（文本截断）
+const maxLines = 5;
+const lines = content.split('\n').slice(0, maxLines);
+```
+
+### 4. 可点击区域检查
+
+**检查要点：**
+- [ ] 按钮点击区域是否足够大（最小 44x44px）
+- [ ] 交互反馈是否明显（hover、active 状态）
+- [ ] 禁用状态是否有视觉区分
+
+## 预览/测试界面检查流程
+
+### 完整检查步骤
+
+1. **截图检查**：使用浏览器工具截图
+2. **逐区域检查**：从上到下、从左到右
+3. **交互测试**：点击、滚动、输入
+4. **边界测试**：极长文本、空内容、特殊字符
+
+### 检查报告模板
+
+```
+界面：XXX预览
+检查时间：YYYY-MM-DD HH:mm
+
+✅ 主标题：字体清晰，居中显示
+✅ 统计信息：字体适中，布局正常
+❌ 组件元素：字体太小（发现 9px，应为 14px+）
+❌ 卡片内容：文字超出边界
+
+修复项：
+1. 组件标题字体从 13px 改为 20px
+2. 卡片添加文字裁剪遮罩
+```
+
+## 规则自更新机制（元规则）
+
+### 触发条件
+
+当对话中出现以下情况，AI 必须更新 MDC：
+
+1. **新增技术约定**：发现新的最佳实践
+2. **修复规范问题**：从 Bug 中总结规则
+3. **用户明确要求**：用户说"记住这个"、"以后都要这样"
+4. **重复性问题**：同类问题出现 2 次以上
+
+### 更新流程
+
+```
+1. 判断 → 这次对话是否产生了新规则/要求？
+2. 归类 → 应该写入哪个 MDC 文件？
+3. 落盘 → 写入规则，保持简洁明确
+4. 反馈 → 告知用户已记录
+```
+
+### MDC 文件分类
+
+| 文件 | 内容范围 |
+|------|---------|
+| `01-typescript.mdc` | TypeScript 代码规范 |
+| `02-phaser.mdc` | Phaser 引擎使用规范 |
+| `03-narrative.mdc` | 叙事系统规范 |
+| `04-testing.mdc` | 测试规范 |
+| `05-assets.mdc` | 美术资源规范 |
+| `06-ai-art-generation.mdc` | AI生图规范 |
+| `07-auto-testing.mdc` | 自动化测试规范 |
+| `08-ui-qa-rules.mdc` | UI质量和规则更新规范（本文件） |
+
+### 规则格式要求
+
+```markdown
+## 规则标题
+
+### 背景（可选）
+简述为什么需要这个规则
+
+### 规则内容
+具体要求，使用检查清单格式
+
+### 示例（如适用）
+好的做法 vs 不好的做法
+```
+
+## 常见问题和解决方案
+
+### 问题：字体在某些界面漏检
+
+**原因**：手动检查不够仔细
+**解决**：
+1. 建立标准化检查流程
+2. 使用浏览器开发者工具检查所有文本元素
+3. 搜索代码中所有 `fontSize` 关键字
+
+### 问题：文字超出容器
+
+**原因**：未设置 wordWrap 或遮罩
+**解决**：
+1. 所有动态文本必须设置 wordWrap
+2. 长文本使用遮罩裁剪
+3. 预留足够的容器空间
+
+### 问题：规则没有及时更新
+
+**原因**：AI 没有意识到需要记录
+**解决**：
+1. 用户明确提醒"记到规则里"
+2. AI 主动判断是否是通用规则
+3. 每次修复后检查是否需要更新 MDC
+
+## 检查命令快速参考
+
+```bash
+# 搜索所有硬编码字体大小
+grep -r "fontSize.*px" src/ --include="*.ts"
+
+# 搜索可能遗漏 wordWrap 的文本
+grep -r "add.text" src/ --include="*.ts" | grep -v "wordWrap"
+
+# 查看所有预览场景
+ls -la src/scenes/preview/
+```
+
+## 强制要求
+
+> 🔴 **以下要求必须遵守，违反将导致任务验收失败**
+
+1. **UI 修改后必须截图验证每个元素**
+2. **发现规则性问题必须更新 MDC**
+3. **用户提出的规则要求必须落盘记录**
+4. **不得遗漏任何界面区域的检查**
+5. **文字相关问题必须检查 wordWrap 和遮罩**
+6. **全局字体检查**：不仅检查预览场景，还要检查所有游戏内UI（MenuScene、GameScene、DialogueUI、InventoryUI、CardUI等）
+7. **白盒系统也要检查**：BillboardFactory、SceneAssembler等白盒资产的标签字体也需要可读
+
+## 本次修复记录（2025-12-26）
+
+### 问题范围
+用户反馈游戏内资产存在大量字体过小问题，不仅限于预览场景，涉及：
+- 核心UI系统：CardUI、DialogueUI、InventoryUI、PauseMenu、ToastManager
+- 游戏场景：MenuScene、GameScene
+- 白盒系统：BillboardFactory、SceneAssembler
+- 触控系统：TouchControls
+- 成就系统：AchievementSystem
+- 特效系统：DepthEffects、ForeshadowManager
+
+### 修复内容
+1. **CardUI**：增加卡片尺寸（320x480）、修复遮罩位置计算、翻转提示字体 12px→16px
+2. **DialogueUI**：继续指示器字体 14px→18px
+3. **InventoryUI**：标签字体 14px→16px、卡片标题 12px→14px、章节标记 10px→12px、NEW徽章 10px→12px
+4. **PauseMenu**：单选按钮和音量值字体 14px→16px
+5. **ToastManager**：消息字体 14px→16px、描述字体 12px→14px
+6. **AchievementSystem**：标题字体 12px→14px、稀有度字体 10px→12px
+7. **BillboardFactory**：全面提升标签字体，消除所有9px和10px
+8. **MenuScene**：标语字体 14px→16px、全局12px→14px
+9. **GameScene**：全局12px→14px
+10. **TouchControls**：提示字体 12px→14px、辅助字体 10px→12px
+11. **SceneAssembler**：标签字体 12px→14px
+
+### 经验教训
+- **检查范围不能只限于预览场景**，必须全局扫描
+- **使用 grep 命令全局搜索**小字体是最可靠的方法
+- **用户提到的每一个要求都要记录到 MDC**

@@ -100,7 +100,7 @@ export class DepthEffects {
 
         const label = this._scene.add.text(x, 20, nodeLabels[i], {
           fontFamily: 'monospace',
-          fontSize: '12px',
+          fontSize: '14px',
           color: '#aaccff',
         });
         label.setOrigin(0.5, 0);

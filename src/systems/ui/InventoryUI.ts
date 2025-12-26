@@ -223,7 +223,7 @@ export class InventoryUI {
     
     const text = this._scene.add.text(0, 0, label, {
       ...TEXT_STYLES.BODY,
-      fontSize: '14px',
+      fontSize: '16px',
     }).setOrigin(0.5);
     text.setName('text');
 
@@ -266,7 +266,7 @@ export class InventoryUI {
 
     const statsText = this._scene.add.text(0, y, `已收集: ${obtainedCount} / ${totalCards}`, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '14px',
+      fontSize: '16px',
     }).setOrigin(0.5);
     statsText.setName('statsText');
     panel.add(statsText);
@@ -339,7 +339,7 @@ export class InventoryUI {
     // 卡片标题
     const title = this._scene.add.text(0, 0, card.title, {
       ...TEXT_STYLES.BODY,
-      fontSize: '12px',
+      fontSize: '14px',
       wordWrap: { width: CONFIG.CARD_THUMB_WIDTH - 20 },
       align: 'center',
     }).setOrigin(0.5);
@@ -351,7 +351,7 @@ export class InventoryUI {
       card.chapter,
       {
         ...TEXT_STYLES.MUTED,
-        fontSize: '10px',
+        fontSize: '12px',
       }
     ).setOrigin(0.5);
 
@@ -367,7 +367,7 @@ export class InventoryUI {
         -CONFIG.CARD_THUMB_HEIGHT / 2 + 10,
         'NEW',
         {
-          fontSize: '10px',
+          fontSize: '12px',
           color: '#FFD700',
           backgroundColor: '#000000',
           padding: { x: 4, y: 2 },

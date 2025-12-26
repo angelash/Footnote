@@ -309,7 +309,7 @@ export class PauseMenu {
       CONFIG.SETTINGS_WIDTH / 2 - 10,
       y,
       `${Math.round(value * 100)}%`,
-      { ...TEXT_STYLES.BODY, fontSize: '14px' }
+      { ...TEXT_STYLES.BODY, fontSize: '16px' }
     ).setOrigin(1, 0.5);
     this._settingsContainer.add(valueText);
 
@@ -380,7 +380,7 @@ export class PauseMenu {
 
     const label = this._scene.add.text(20, 0, text, {
       ...TEXT_STYLES.BODY,
-      fontSize: '14px',
+      fontSize: '16px',
       color: selected ? '#00FFAA' : '#A8A6A3',
     }).setOrigin(0, 0.5);
 

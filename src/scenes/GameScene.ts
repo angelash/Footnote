@@ -562,7 +562,7 @@ export class GameScene extends Phaser.Scene {
       
       // 快捷键提示
       const keyHint = this.add.text(x, -15, ability.key, {
-        fontSize: '12px',
+        fontSize: '14px',
         color: '#686868',
       }).setOrigin(0.5);
 
@@ -1037,7 +1037,7 @@ export class GameScene extends Phaser.Scene {
     // 标签
     const text = this.add.text(0, 45, label, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '12px',
+      fontSize: '14px',
     }).setOrigin(0.5);
 
     container.add([indicator, text]);

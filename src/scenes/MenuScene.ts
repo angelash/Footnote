@@ -84,7 +84,7 @@ export class MenuScene extends Phaser.Scene {
     this.add.text(width / 2, height * 0.25 + 100, 
       '你生活在一个二维世界，\n但你能短暂触碰更高维度——\n代价是：世界会记住你做过的一切。', {
       ...TEXT_STYLES.BODY,
-      fontSize: '14px',
+      fontSize: '16px',
       align: 'center',
       color: '#686868',
     })
@@ -259,7 +259,7 @@ export class MenuScene extends Phaser.Scene {
     // 章节和位置
     const location = this.add.text(-180, 10, `${save.chapter} - ${save.currentZone}`, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '12px',
+      fontSize: '14px',
     });
 
     // 时间
@@ -267,14 +267,14 @@ export class MenuScene extends Phaser.Scene {
     const dateStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
     const timeText = this.add.text(180, -15, dateStr, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '12px',
+      fontSize: '14px',
     }).setOrigin(1, 0);
 
     // 游玩时长
     const playTimeStr = this._formatPlayTime(save.playTime);
     const playTimeText = this.add.text(180, 10, `游玩: ${playTimeStr}`, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '12px',
+      fontSize: '14px',
     }).setOrigin(1, 0);
 
     container.add([bg, name, location, timeText, playTimeText]);
@@ -521,7 +521,7 @@ export class MenuScene extends Phaser.Scene {
 
     const text = this.add.text(0, 0, label, {
       ...TEXT_STYLES.BODY,
-      fontSize: '12px',
+      fontSize: '14px',
       color: selected ? '#00FFAA' : '#A8A6A3',
     }).setOrigin(0.5);
     text.setName('text');
@@ -664,7 +664,7 @@ export class MenuScene extends Phaser.Scene {
     const version = __VERSION__ || '0.1.0';
     this.add.text(width / 2, height - 30, `v${version}`, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '12px',
+      fontSize: '14px',
     }).setOrigin(0.5);
   }
 

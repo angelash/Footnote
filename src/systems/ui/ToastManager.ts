@@ -238,7 +238,7 @@ export class ToastManager {
       message,
       {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
+        fontSize: '16px',
         wordWrap: { width: CONFIG.WIDTH - 80 },
       }
     ).setOrigin(0, 0.5);
@@ -282,11 +282,11 @@ export class ToastManager {
     // 描述
     const descText = this._scene.add.text(
       -CONFIG.WIDTH / 2 + 65,
-      12,
+      14,
       description,
       {
         ...TEXT_STYLES.MUTED,
-        fontSize: '12px',
+        fontSize: '14px',
       }
     ).setOrigin(0, 0.5);
 

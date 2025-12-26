@@ -242,7 +242,7 @@ export class SceneAssembler {
       const dx = obj.labelOffset?.[0] ?? 0;
       const dy = obj.labelOffset?.[1] ?? 72;
       const label = this._scene.add
-        .text(obj.x + dx, obj.y + dy, obj.label, { ...TEXT_STYLES.MUTED, fontSize: '12px' })
+        .text(obj.x + dx, obj.y + dy, obj.label, { ...TEXT_STYLES.MUTED, fontSize: '14px' })
         .setOrigin(0.5, 0.5);
       if (typeof obj.depth === 'number') {
         label.setDepth(obj.depth + 1);

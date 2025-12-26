@@ -277,7 +277,7 @@ export class DialogueUI {
       height - CONFIG.BOX_MARGIN_BOTTOM - 20,
       '▼',
       {
-        fontSize: '14px',
+        fontSize: '18px',
         color: '#686868',
       }
     );

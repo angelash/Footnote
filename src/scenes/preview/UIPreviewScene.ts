@@ -833,13 +833,13 @@ export class UIPreviewScene extends BasePreviewScene {
     const buttonContainer = this._createComponentSection('按钮 (Buttons)', currentY, width);
     this._addButtonPreviews(buttonContainer, width);
     this.contentContainer.add(buttonContainer);
-    currentY += 160;
+    currentY += 200;
 
     // 颜色系统
     const colorContainer = this._createComponentSection('颜色系统 (Colors)', currentY, width);
     this._addColorPreviews(colorContainer, width);
     this.contentContainer.add(colorContainer);
-    currentY += 100;
+    currentY += 150;
 
     return currentY;
   }
@@ -849,7 +849,7 @@ export class UIPreviewScene extends BasePreviewScene {
 
     const sectionTitle = this.add.text(0, 0, title, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '13px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     });
     container.add(sectionTitle);
@@ -866,22 +866,22 @@ export class UIPreviewScene extends BasePreviewScene {
     ];
 
     buttons.forEach((btn, index) => {
-      const x = 20 + index * 150;
-      const y = 50;
+      const x = 20 + index * 180;
+      const y = 55;
 
       const graphic = this.add.graphics();
       if (btn.fill) {
         graphic.fillStyle(btn.color, 1);
-        graphic.fillRoundedRect(x, y, 130, 40, 8);
+        graphic.fillRoundedRect(x, y, 160, 50, 8);
       } else {
         graphic.lineStyle(2, btn.color, 1);
-        graphic.strokeRoundedRect(x, y, 130, 40, 8);
+        graphic.strokeRoundedRect(x, y, 160, 50, 8);
       }
       container.add(graphic);
 
-      const text = this.add.text(x + 65, y + 20, btn.name, {
+      const text = this.add.text(x + 80, y + 25, btn.name, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '13px',
+        fontSize: this.FONT_SIZE.NORMAL,
         color: btn.textColor || (btn.fill ? '#0A0A0F' : `#${btn.color.toString(16).padStart(6, '0')}`),
       }).setOrigin(0.5);
       container.add(text);
@@ -900,17 +900,17 @@ export class UIPreviewScene extends BasePreviewScene {
     ];
 
     colors.forEach((c, index) => {
-      const x = 20 + index * 80;
-      const y = 40;
+      const x = 20 + index * 100;
+      const y = 50;
 
       const swatch = this.add.graphics();
       swatch.fillStyle(c.color, 1);
-      swatch.fillRoundedRect(x, y, 60, 30, 4);
+      swatch.fillRoundedRect(x, y, 80, 40, 6);
       container.add(swatch);
 
-      const label = this.add.text(x + 30, y + 40, c.name, {
+      const label = this.add.text(x + 40, y + 52, c.name, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '9px',
+        fontSize: this.FONT_SIZE.SMALL,
         color: '#4A4A4A',
       }).setOrigin(0.5, 0);
       container.add(label);

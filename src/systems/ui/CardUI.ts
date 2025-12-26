@@ -13,15 +13,19 @@ import type { ICard } from '@/types';
 
 const CONFIG = {
   /** 卡片宽度 */
-  CARD_WIDTH: 280,
+  CARD_WIDTH: 320,
   /** 卡片高度 */
-  CARD_HEIGHT: 400,
+  CARD_HEIGHT: 480,
   /** 卡片圆角 */
   CARD_RADIUS: 16,
   /** 获取动画时长 */
   OBTAIN_ANIMATION_DURATION: 800,
   /** 翻转动画时长 */
   FLIP_DURATION: 300,
+  /** 内容区域内边距 */
+  CONTENT_PADDING: 30,
+  /** 内容最大高度 */
+  CONTENT_MAX_HEIGHT: 280,
 };
 
 // ==================== 类型定义 ====================
@@ -234,11 +238,12 @@ export class CardUI {
     // 卡片标题
     this._cardTitle = this._scene.add.text(
       0,
-      -CONFIG.CARD_HEIGHT / 2 + 60,
+      -CONFIG.CARD_HEIGHT / 2 + 70,
       '',
       {
         ...TEXT_STYLES.TITLE,
-        fontSize: '22px',
+        fontSize: '24px',
+        wordWrap: { width: CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2 },
       }
     ).setOrigin(0.5);
     this._cardContainer.add(this._cardTitle);
@@ -246,32 +251,65 @@ export class CardUI {
     // 卡片内容
     this._cardContent = this._scene.add.text(
       0,
-      -CONFIG.CARD_HEIGHT / 2 + 120,
+      -CONFIG.CARD_HEIGHT / 2 + 130,
       '',
       {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
-        wordWrap: { width: CONFIG.CARD_WIDTH - 40 },
-        lineSpacing: 6,
+        fontSize: '16px',
+        wordWrap: { width: CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2, useAdvancedWrap: true },
+        lineSpacing: 8,
         align: 'center',
       }
     ).setOrigin(0.5, 0);
     this._cardContainer.add(this._cardContent);
 
+    // 创建内容遮罩，防止超出卡片边界
+    this._createContentMask();
+
     // 翻转提示
     this._flipHint = this._scene.add.text(
       0,
-      CONFIG.CARD_HEIGHT / 2 - 30,
+      CONFIG.CARD_HEIGHT / 2 - 40,
       '点击翻转',
       {
         ...TEXT_STYLES.MUTED,
-        fontSize: '12px',
+        fontSize: '16px',
       }
     ).setOrigin(0.5);
     this._cardContainer.add(this._flipHint);
 
     // 关闭按钮
     this._createCloseButton();
+  }
+
+  /**
+   * 创建内容遮罩，防止文字超出卡片边界
+   * 注意：遮罩使用场景坐标系，需要计算卡片容器的实际位置
+   */
+  private _createContentMask(): void {
+    const { width, height } = this._scene.scale;
+    const maskGraphics = this._scene.add.graphics();
+    maskGraphics.fillStyle(0xffffff);
+    
+    // 遮罩区域（基于卡片容器在场景中的实际位置）
+    // 卡片容器在场景中心 (width/2, height/2)
+    const cardCenterX = width / 2;
+    const cardCenterY = height / 2;
+    
+    // 内容区域的遮罩范围
+    const maskX = cardCenterX - CONFIG.CARD_WIDTH / 2 + CONFIG.CONTENT_PADDING;
+    const maskY = cardCenterY - CONFIG.CARD_HEIGHT / 2 + 120; // 标题下方开始
+    const maskWidth = CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2;
+    const maskHeight = CONFIG.CARD_HEIGHT - 200; // 留出标题和底部提示的空间
+    
+    maskGraphics.fillRect(maskX, maskY, maskWidth, maskHeight);
+    
+    const mask = maskGraphics.createGeometryMask();
+    this._cardContent.setMask(mask);
+    
+    // 将遮罩图形添加到容器以便管理
+    this._container.add(maskGraphics);
+    maskGraphics.setVisible(false); // 遮罩图形本身不需要显示
   }
 
   private _createCloseButton(): void {

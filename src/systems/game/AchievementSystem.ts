@@ -627,7 +627,7 @@ export class AchievementManager {
     // 标题
     const title = this._scene.add.text(-100, -15, '成就解锁', {
       fontFamily: 'monospace',
-      fontSize: '12px',
+      fontSize: '14px',
       color: '#888888',
     });
     title.setOrigin(0, 0.5);
@@ -645,7 +645,7 @@ export class AchievementManager {
     // 稀有度标识
     const rarityText = this._scene.add.text(140, 0, this._getRarityText(achievement.rarity), {
       fontFamily: 'monospace',
-      fontSize: '10px',
+      fontSize: '12px',
       color: `#${this._getRarityColor(achievement.rarity).toString(16).padStart(6, '0')}`,
     });
     rarityText.setOrigin(0.5);

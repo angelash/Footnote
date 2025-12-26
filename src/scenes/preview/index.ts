@@ -5,6 +5,7 @@
 export { DevPreviewScene } from './DevPreviewScene';
 export { BasePreviewScene } from './BasePreviewScene';
 export { ScenePreviewScene } from './ScenePreviewScene';
+export { ObjectPreviewScene } from './ObjectPreviewScene';
 export { CharacterPreviewScene } from './CharacterPreviewScene';
 export { AnimationPreviewScene } from './AnimationPreviewScene';
 export { UIPreviewScene } from './UIPreviewScene';
@@ -17,6 +18,7 @@ export { DialoguePreviewScene } from './DialoguePreviewScene';
 export const PREVIEW_SCENES = [
   'DevPreviewScene',
   'ScenePreviewScene',
+  'ObjectPreviewScene',
   'CharacterPreviewScene',
   'AnimationPreviewScene',
   'UIPreviewScene',

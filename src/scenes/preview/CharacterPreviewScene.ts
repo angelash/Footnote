@@ -1,21 +1,30 @@
 /**
- * 角色预览场景
+ * 角色预览场景 (Prefab 模式)
  * 
- * 预览8个角色的所有表情
+ * 预览8个角色的完整表现：
+ * - 所有表情立绘
+ * - 在对话框中的展示效果
+ * - 角色信息卡片
  */
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
 import { CHARACTERS, CharacterId, getPortraitKey, ICharacterInfo } from '@/config/characters.config';
 import { CHARACTER_PORTRAITS } from '@/data/webpAssets';
+import { DialogueUI } from '@/systems/ui/DialogueUI';
+import type { IDialogue } from '@/types';
 
 export class CharacterPreviewScene extends BasePreviewScene {
   protected title = '👤 角色预览';
-  protected subtitle = '预览8个角色的所有表情';
+  protected subtitle = '预览角色立绘、表情和对话框表现';
 
   private previewContainer!: Phaser.GameObjects.Container;
   private isFullPreview = false;
   private currentCharacter: ICharacterInfo | null = null;
+  
+  // 对话预览
+  private _dialoguePreviewContainer!: Phaser.GameObjects.Container;
+  private _dialogueUI: DialogueUI | null = null;
 
   constructor() {
     super({ key: 'CharacterPreviewScene' });
@@ -53,6 +62,11 @@ export class CharacterPreviewScene extends BasePreviewScene {
     this.previewContainer = this.add.container(0, 0);
     this.previewContainer.setDepth(200);
     this.previewContainer.setVisible(false);
+
+    // 对话预览容器
+    this._dialoguePreviewContainer = this.add.container(0, 0);
+    this._dialoguePreviewContainer.setDepth(300);
+    this._dialoguePreviewContainer.setVisible(false);
   }
 
   private createCharacterCard(
@@ -228,8 +242,30 @@ export class CharacterPreviewScene extends BasePreviewScene {
       this.previewContainer.add(card);
     });
 
+    // 对话预览按钮
+    const dialoguePreviewBtn = this.add.graphics();
+    dialoguePreviewBtn.fillStyle(0x4A9EFF, 0.2);
+    dialoguePreviewBtn.fillRoundedRect(width / 2 - 100, height - 80, 200, 40, 8);
+    dialoguePreviewBtn.lineStyle(2, 0x4A9EFF, 1);
+    dialoguePreviewBtn.strokeRoundedRect(width / 2 - 100, height - 80, 200, 40, 8);
+    this.previewContainer.add(dialoguePreviewBtn);
+
+    const dialogueBtnText = this.add.text(width / 2, height - 60, '💬 预览对话框效果', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '14px',
+      color: '#4A9EFF',
+    }).setOrigin(0.5);
+    this.previewContainer.add(dialogueBtnText);
+
+    const dialogueHitArea = this.add.rectangle(width / 2, height - 60, 200, 40, 0x000000, 0)
+      .setInteractive({ useHandCursor: true });
+    dialogueHitArea.on('pointerover', () => dialogueBtnText.setColor('#00FFAA'));
+    dialogueHitArea.on('pointerout', () => dialogueBtnText.setColor('#4A9EFF'));
+    dialogueHitArea.on('pointerdown', () => this._showDialoguePreview(character));
+    this.previewContainer.add(dialogueHitArea);
+
     // 底部提示
-    const tipText = this.add.text(width / 2, height - 30, '点击表情可放大查看 | 按 ESC 关闭', {
+    const tipText = this.add.text(width / 2, height - 25, '点击表情查看 | 按 ESC 关闭', {
       fontFamily: 'Noto Sans SC',
       fontSize: '12px',
       color: '#4A4A4A',
@@ -345,16 +381,120 @@ export class CharacterPreviewScene extends BasePreviewScene {
     });
   }
 
+  /**
+   * 显示对话框预览
+   */
+  private _showDialoguePreview(character: ICharacterInfo): void {
+    const { width, height } = this.scale;
+
+    // 清空容器
+    this._dialoguePreviewContainer.removeAll(true);
+
+    // 半透明遮罩
+    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.9).setOrigin(0);
+    overlay.setInteractive();
+    overlay.on('pointerdown', () => this._hideDialoguePreview());
+    this._dialoguePreviewContainer.add(overlay);
+
+    // 模拟游戏场景背景
+    const sceneBg = this.add.graphics();
+    sceneBg.fillStyle(0x1A1A1F, 1);
+    sceneBg.fillRect(50, 100, width - 100, height - 300);
+    sceneBg.lineStyle(1, 0x2A2A30, 1);
+    sceneBg.strokeRect(50, 100, width - 100, height - 300);
+    this._dialoguePreviewContainer.add(sceneBg);
+
+    // 标题
+    const title = this.add.text(width / 2, 60, `💬 ${character.name} 对话框预览`, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '18px',
+      color: '#00FFAA',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+    this._dialoguePreviewContainer.add(title);
+
+    // 创建对话UI
+    this._dialogueUI = new DialogueUI({
+      scene: this,
+      onDialogueEnd: () => {
+        console.log('[CharacterPreview] 对话结束');
+      },
+    });
+
+    // 示例对话数据
+    const sampleDialogues: Record<string, string> = {
+      'cenhui': '先按流程走。',
+      'gulin': '收敛是必要的。不然世界会记住太多。',
+      'songlan': '版本库里还有另一个说法……',
+      'xuchen': '我只能告诉你，这不是病。',
+      'atang': '我不存在。但我还是会漂。',
+      'muping': '平面神话从不沉没。',
+      'qilan': '我做的事没有收益。但我想做。',
+      'chenjiang': '我修的东西已经不存在了。但我还是修。',
+    };
+
+    // 显示对话
+    const dialogue: IDialogue = {
+      id: `preview_${character.id}`,
+      speaker: character.name,
+      text: sampleDialogues[character.id] || `这是${character.name}的示例对话文本，用于展示角色在对话框中的表现效果。`,
+      expression: character.defaultExpression,
+    };
+
+    this.time.delayedCall(300, () => {
+      this._dialogueUI?.showDialogue(dialogue);
+    });
+
+    // 关闭按钮
+    const closeBtn = this.add.text(width - 60, 60, '✕ 关闭', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '14px',
+      color: '#686868',
+    }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
+    closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
+    closeBtn.on('pointerout', () => closeBtn.setColor('#686868'));
+    closeBtn.on('pointerdown', () => this._hideDialoguePreview());
+    this._dialoguePreviewContainer.add(closeBtn);
+
+    // 切换表情提示
+    const expressionTip = this.add.text(width / 2, height - 30, 
+      '💡 这是使用 DialogueUI 组件渲染的真实对话框', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '11px',
+      color: '#4A4A4A',
+    }).setOrigin(0.5);
+    this._dialoguePreviewContainer.add(expressionTip);
+
+    this._dialoguePreviewContainer.setVisible(true);
+  }
+
+  /**
+   * 隐藏对话框预览
+   */
+  private _hideDialoguePreview(): void {
+    this._dialogueUI?.destroy();
+    this._dialogueUI = null;
+    this._dialoguePreviewContainer.setVisible(false);
+    this._dialoguePreviewContainer.removeAll(true);
+  }
+
   protected setupKeyboard(): void {
     super.setupKeyboard();
 
     this.input.keyboard?.on('keydown-ESC', () => {
-      if (this.isFullPreview) {
+      if (this._dialoguePreviewContainer.visible) {
+        this._hideDialoguePreview();
+      } else if (this.isFullPreview) {
         this.hideFullPreview();
       } else {
         this.goBack();
       }
     });
+  }
+
+  shutdown(): void {
+    this._dialogueUI?.destroy();
+    super.shutdown();
   }
 }
 

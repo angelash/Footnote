@@ -18,6 +18,7 @@ import { COLORS, TEXT_STYLES, CONSTANTS } from '@/config/game.config';
 // 预览类型
 export type PreviewType = 
   | 'scene'       // 场景预览
+  | 'object'      // 物件预览
   | 'character'   // 角色预览
   | 'animation'   // 动画预览
   | 'ui'          // UI预览
@@ -41,8 +42,15 @@ export class DevPreviewScene extends Phaser.Scene {
       type: 'scene',
       label: '场景预览',
       icon: '🏠',
-      description: '预览Zone背景和物件布局',
+      description: '使用 SceneAssembler 组装完整场景 Prefab',
       sceneKey: 'ScenePreviewScene',
+    },
+    {
+      type: 'object',
+      label: '物件预览',
+      icon: '📦',
+      description: '预览所有物件 Prefab（碰撞、交互、动画）',
+      sceneKey: 'ObjectPreviewScene',
     },
     {
       type: 'character',
@@ -62,7 +70,7 @@ export class DevPreviewScene extends Phaser.Scene {
       type: 'ui',
       label: 'UI预览',
       icon: '🎨',
-      description: '预览面板、按钮、图标',
+      description: '预览完整UI界面 Prefab（对话框、菜单、物品栏）',
       sceneKey: 'UIPreviewScene',
     },
     {

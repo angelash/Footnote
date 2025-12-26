@@ -1,13 +1,20 @@
 /**
- * 场景预览场景
+ * 场景预览场景 (Prefab 模式)
  * 
- * 预览所有Zone的背景和物件布局
+ * 使用 SceneAssembler 组装完整场景，展示：
+ * - 背景（正式资源或白盒占位）
+ * - 所有物件（位置、碰撞区域、交互类型）
+ * - 交互点标记
+ * - 动画物件
  */
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
 import { ZONES, ChapterId, getZonesByChapter } from '@/config/zones.config';
-import { SCENE_BACKGROUNDS } from '@/data/webpAssets';
+import { getSceneConfig, getAllZoneIds } from '@/data/scenes';
+import { SceneAssembler } from '@/systems/scene/SceneAssembler';
+import { assetResolver } from '@/systems/whitebox/AssetResolver';
+import type { ISceneConfig, IAssembledScene, ISceneAction } from '@/types/scene';
 
 // 章节配置
 const CHAPTERS = [
@@ -20,16 +27,66 @@ const CHAPTERS = [
   { id: ChapterId.CF, name: '终章 (CF)', color: '#00FFAA' },
 ];
 
+// 显示模式
+type DisplayMode = 'list' | 'prefab';
+
 export class ScenePreviewScene extends BasePreviewScene {
   protected title = '🏠 场景预览';
-  protected subtitle = '预览所有Zone背景和物件布局';
+  protected subtitle = '使用 SceneAssembler 组装完整场景 Prefab';
 
-  private previewContainer!: Phaser.GameObjects.Container;
-  private currentZoneId: string | null = null;
-  private isFullPreview = false;
+  // 场景组装器
+  private _sceneAssembler!: SceneAssembler;
+  private _assembledScene: IAssembledScene | null = null;
+
+  // 预览相关
+  private _previewContainer!: Phaser.GameObjects.Container;
+  private _prefabViewContainer!: Phaser.GameObjects.Container;
+  private _currentZoneId: string | null = null;
+  private _displayMode: DisplayMode = 'list';
+
+  // 调试覆盖层
+  private _debugOverlay!: Phaser.GameObjects.Container;
+  private _showDebugInfo = true;
+
+  // 交互信息面板
+  private _interactionPanel!: Phaser.GameObjects.Container;
 
   constructor() {
     super({ key: 'ScenePreviewScene' });
+  }
+
+  create(): void {
+    super.create();
+
+    // 初始化资源解析器
+    if (!assetResolver.isInitialized()) {
+      assetResolver.init(this);
+    }
+
+    // 创建场景组装器
+    this._sceneAssembler = new SceneAssembler(this, {
+      onAction: (action, objectId) => this._handlePreviewAction(action, objectId),
+    });
+
+    // Prefab视图容器（在contentContainer之上）
+    this._prefabViewContainer = this.add.container(0, 0);
+    this._prefabViewContainer.setDepth(100);
+    this._prefabViewContainer.setVisible(false);
+
+    // 调试信息覆盖层
+    this._debugOverlay = this.add.container(0, 0);
+    this._debugOverlay.setDepth(150);
+    this._debugOverlay.setVisible(false);
+
+    // 交互信息面板
+    this._interactionPanel = this.add.container(0, 0);
+    this._interactionPanel.setDepth(160);
+    this._interactionPanel.setVisible(false);
+
+    // 预览弹窗容器
+    this._previewContainer = this.add.container(0, 0);
+    this._previewContainer.setDepth(200);
+    this._previewContainer.setVisible(false);
   }
 
   protected createContent(width: number, height: number): void {
@@ -40,14 +97,27 @@ export class ScenePreviewScene extends BasePreviewScene {
     const cardsPerRow = 3;
 
     // 统计信息
-    const totalZones = Object.keys(ZONES).length;
-    const stats = this.add.text(width / 2, currentY, `共 ${totalZones} 个Zone`, {
+    const totalZones = getAllZoneIds().length;
+    const configuredZones = getAllZoneIds().filter(id => getSceneConfig(id) !== null).length;
+    
+    const stats = this.add.text(width / 2, currentY, 
+      `共 ${totalZones} 个Zone | ${configuredZones} 个已配置Prefab`, {
       fontFamily: 'Noto Sans SC',
       fontSize: '14px',
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 40;
+    currentY += 30;
+
+    // 操作提示
+    const hint = this.add.text(width / 2, currentY, 
+      '💡 点击Zone卡片进入 Prefab 预览模式（包含物件、交互点、碰撞区域）', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '12px',
+      color: '#4A9EFF',
+    }).setOrigin(0.5);
+    this.contentContainer.add(hint);
+    currentY += 35;
 
     // 按章节分类显示
     CHAPTERS.forEach((chapter) => {
@@ -67,7 +137,9 @@ export class ScenePreviewScene extends BasePreviewScene {
         const x = 30 + col * (cardWidth + cardPadding);
         const y = currentY + row * (cardHeight + cardPadding);
 
-        const card = this.createZoneCard(x, y, cardWidth, cardHeight, zone.id, zone.name, zone.backgroundKey);
+        // 检查是否有配置
+        const hasConfig = getSceneConfig(zone.id) !== null;
+        const card = this._createZoneCard(x, y, cardWidth, cardHeight, zone.id, zone.name, hasConfig);
         this.contentContainer.add(card);
       });
 
@@ -82,68 +154,68 @@ export class ScenePreviewScene extends BasePreviewScene {
     });
 
     this.setContentHeight(currentY);
-
-    // 全屏预览容器
-    this.previewContainer = this.add.container(0, 0);
-    this.previewContainer.setDepth(200);
-    this.previewContainer.setVisible(false);
   }
 
-  private createZoneCard(
+  private _createZoneCard(
     x: number,
     y: number,
     width: number,
     height: number,
     zoneId: string,
     zoneName: string,
-    backgroundKey: string
+    hasConfig: boolean
   ): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
 
     // 背景
     const bg = this.add.graphics();
-    bg.fillStyle(0x141419, 1);
+    bg.fillStyle(hasConfig ? 0x141419 : 0x0A0A0F, 1);
     bg.fillRoundedRect(0, 0, width, height, 8);
-    bg.lineStyle(1, 0x2A2A30, 1);
+    bg.lineStyle(1, hasConfig ? 0x2A2A30 : 0x1A1A1F, 1);
     bg.strokeRoundedRect(0, 0, width, height, 8);
     container.add(bg);
 
-    // 尝试加载背景缩略图
-    const bgUrl = SCENE_BACKGROUNDS[backgroundKey];
-    if (bgUrl && this.textures.exists(backgroundKey)) {
-      const thumbnail = this.add.image(width / 2, (height - 40) / 2, backgroundKey);
-      const scale = Math.min((width - 10) / thumbnail.width, (height - 50) / thumbnail.height);
-      thumbnail.setScale(scale);
-      container.add(thumbnail);
-    } else {
-      // 占位图
-      const placeholder = this.add.graphics();
-      placeholder.fillStyle(0x1E1E24, 1);
-      placeholder.fillRect(5, 5, width - 10, height - 50);
-      container.add(placeholder);
+    // 配置状态图标
+    const statusIcon = hasConfig ? '✅' : '⚠️';
+    const statusColor = hasConfig ? '#00FFAA' : '#FFD700';
+    
+    // 场景预览图标（占位）
+    const previewIcon = this.add.text(width / 2, (height - 40) / 2, hasConfig ? '🎬' : '📋', {
+      fontSize: '48px',
+    }).setOrigin(0.5);
+    container.add(previewIcon);
 
-      // 占位文字
-      const placeholderText = this.add.text(width / 2, (height - 40) / 2, '📷', {
-        fontSize: '32px',
+    // 获取物件数量
+    const config = getSceneConfig(zoneId);
+    const objectCount = config?.objects?.length ?? 0;
+    const interactiveCount = config?.objects?.filter(o => o.interactive)?.length ?? 0;
+
+    // 物件统计
+    if (hasConfig) {
+      const objStats = this.add.text(width / 2, (height - 40) / 2 + 35, 
+        `${objectCount}物件 | ${interactiveCount}交互`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '10px',
+        color: '#4A4A4A',
       }).setOrigin(0.5);
-      container.add(placeholderText);
+      container.add(objStats);
     }
 
-    // Zone ID
-    const idText = this.add.text(width / 2, height - 35, zoneId, {
+    // Zone ID + 状态
+    const idText = this.add.text(10, height - 35, `${statusIcon} ${zoneId}`, {
       fontFamily: 'Noto Sans SC',
       fontSize: '11px',
-      color: '#00FFAA',
+      color: statusColor,
       fontStyle: 'bold',
-    }).setOrigin(0.5);
+    });
     container.add(idText);
 
     // Zone名称
-    const nameText = this.add.text(width / 2, height - 18, zoneName, {
+    const nameText = this.add.text(10, height - 18, zoneName, {
       fontFamily: 'Noto Sans SC',
       fontSize: '11px',
       color: '#A8A6A3',
-    }).setOrigin(0.5);
+    });
     container.add(nameText);
 
     // 交互
@@ -153,230 +225,500 @@ export class ScenePreviewScene extends BasePreviewScene {
       bg.clear();
       bg.fillStyle(0x1E1E24, 1);
       bg.fillRoundedRect(0, 0, width, height, 8);
-      bg.lineStyle(2, 0x00FFAA, 1);
+      bg.lineStyle(2, hasConfig ? 0x00FFAA : 0xFFD700, 1);
       bg.strokeRoundedRect(0, 0, width, height, 8);
     });
 
     container.on('pointerout', () => {
       bg.clear();
-      bg.fillStyle(0x141419, 1);
+      bg.fillStyle(hasConfig ? 0x141419 : 0x0A0A0F, 1);
       bg.fillRoundedRect(0, 0, width, height, 8);
-      bg.lineStyle(1, 0x2A2A30, 1);
+      bg.lineStyle(1, hasConfig ? 0x2A2A30 : 0x1A1A1F, 1);
       bg.strokeRoundedRect(0, 0, width, height, 8);
     });
 
     container.on('pointerdown', () => {
-      this.showFullPreview(zoneId);
+      this._enterPrefabView(zoneId);
     });
 
     return container;
   }
 
-  private showFullPreview(zoneId: string): void {
+  /**
+   * 进入 Prefab 视图模式
+   */
+  private _enterPrefabView(zoneId: string): void {
+    const config = getSceneConfig(zoneId);
     const zone = ZONES[zoneId];
+    
     if (!zone) return;
 
-    this.currentZoneId = zoneId;
-    this.isFullPreview = true;
+    this._currentZoneId = zoneId;
+    this._displayMode = 'prefab';
+
     const { width, height } = this.scale;
 
-    // 清空预览容器
-    this.previewContainer.removeAll(true);
+    // 隐藏列表
+    this.contentContainer.setVisible(false);
+    this.headerContainer.setVisible(false);
 
-    // 半透明背景
-    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.9).setOrigin(0);
-    this.previewContainer.add(overlay);
-
-    // 背景图
-    const bgUrl = SCENE_BACKGROUNDS[zone.backgroundKey];
-    if (bgUrl) {
-      // 检查纹理是否已加载且不是缺失纹理
-      if (this.textures.exists(zone.backgroundKey) && !this.isPlaceholderTexture(zone.backgroundKey)) {
-        const bgImage = this.add.image(width / 2, height / 2, zone.backgroundKey);
-        const scale = Math.min((width - 40) / bgImage.width, (height - 150) / bgImage.height);
-        bgImage.setScale(scale);
-        this.previewContainer.add(bgImage);
-      } else {
-        // 加载中提示
-        const loadingText = this.add.text(width / 2, height / 2, '🔄 加载中...', {
-          fontFamily: 'Noto Sans SC',
-          fontSize: '16px',
-          color: '#686868',
-        }).setOrigin(0.5);
-        this.previewContainer.add(loadingText);
-
-        // 尝试加载纹理
-        this.load.image(zone.backgroundKey, bgUrl);
-        
-        // 监听加载完成
-        this.load.once('complete', () => {
-          if (this.currentZoneId === zoneId) {
-            // 检查是否加载成功（不是缺失纹理）
-            if (this.textures.exists(zone.backgroundKey) && !this.isPlaceholderTexture(zone.backgroundKey)) {
-              loadingText.destroy();
-              const bgImage = this.add.image(width / 2, height / 2, zone.backgroundKey);
-              const scale = Math.min((width - 40) / bgImage.width, (height - 150) / bgImage.height);
-              bgImage.setScale(scale);
-              this.previewContainer.add(bgImage);
-            } else {
-              // 加载失败，显示占位符
-              loadingText.setText('📷 资源待制作');
-              loadingText.setColor('#4A4A4A');
-              this.showPlaceholderInfo(zone.backgroundKey);
-            }
-          }
-        });
-
-        // 监听加载错误
-        this.load.once('loaderror', () => {
-          if (this.currentZoneId === zoneId) {
-            loadingText.setText('📷 资源待制作');
-            loadingText.setColor('#4A4A4A');
-            this.showPlaceholderInfo(zone.backgroundKey);
-          }
-        });
-
-        this.load.start();
-      }
-    } else {
-      // 无背景配置
-      const noImageText = this.add.text(width / 2, height / 2, '📷 暂无背景配置', {
-        fontFamily: 'Noto Sans SC',
-        fontSize: '18px',
-        color: '#4A4A4A',
-      }).setOrigin(0.5);
-      this.previewContainer.add(noImageText);
+    // 清理旧的组装场景
+    if (this._assembledScene) {
+      this._sceneAssembler.destroy(this._assembledScene);
+      this._assembledScene = null;
     }
 
-    // 信息面板
-    const infoPanel = this.add.graphics();
-    infoPanel.fillStyle(0x141419, 0.9);
-    infoPanel.fillRoundedRect(20, 20, width - 40, 80, 8);
-    this.previewContainer.add(infoPanel);
+    // 清空 Prefab 视图
+    this._prefabViewContainer.removeAll(true);
+    this._debugOverlay.removeAll(true);
 
-    // Zone信息
-    const infoTitle = this.add.text(40, 35, `${zone.id} - ${zone.name}`, {
+    // 背景
+    const bgRect = this.add.rectangle(0, 0, width, height, 0x0A0A0F).setOrigin(0);
+    this._prefabViewContainer.add(bgRect);
+
+    // 使用 SceneAssembler 组装场景
+    if (config) {
+      this._assembledScene = this._sceneAssembler.build(config);
+      
+      // 将组装的对象添加到容器
+      // 注意：SceneAssembler 直接添加到场景，我们需要调整深度
+      this._assembledScene.objects.forEach(obj => {
+        obj.setDepth((obj.depth ?? 0) + 10);
+      });
+
+      // 创建调试覆盖层
+      this._createDebugOverlay(config);
+    } else {
+      // 无配置，显示提示
+      const noConfigText = this.add.text(width / 2, height / 2, 
+        `⚠️ Zone ${zoneId} 暂无 Prefab 配置\n\n请在 src/data/scenes/ 添加对应 YAML 文件`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '16px',
+        color: '#FFD700',
+        align: 'center',
+      }).setOrigin(0.5);
+      this._prefabViewContainer.add(noConfigText);
+    }
+
+    // 顶部信息栏
+    this._createPrefabHeader(zoneId, zone.name, config);
+
+    // 底部工具栏
+    this._createPrefabToolbar();
+
+    // 显示 Prefab 视图
+    this._prefabViewContainer.setVisible(true);
+    this._debugOverlay.setVisible(this._showDebugInfo);
+  }
+
+  /**
+   * 创建 Prefab 视图头部
+   */
+  private _createPrefabHeader(zoneId: string, zoneName: string, config: ISceneConfig | null): void {
+    const { width } = this.scale;
+
+    // 头部背景
+    const headerBg = this.add.graphics();
+    headerBg.fillStyle(0x141419, 0.95);
+    headerBg.fillRect(0, 0, width, 80);
+    this._prefabViewContainer.add(headerBg);
+
+    // 返回按钮
+    const backBtn = this.add.text(20, 25, '← 返回列表', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '14px',
+      color: '#4A9EFF',
+    }).setInteractive({ useHandCursor: true });
+    
+    backBtn.on('pointerover', () => backBtn.setColor('#00FFAA'));
+    backBtn.on('pointerout', () => backBtn.setColor('#4A9EFF'));
+    backBtn.on('pointerdown', () => this._exitPrefabView());
+    this._prefabViewContainer.add(backBtn);
+
+    // Zone 信息
+    const zoneTitle = this.add.text(width / 2, 20, `🎬 ${zoneId} - ${zoneName}`, {
       fontFamily: 'Noto Sans SC',
       fontSize: '18px',
       color: '#00FFAA',
       fontStyle: 'bold',
-    });
-    this.previewContainer.add(infoTitle);
+    }).setOrigin(0.5, 0);
+    this._prefabViewContainer.add(zoneTitle);
 
-    const infoDesc = this.add.text(40, 62, zone.description, {
+    // 配置信息
+    if (config) {
+      const objectCount = config.objects?.length ?? 0;
+      const interactiveObjects = config.objects?.filter(o => o.interactive) ?? [];
+      const animatedObjects = config.objects?.filter(o => o.animation) ?? [];
+      
+      const statsText = this.add.text(width / 2, 48, 
+        `📦 ${objectCount} 物件 | 🎯 ${interactiveObjects.length} 交互点 | 🎬 ${animatedObjects.length} 动画`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '12px',
+        color: '#686868',
+      }).setOrigin(0.5, 0);
+      this._prefabViewContainer.add(statsText);
+    }
+
+    // 调试开关
+    const debugToggle = this.add.text(width - 20, 25, this._showDebugInfo ? '🔍 隐藏调试' : '🔍 显示调试', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '13px',
-      color: '#A8A6A3',
+      fontSize: '12px',
+      color: '#686868',
+    }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+    
+    debugToggle.on('pointerover', () => debugToggle.setColor('#00FFAA'));
+    debugToggle.on('pointerout', () => debugToggle.setColor('#686868'));
+    debugToggle.on('pointerdown', () => {
+      this._showDebugInfo = !this._showDebugInfo;
+      debugToggle.setText(this._showDebugInfo ? '🔍 隐藏调试' : '🔍 显示调试');
+      this._debugOverlay.setVisible(this._showDebugInfo);
     });
-    this.previewContainer.add(infoDesc);
+    this._prefabViewContainer.add(debugToggle);
+  }
 
-    // 背景键名
-    const keyText = this.add.text(40, 82, `纹理: ${zone.backgroundKey}`, {
+  /**
+   * 创建调试覆盖层（显示碰撞区域、交互类型等）
+   */
+  private _createDebugOverlay(config: ISceneConfig): void {
+    if (!config.objects) return;
+
+    config.objects.forEach(obj => {
+      // 物件边界框
+      const bounds = this._estimateObjectBounds(obj);
+      
+      // 根据类型选择颜色
+      let color = 0x444444; // 默认灰色（装饰）
+      let label = '装饰';
+      
+      if (obj.interactive) {
+        switch (obj.interactive.action?.type) {
+          case 'card':
+            color = 0x00FFAA;
+            label = '📇 卡片';
+            break;
+          case 'dialogue':
+            color = 0x4A9EFF;
+            label = '💬 对话';
+            break;
+          case 'gotoZone':
+            color = 0xFFD700;
+            label = '🚪 传送';
+            break;
+          default:
+            color = 0xFF6600;
+            label = '🎯 交互';
+        }
+      }
+      
+      if (obj.animation) {
+        color = 0xFF00FF;
+        label = '🎬 动画';
+      }
+
+      // 绘制边界框
+      const debugBox = this.add.graphics();
+      debugBox.lineStyle(2, color, 0.8);
+      debugBox.strokeRect(
+        obj.x - bounds.width / 2,
+        obj.y - bounds.height / 2,
+        bounds.width,
+        bounds.height
+      );
+      
+      // 中心点
+      debugBox.fillStyle(color, 1);
+      debugBox.fillCircle(obj.x, obj.y, 4);
+      
+      this._debugOverlay.add(debugBox);
+
+      // 标签
+      const labelBg = this.add.graphics();
+      labelBg.fillStyle(0x000000, 0.7);
+      labelBg.fillRoundedRect(obj.x - 30, obj.y - bounds.height / 2 - 25, 60, 20, 4);
+      this._debugOverlay.add(labelBg);
+
+      const labelText = this.add.text(obj.x, obj.y - bounds.height / 2 - 15, label, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '10px',
+        color: `#${color.toString(16).padStart(6, '0')}`,
+      }).setOrigin(0.5);
+      this._debugOverlay.add(labelText);
+
+      // 物件ID
+      const idText = this.add.text(obj.x, obj.y + bounds.height / 2 + 5, obj.id, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '9px',
+        color: '#4A4A4A',
+      }).setOrigin(0.5, 0);
+      this._debugOverlay.add(idText);
+    });
+
+    // 图例
+    this._createDebugLegend();
+  }
+
+  /**
+   * 创建调试图例
+   */
+  private _createDebugLegend(): void {
+    const { width, height } = this.scale;
+    
+    const legendBg = this.add.graphics();
+    legendBg.fillStyle(0x141419, 0.9);
+    legendBg.fillRoundedRect(width - 150, height - 180, 140, 160, 8);
+    this._debugOverlay.add(legendBg);
+
+    const legendTitle = this.add.text(width - 80, height - 170, '📋 图例', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
-      color: '#4A4A4A',
-    });
-    this.previewContainer.add(keyText);
-
-    // 关闭按钮
-    const closeBtn = this.add.text(width - 50, 40, '✕', {
-      fontSize: '28px',
+      fontSize: '12px',
       color: '#A8A6A3',
+      fontStyle: 'bold',
     }).setOrigin(0.5);
-    closeBtn.setInteractive({ useHandCursor: true });
-    closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
-    closeBtn.on('pointerout', () => closeBtn.setColor('#A8A6A3'));
-    closeBtn.on('pointerdown', () => this.hideFullPreview());
-    this.previewContainer.add(closeBtn);
+    this._debugOverlay.add(legendTitle);
 
-    // 底部提示
-    const tipText = this.add.text(width / 2, height - 30, '点击空白处或按 ESC 关闭', {
+    const legends = [
+      { color: 0x00FFAA, label: '📇 卡片交互' },
+      { color: 0x4A9EFF, label: '💬 对话交互' },
+      { color: 0xFFD700, label: '🚪 区域传送' },
+      { color: 0xFF6600, label: '🎯 其他交互' },
+      { color: 0xFF00FF, label: '🎬 动画物件' },
+      { color: 0x444444, label: '🏛️ 装饰物件' },
+    ];
+
+    legends.forEach((item, index) => {
+      const y = height - 145 + index * 22;
+      
+      const dot = this.add.graphics();
+      dot.fillStyle(item.color, 1);
+      dot.fillCircle(width - 130, y, 5);
+      this._debugOverlay.add(dot);
+
+      const text = this.add.text(width - 120, y, item.label, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '10px',
+        color: '#A8A6A3',
+      }).setOrigin(0, 0.5);
+      this._debugOverlay.add(text);
+    });
+  }
+
+  /**
+   * 创建底部工具栏
+   */
+  private _createPrefabToolbar(): void {
+    const { width, height } = this.scale;
+
+    const toolbarBg = this.add.graphics();
+    toolbarBg.fillStyle(0x141419, 0.95);
+    toolbarBg.fillRect(0, height - 50, width, 50);
+    this._prefabViewContainer.add(toolbarBg);
+
+    // 快捷键提示
+    const shortcuts = this.add.text(width / 2, height - 25, 
+      'ESC 返回 | D 切换调试 | ← → 切换Zone', {
       fontFamily: 'Noto Sans SC',
       fontSize: '12px',
       color: '#4A4A4A',
     }).setOrigin(0.5);
-    this.previewContainer.add(tipText);
+    this._prefabViewContainer.add(shortcuts);
 
-    // 点击背景关闭
-    overlay.setInteractive();
-    overlay.on('pointerdown', () => this.hideFullPreview());
+    // 前一个Zone
+    const prevBtn = this.add.text(100, height - 25, '← 上一个', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '12px',
+      color: '#686868',
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    
+    prevBtn.on('pointerover', () => prevBtn.setColor('#00FFAA'));
+    prevBtn.on('pointerout', () => prevBtn.setColor('#686868'));
+    prevBtn.on('pointerdown', () => this._navigateZone(-1));
+    this._prefabViewContainer.add(prevBtn);
 
-    this.previewContainer.setVisible(true);
+    // 下一个Zone
+    const nextBtn = this.add.text(width - 100, height - 25, '下一个 →', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '12px',
+      color: '#686868',
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    
+    nextBtn.on('pointerover', () => nextBtn.setColor('#00FFAA'));
+    nextBtn.on('pointerout', () => nextBtn.setColor('#686868'));
+    nextBtn.on('pointerdown', () => this._navigateZone(1));
+    this._prefabViewContainer.add(nextBtn);
+  }
 
-    // 动画
-    this.previewContainer.setAlpha(0);
-    this.tweens.add({
-      targets: this.previewContainer,
-      alpha: 1,
-      duration: 200,
+  /**
+   * 退出 Prefab 视图
+   */
+  private _exitPrefabView(): void {
+    // 清理组装的场景
+    if (this._assembledScene) {
+      this._sceneAssembler.destroy(this._assembledScene);
+      this._assembledScene = null;
+    }
+
+    this._currentZoneId = null;
+    this._displayMode = 'list';
+
+    // 隐藏 Prefab 视图
+    this._prefabViewContainer.setVisible(false);
+    this._prefabViewContainer.removeAll(true);
+    this._debugOverlay.setVisible(false);
+    this._debugOverlay.removeAll(true);
+
+    // 显示列表
+    this.contentContainer.setVisible(true);
+    this.headerContainer.setVisible(true);
+  }
+
+  /**
+   * 导航到相邻Zone
+   */
+  private _navigateZone(direction: number): void {
+    if (!this._currentZoneId) return;
+
+    const allZones = getAllZoneIds();
+    const currentIndex = allZones.indexOf(this._currentZoneId);
+    
+    if (currentIndex === -1) return;
+
+    const newIndex = (currentIndex + direction + allZones.length) % allZones.length;
+    this._enterPrefabView(allZones[newIndex]);
+  }
+
+  /**
+   * 处理预览中的交互动作
+   */
+  private _handlePreviewAction(action: ISceneAction, objectId: string): void {
+    // 在预览模式下显示交互信息面板
+    const { width, height } = this.scale;
+
+    // 清空旧面板
+    this._interactionPanel.removeAll(true);
+
+    // 面板背景
+    const panelBg = this.add.graphics();
+    panelBg.fillStyle(0x141419, 0.95);
+    panelBg.fillRoundedRect(20, height - 200, width - 40, 140, 8);
+    panelBg.lineStyle(2, 0x00FFAA, 1);
+    panelBg.strokeRoundedRect(20, height - 200, width - 40, 140, 8);
+    this._interactionPanel.add(panelBg);
+
+    // 标题
+    const title = this.add.text(40, height - 185, `🎯 交互预览 - ${objectId}`, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '14px',
+      color: '#00FFAA',
+      fontStyle: 'bold',
+    });
+    this._interactionPanel.add(title);
+
+    // 动作类型
+    const actionType = this.add.text(40, height - 160, `类型: ${action.type}`, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '12px',
+      color: '#A8A6A3',
+    });
+    this._interactionPanel.add(actionType);
+
+    // 动作详情
+    let detailText = '';
+    switch (action.type) {
+      case 'card':
+        detailText = `卡片ID: ${action.cardId}`;
+        break;
+      case 'dialogue':
+        detailText = `说话者: ${action.speaker}\n内容: ${action.text?.slice(0, 50)}...`;
+        break;
+      case 'gotoZone':
+        detailText = `目标Zone: ${action.zoneId}`;
+        break;
+    }
+
+    const detail = this.add.text(40, height - 140, detailText, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '11px',
+      color: '#686868',
+      wordWrap: { width: width - 80 },
+    });
+    this._interactionPanel.add(detail);
+
+    // 关闭按钮
+    const closeBtn = this.add.text(width - 50, height - 185, '✕', {
+      fontSize: '20px',
+      color: '#686868',
+    }).setInteractive({ useHandCursor: true });
+    
+    closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
+    closeBtn.on('pointerout', () => closeBtn.setColor('#686868'));
+    closeBtn.on('pointerdown', () => this._interactionPanel.setVisible(false));
+    this._interactionPanel.add(closeBtn);
+
+    this._interactionPanel.setVisible(true);
+
+    // 3秒后自动隐藏
+    this.time.delayedCall(3000, () => {
+      this._interactionPanel.setVisible(false);
     });
   }
 
-  private hideFullPreview(): void {
-    this.isFullPreview = false;
-    this.currentZoneId = null;
+  /**
+   * 估算物件边界
+   */
+  private _estimateObjectBounds(obj: { scale?: number; texture?: string }): { width: number; height: number } {
+    let width = 60;
+    let height = 60;
 
-    this.tweens.add({
-      targets: this.previewContainer,
-      alpha: 0,
-      duration: 200,
-      onComplete: () => {
-        this.previewContainer.setVisible(false);
-        this.previewContainer.removeAll(true);
-      },
-    });
+    if (typeof obj.scale === 'number') {
+      width *= obj.scale;
+      height *= obj.scale;
+    }
+
+    return { width, height };
   }
 
   protected setupKeyboard(): void {
     super.setupKeyboard();
 
     this.input.keyboard?.on('keydown-ESC', () => {
-      if (this.isFullPreview) {
-        this.hideFullPreview();
+      if (this._interactionPanel.visible) {
+        this._interactionPanel.setVisible(false);
+      } else if (this._displayMode === 'prefab') {
+        this._exitPrefabView();
       } else {
         this.goBack();
       }
     });
+
+    // D键切换调试信息
+    this.input.keyboard?.on('keydown-D', () => {
+      if (this._displayMode === 'prefab') {
+        this._showDebugInfo = !this._showDebugInfo;
+        this._debugOverlay.setVisible(this._showDebugInfo);
+      }
+    });
+
+    // 方向键导航
+    this.input.keyboard?.on('keydown-LEFT', () => {
+      if (this._displayMode === 'prefab') {
+        this._navigateZone(-1);
+      }
+    });
+
+    this.input.keyboard?.on('keydown-RIGHT', () => {
+      if (this._displayMode === 'prefab') {
+        this._navigateZone(1);
+      }
+    });
   }
 
-  /**
-   * 检查纹理是否为 Phaser 的缺失纹理占位符
-   */
-  private isPlaceholderTexture(key: string): boolean {
-    if (!this.textures.exists(key)) return true;
-    
-    const texture = this.textures.get(key);
-    const frame = texture.get();
-    
-    // Phaser 默认缺失纹理是 32x32 的绿色方块
-    if (frame.width === 32 && frame.height === 32) {
-      return true;
+  shutdown(): void {
+    // 清理组装的场景
+    if (this._assembledScene) {
+      this._sceneAssembler.destroy(this._assembledScene);
+      this._assembledScene = null;
     }
     
-    return false;
-  }
-
-  /**
-   * 显示资源占位信息
-   */
-  private showPlaceholderInfo(backgroundKey: string): void {
-    const { width, height } = this.scale;
-    
-    // 显示预期路径信息
-    const pathInfo = this.add.text(width / 2, height / 2 + 40, `纹理键: ${backgroundKey}`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
-      color: '#3A3A3A',
-    }).setOrigin(0.5);
-    this.previewContainer.add(pathInfo);
-
-    // 显示提示
-    const hintText = this.add.text(width / 2, height / 2 + 65, '请在 assets/images/backgrounds/ 添加对应资源', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
-      color: '#2A2A2A',
-    }).setOrigin(0.5);
-    this.previewContainer.add(hintText);
+    super.shutdown();
   }
 }
-

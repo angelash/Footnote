@@ -11,6 +11,7 @@ import { GAME_CONFIG } from './config/game.config';
 // 预览场景导入
 import { DevPreviewScene } from './scenes/preview/DevPreviewScene';
 import { ScenePreviewScene } from './scenes/preview/ScenePreviewScene';
+import { ObjectPreviewScene } from './scenes/preview/ObjectPreviewScene';
 import { CharacterPreviewScene } from './scenes/preview/CharacterPreviewScene';
 import { AnimationPreviewScene } from './scenes/preview/AnimationPreviewScene';
 import { UIPreviewScene } from './scenes/preview/UIPreviewScene';
@@ -23,6 +24,7 @@ import { DialoguePreviewScene } from './scenes/preview/DialoguePreviewScene';
 const previewScenes = [
   DevPreviewScene,
   ScenePreviewScene,
+  ObjectPreviewScene,
   CharacterPreviewScene,
   AnimationPreviewScene,
   UIPreviewScene,
@@ -88,10 +90,11 @@ const config: Phaser.Types.Core.GameConfig = {
     postBoot: (game) => {
       console.log('[Footnote Preview] 预览工具已就绪');
       console.log('[Footnote Preview] 支持的预览类型:');
-      console.log('  - scene: 场景预览');
+      console.log('  - scene: 场景预览 (Prefab模式)');
+      console.log('  - object: 物件预览 (碰撞/交互/动画)');
       console.log('  - character: 角色预览');
       console.log('  - animation: 动画预览');
-      console.log('  - ui: UI预览');
+      console.log('  - ui: UI预览 (完整界面)');
       console.log('  - effect: 特效预览');
       console.log('  - audio: 音频预览');
       console.log('  - card: 卡片预览');

@@ -118,24 +118,24 @@ export class DevPreviewScene extends Phaser.Scene {
     this.createBackground(width, height);
 
     // 标题
-    this.titleText = this.add.text(width / 2, 60, '🛠️ 开发预览工具', {
+    this.titleText = this.add.text(width / 2, 80, '🛠️ 开发预览工具', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '32px',
+      fontSize: '40px',
       color: '#00FFAA',
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
     // 副标题
-    this.add.text(width / 2, 100, '《备注 / Footnote》资源预览系统', {
+    this.add.text(width / 2, 135, '《备注 / Footnote》资源预览系统', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: '20px',
       color: '#686868',
     }).setOrigin(0.5);
 
     // 版本信息
-    this.versionText = this.add.text(width / 2, height - 30, 'DEV v0.1.0 | 按 ESC 返回此菜单', {
+    this.versionText = this.add.text(width / 2, height - 40, 'DEV v0.1.0 | 按 ESC 返回此菜单', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: '16px',
       color: '#4A4A4A',
     }).setOrigin(0.5);
 
@@ -183,10 +183,10 @@ export class DevPreviewScene extends Phaser.Scene {
   private createMenu(width: number, height: number): void {
     this.menuContainer = this.add.container(0, 0);
     
-    const startY = 160;
-    const itemHeight = 100;
-    const itemPadding = 15;
-    const itemWidth = width - 60;
+    const startY = 200;
+    const itemHeight = 120;
+    const itemPadding = 18;
+    const itemWidth = width - 80;
 
     this.menuItems.forEach((item, index) => {
       const y = startY + index * (itemHeight + itemPadding);
@@ -213,31 +213,31 @@ export class DevPreviewScene extends Phaser.Scene {
     container.add(bg);
 
     // 图标
-    const icon = this.add.text(-width / 2 + 25, -height / 2 + 20, item.icon, {
-      fontSize: '36px',
+    const icon = this.add.text(-width / 2 + 35, -height / 2 + 25, item.icon, {
+      fontSize: '48px',
     });
     container.add(icon);
 
     // 标签
-    const label = this.add.text(-width / 2 + 80, -height / 2 + 18, item.label, {
+    const label = this.add.text(-width / 2 + 110, -height / 2 + 25, item.label, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '20px',
+      fontSize: '24px',
       color: '#E8E6E3',
       fontStyle: 'bold',
     });
     container.add(label);
 
     // 描述
-    const desc = this.add.text(-width / 2 + 80, -height / 2 + 48, item.description, {
+    const desc = this.add.text(-width / 2 + 110, -height / 2 + 60, item.description, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '13px',
+      fontSize: '16px',
       color: '#686868',
     });
     container.add(desc);
 
     // 箭头
-    const arrow = this.add.text(width / 2 - 30, 0, '→', {
-      fontSize: '24px',
+    const arrow = this.add.text(width / 2 - 40, 0, '→', {
+      fontSize: '30px',
       color: '#3A3A40',
     }).setOrigin(0.5);
     container.add(arrow);

@@ -12,13 +12,24 @@ import Phaser from 'phaser';
 import { COLORS, TEXT_STYLES } from '@/config/game.config';
 
 export abstract class BasePreviewScene extends Phaser.Scene {
-  protected headerHeight = 80;
-  protected footerHeight = 60;
+  protected headerHeight = 120;
+  protected footerHeight = 80;
+  protected headerContainer!: Phaser.GameObjects.Container;
   protected contentContainer!: Phaser.GameObjects.Container;
   protected scrollY = 0;
   protected maxScrollY = 0;
   protected title: string = '预览';
   protected subtitle: string = '';
+  
+  // 字体大小常量（放大后的尺寸）
+  protected readonly FONT_SIZE = {
+    TITLE: '32px',
+    SUBTITLE: '18px',
+    SECTION: '24px',
+    NORMAL: '18px',
+    SMALL: '14px',
+    TINY: '12px',
+  };
 
   create(): void {
     const { width, height } = this.scale;
@@ -69,64 +80,72 @@ export abstract class BasePreviewScene extends Phaser.Scene {
   }
 
   protected createHeader(width: number): void {
+    // 头部容器
+    this.headerContainer = this.add.container(0, 0);
+    this.headerContainer.setDepth(100);
+    
     // 头部背景
     const headerBg = this.add.graphics();
     headerBg.fillStyle(0x141419, 0.95);
     headerBg.fillRect(0, 0, width, this.headerHeight);
-    headerBg.lineStyle(1, 0x2A2A30, 1);
+    headerBg.lineStyle(2, 0x2A2A30, 1);
     headerBg.lineBetween(0, this.headerHeight, width, this.headerHeight);
-    headerBg.setDepth(100);
+    this.headerContainer.add(headerBg);
 
     // 返回按钮
-    const backBtn = this.createBackButton(20, this.headerHeight / 2);
-    backBtn.setDepth(101);
+    const backBtn = this.createBackButton(30, this.headerHeight / 2);
+    this.headerContainer.add(backBtn);
 
     // 标题
-    const titleText = this.add.text(width / 2, 25, this.title, {
+    const titleText = this.add.text(width / 2, 35, this.title, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '22px',
+      fontSize: this.FONT_SIZE.TITLE,
       color: '#00FFAA',
       fontStyle: 'bold',
-    }).setOrigin(0.5).setDepth(101);
+    }).setOrigin(0.5);
+    this.headerContainer.add(titleText);
 
     // 副标题
     if (this.subtitle) {
-      this.add.text(width / 2, 52, this.subtitle, {
+      const subtitleText = this.add.text(width / 2, 78, this.subtitle, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.SUBTITLE,
         color: '#686868',
-      }).setOrigin(0.5).setDepth(101);
+      }).setOrigin(0.5);
+      this.headerContainer.add(subtitleText);
     }
   }
 
   protected createBackButton(x: number, y: number): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
+    const btnWidth = 120;
+    const btnHeight = 50;
 
     const bg = this.add.graphics();
     bg.fillStyle(0x1E1E24, 1);
-    bg.fillRoundedRect(0, -18, 80, 36, 8);
+    bg.fillRoundedRect(0, -btnHeight / 2, btnWidth, btnHeight, 10);
     container.add(bg);
 
-    const text = this.add.text(40, 0, '← 返回', {
+    const text = this.add.text(btnWidth / 2, 0, '← 返回', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#A8A6A3',
     }).setOrigin(0.5);
     container.add(text);
 
-    container.setInteractive(new Phaser.Geom.Rectangle(0, -18, 80, 36), Phaser.Geom.Rectangle.Contains);
+    container.setInteractive(new Phaser.Geom.Rectangle(0, -btnHeight / 2, btnWidth, btnHeight), Phaser.Geom.Rectangle.Contains);
 
     container.on('pointerover', () => {
       bg.clear();
       bg.fillStyle(0x2A2A30, 1);
-      bg.fillRoundedRect(0, -18, 80, 36, 8);
+      bg.fillRoundedRect(0, -btnHeight / 2, btnWidth, btnHeight, 10);
       text.setColor('#00FFAA');
     });
 
     container.on('pointerout', () => {
       bg.clear();
       bg.fillStyle(0x1E1E24, 1);
-      bg.fillRoundedRect(0, -18, 80, 36, 8);
+      bg.fillRoundedRect(0, -btnHeight / 2, btnWidth, btnHeight, 10);
       text.setColor('#A8A6A3');
     });
 
@@ -141,14 +160,14 @@ export abstract class BasePreviewScene extends Phaser.Scene {
     const footerBg = this.add.graphics();
     footerBg.fillStyle(0x141419, 0.95);
     footerBg.fillRect(0, height - this.footerHeight, width, this.footerHeight);
-    footerBg.lineStyle(1, 0x2A2A30, 1);
+    footerBg.lineStyle(2, 0x2A2A30, 1);
     footerBg.lineBetween(0, height - this.footerHeight, width, height - this.footerHeight);
     footerBg.setDepth(100);
 
     // 提示文字
     this.add.text(width / 2, height - this.footerHeight / 2, '↑↓ 滚动 | ESC 返回 | 点击预览', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     }).setOrigin(0.5).setDepth(101);
   }
@@ -224,15 +243,15 @@ export abstract class BasePreviewScene extends Phaser.Scene {
 
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
-    bg.fillRoundedRect(0, 0, width, height, 8);
-    bg.lineStyle(1, 0x2A2A30, 1);
-    bg.strokeRoundedRect(0, 0, width, height, 8);
+    bg.fillRoundedRect(0, 0, width, height, 12);
+    bg.lineStyle(2, 0x2A2A30, 1);
+    bg.strokeRoundedRect(0, 0, width, height, 12);
     container.add(bg);
 
     // 标题
-    const titleText = this.add.text(width / 2, height - 25, title, {
+    const titleText = this.add.text(width / 2, height - 35, title, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#A8A6A3',
     }).setOrigin(0.5);
     container.add(titleText);
@@ -243,18 +262,18 @@ export abstract class BasePreviewScene extends Phaser.Scene {
       container.on('pointerover', () => {
         bg.clear();
         bg.fillStyle(0x1E1E24, 1);
-        bg.fillRoundedRect(0, 0, width, height, 8);
-        bg.lineStyle(2, 0x00FFAA, 1);
-        bg.strokeRoundedRect(0, 0, width, height, 8);
+        bg.fillRoundedRect(0, 0, width, height, 12);
+        bg.lineStyle(3, 0x00FFAA, 1);
+        bg.strokeRoundedRect(0, 0, width, height, 12);
         titleText.setColor('#00FFAA');
       });
 
       container.on('pointerout', () => {
         bg.clear();
         bg.fillStyle(0x141419, 1);
-        bg.fillRoundedRect(0, 0, width, height, 8);
-        bg.lineStyle(1, 0x2A2A30, 1);
-        bg.strokeRoundedRect(0, 0, width, height, 8);
+        bg.fillRoundedRect(0, 0, width, height, 12);
+        bg.lineStyle(2, 0x2A2A30, 1);
+        bg.strokeRoundedRect(0, 0, width, height, 12);
         titleText.setColor('#A8A6A3');
       });
 
@@ -270,7 +289,7 @@ export abstract class BasePreviewScene extends Phaser.Scene {
   protected createSectionTitle(x: number, y: number, text: string): Phaser.GameObjects.Text {
     return this.add.text(x, y, text, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '16px',
+      fontSize: this.FONT_SIZE.SECTION,
       color: '#00FFAA',
       fontStyle: 'bold',
     });
@@ -281,9 +300,54 @@ export abstract class BasePreviewScene extends Phaser.Scene {
    */
   protected createDivider(y: number, width: number): Phaser.GameObjects.Graphics {
     const line = this.add.graphics();
-    line.lineStyle(1, 0x2A2A30, 0.5);
-    line.lineBetween(30, y, width - 30, y);
+    line.lineStyle(2, 0x2A2A30, 0.5);
+    line.lineBetween(40, y, width - 40, y);
     return line;
+  }
+  
+  /**
+   * 显示Toast提示
+   */
+  protected showToast(message: string, type: 'info' | 'success' | 'error' = 'info'): void {
+    const { width } = this.scale;
+    
+    const colors = {
+      info: 0x4A9EFF,
+      success: 0x00FFAA,
+      error: 0xFF4444,
+    };
+    
+    const toast = this.add.container(width / 2, 150);
+    toast.setDepth(1000);
+    
+    const bg = this.add.graphics();
+    bg.fillStyle(colors[type], 0.9);
+    bg.fillRoundedRect(-180, -25, 360, 50, 8);
+    toast.add(bg);
+    
+    const text = this.add.text(0, 0, message, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: this.FONT_SIZE.SMALL,
+      color: '#FFFFFF',
+    }).setOrigin(0.5);
+    toast.add(text);
+    
+    this.tweens.add({
+      targets: toast,
+      alpha: { from: 0, to: 1 },
+      y: { from: 100, to: 150 },
+      duration: 200,
+      onComplete: () => {
+        this.time.delayedCall(2000, () => {
+          this.tweens.add({
+            targets: toast,
+            alpha: 0,
+            duration: 200,
+            onComplete: () => toast.destroy(),
+          });
+        });
+      },
+    });
   }
 }
 

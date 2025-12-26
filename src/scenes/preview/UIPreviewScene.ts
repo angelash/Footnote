@@ -57,7 +57,7 @@ export class UIPreviewScene extends BasePreviewScene {
   }
 
   protected createContent(width: number, height: number): void {
-    let currentY = 20;
+    let currentY = 30;
 
     // 分两大类
     const uiScreens = this._getUIScreens();
@@ -69,54 +69,54 @@ export class UIPreviewScene extends BasePreviewScene {
     const stats = this.add.text(width / 2, currentY, 
       `${totalScreens} 个界面 Prefab | ${totalComponents} 个组件元素`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 30;
+    currentY += 45;
 
     // 操作提示
     const hint = this.add.text(width / 2, currentY, 
       '💡 点击界面卡片进入全屏预览模式，可交互测试', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A9EFF',
     }).setOrigin(0.5);
     this.contentContainer.add(hint);
-    currentY += 40;
+    currentY += 50;
 
     // UI界面 Prefab 区域
-    const screenTitle = this.createSectionTitle(30, currentY, '📺 UI界面 Prefab（点击进入全屏预览）');
+    const screenTitle = this.createSectionTitle(40, currentY, '📺 UI界面 Prefab（点击进入全屏预览）');
     this.contentContainer.add(screenTitle);
-    currentY += 35;
+    currentY += 50;
 
-    // 界面卡片网格
-    const cardWidth = 200;
-    const cardHeight = 120;
+    // 界面卡片网格 - 增大卡片
+    const cardWidth = 300;
+    const cardHeight = 180;
     const cardsPerRow = 3;
 
     uiScreens.forEach((screen, index) => {
       const col = index % cardsPerRow;
       const row = Math.floor(index / cardsPerRow);
-      const x = 30 + col * (cardWidth + 15);
-      const y = currentY + row * (cardHeight + 15);
+      const x = 40 + col * (cardWidth + 20);
+      const y = currentY + row * (cardHeight + 20);
 
       const card = this._createScreenCard(x, y, cardWidth, cardHeight, screen);
       this.contentContainer.add(card);
     });
 
     const screenRows = Math.ceil(uiScreens.length / cardsPerRow);
-    currentY += screenRows * (cardHeight + 15) + 20;
+    currentY += screenRows * (cardHeight + 20) + 30;
 
     // 分隔线
     const divider1 = this.createDivider(currentY, width);
     this.contentContainer.add(divider1);
-    currentY += 30;
+    currentY += 40;
 
     // UI组件元素区域
-    const componentTitle = this.createSectionTitle(30, currentY, '🧩 UI组件元素');
+    const componentTitle = this.createSectionTitle(40, currentY, '🧩 UI组件元素');
     this.contentContainer.add(componentTitle);
-    currentY += 35;
+    currentY += 50;
 
     // 组件预览
     currentY = this._renderComponentPreviews(currentY, width);
@@ -181,32 +181,32 @@ export class UIPreviewScene extends BasePreviewScene {
     // 背景
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
-    bg.fillRoundedRect(0, 0, width, height, 8);
-    bg.lineStyle(1, 0x2A2A30, 1);
-    bg.strokeRoundedRect(0, 0, width, height, 8);
+    bg.fillRoundedRect(0, 0, width, height, 10);
+    bg.lineStyle(2, 0x2A2A30, 1);
+    bg.strokeRoundedRect(0, 0, width, height, 10);
     container.add(bg);
 
     // 图标
-    const icon = this.add.text(width / 2, 30, screen.icon, {
-      fontSize: '32px',
+    const icon = this.add.text(width / 2, 45, screen.icon, {
+      fontSize: '48px',
     }).setOrigin(0.5);
     container.add(icon);
 
     // 名称
-    const name = this.add.text(width / 2, 65, screen.name, {
+    const name = this.add.text(width / 2, 100, screen.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#00FFAA',
       fontStyle: 'bold',
     }).setOrigin(0.5);
     container.add(name);
 
     // 描述
-    const desc = this.add.text(width / 2, 88, screen.description, {
+    const desc = this.add.text(width / 2, 130, screen.description, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '9px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
-      wordWrap: { width: width - 20 },
+      wordWrap: { width: width - 30 },
       align: 'center',
     }).setOrigin(0.5, 0);
     container.add(desc);
@@ -217,17 +217,17 @@ export class UIPreviewScene extends BasePreviewScene {
     container.on('pointerover', () => {
       bg.clear();
       bg.fillStyle(0x1E1E24, 1);
-      bg.fillRoundedRect(0, 0, width, height, 8);
+      bg.fillRoundedRect(0, 0, width, height, 10);
       bg.lineStyle(2, 0x00FFAA, 1);
-      bg.strokeRoundedRect(0, 0, width, height, 8);
+      bg.strokeRoundedRect(0, 0, width, height, 10);
     });
 
     container.on('pointerout', () => {
       bg.clear();
       bg.fillStyle(0x141419, 1);
-      bg.fillRoundedRect(0, 0, width, height, 8);
-      bg.lineStyle(1, 0x2A2A30, 1);
-      bg.strokeRoundedRect(0, 0, width, height, 8);
+      bg.fillRoundedRect(0, 0, width, height, 10);
+      bg.lineStyle(2, 0x2A2A30, 1);
+      bg.strokeRoundedRect(0, 0, width, height, 10);
     });
 
     container.on('pointerdown', () => {

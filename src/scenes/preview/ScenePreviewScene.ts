@@ -90,10 +90,10 @@ export class ScenePreviewScene extends BasePreviewScene {
   }
 
   protected createContent(width: number, height: number): void {
-    let currentY = 20;
-    const cardWidth = 200;
-    const cardHeight = 150;
-    const cardPadding = 15;
+    let currentY = 30;
+    const cardWidth = 300;
+    const cardHeight = 220;
+    const cardPadding = 20;
     const cardsPerRow = 3;
 
     // 统计信息
@@ -103,21 +103,21 @@ export class ScenePreviewScene extends BasePreviewScene {
     const stats = this.add.text(width / 2, currentY, 
       `共 ${totalZones} 个Zone | ${configuredZones} 个已配置Prefab`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 30;
+    currentY += 45;
 
     // 操作提示
     const hint = this.add.text(width / 2, currentY, 
       '💡 点击Zone卡片进入 Prefab 预览模式（包含物件、交互点、碰撞区域）', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A9EFF',
     }).setOrigin(0.5);
     this.contentContainer.add(hint);
-    currentY += 35;
+    currentY += 50;
 
     // 按章节分类显示
     CHAPTERS.forEach((chapter) => {
@@ -125,16 +125,16 @@ export class ScenePreviewScene extends BasePreviewScene {
       if (zones.length === 0) return;
 
       // 章节标题
-      const sectionTitle = this.createSectionTitle(30, currentY, `${chapter.name} (${zones.length}个)`);
+      const sectionTitle = this.createSectionTitle(40, currentY, `${chapter.name} (${zones.length}个)`);
       sectionTitle.setColor(chapter.color);
       this.contentContainer.add(sectionTitle);
-      currentY += 35;
+      currentY += 50;
 
       // Zone卡片网格
       zones.forEach((zone, index) => {
         const col = index % cardsPerRow;
         const row = Math.floor(index / cardsPerRow);
-        const x = 30 + col * (cardWidth + cardPadding);
+        const x = 40 + col * (cardWidth + cardPadding);
         const y = currentY + row * (cardHeight + cardPadding);
 
         // 检查是否有配置
@@ -145,12 +145,12 @@ export class ScenePreviewScene extends BasePreviewScene {
 
       // 计算行数
       const rows = Math.ceil(zones.length / cardsPerRow);
-      currentY += rows * (cardHeight + cardPadding) + 20;
+      currentY += rows * (cardHeight + cardPadding) + 30;
 
       // 分隔线
       const divider = this.createDivider(currentY, width);
       this.contentContainer.add(divider);
-      currentY += 30;
+      currentY += 40;
     });
 
     this.setContentHeight(currentY);
@@ -192,28 +192,28 @@ export class ScenePreviewScene extends BasePreviewScene {
 
     // 物件统计
     if (hasConfig) {
-      const objStats = this.add.text(width / 2, (height - 40) / 2 + 35, 
+      const objStats = this.add.text(width / 2, (height - 50) / 2 + 40, 
         `${objectCount}物件 | ${interactiveCount}交互`, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '10px',
+        fontSize: '14px',
         color: '#4A4A4A',
       }).setOrigin(0.5);
       container.add(objStats);
     }
 
     // Zone ID + 状态
-    const idText = this.add.text(10, height - 35, `${statusIcon} ${zoneId}`, {
+    const idText = this.add.text(15, height - 50, `${statusIcon} ${zoneId}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: '16px',
       color: statusColor,
       fontStyle: 'bold',
     });
     container.add(idText);
 
     // Zone名称
-    const nameText = this.add.text(10, height - 18, zoneName, {
+    const nameText = this.add.text(15, height - 25, zoneName, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: '14px',
       color: '#A8A6A3',
     });
     container.add(nameText);
@@ -324,9 +324,9 @@ export class ScenePreviewScene extends BasePreviewScene {
     this._prefabViewContainer.add(headerBg);
 
     // 返回按钮
-    const backBtn = this.add.text(20, 25, '← 返回列表', {
+    const backBtn = this.add.text(30, 30, '← 返回列表', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: '18px',
       color: '#4A9EFF',
     }).setInteractive({ useHandCursor: true });
     
@@ -336,9 +336,9 @@ export class ScenePreviewScene extends BasePreviewScene {
     this._prefabViewContainer.add(backBtn);
 
     // Zone 信息
-    const zoneTitle = this.add.text(width / 2, 20, `🎬 ${zoneId} - ${zoneName}`, {
+    const zoneTitle = this.add.text(width / 2, 22, `🎬 ${zoneId} - ${zoneName}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '18px',
+      fontSize: '22px',
       color: '#00FFAA',
       fontStyle: 'bold',
     }).setOrigin(0.5, 0);
@@ -350,19 +350,19 @@ export class ScenePreviewScene extends BasePreviewScene {
       const interactiveObjects = config.objects?.filter(o => o.interactive) ?? [];
       const animatedObjects = config.objects?.filter(o => o.animation) ?? [];
       
-      const statsText = this.add.text(width / 2, 48, 
+      const statsText = this.add.text(width / 2, 52, 
         `📦 ${objectCount} 物件 | 🎯 ${interactiveObjects.length} 交互点 | 🎬 ${animatedObjects.length} 动画`, {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: '16px',
         color: '#686868',
       }).setOrigin(0.5, 0);
       this._prefabViewContainer.add(statsText);
     }
 
     // 调试开关
-    const debugToggle = this.add.text(width - 20, 25, this._showDebugInfo ? '🔍 隐藏调试' : '🔍 显示调试', {
+    const debugToggle = this.add.text(width - 30, 30, this._showDebugInfo ? '🔍 隐藏调试' : '🔍 显示调试', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: '16px',
       color: '#686868',
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
     

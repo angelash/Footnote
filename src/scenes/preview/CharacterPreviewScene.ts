@@ -31,27 +31,27 @@ export class CharacterPreviewScene extends BasePreviewScene {
   }
 
   protected createContent(width: number, height: number): void {
-    let currentY = 20;
+    let currentY = 30;
 
     // 统计
     const totalPortraits = Object.keys(CHARACTER_PORTRAITS).length;
     const stats = this.add.text(width / 2, currentY, `8个角色，共 ${totalPortraits} 张头像`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#686868',
     }).setOrigin(0.5);
     this.contentContainer.add(stats);
-    currentY += 40;
+    currentY += 50;
 
     // 角色列表
     const characters = Object.values(CHARACTERS);
-    const cardWidth = width - 60;
-    const cardHeight = 120;
-    const cardPadding = 15;
+    const cardWidth = width - 80;
+    const cardHeight = 160;
+    const cardPadding = 20;
 
     characters.forEach((character, index) => {
       const y = currentY + index * (cardHeight + cardPadding);
-      const card = this.createCharacterCard(30, y, cardWidth, cardHeight, character);
+      const card = this.createCharacterCard(40, y, cardWidth, cardHeight, character);
       this.contentContainer.add(card);
     });
 
@@ -91,59 +91,59 @@ export class CharacterPreviewScene extends BasePreviewScene {
     const portraitUrl = CHARACTER_PORTRAITS[portraitKey];
 
     if (portraitUrl && this.textures.exists(portraitKey)) {
-      const portrait = this.add.image(55, height / 2, portraitKey);
-      portrait.setDisplaySize(70, 70);
+      const portrait = this.add.image(70, height / 2, portraitKey);
+      portrait.setDisplaySize(90, 90);
       container.add(portrait);
     } else {
       // 占位
       const placeholder = this.add.graphics();
       placeholder.fillStyle(0x1E1E24, 1);
-      placeholder.fillCircle(55, height / 2, 35);
+      placeholder.fillCircle(70, height / 2, 45);
       container.add(placeholder);
 
-      const placeholderText = this.add.text(55, height / 2, '👤', {
-        fontSize: '28px',
+      const placeholderText = this.add.text(70, height / 2, '👤', {
+        fontSize: '36px',
       }).setOrigin(0.5);
       container.add(placeholderText);
     }
 
     // 角色名称
-    const nameText = this.add.text(120, 20, character.name, {
+    const nameText = this.add.text(150, 25, character.name, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '20px',
+      fontSize: '24px',
       color: '#E8E6E3',
       fontStyle: 'bold',
     });
     container.add(nameText);
 
     // 角色称号
-    const titleText = this.add.text(120, 48, character.title, {
+    const titleText = this.add.text(150, 58, character.title, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '13px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#00FFAA',
     });
     container.add(titleText);
 
     // 表情数量
-    const expressionCount = this.add.text(120, 72, `${character.expressions.length} 种表情`, {
+    const expressionCount = this.add.text(150, 90, `${character.expressions.length} 种表情`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#686868',
     });
     container.add(expressionCount);
 
     // 表情列表预览（小图标）
-    const expressionPreview = this.add.text(120, 92, character.expressions.slice(0, 5).join(' · ') + (character.expressions.length > 5 ? ' ...' : ''), {
+    const expressionPreview = this.add.text(150, 118, character.expressions.slice(0, 5).join(' · ') + (character.expressions.length > 5 ? ' ...' : ''), {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
+      fontSize: this.FONT_SIZE.SMALL,
       color: '#4A4A4A',
     });
     container.add(expressionPreview);
 
     // 查看按钮
-    const viewBtn = this.add.text(width - 60, height / 2, '查看 →', {
+    const viewBtn = this.add.text(width - 80, height / 2, '查看 →', {
       fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
+      fontSize: this.FONT_SIZE.NORMAL,
       color: '#4A9EFF',
     }).setOrigin(0.5);
     container.add(viewBtn);

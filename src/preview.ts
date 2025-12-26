@@ -47,19 +47,19 @@ const config: Phaser.Types.Core.GameConfig = {
     roundPixels: true,
   },
   
-  // 缩放配置（适配移动端）
+  // 缩放配置（预览工具使用更大尺寸以便查看）
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 750,
-    height: 1334,
+    width: 1080,  // 预览工具使用更大的宽度
+    height: 1920, // 预览工具使用更大的高度
     min: {
-      width: 320,
-      height: 568,
+      width: 640,
+      height: 960,
     },
     max: {
-      width: 750,
-      height: 1624,
+      width: 1440,
+      height: 2560,
     },
   },
   

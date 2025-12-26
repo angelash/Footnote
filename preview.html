@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0A0A0F" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="Footnote 开发预览工具 - 资源预览系统" />
+    
+    <title>🛠️ Footnote 预览工具</title>
+    
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #0A0A0F;
+        font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+      
+      #game-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      #game-container canvas {
+        display: block;
+      }
+      
+      /* 加载动画 */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0A0A0F;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        transition: opacity 0.3s ease;
+      }
+      
+      #loading-screen.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      .loading-title {
+        font-size: 28px;
+        color: #00FFAA;
+        margin-bottom: 10px;
+      }
+      
+      .loading-subtitle {
+        font-size: 14px;
+        color: #686868;
+        margin-bottom: 30px;
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #1A1A20;
+        border-top-color: #00FFAA;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      
+      /* 快捷键提示 */
+      #shortcuts-hint {
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        color: #3A3A40;
+        z-index: 10;
+      }
+    </style>
+    
+    <!-- 字体预加载 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- 加载屏幕 -->
+    <div id="loading-screen">
+      <div class="loading-title">🛠️ 预览工具</div>
+      <div class="loading-subtitle">Footnote 资源预览系统</div>
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- 游戏容器 -->
+    <div id="game-container"></div>
+    
+    <!-- 快捷键提示 -->
+    <div id="shortcuts-hint">ESC 返回 | ↑↓ 滚动 | ?preview=scene 快速跳转</div>
+    
+    <script type="module" src="/src/preview.ts"></script>
+    
+    <script>
+      // 隐藏加载屏幕
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          document.getElementById('loading-screen').classList.add('hidden');
+        }, 500);
+      });
+    </script>
+  </body>
+</html>
+

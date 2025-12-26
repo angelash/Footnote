@@ -1,0 +1,479 @@
+/**
+ * 卡片预览场景
+ * 
+ * 预览游戏卡片系统
+ */
+
+import Phaser from 'phaser';
+import { BasePreviewScene } from './BasePreviewScene';
+import { CONSTANTS } from '@/config/game.config';
+
+// 卡片类型配置
+const CARD_TYPE_CONFIG: Record<string, { name: string; color: string; icon: string }> = {
+  archive: { name: '档案', color: '#00FFAA', icon: '📁' },
+  item: { name: '物品', color: '#FFD700', icon: '🎒' },
+  map: { name: '地图', color: '#4A9EFF', icon: '🗺️' },
+  prayer: { name: '祈祷', color: '#9933FF', icon: '🙏' },
+  receipt: { name: '收据', color: '#A8A6A3', icon: '🧾' },
+  verdict: { name: '判决', color: '#FF4444', icon: '⚖️' },
+  diary: { name: '日记', color: '#FF8C00', icon: '📔' },
+};
+
+// 示例卡片数据
+interface ICardData {
+  id: string;
+  type: string;
+  title: string;
+  content: string;
+  chapter: string;
+}
+
+export class CardPreviewScene extends BasePreviewScene {
+  protected title = '🃏 卡片预览';
+  protected subtitle = '预览游戏卡片系统';
+
+  private previewContainer!: Phaser.GameObjects.Container;
+  private isFullPreview = false;
+
+  constructor() {
+    super({ key: 'CardPreviewScene' });
+  }
+
+  protected createContent(width: number, height: number): void {
+    let currentY = 20;
+
+    // 获取示例卡片
+    const sampleCards = this.getSampleCards();
+
+    // 统计
+    const stats = this.add.text(width / 2, currentY, `${Object.keys(CARD_TYPE_CONFIG).length} 种卡片类型`, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '14px',
+      color: '#686868',
+    }).setOrigin(0.5);
+    this.contentContainer.add(stats);
+    currentY += 40;
+
+    // 卡片类型说明
+    const typeSection = this.createSectionTitle(30, currentY, '卡片类型');
+    this.contentContainer.add(typeSection);
+    currentY += 35;
+
+    // 类型网格
+    const typeItems = Object.entries(CARD_TYPE_CONFIG);
+    const typeWidth = 150;
+    const typeHeight = 60;
+    const typePadding = 10;
+    const typesPerRow = 4;
+
+    typeItems.forEach(([type, config], index) => {
+      const col = index % typesPerRow;
+      const row = Math.floor(index / typesPerRow);
+      const x = 30 + col * (typeWidth + typePadding);
+      const y = currentY + row * (typeHeight + typePadding);
+
+      const typeCard = this.createTypeCard(x, y, typeWidth, typeHeight, type, config);
+      this.contentContainer.add(typeCard);
+    });
+
+    const typeRows = Math.ceil(typeItems.length / typesPerRow);
+    currentY += typeRows * (typeHeight + typePadding) + 30;
+
+    // 分隔线
+    const divider1 = this.createDivider(currentY, width);
+    this.contentContainer.add(divider1);
+    currentY += 30;
+
+    // 示例卡片
+    const cardSection = this.createSectionTitle(30, currentY, '示例卡片');
+    this.contentContainer.add(cardSection);
+    currentY += 35;
+
+    // 卡片网格
+    const cardWidth = 200;
+    const cardHeight = 280;
+    const cardPadding = 20;
+    const cardsPerRow = 3;
+
+    sampleCards.forEach((card, index) => {
+      const col = index % cardsPerRow;
+      const row = Math.floor(index / cardsPerRow);
+      const x = 30 + col * (cardWidth + cardPadding);
+      const y = currentY + row * (cardHeight + cardPadding);
+
+      const cardContainer = this.createCardPreview(x, y, cardWidth, cardHeight, card);
+      this.contentContainer.add(cardContainer);
+    });
+
+    const cardRows = Math.ceil(sampleCards.length / cardsPerRow);
+    currentY += cardRows * (cardHeight + cardPadding) + 30;
+
+    this.setContentHeight(currentY);
+
+    // 全屏预览容器
+    this.previewContainer = this.add.container(0, 0);
+    this.previewContainer.setDepth(200);
+    this.previewContainer.setVisible(false);
+  }
+
+  private getSampleCards(): ICardData[] {
+    return [
+      {
+        id: 'CARD_C0_01',
+        type: 'archive',
+        title: '维修局员工证',
+        content: '岑回的员工证，编号位置有明显的涂改痕迹。',
+        chapter: 'C0',
+      },
+      {
+        id: 'CARD_C1_01',
+        type: 'item',
+        title: '旧钥匙',
+        content: '一把锈迹斑斑的钥匙，不知道能打开什么。',
+        chapter: 'C1',
+      },
+      {
+        id: 'CARD_C2_01',
+        type: 'map',
+        title: '边缘区地图',
+        content: '宋岚手绘的边缘区地图，标注了多个危险位置。',
+        chapter: 'C2',
+      },
+      {
+        id: 'CARD_C3_01',
+        type: 'prayer',
+        title: '栖蓝的祈祷',
+        content: '愿那些被遗忘的名字，在某个角落仍被记得。',
+        chapter: 'C3',
+      },
+      {
+        id: 'CARD_C4_01',
+        type: 'verdict',
+        title: '系统判决书',
+        content: '对象：阿棠\n判定：对账失败\n处理：等待收敛',
+        chapter: 'C4',
+      },
+      {
+        id: 'CARD_C5_01',
+        type: 'diary',
+        title: '岑回的日记',
+        content: '今天又梦到了那个声音。它说：你是例外。',
+        chapter: 'C5',
+      },
+    ];
+  }
+
+  private createTypeCard(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    type: string,
+    config: { name: string; color: string; icon: string }
+  ): Phaser.GameObjects.Container {
+    const container = this.add.container(x, y);
+
+    const bg = this.add.graphics();
+    const colorValue = Phaser.Display.Color.HexStringToColor(config.color).color;
+    bg.fillStyle(colorValue, 0.1);
+    bg.fillRoundedRect(0, 0, width, height, 8);
+    bg.lineStyle(1, colorValue, 0.5);
+    bg.strokeRoundedRect(0, 0, width, height, 8);
+    container.add(bg);
+
+    const icon = this.add.text(15, height / 2, config.icon, {
+      fontSize: '24px',
+    }).setOrigin(0, 0.5);
+    container.add(icon);
+
+    const name = this.add.text(50, height / 2 - 8, config.name, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '14px',
+      color: config.color,
+      fontStyle: 'bold',
+    });
+    container.add(name);
+
+    const typeText = this.add.text(50, height / 2 + 10, type, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '10px',
+      color: '#4A4A4A',
+    });
+    container.add(typeText);
+
+    return container;
+  }
+
+  private createCardPreview(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    card: ICardData
+  ): Phaser.GameObjects.Container {
+    const container = this.add.container(x, y);
+    const config = CARD_TYPE_CONFIG[card.type] || CARD_TYPE_CONFIG.archive;
+    const colorValue = Phaser.Display.Color.HexStringToColor(config.color).color;
+
+    // 卡片背景
+    const bg = this.add.graphics();
+    bg.fillStyle(0x141419, 1);
+    bg.fillRoundedRect(0, 0, width, height, 12);
+    bg.lineStyle(2, colorValue, 0.8);
+    bg.strokeRoundedRect(0, 0, width, height, 12);
+    container.add(bg);
+
+    // 顶部装饰条
+    const topBar = this.add.graphics();
+    topBar.fillStyle(colorValue, 0.3);
+    topBar.fillRoundedRect(0, 0, width, 40, { tl: 12, tr: 12, bl: 0, br: 0 });
+    container.add(topBar);
+
+    // 类型图标
+    const icon = this.add.text(width / 2, 22, config.icon, {
+      fontSize: '20px',
+    }).setOrigin(0.5);
+    container.add(icon);
+
+    // 卡片标题
+    const title = this.add.text(width / 2, 60, card.title, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '16px',
+      color: '#E8E6E3',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+    container.add(title);
+
+    // 类型标签
+    const typeBadge = this.add.graphics();
+    typeBadge.fillStyle(colorValue, 0.2);
+    typeBadge.fillRoundedRect(width / 2 - 30, 80, 60, 20, 4);
+    container.add(typeBadge);
+
+    const typeText = this.add.text(width / 2, 90, config.name, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '11px',
+      color: config.color,
+    }).setOrigin(0.5);
+    container.add(typeText);
+
+    // 分隔线
+    const divider = this.add.graphics();
+    divider.lineStyle(1, 0x2A2A30, 1);
+    divider.lineBetween(15, 110, width - 15, 110);
+    container.add(divider);
+
+    // 卡片内容
+    const content = this.add.text(15, 120, card.content, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '12px',
+      color: '#A8A6A3',
+      wordWrap: { width: width - 30 },
+      lineSpacing: 4,
+    });
+    container.add(content);
+
+    // 章节信息
+    const chapterText = this.add.text(width / 2, height - 25, card.chapter, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '11px',
+      color: '#4A4A4A',
+    }).setOrigin(0.5);
+    container.add(chapterText);
+
+    // 卡片ID
+    const idText = this.add.text(width / 2, height - 10, card.id, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '9px',
+      color: '#3A3A40',
+    }).setOrigin(0.5);
+    container.add(idText);
+
+    // 交互
+    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
+
+    container.on('pointerover', () => {
+      bg.clear();
+      bg.fillStyle(0x1E1E24, 1);
+      bg.fillRoundedRect(0, 0, width, height, 12);
+      bg.lineStyle(2, colorValue, 1);
+      bg.strokeRoundedRect(0, 0, width, height, 12);
+      
+      this.tweens.add({
+        targets: container,
+        scaleX: 1.03,
+        scaleY: 1.03,
+        duration: 100,
+      });
+    });
+
+    container.on('pointerout', () => {
+      bg.clear();
+      bg.fillStyle(0x141419, 1);
+      bg.fillRoundedRect(0, 0, width, height, 12);
+      bg.lineStyle(2, colorValue, 0.8);
+      bg.strokeRoundedRect(0, 0, width, height, 12);
+      
+      this.tweens.add({
+        targets: container,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 100,
+      });
+    });
+
+    container.on('pointerdown', () => {
+      this.showCardDetail(card);
+    });
+
+    return container;
+  }
+
+  private showCardDetail(card: ICardData): void {
+    this.isFullPreview = true;
+    const { width, height } = this.scale;
+    const config = CARD_TYPE_CONFIG[card.type] || CARD_TYPE_CONFIG.archive;
+    const colorValue = Phaser.Display.Color.HexStringToColor(config.color).color;
+
+    this.previewContainer.removeAll(true);
+
+    // 背景
+    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.9).setOrigin(0);
+    overlay.setInteractive();
+    overlay.on('pointerdown', () => this.hideFullPreview());
+    this.previewContainer.add(overlay);
+
+    // 放大的卡片
+    const cardWidth = 350;
+    const cardHeight = 500;
+    const cardX = width / 2 - cardWidth / 2;
+    const cardY = height / 2 - cardHeight / 2;
+
+    // 卡片背景
+    const cardBg = this.add.graphics();
+    cardBg.fillStyle(0x141419, 1);
+    cardBg.fillRoundedRect(cardX, cardY, cardWidth, cardHeight, 16);
+    cardBg.lineStyle(3, colorValue, 1);
+    cardBg.strokeRoundedRect(cardX, cardY, cardWidth, cardHeight, 16);
+    this.previewContainer.add(cardBg);
+
+    // 顶部装饰
+    const topBar = this.add.graphics();
+    topBar.fillStyle(colorValue, 0.3);
+    topBar.fillRoundedRect(cardX, cardY, cardWidth, 70, { tl: 16, tr: 16, bl: 0, br: 0 });
+    this.previewContainer.add(topBar);
+
+    // 类型图标
+    const icon = this.add.text(width / 2, cardY + 35, config.icon, {
+      fontSize: '36px',
+    }).setOrigin(0.5);
+    this.previewContainer.add(icon);
+
+    // 标题
+    const title = this.add.text(width / 2, cardY + 95, card.title, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '24px',
+      color: '#E8E6E3',
+      fontStyle: 'bold',
+    }).setOrigin(0.5);
+    this.previewContainer.add(title);
+
+    // 类型标签
+    const typeBadge = this.add.graphics();
+    typeBadge.fillStyle(colorValue, 0.2);
+    typeBadge.fillRoundedRect(width / 2 - 45, cardY + 120, 90, 28, 6);
+    this.previewContainer.add(typeBadge);
+
+    const typeText = this.add.text(width / 2, cardY + 134, config.name, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '14px',
+      color: config.color,
+    }).setOrigin(0.5);
+    this.previewContainer.add(typeText);
+
+    // 分隔线
+    const divider = this.add.graphics();
+    divider.lineStyle(1, 0x2A2A30, 1);
+    divider.lineBetween(cardX + 25, cardY + 165, cardX + cardWidth - 25, cardY + 165);
+    this.previewContainer.add(divider);
+
+    // 内容
+    const content = this.add.text(cardX + 25, cardY + 185, card.content, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '16px',
+      color: '#A8A6A3',
+      wordWrap: { width: cardWidth - 50 },
+      lineSpacing: 8,
+    });
+    this.previewContainer.add(content);
+
+    // 底部信息
+    const chapterText = this.add.text(width / 2, cardY + cardHeight - 45, `章节: ${card.chapter}`, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '13px',
+      color: '#686868',
+    }).setOrigin(0.5);
+    this.previewContainer.add(chapterText);
+
+    const idText = this.add.text(width / 2, cardY + cardHeight - 22, card.id, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '11px',
+      color: '#4A4A4A',
+    }).setOrigin(0.5);
+    this.previewContainer.add(idText);
+
+    // 关闭按钮
+    const closeBtn = this.add.text(cardX + cardWidth - 30, cardY + 25, '✕', {
+      fontSize: '24px',
+      color: '#A8A6A3',
+    }).setOrigin(0.5);
+    closeBtn.setInteractive({ useHandCursor: true });
+    closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
+    closeBtn.on('pointerout', () => closeBtn.setColor('#A8A6A3'));
+    closeBtn.on('pointerdown', () => this.hideFullPreview());
+    this.previewContainer.add(closeBtn);
+
+    // 底部提示
+    const tipText = this.add.text(width / 2, height - 30, '点击空白处或按 ESC 关闭', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '12px',
+      color: '#4A4A4A',
+    }).setOrigin(0.5);
+    this.previewContainer.add(tipText);
+
+    this.previewContainer.setVisible(true);
+    this.previewContainer.setAlpha(0);
+    this.tweens.add({
+      targets: this.previewContainer,
+      alpha: 1,
+      duration: 200,
+    });
+  }
+
+  private hideFullPreview(): void {
+    this.isFullPreview = false;
+
+    this.tweens.add({
+      targets: this.previewContainer,
+      alpha: 0,
+      duration: 200,
+      onComplete: () => {
+        this.previewContainer.setVisible(false);
+        this.previewContainer.removeAll(true);
+      },
+    });
+  }
+
+  protected setupKeyboard(): void {
+    super.setupKeyboard();
+
+    this.input.keyboard?.on('keydown-ESC', () => {
+      if (this.isFullPreview) {
+        this.hideFullPreview();
+      } else {
+        this.goBack();
+      }
+    });
+  }
+}
+

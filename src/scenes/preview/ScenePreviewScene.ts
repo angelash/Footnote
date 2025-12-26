@@ -190,39 +190,60 @@ export class ScenePreviewScene extends BasePreviewScene {
     // 背景图
     const bgUrl = SCENE_BACKGROUNDS[zone.backgroundKey];
     if (bgUrl) {
-      // 检查纹理是否已加载
-      if (this.textures.exists(zone.backgroundKey)) {
+      // 检查纹理是否已加载且不是缺失纹理
+      if (this.textures.exists(zone.backgroundKey) && !this.isPlaceholderTexture(zone.backgroundKey)) {
         const bgImage = this.add.image(width / 2, height / 2, zone.backgroundKey);
         const scale = Math.min((width - 40) / bgImage.width, (height - 150) / bgImage.height);
         bgImage.setScale(scale);
         this.previewContainer.add(bgImage);
       } else {
-        // 加载纹理
-        this.load.image(zone.backgroundKey, bgUrl);
-        this.load.once('complete', () => {
-          if (this.currentZoneId === zoneId) {
-            const bgImage = this.add.image(width / 2, height / 2, zone.backgroundKey);
-            const scale = Math.min((width - 40) / bgImage.width, (height - 150) / bgImage.height);
-            bgImage.setScale(scale);
-            this.previewContainer.add(bgImage);
-          }
-        });
-        this.load.start();
-
-        // 加载中文字
-        const loadingText = this.add.text(width / 2, height / 2, '加载中...', {
+        // 加载中提示
+        const loadingText = this.add.text(width / 2, height / 2, '🔄 加载中...', {
           fontFamily: 'Noto Sans SC',
           fontSize: '16px',
           color: '#686868',
         }).setOrigin(0.5);
         this.previewContainer.add(loadingText);
+
+        // 尝试加载纹理
+        this.load.image(zone.backgroundKey, bgUrl);
+        
+        // 监听加载完成
+        this.load.once('complete', () => {
+          if (this.currentZoneId === zoneId) {
+            // 检查是否加载成功（不是缺失纹理）
+            if (this.textures.exists(zone.backgroundKey) && !this.isPlaceholderTexture(zone.backgroundKey)) {
+              loadingText.destroy();
+              const bgImage = this.add.image(width / 2, height / 2, zone.backgroundKey);
+              const scale = Math.min((width - 40) / bgImage.width, (height - 150) / bgImage.height);
+              bgImage.setScale(scale);
+              this.previewContainer.add(bgImage);
+            } else {
+              // 加载失败，显示占位符
+              loadingText.setText('📷 资源待制作');
+              loadingText.setColor('#4A4A4A');
+              this.showPlaceholderInfo(zone.backgroundKey);
+            }
+          }
+        });
+
+        // 监听加载错误
+        this.load.once('loaderror', () => {
+          if (this.currentZoneId === zoneId) {
+            loadingText.setText('📷 资源待制作');
+            loadingText.setColor('#4A4A4A');
+            this.showPlaceholderInfo(zone.backgroundKey);
+          }
+        });
+
+        this.load.start();
       }
     } else {
-      // 无背景
-      const noImageText = this.add.text(width / 2, height / 2, '暂无背景图', {
+      // 无背景配置
+      const noImageText = this.add.text(width / 2, height / 2, '📷 暂无背景配置', {
         fontFamily: 'Noto Sans SC',
         fontSize: '18px',
-        color: '#686868',
+        color: '#4A4A4A',
       }).setOrigin(0.5);
       this.previewContainer.add(noImageText);
     }
@@ -316,6 +337,46 @@ export class ScenePreviewScene extends BasePreviewScene {
         this.goBack();
       }
     });
+  }
+
+  /**
+   * 检查纹理是否为 Phaser 的缺失纹理占位符
+   */
+  private isPlaceholderTexture(key: string): boolean {
+    if (!this.textures.exists(key)) return true;
+    
+    const texture = this.textures.get(key);
+    const frame = texture.get();
+    
+    // Phaser 默认缺失纹理是 32x32 的绿色方块
+    if (frame.width === 32 && frame.height === 32) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * 显示资源占位信息
+   */
+  private showPlaceholderInfo(backgroundKey: string): void {
+    const { width, height } = this.scale;
+    
+    // 显示预期路径信息
+    const pathInfo = this.add.text(width / 2, height / 2 + 40, `纹理键: ${backgroundKey}`, {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '12px',
+      color: '#3A3A3A',
+    }).setOrigin(0.5);
+    this.previewContainer.add(pathInfo);
+
+    // 显示提示
+    const hintText = this.add.text(width / 2, height / 2 + 65, '请在 assets/images/backgrounds/ 添加对应资源', {
+      fontFamily: 'Noto Sans SC',
+      fontSize: '11px',
+      color: '#2A2A2A',
+    }).setOrigin(0.5);
+    this.previewContainer.add(hintText);
   }
 }
 

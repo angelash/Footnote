@@ -1,11 +1,11 @@
 # CH05《稳定结论》场景分析（Phase 1）
-# 参照：story/1.md L517-L641
+# 参照：story/1.md L517-L641（第五章：稳定结论）
 
 metadata:
   chapter: 5
   title: 稳定结论
   part: "第1部：流程"
-  status: draft
+  status: completed
   scope:
     - "只允许使用本章原文内容，不得引入后续章事件/术语"
 
@@ -14,15 +14,123 @@ characters:
     name: 岑回
     gender: 男
     description: "20多岁的亚洲男性，黑色短发整齐干练，深邃疲倦但锐利的眼神，穿着灰色维修局工作服，胸口佩戴工号牌，身材中等偏瘦，气质克制沉稳"
+  xucheng:
+    name: 许澄
+    gender: 女
+    description: "女医生，目光像看病历，语气平静，给边界但不恐吓"
+  atang:
+    name: 阿棠
+    gender: 女
+    description: "瘦小的女孩，抱膝坐角落，眼神疲惫，手里捏撕碎纸片，像能看见别人看不见的东西"
 
 anchors:
-  # 每章至少列 6-12 个“原文锚点短句”，用于对齐检查
-  - "待填写：从原文复制短句"
+  # 原文锚点短句（用于对齐检查）
+  - "医疗站在一条安静的小路上"
+  - "树干被缠上了保护带"
+  - "味道很淡，但很“正确”"
+  - "曲线上写着“稳定”"
+  - "没有这个字段"
+  - "是否听见不应存在的声音"
+  - "结论：稳定"
+  - "备注栏，两行，空白"
+  - "你今天像昨天"
+  - "你回来得更快了"
+  - "对日期不敏感"
+  - "你只需要把今天过完"
 
-scenes:
-  # 每个 scene 对应一段可视化单元（可拆成漫画页）
-  - id: S01
-    location: "待填写"
-    event: "待填写"
-    beats:
-      - "待填写"
+pages:
+  - page_id: P01
+    title: "医疗站：树与稳定宣传画（2x2 四格，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "外景：安静小路、医疗站门口树、保护带缠得很紧。"
+      - panel_id: 2
+        description: "大厅：消毒水味很淡但“正确”。"
+      - panel_id: 3
+        description: "候诊区墙上宣传画：平滑曲线+“稳定”。"
+      - panel_id: 4
+        description: "前台递问卷：‘填一下。填完给医生。’"
+
+  - page_id: P02
+    title: "问卷：字段很多但只为结论（2x2 四格，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "问卷题目特写：重复/日期/警觉等，选项从‘从不’到‘总是’。"
+      - panel_id: 2
+        description: "岑回快速勾选‘从不/偶尔/很少’，像完成任务。"
+      - panel_id: 3
+        description: "岑回想到市政窗口那句‘没有这个字段’（冷光闪回即可）。"
+      - panel_id: 4
+        description: "旁白强调：字段多但都是为了把你塞进结论。"
+
+  - page_id: P03
+    title: "停顿：是否听见不应存在的声音（2x2 四格，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "题目特写：‘是否听见不应存在的声音’；笔尖悬停。"
+      - panel_id: 2
+        description: "薄墙回声闪回（极短、像敲墙从里面）。"
+      - panel_id: 3
+        description: "岑回克制，最终勾选‘从不’。"
+      - panel_id: 4
+        description: "旁白：‘偶尔’也是承认；他把承认吞回去。"
+
+  - page_id: P04
+    title: "许澄：你不需要记住每一件事（2x2 四格，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "许澄先看岑回一眼，像确认你有没有在疼。"
+      - panel_id: 2
+        description: "对话：‘最近睡得怎么样？’‘还行。’"
+      - panel_id: 3
+        description: "对话：‘有重复感吗？’岑回答：‘没有。’（克制）"
+      - panel_id: 4
+        description: "许澄：‘你不需要记住每一件事。不一致会让你很累。’夹板编号中间有空白。"
+
+  - page_id: P05
+    title: "结论单：稳定（2x2 四格，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "打印机吐纸，纸还热；许澄：‘结论：稳定。建议休息。’"
+      - panel_id: 2
+        description: "正面条目标准化、无空隙，像把他压紧。"
+      - panel_id: 3
+        description: "背面特写：备注栏两行，空白。"
+      - panel_id: 4
+        description: "岑回盯着空白想写又不写：写进去像写进系统身体。"
+
+  - page_id: P06
+    title: "角落的声音：你今天像昨天（2x2 四格，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "候诊区角落传来轻声：‘你今天像昨天。’"
+      - panel_id: 2
+        description: "阿棠出现：瘦小抱膝、眼神疲惫、捏着撕碎纸片。"
+      - panel_id: 3
+        description: "对话：‘你刚刚是不是又走了一遍？’岑回：‘你说什么？’"
+      - panel_id: 4
+        description: "阿棠把纸片塞进椅子缝，像藏秘密。"
+
+  - page_id: P07
+    title: "边界：别吓人 / 对日期不敏感（2x2 四格，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "阿棠：‘别去边缘断口。’"
+      - panel_id: 2
+        description: "许澄制止：‘阿棠，别吓人。’"
+      - panel_id: 3
+        description: "许澄对岑回：‘别把她的话当事实。她只是…对日期不敏感。’"
+      - panel_id: 4
+        description: "许澄：‘你只需要把今天过完。’离开前阿棠补一句：‘你回来得更快了。’"
+
+  - page_id: P08
+    title: "插页文件：A-09 结论单 / B-06 碎片日记（文件页占满画面，竖版 9:16）"
+    panels:
+      - panel_id: 1
+        description: "文件 A-09：诊疗问卷结论单-01（结论：稳定；备注：无需进一步讨论）。"
+      - panel_id: 2
+        description: "背面备注栏：空（两行）。"
+      - panel_id: 3
+        description: "文件 B-06：碎片日记-01（你今天像昨天/你刚刚是不是又走了一遍？/别去边缘断口）。"
+      - panel_id: 4
+        description: "纸片背面小字：‘我不是在猜。’"

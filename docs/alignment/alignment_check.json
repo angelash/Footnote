@@ -1,0 +1,422 @@
+{
+  "declared_episode_chapters": {
+    "EP01": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "EP02": [
+      3,
+      4,
+      5
+    ]
+  },
+  "anchors": [
+    "身份：核对中",
+    "核对中持续了三秒",
+    "互斥双日期",
+    "两份小票",
+    "17-06",
+    "路线：已更正",
+    "以最新更正为准",
+    "结论：稳定",
+    "对日期不敏感",
+    "你今天像昨天",
+    "你回来得更快了",
+    "空椅",
+    "边缘断口",
+    "例外许可",
+    "此行为在当前模型中无意义"
+  ],
+  "anchor_hits_in_novel": {
+    "身份：核对中": [
+      {
+        "chapter": 31,
+        "title": "对账口",
+        "part": 4,
+        "source_file": "story/4.md"
+      }
+    ],
+    "核对中持续了三秒": [
+      {
+        "chapter": 31,
+        "title": "对账口",
+        "part": 4,
+        "source_file": "story/4.md"
+      }
+    ],
+    "互斥双日期": [
+      {
+        "chapter": 13,
+        "title": "复走",
+        "part": 2,
+        "source_file": "story/2.md"
+      },
+      {
+        "chapter": 17,
+        "title": "底层抽屉",
+        "part": 2,
+        "source_file": "story/2.md"
+      },
+      {
+        "chapter": 31,
+        "title": "对账口",
+        "part": 4,
+        "source_file": "story/4.md"
+      }
+    ],
+    "两份小票": [
+      {
+        "chapter": 11,
+        "title": "两份小票",
+        "part": 2,
+        "source_file": "story/2.md"
+      },
+      {
+        "chapter": 12,
+        "title": "双份回执",
+        "part": 2,
+        "source_file": "story/2.md"
+      }
+    ],
+    "17-06": [
+      {
+        "chapter": 3,
+        "title": "错门",
+        "part": 1,
+        "source_file": "story/1.md"
+      }
+    ],
+    "路线：已更正": [
+      {
+        "chapter": 3,
+        "title": "错门",
+        "part": 1,
+        "source_file": "story/1.md"
+      }
+    ],
+    "以最新更正为准": [
+      {
+        "chapter": 1,
+        "title": "既定路线",
+        "part": 1,
+        "source_file": "story/1.md"
+      },
+      {
+        "chapter": 4,
+        "title": "以最新更正为准",
+        "part": 1,
+        "source_file": "story/1.md"
+      },
+      {
+        "chapter": 10,
+        "title": "变更已应用",
+        "part": 1,
+        "source_file": "story/1.md"
+      },
+      {
+        "chapter": 12,
+        "title": "双份回执",
+        "part": 2,
+        "source_file": "story/2.md"
+      },
+      {
+        "chapter": 25,
+        "title": "轻写",
+        "part": 3,
+        "source_file": "story/3.md"
+      },
+      {
+        "chapter": 32,
+        "title": "清点",
+        "part": 4,
+        "source_file": "story/4.md"
+      },
+      {
+        "chapter": 36,
+        "title": "备注锁",
+        "part": 4,
+        "source_file": "story/4.md"
+      }
+    ],
+    "结论：稳定": [
+      {
+        "chapter": 5,
+        "title": "稳定结论",
+        "part": 1,
+        "source_file": "story/1.md"
+      },
+      {
+        "chapter": 28,
+        "title": "轻松的人",
+        "part": 3,
+        "source_file": "story/3.md"
+      }
+    ],
+    "对日期不敏感": [
+      {
+        "chapter": 5,
+        "title": "稳定结论",
+        "part": 1,
+        "source_file": "story/1.md"
+      }
+    ],
+    "你今天像昨天": [
+      {
+        "chapter": 5,
+        "title": "稳定结论",
+        "part": 1,
+        "source_file": "story/1.md"
+      }
+    ],
+    "你回来得更快了": [
+      {
+        "chapter": 5,
+        "title": "稳定结论",
+        "part": 1,
+        "source_file": "story/1.md"
+      },
+      {
+        "chapter": 11,
+        "title": "两份小票",
+        "part": 2,
+        "source_file": "story/2.md"
+      }
+    ],
+    "空椅": [
+      {
+        "chapter": 20,
+        "title": "同一处",
+        "part": 2,
+        "source_file": "story/2.md"
+      },
+      {
+        "chapter": 21,
+        "title": "例外许可",
+        "part": 3,
+        "source_file": "story/3.md"
+      },
+      {
+        "chapter": 25,
+        "title": "轻写",
+        "part": 3,
+        "source_file": "story/3.md"
+      },
+      {
+        "chapter": 26,
+        "title": "配额",
+        "part": 3,
+        "source_file": "story/3.md"
+      },
+      {
+        "chapter": 27,
+        "title": "审计快照",
+        "part": 3,
+        "source_file": "story/3.md"
+      },
+      {
+        "chapter": 30,
+        "title": "不可结算",
+        "part": 3,
+        "source_file": "story/3.md"
+      },
+      {
+        "chapter": 31,
+        "title": "对账口",
+        "part": 4,
+        "source_file": "story/4.md"
+      },
+      {
+        "chapter": 37,
+        "title": "抹除演练",
+        "part": 4,
+        "source_file": "story/4.md"
+      },
+      {
+        "chapter": 38,
+        "title": "冗余不可关闭",
+        "part": 4,
+        "source_file": "story/4.md"
+      },
+      {
+        "chapter": 39,
+        "title": "顾临的签名",
+        "part": 4,
+        "source_file": "story/4.md"
+      },
+      {
+        "chapter": 41,
+        "title": "累计",
+        "part": 4,
+        "source_file": "story/4.md"
+      },
+      {
+        "chapter": 46,
+        "title": "备注口",
+        "part": 5,
+        "source_file": "story/5.md"
+      },
+      {
+        "chapter": 59,
+        "title": "永久非最优",
+        "part": 5,
+        "source_file": "story/5.md"
+      },
+      {
+        "chapter": 63,
+        "title": "门影通行",
+        "part": 5,
+        "source_file": "story/5.md"
+      },
+      {
+        "chapter": 65,
+        "title": "折痕",
+        "part": 5,
+        "source_file": "story/5.md"
+      }
+    ],
+    "边缘断口": [
+      {
+        "chapter": 5,
+        "title": "稳定结论",
+        "part": 1,
+        "source_file": "story/1.md"
+      },
+      {
+        "chapter": 8,
+        "title": "封锁线外侧",
+        "part": 1,
+        "source_file": "story/1.md"
+      },
+      {
+        "chapter": 22,
+        "title": "救援",
+        "part": 3,
+        "source_file": "story/3.md"
+      }
+    ],
+    "例外许可": [
+      {
+        "chapter": 21,
+        "title": "例外许可",
+        "part": 3,
+        "source_file": "story/3.md"
+      },
+      {
+        "chapter": 35,
+        "title": "收敛失败",
+        "part": 4,
+        "source_file": "story/4.md"
+      }
+    ],
+    "此行为在当前模型中无意义": [
+      {
+        "chapter": 24,
+        "title": "归档失败",
+        "part": 3,
+        "source_file": "story/3.md"
+      }
+    ]
+  },
+  "anchor_used_in_artifacts": {
+    "身份：核对中": [
+      "ep01_scene_analysis",
+      "ep01_prompts"
+    ],
+    "核对中持续了三秒": [],
+    "互斥双日期": [],
+    "两份小票": [],
+    "17-06": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "路线：已更正": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "以最新更正为准": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "结论：稳定": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "对日期不敏感": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "你今天像昨天": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "你回来得更快了": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "空椅": [
+      "ep01_scene_analysis",
+      "ep01_prompts"
+    ],
+    "边缘断口": [
+      "ep02_scene_analysis",
+      "ep02_prompts"
+    ],
+    "例外许可": [],
+    "此行为在当前模型中无意义": []
+  },
+  "alarms": [
+    {
+      "ep": "EP01",
+      "anchor": "身份：核对中",
+      "declared_chapters": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "novel_chapters": [
+        31
+      ],
+      "used_in": [
+        "ep01_scene_analysis",
+        "ep01_prompts"
+      ]
+    },
+    {
+      "ep": "EP01",
+      "anchor": "空椅",
+      "declared_chapters": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "novel_chapters": [
+        20,
+        21,
+        25,
+        26,
+        27,
+        30,
+        31,
+        37,
+        38,
+        39,
+        41,
+        46,
+        59,
+        63,
+        65
+      ],
+      "used_in": [
+        "ep01_scene_analysis",
+        "ep01_prompts"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>备注 / Footnote - 漫画预览</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <h1 class="logo">备注<span>FOOTNOTE</span></h1>
+            <nav class="nav">
+                <div class="nav-section">
+                    <h3>章节</h3>
+                    <ul id="episode-list"></ul>
+                </div>
+                <div class="nav-section">
+                    <h3>进度</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <p class="progress-text" id="progress-text">0/0 页</p>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main">
+            <!-- 顶部工具栏 -->
+            <header class="toolbar">
+                <h2 id="current-episode">选择章节</h2>
+                <div class="view-modes">
+                    <button class="btn active" data-mode="grid">网格</button>
+                    <button class="btn" data-mode="read">阅读</button>
+                    <button class="btn" data-mode="compare">对比</button>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <div class="content" id="content">
+                <div class="placeholder">
+                    <p>← 选择章节开始预览</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- 图片查看器弹窗 -->
+        <div class="modal" id="image-modal">
+            <div class="modal-content">
+                <button class="modal-close">&times;</button>
+                <img id="modal-image" src="" alt="">
+                <div class="modal-nav">
+                    <button class="btn" id="prev-btn">上一页</button>
+                    <span id="page-indicator">1/18</span>
+                    <button class="btn" id="next-btn">下一页</button>
+                </div>
+                <div class="candidates" id="candidates"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据
+        let data = null;
+        let currentEpisode = null;
+        let currentPageIndex = 0;
+        let viewMode = 'grid';
+
+        // 加载数据
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                data = await response.json();
+                renderEpisodeList();
+                updateProgress();
+            } catch (e) {
+                console.error('加载数据失败:', e);
+                document.getElementById('content').innerHTML = 
+                    '<div class="placeholder"><p>加载数据失败，请确保 data.json 存在</p></div>';
+            }
+        }
+
+        // 渲染章节列表
+        function renderEpisodeList() {
+            const list = document.getElementById('episode-list');
+            list.innerHTML = data.episodes.map(ep => `
+                <li class="${ep.status}" data-id="${ep.id}">
+                    <span class="status-dot"></span>
+                    ${ep.id.toUpperCase()}: ${ep.title}
+                    <span class="page-count">${ep.pages?.length || 0}页</span>
+                </li>
+            `).join('');
+
+            // 绑定点击事件
+            list.querySelectorAll('li').forEach(li => {
+                li.addEventListener('click', () => selectEpisode(li.dataset.id));
+            });
+        }
+
+        // 选择章节
+        function selectEpisode(episodeId) {
+            currentEpisode = data.episodes.find(ep => ep.id === episodeId);
+            if (!currentEpisode) return;
+
+            document.getElementById('current-episode').textContent = 
+                `${currentEpisode.id.toUpperCase()}: ${currentEpisode.title}`;
+
+            // 更新侧边栏选中状态
+            document.querySelectorAll('#episode-list li').forEach(li => {
+                li.classList.toggle('active', li.dataset.id === episodeId);
+            });
+
+            renderContent();
+        }
+
+        // 渲染内容
+        function renderContent() {
+            const content = document.getElementById('content');
+            
+            if (!currentEpisode || !currentEpisode.pages) {
+                content.innerHTML = '<div class="placeholder"><p>该章节暂无内容</p></div>';
+                return;
+            }
+
+            if (viewMode === 'grid') {
+                renderGridView(content);
+            } else if (viewMode === 'read') {
+                renderReadView(content);
+            } else if (viewMode === 'compare') {
+                renderCompareView(content);
+            }
+        }
+
+        // 网格视图
+        function renderGridView(container) {
+            container.innerHTML = `
+                <div class="grid">
+                    ${currentEpisode.pages.map((page, index) => `
+                        <div class="grid-item" data-index="${index}">
+                            <img src="../${page.final || page.candidates?.[0] || ''}" 
+                                 alt="${page.title}" 
+                                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2250%22 fill=%22%23666%22 text-anchor=%22middle%22 dy=%22.3em%22>无图</text></svg>'">
+                            <div class="grid-info">
+                                <span class="page-num">${page.id}</span>
+                                <span class="page-title">${page.title}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // 绑定点击事件
+            container.querySelectorAll('.grid-item').forEach(item => {
+                item.addEventListener('click', () => openModal(parseInt(item.dataset.index)));
+            });
+        }
+
+        // 阅读视图
+        function renderReadView(container) {
+            container.innerHTML = `
+                <div class="read-view">
+                    ${currentEpisode.pages.map(page => `
+                        <div class="read-page">
+                            <img src="../${page.final || page.candidates?.[0] || ''}" alt="${page.title}">
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // 对比视图
+        function renderCompareView(container) {
+            container.innerHTML = `
+                <div class="compare-view">
+                    ${currentEpisode.pages.map((page, index) => `
+                        <div class="compare-group">
+                            <h3>${page.id}: ${page.title}</h3>
+                            <div class="compare-candidates">
+                                ${(page.candidates || []).map((c, i) => `
+                                    <div class="compare-item ${page.selected === i ? 'selected' : ''}" 
+                                         data-page="${index}" data-candidate="${i}">
+                                        <img src="../${c}" alt="候选${i+1}">
+                                        <span class="candidate-num">${i+1}</span>
+                                        ${page.selected === i ? '<span class="selected-badge">✓ 已选</span>' : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // 绑定选择事件
+            container.querySelectorAll('.compare-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const pageIndex = parseInt(item.dataset.page);
+                    const candidateIndex = parseInt(item.dataset.candidate);
+                    selectCandidate(pageIndex, candidateIndex);
+                });
+            });
+        }
+
+        // 选择候选图
+        function selectCandidate(pageIndex, candidateIndex) {
+            if (!currentEpisode) return;
+            currentEpisode.pages[pageIndex].selected = candidateIndex;
+            currentEpisode.pages[pageIndex].final = currentEpisode.pages[pageIndex].candidates[candidateIndex];
+            renderContent();
+            // TODO: 保存到data.json
+            console.log(`选择 ${currentEpisode.pages[pageIndex].id} 候选${candidateIndex + 1}`);
+        }
+
+        // 打开弹窗
+        function openModal(index) {
+            currentPageIndex = index;
+            const modal = document.getElementById('image-modal');
+            modal.classList.add('active');
+            updateModal();
+        }
+
+        // 更新弹窗内容
+        function updateModal() {
+            const page = currentEpisode.pages[currentPageIndex];
+            const img = document.getElementById('modal-image');
+            // 如果服务器在comics目录运行，路径不需要../
+            const basePath = window.location.pathname.includes('/viewer/') ? '../' : '';
+            img.src = basePath + (page.final || page.candidates?.[0] || '');
+            
+            document.getElementById('page-indicator').textContent = 
+                `${currentPageIndex + 1}/${currentEpisode.pages.length}`;
+
+            // 渲染候选图
+            const candidates = document.getElementById('candidates');
+            candidates.innerHTML = (page.candidates || []).map((c, i) => `
+                <img src="../${c}" alt="候选${i+1}" 
+                     class="${page.selected === i ? 'selected' : ''}"
+                     onclick="selectFromModal(${i})">
+            `).join('');
+        }
+
+        // 从弹窗选择候选
+        function selectFromModal(candidateIndex) {
+            selectCandidate(currentPageIndex, candidateIndex);
+            updateModal();
+        }
+
+        // 上一页
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                updateModal();
+            }
+        });
+
+        // 下一页
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (currentPageIndex < currentEpisode.pages.length - 1) {
+                currentPageIndex++;
+                updateModal();
+            }
+        });
+
+        // 关闭弹窗
+        document.querySelector('.modal-close').addEventListener('click', () => {
+            document.getElementById('image-modal').classList.remove('active');
+        });
+
+        // ESC关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('image-modal').classList.remove('active');
+            }
+            if (e.key === 'ArrowLeft') {
+                document.getElementById('prev-btn').click();
+            }
+            if (e.key === 'ArrowRight') {
+                document.getElementById('next-btn').click();
+            }
+        });
+
+        // 切换视图模式
+        document.querySelectorAll('.view-modes .btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.view-modes .btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                viewMode = btn.dataset.mode;
+                renderContent();
+            });
+        });
+
+        // 更新总进度
+        function updateProgress() {
+            let total = 0;
+            let completed = 0;
+            data.episodes.forEach(ep => {
+                if (ep.pages) {
+                    total += ep.pages.length;
+                    completed += ep.pages.filter(p => p.final).length;
+                }
+            });
+            
+            const percent = total > 0 ? (completed / total * 100) : 0;
+            document.getElementById('progress-fill').style.width = percent + '%';
+            document.getElementById('progress-text').textContent = `${completed}/${total} 页`;
+        }
+
+        // 初始化
+        loadData();
+    </script>
+</body>
+</html>
+

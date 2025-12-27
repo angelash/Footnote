@@ -1,0 +1,257 @@
+{
+  "title": "备注 / Footnote",
+  "description": "叙事驱动的2D系统策略冒险漫画",
+  "episodes": [
+    {
+      "id": "ep01",
+      "title": "不一致",
+      "status": "completed",
+      "chapters": "第1-2章",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "扉页",
+          "final": "output/ep01/page-01.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P01-title_1.webp",
+            "generated/ep01-v4/approved/EP01-P01-title_2.webp",
+            "generated/ep01-v4/approved/EP01-P01-title_3.webp",
+            "generated/ep01-v4/approved/EP01-P01-title_4.webp"
+          ],
+          "selected": 2
+        },
+        {
+          "id": "P02",
+          "title": "晨间核验",
+          "final": "output/ep01/page-02.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P02-verify_1.webp",
+            "generated/ep01-v4/approved/EP01-P02-verify_2.webp",
+            "generated/ep01-v4/approved/EP01-P02-verify_3.webp",
+            "generated/ep01-v4/approved/EP01-P02-verify_4.webp"
+          ],
+          "selected": 2
+        },
+        {
+          "id": "P03",
+          "title": "延迟三秒",
+          "final": "output/ep01/page-03.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P03-delay_1.webp",
+            "generated/ep01-v4/approved/EP01-P03-delay_2.webp",
+            "generated/ep01-v4/approved/EP01-P03-delay_3.webp",
+            "generated/ep01-v4/approved/EP01-P03-delay_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "薄墙任务",
+          "final": "output/ep01/page-04.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P04-task_1.webp",
+            "generated/ep01-v4/approved/EP01-P04-task_2.webp",
+            "generated/ep01-v4/approved/EP01-P04-task_3.webp",
+            "generated/ep01-v4/approved/EP01-P04-task_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "发现空腔",
+          "final": "output/ep01/page-05.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P05-hollow_1.webp",
+            "generated/ep01-v4/approved/EP01-P05-hollow_2.webp",
+            "generated/ep01-v4/approved/EP01-P05-hollow_3.webp",
+            "generated/ep01-v4/approved/EP01-P05-hollow_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "第一次记录",
+          "final": "output/ep01/page-06.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P06-record_1.webp",
+            "generated/ep01-v4/approved/EP01-P06-record_2.webp",
+            "generated/ep01-v4/approved/EP01-P06-record_3.webp",
+            "generated/ep01-v4/approved/EP01-P06-record_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "早餐摊",
+          "final": "output/ep01/page-07.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P07-more_1.webp",
+            "generated/ep01-v4/approved/EP01-P07-more_2.webp",
+            "generated/ep01-v4/approved/EP01-P07-more_3.webp",
+            "generated/ep01-v4/approved/EP01-P07-more_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "双日期",
+          "final": "output/ep01/page-08.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P08-chair_1.webp",
+            "generated/ep01-v4/approved/EP01-P08-chair_2.webp",
+            "generated/ep01-v4/approved/EP01-P08-chair_3.webp",
+            "generated/ep01-v4/approved/EP01-P08-chair_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P09",
+          "title": "回家路上",
+          "final": "output/ep01/page-09.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P09-home_1.webp",
+            "generated/ep01-v4/approved/EP01-P09-home_2.webp",
+            "generated/ep01-v4/approved/EP01-P09-home_3.webp",
+            "generated/ep01-v4/approved/EP01-P09-home_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P10",
+          "title": "错误门牌",
+          "final": "output/ep01/page-10.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P10-plate_1.webp",
+            "generated/ep01-v4/approved/EP01-P10-plate_2.webp",
+            "generated/ep01-v4/approved/EP01-P10-plate_3.webp",
+            "generated/ep01-v4/approved/EP01-P10-plate_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P11",
+          "title": "空地场景",
+          "final": "output/ep01/page-11.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P11-vacant_1.webp",
+            "generated/ep01-v4/approved/EP01-P11-vacant_2.webp",
+            "generated/ep01-v4/approved/EP01-P11-vacant_3.webp",
+            "generated/ep01-v4/approved/EP01-P11-vacant_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P12",
+          "title": "空椅发现",
+          "final": "output/ep01/page-12.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P12-invisible-chair_1.webp",
+            "generated/ep01-v4/approved/EP01-P12-invisible-chair_2.webp",
+            "generated/ep01-v4/approved/EP01-P12-invisible-chair_3.webp",
+            "generated/ep01-v4/approved/EP01-P12-invisible-chair_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P13",
+          "title": "悬浮篮子",
+          "final": "output/ep01/page-13.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P13-record-chair_1.webp",
+            "generated/ep01-v4/approved/EP01-P13-record-chair_2.webp",
+            "generated/ep01-v4/approved/EP01-P13-record-chair_3.webp",
+            "generated/ep01-v4/approved/EP01-P13-record-chair_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P14",
+          "title": "第三条记录",
+          "final": "output/ep01/page-14.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P14-record-invisible_1.webp",
+            "generated/ep01-v4/approved/EP01-P14-record-invisible_2.webp",
+            "generated/ep01-v4/approved/EP01-P14-record-invisible_3.webp",
+            "generated/ep01-v4/approved/EP01-P14-record-invisible_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P15",
+          "title": "夜晚房间",
+          "final": "output/ep01/page-15.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P15-night-room_1.webp",
+            "generated/ep01-v4/approved/EP01-P15-night-room_2.webp",
+            "generated/ep01-v4/approved/EP01-P15-night-room_3.webp",
+            "generated/ep01-v4/approved/EP01-P15-night-room_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P16",
+          "title": "整理思绪",
+          "final": "output/ep01/page-16.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P16-organize_1.webp",
+            "generated/ep01-v4/approved/EP01-P16-organize_2.webp",
+            "generated/ep01-v4/approved/EP01-P16-organize_3.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P17",
+          "title": "决心",
+          "final": "output/ep01/page-17.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P17-decision_1.webp",
+            "generated/ep01-v4/approved/EP01-P17-decision_2.webp",
+            "generated/ep01-v4/approved/EP01-P17-decision_3.webp",
+            "generated/ep01-v4/approved/EP01-P17-decision_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P18",
+          "title": "预告页",
+          "final": "output/ep01/page-18.webp",
+          "candidates": [
+            "generated/ep01-v4/approved/EP01-P18-preview_1.webp",
+            "generated/ep01-v4/approved/EP01-P18-preview_2.webp",
+            "generated/ep01-v4/approved/EP01-P18-preview_3.webp",
+            "generated/ep01-v4/approved/EP01-P18-preview_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ep02",
+      "title": "深入",
+      "status": "pending",
+      "chapters": "第3-5章",
+      "pages": []
+    },
+    {
+      "id": "ep03",
+      "title": "觉醒",
+      "status": "pending",
+      "chapters": "第6-8章",
+      "pages": []
+    },
+    {
+      "id": "ep04",
+      "title": "断口",
+      "status": "pending",
+      "chapters": "第9-12章",
+      "pages": []
+    },
+    {
+      "id": "ep05",
+      "title": "结局",
+      "status": "pending",
+      "chapters": "第13-15章",
+      "pages": []
+    }
+  ]
+}

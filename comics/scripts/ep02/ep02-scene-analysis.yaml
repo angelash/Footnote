@@ -1,0 +1,303 @@
+# EP02《记录者》场景分析
+# 章节范围: 第3-5章
+# 页数规划: 18页
+
+metadata:
+  episode: EP02
+  title: 记录者
+  chapters: [3, 4, 5]
+  themes:
+    - 空间扭曲与迷失
+    - 差异的保存
+    - 系统的自动更正
+    - 稳定结论的虚假
+  mood: 压抑、困惑、觉醒
+
+# ============ 角色设定 ============
+characters:
+  cenhui:
+    name: 岑回
+    description: 20多岁的亚洲男性，黑色短发整齐干练，深邃疲倦但锐利的眼神，穿着灰色维修局工作服，胸口佩戴工号牌，身材中等偏瘦，气质克制沉稳
+    role: 主角
+    
+  songlan:
+    name: 宋岚
+    description: 中年亚洲男性，眼神像笔一样锐利，皮肤粗糙，穿旧外套，摆着一堆发黄地图的摊位，字迹硬朗，卖的不是地图而是"差异"
+    role: 关键NPC
+    first_appearance: 第3章
+    key_trait: 记录差异的人
+    
+  xucheng:
+    name: 许澄
+    description: 女医生，30多岁，穿白大褂，目光温和但有边界，不急于拯救谁，说话平静像陈述事实
+    role: 关键NPC
+    first_appearance: 第5章
+    key_trait: 医疗系统的执行者
+    
+  atang:
+    name: 阿棠
+    description: 瘦小的年轻女孩，抱膝坐在角落，眼神不聚焦却能看见别人看不见的东西，手里捏着撕碎的纸片，说话像预言
+    role: 关键NPC
+    first_appearance: 第5章
+    key_trait: 对日期不敏感/能感知重复
+
+# ============ 场景列表 ============
+scenes:
+  # ---- 第3章：错门 ----
+  - id: S01
+    chapter: 3
+    location: 居住区走廊
+    description: 纸缝般的长走廊，门牌整齐排列数字递增，灯光恒定
+    visual_elements:
+      - 整齐的门牌号
+      - 恒定的走廊灯光
+      - 数字递增的门排
+    mood: 正常但略有不安
+    
+  - id: S02
+    chapter: 3
+    location: 17-06门前
+    description: 岑回在门牌17-06前停下，感觉距离被拉长
+    visual_elements:
+      - 门牌"17-06"特写
+      - 电梯口的灯在远处
+      - 距离感扭曲
+    key_dialogue:
+      - speaker: 终端
+        text: 地址匹配。
+    mood: 微妙的不对劲
+    
+  - id: S03
+    chapter: 3
+    location: 17-06内部
+    description: 阴暗的窄走廊，墙面颜色暗一阶，窗外是另一面墙
+    visual_elements:
+      - 比外面暗的墙面
+      - 窗外紧贴的另一面墙
+      - 没有生活痕迹的空房
+    mood: 诡异、压抑
+    
+  - id: S04
+    chapter: 3
+    location: 迷失的走廊
+    description: 来时的门消失，走廊变长，墙面纹理重复像复制粘贴
+    visual_elements:
+      - 门消失
+      - 墙面纹理重复
+      - 走廊无限延伸感
+    key_dialogue:
+      - speaker: 终端
+        text: 建议：撤离。
+      - speaker: 终端
+        text: 路线：已更正。
+    mood: 恐惧、困惑
+    
+  - id: S05
+    chapter: 3
+    location: 脱困
+    description: 岑回摸到门框轮廓，用力推出，回到正常走廊
+    visual_elements:
+      - 手摸墙面找门框
+      - 门从墙面挤出
+      - 明亮灯光扑面
+    mood: 紧张转为解脱
+    
+  - id: S06
+    chapter: 3
+    location: 走廊转角摊位
+    description: 宋岚摆着旧纸箱和发黄地图的摊位
+    visual_elements:
+      - 纸张和地图摊位
+      - 纸张的味道
+      - 宋岚锐利的眼神
+    key_dialogue:
+      - speaker: 宋岚
+        text: 你走错了。
+      - speaker: 宋岚
+        text: 同一个地方，记两次。少解释，多对比。
+      - speaker: 岑回
+        text: 奖励呢？
+      - speaker: 宋岚
+        text: 没有。但抹掉会更难。
+    mood: 启示
+    
+  # ---- 第4章：以最新更正为准 ----
+  - id: S07
+    chapter: 4
+    location: 市政办事厅大厅
+    description: 比维修局更亮，灯光照在流程上，椅子间距一样
+    visual_elements:
+      - 极亮的大厅
+      - 整齐的椅子
+      - 大屏滚动"以最新更正为准"
+    mood: 冷漠、机械
+    
+  - id: S08
+    chapter: 4
+    location: 办事窗口
+    description: 岑回发现地址被自动更正，多了字母分区
+    visual_elements:
+      - 窗口玻璃
+      - 屏幕显示地址（已更正）
+      - 疲惫的职员
+    key_dialogue:
+      - speaker: 岑回
+        text: 这行不对。
+      - speaker: 职员
+        text: 系统会自动更正。以最新更正为准。
+    mood: 无力
+    
+  - id: S09
+    chapter: 4
+    location: 旁边窗口
+    description: 老人对着表格发愣，手抖，说"那间小房"
+    visual_elements:
+      - 颤抖的老人
+      - 表格
+      - 求助的眼神
+    key_dialogue:
+      - speaker: 老人
+        text: 我家里本来有一间小房……
+      - speaker: 职员
+        text: 没有这个字段。请按标准填。
+      - speaker: 老人
+        text: 那间小房……他们说从来没有。
+    mood: 悲伤、无奈
+    
+  - id: S10
+    chapter: 4
+    location: 备注栏
+    description: 岑回帮老人填表，在备注栏写下"不一致"
+    visual_elements:
+      - 笔尖悬在纸上
+      - 备注栏两行空白
+      - 写下"不一致"
+    mood: 克制的抵抗
+    
+  # ---- 第5章：稳定结论 ----
+  - id: S11
+    chapter: 5
+    location: 医疗站外
+    description: 安静小路上的医疗站，门口有棵被缠保护带的树
+    visual_elements:
+      - 被缠保护带的树
+      - 医疗站门口
+      - 消毒水味道
+    mood: 平静但压抑
+    
+  - id: S12
+    chapter: 5
+    location: 医疗站候诊区
+    description: 墙上宣传画"稳定"，岑回填问卷
+    visual_elements:
+      - 稳定宣传画
+      - 问卷表格
+      - 标准选项
+    key_dialogue:
+      - speaker: 旁白
+        text: 是否听见不应存在的声音？
+    mood: 内心挣扎
+    
+  - id: S13
+    chapter: 5
+    location: 许澄诊室
+    description: 许澄接过问卷，温和但有边界的目光
+    visual_elements:
+      - 白大褂医生
+      - 夹板上的编号（中间空白）
+      - 温和的眼神
+    key_dialogue:
+      - speaker: 许澄
+        text: 最近睡得怎么样？
+      - speaker: 许澄
+        text: 你不需要记住每一件事。不一致会让你很累。
+      - speaker: 许澄
+        text: 结论：稳定。建议休息。
+    mood: 表面温和的压制
+    
+  - id: S14
+    chapter: 5
+    location: 候诊区角落
+    description: 阿棠抱膝坐在角落，说出预言般的话
+    visual_elements:
+      - 瘦小的女孩抱膝
+      - 眼神不聚焦
+      - 手里的碎纸片
+    key_dialogue:
+      - speaker: 阿棠
+        text: 你今天像昨天。
+      - speaker: 阿棠
+        text: 你刚刚是不是又走了一遍？
+      - speaker: 阿棠
+        text: 别去边缘断口。
+      - speaker: 许澄
+        text: 阿棠，别吓人。
+      - speaker: 许澄
+        text: 别把她的话当事实。她只是……对日期不敏感。
+    mood: 诡异、预言感
+    
+  - id: S15
+    chapter: 5
+    location: 医疗站门口
+    description: 岑回拿着结论单离开，阿棠最后一句话
+    visual_elements:
+      - 结论单特写："稳定"
+      - 背面空白的备注栏
+      - 门外的风
+    key_dialogue:
+      - speaker: 阿棠
+        text: 你回来得更快了。
+    mood: 不安的结束
+
+# ============ 页面规划 ============
+pages:
+  - page: 1
+    type: 扉页
+    scene: S01
+    content: 走廊门牌延伸，数字递增，标题"记录者"
+    
+  - page: 2-3
+    type: 四格×2
+    scenes: [S01, S02]
+    content: 岑回走在走廊，发现距离被拉长，敲17-06门
+    
+  - page: 4-5
+    type: 四格×2
+    scenes: [S03, S04]
+    content: 进入阴暗房间，走廊变长门消失，墙面纹理重复
+    
+  - page: 6-7
+    type: 四格×2
+    scenes: [S05, S06]
+    content: 摸到门框脱困，遇到宋岚摊位
+    
+  - page: 8-9
+    type: 四格×2
+    scene: S06
+    content: 宋岚的差异规则对话，便签特写
+    
+  - page: 10-11
+    type: 四格×2
+    scenes: [S07, S08]
+    content: 市政大厅，自动更正地址
+    
+  - page: 12-13
+    type: 四格×2
+    scenes: [S09, S10]
+    content: 老人的小房，备注栏写"不一致"
+    
+  - page: 14-15
+    type: 四格×2
+    scenes: [S11, S12, S13]
+    content: 医疗站，许澄诊疗，问卷
+    
+  - page: 16-17
+    type: 四格×2
+    scene: S14
+    content: 阿棠的预言，"你今天像昨天"
+    
+  - page: 18
+    type: 结尾单页
+    scene: S15
+    content: 结论单特写"稳定"，岑回离开
+

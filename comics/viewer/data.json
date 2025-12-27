@@ -228,9 +228,226 @@
     {
       "id": "ep02",
       "title": "深入",
-      "status": "pending",
+      "status": "completed",
       "chapters": "第3-5章",
-      "pages": []
+      "pages": [
+        {
+          "id": "p01",
+          "title": "无限延伸的走廊（扉页）",
+          "candidates": [
+            "generated/ep02/p01_1.webp",
+            "generated/ep02/p01_2.webp",
+            "generated/ep02/p01_3.webp",
+            "generated/ep02/p01_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-01.webp"
+        },
+        {
+          "id": "p02",
+          "title": "门牌17-06",
+          "candidates": [
+            "generated/ep02/p02_1.webp",
+            "generated/ep02/p02_2.webp",
+            "generated/ep02/p02_3.webp",
+            "generated/ep02/p02_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-02.webp"
+        },
+        {
+          "id": "p03",
+          "title": "进入异常走廊",
+          "candidates": [
+            "generated/ep02/p03_1.webp",
+            "generated/ep02/p03_2.webp",
+            "generated/ep02/p03_3.webp",
+            "generated/ep02/p03_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-03.webp"
+        },
+        {
+          "id": "p04",
+          "title": "迷宫奔跑",
+          "candidates": [
+            "generated/ep02/p04_1.webp",
+            "generated/ep02/p04_2.webp",
+            "generated/ep02/p04_3.webp",
+            "generated/ep02/p04_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-04.webp"
+        },
+        {
+          "id": "p05",
+          "title": "发现门框逃离",
+          "candidates": [
+            "generated/ep02/p05_1.webp",
+            "generated/ep02/p05_2.webp",
+            "generated/ep02/p05_3.webp",
+            "generated/ep02/p05_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-05.webp"
+        },
+        {
+          "id": "p06",
+          "title": "遇见宋岚",
+          "candidates": [
+            "generated/ep02/p06_1.webp",
+            "generated/ep02/p06_2.webp",
+            "generated/ep02/p06_3.webp",
+            "generated/ep02/p06_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-06.webp"
+        },
+        {
+          "id": "p07",
+          "title": "差异规则",
+          "candidates": [
+            "generated/ep02/p07_1.webp",
+            "generated/ep02/p07_2.webp",
+            "generated/ep02/p07_3.webp",
+            "generated/ep02/p07_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-07.webp"
+        },
+        {
+          "id": "p08",
+          "title": "便签告别",
+          "candidates": [
+            "generated/ep02/p08_1.webp",
+            "generated/ep02/p08_2.webp",
+            "generated/ep02/p08_3.webp",
+            "generated/ep02/p08_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-08.webp"
+        },
+        {
+          "id": "p09",
+          "title": "市政大厅",
+          "candidates": [
+            "generated/ep02/p09_1.webp",
+            "generated/ep02/p09_2.webp",
+            "generated/ep02/p09_3.webp",
+            "generated/ep02/p09_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-09.webp"
+        },
+        {
+          "id": "p10",
+          "title": "自动更正",
+          "candidates": [
+            "generated/ep02/p10_1.webp",
+            "generated/ep02/p10_2.webp",
+            "generated/ep02/p10_3.webp",
+            "generated/ep02/p10_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-10.webp"
+        },
+        {
+          "id": "p11",
+          "title": "帮老人填表",
+          "candidates": [
+            "generated/ep02/p11_1.webp",
+            "generated/ep02/p11_2.webp",
+            "generated/ep02/p11_3.webp",
+            "generated/ep02/p11_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-11.webp"
+        },
+        {
+          "id": "p12",
+          "title": "离开办事厅",
+          "candidates": [
+            "generated/ep02/p12_1.webp",
+            "generated/ep02/p12_2.webp",
+            "generated/ep02/p12_3.webp",
+            "generated/ep02/p12_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-12.webp"
+        },
+        {
+          "id": "p13",
+          "title": "医疗站",
+          "candidates": [
+            "generated/ep02/p13_1.webp",
+            "generated/ep02/p13_2.webp",
+            "generated/ep02/p13_3.webp",
+            "generated/ep02/p13_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-13.webp"
+        },
+        {
+          "id": "p14",
+          "title": "填问卷",
+          "candidates": [
+            "generated/ep02/p14_1.webp",
+            "generated/ep02/p14_2.webp",
+            "generated/ep02/p14_3.webp",
+            "generated/ep02/p14_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-14.webp"
+        },
+        {
+          "id": "p15",
+          "title": "许澄医生",
+          "candidates": [
+            "generated/ep02/p15_1.webp",
+            "generated/ep02/p15_2.webp",
+            "generated/ep02/p15_3.webp",
+            "generated/ep02/p15_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-15.webp"
+        },
+        {
+          "id": "p16",
+          "title": "遇到阿棠",
+          "candidates": [
+            "generated/ep02/p16_1.webp",
+            "generated/ep02/p16_2.webp",
+            "generated/ep02/p16_3.webp",
+            "generated/ep02/p16_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-16.webp"
+        },
+        {
+          "id": "p17",
+          "title": "对日期不敏感",
+          "candidates": [
+            "generated/ep02/p17_1.webp",
+            "generated/ep02/p17_2.webp",
+            "generated/ep02/p17_3.webp",
+            "generated/ep02/p17_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-17.webp"
+        },
+        {
+          "id": "p18",
+          "title": "结论单：稳定",
+          "candidates": [
+            "generated/ep02/p18_1.webp",
+            "generated/ep02/p18_2.webp",
+            "generated/ep02/p18_3.webp",
+            "generated/ep02/p18_4.webp"
+          ],
+          "selected": 0,
+          "final": "output/ep02/page-18.webp"
+        }
+      ]
     },
     {
       "id": "ep03",

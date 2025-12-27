@@ -1,0 +1,28 @@
+# CH04《以最新更正为准》场景分析（Phase 1）
+# 参照：story/1.md L382-L516
+
+metadata:
+  chapter: 4
+  title: 以最新更正为准
+  part: "第1部：流程"
+  status: draft
+  scope:
+    - "只允许使用本章原文内容，不得引入后续章事件/术语"
+
+characters:
+  cenhui:
+    name: 岑回
+    gender: 男
+    description: "20多岁的亚洲男性，黑色短发整齐干练，深邃疲倦但锐利的眼神，穿着灰色维修局工作服，胸口佩戴工号牌，身材中等偏瘦，气质克制沉稳"
+
+anchors:
+  # 每章至少列 6-12 个“原文锚点短句”，用于对齐检查
+  - "待填写：从原文复制短句"
+
+scenes:
+  # 每个 scene 对应一段可视化单元（可拆成漫画页）
+  - id: S01
+    location: "待填写"
+    event: "待填写"
+    beats:
+      - "待填写"

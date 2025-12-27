@@ -1,474 +1,177 @@
 {
-  "title": "备注 / Footnote",
-  "description": "叙事驱动的2D系统策略冒险漫画",
-  "episodes": [
+  "title": "备注 / Footnote（重做版）",
+  "description": "按章节逐级验收的漫画生产",
+  "chapters": [
     {
-      "id": "ep01",
-      "title": "不一致",
+      "id": "ch01",
+      "title": "CH01",
       "status": "completed",
-      "chapters": "第1-2章",
       "pages": [
         {
           "id": "P01",
-          "title": "扉页",
-          "final": "output/ep01/page-01.webp",
+          "title": "清晨：被抚平的安静（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-01.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P01-title_1.webp",
-            "generated/ep01-v4/approved/EP01-P01-title_2.webp",
-            "generated/ep01-v4/approved/EP01-P01-title_3.webp",
-            "generated/ep01-v4/approved/EP01-P01-title_4.webp"
+            "generated/ch01/raw/CH01-P01_1.webp",
+            "generated/ch01/raw/CH01-P01_2.webp"
           ],
-          "selected": 2
+          "selected": 0
         },
         {
           "id": "P02",
-          "title": "晨间核验",
-          "final": "output/ep01/page-02.webp",
+          "title": "窗外“稳定”与卡面划痕（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-02.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P02-verify_1.webp",
-            "generated/ep01-v4/approved/EP01-P02-verify_2.webp",
-            "generated/ep01-v4/approved/EP01-P02-verify_3.webp",
-            "generated/ep01-v4/approved/EP01-P02-verify_4.webp"
+            "generated/ch01/raw/CH01-P02_1.webp",
+            "generated/ch01/raw/CH01-P02_2.webp",
+            "generated/ch01/raw/CH01-P02_3.webp"
           ],
-          "selected": 2
+          "selected": 0
         },
         {
           "id": "P03",
-          "title": "延迟三秒",
-          "final": "output/ep01/page-03.webp",
+          "title": "楼道公告与闸机提示（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-03.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P03-delay_1.webp",
-            "generated/ep01-v4/approved/EP01-P03-delay_2.webp",
-            "generated/ep01-v4/approved/EP01-P03-delay_3.webp",
-            "generated/ep01-v4/approved/EP01-P03-delay_4.webp"
+            "generated/ch01/raw/CH01-P03_1.webp",
+            "generated/ch01/raw/CH01-P03_2.webp",
+            "generated/ch01/raw/CH01-P03_3.webp",
+            "generated/ch01/raw/CH01-P03_4.webp"
           ],
           "selected": 0
         },
         {
           "id": "P04",
-          "title": "薄墙任务",
-          "final": "output/ep01/page-04.webp",
+          "title": "早餐店：余音被削掉（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-04.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P04-task_1.webp",
-            "generated/ep01-v4/approved/EP01-P04-task_2.webp",
-            "generated/ep01-v4/approved/EP01-P04-task_3.webp",
-            "generated/ep01-v4/approved/EP01-P04-task_4.webp"
+            "generated/ch01/raw/CH01-P04_1.webp",
+            "generated/ch01/raw/CH01-P04_2.webp",
+            "generated/ch01/raw/CH01-P04_3.webp",
+            "generated/ch01/raw/CH01-P04_4.webp"
           ],
           "selected": 0
         },
         {
           "id": "P05",
-          "title": "发现空腔",
-          "final": "output/ep01/page-05.webp",
+          "title": "小票与“不会出错”的身份（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-05.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P05-hollow_1.webp",
-            "generated/ep01-v4/approved/EP01-P05-hollow_2.webp",
-            "generated/ep01-v4/approved/EP01-P05-hollow_3.webp",
-            "generated/ep01-v4/approved/EP01-P05-hollow_4.webp"
+            "generated/ch01/raw/CH01-P05_1.webp",
+            "generated/ch01/raw/CH01-P05_2.webp",
+            "generated/ch01/raw/CH01-P05_3.webp",
+            "generated/ch01/raw/CH01-P05_4.webp"
           ],
           "selected": 0
         },
         {
           "id": "P06",
-          "title": "第一次记录",
-          "final": "output/ep01/page-06.webp",
+          "title": "维修局：流程提示与任务单（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-06.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P06-record_1.webp",
-            "generated/ep01-v4/approved/EP01-P06-record_2.webp",
-            "generated/ep01-v4/approved/EP01-P06-record_3.webp",
-            "generated/ep01-v4/approved/EP01-P06-record_4.webp"
+            "generated/ch01/raw/CH01-P06_1.webp",
+            "generated/ch01/raw/CH01-P06_2.webp",
+            "generated/ch01/raw/CH01-P06_3.webp",
+            "generated/ch01/raw/CH01-P06_4.webp"
           ],
           "selected": 0
         },
         {
           "id": "P07",
-          "title": "早餐摊",
-          "final": "output/ep01/page-07.webp",
+          "title": "顾临：看见就记录，别动（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-07.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P07-more_1.webp",
-            "generated/ep01-v4/approved/EP01-P07-more_2.webp",
-            "generated/ep01-v4/approved/EP01-P07-more_3.webp",
-            "generated/ep01-v4/approved/EP01-P07-more_4.webp"
+            "generated/ch01/raw/CH01-P07_1.webp",
+            "generated/ch01/raw/CH01-P07_2.webp"
           ],
           "selected": 0
         },
         {
           "id": "P08",
-          "title": "双日期",
-          "final": "output/ep01/page-08.webp",
+          "title": "既定路线与插页文件（2x2 四格，竖版 9:16）",
+          "final": "output/ch01/page-08.webp",
           "candidates": [
-            "generated/ep01-v4/approved/EP01-P08-chair_1.webp",
-            "generated/ep01-v4/approved/EP01-P08-chair_2.webp",
-            "generated/ep01-v4/approved/EP01-P08-chair_3.webp",
-            "generated/ep01-v4/approved/EP01-P08-chair_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P09",
-          "title": "回家路上",
-          "final": "output/ep01/page-09.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P09-home_1.webp",
-            "generated/ep01-v4/approved/EP01-P09-home_2.webp",
-            "generated/ep01-v4/approved/EP01-P09-home_3.webp",
-            "generated/ep01-v4/approved/EP01-P09-home_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P10",
-          "title": "错误门牌",
-          "final": "output/ep01/page-10.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P10-plate_1.webp",
-            "generated/ep01-v4/approved/EP01-P10-plate_2.webp",
-            "generated/ep01-v4/approved/EP01-P10-plate_3.webp",
-            "generated/ep01-v4/approved/EP01-P10-plate_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P11",
-          "title": "空地场景",
-          "final": "output/ep01/page-11.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P11-vacant_1.webp",
-            "generated/ep01-v4/approved/EP01-P11-vacant_2.webp",
-            "generated/ep01-v4/approved/EP01-P11-vacant_3.webp",
-            "generated/ep01-v4/approved/EP01-P11-vacant_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P12",
-          "title": "空椅发现",
-          "final": "output/ep01/page-12.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P12-invisible-chair_1.webp",
-            "generated/ep01-v4/approved/EP01-P12-invisible-chair_2.webp",
-            "generated/ep01-v4/approved/EP01-P12-invisible-chair_3.webp",
-            "generated/ep01-v4/approved/EP01-P12-invisible-chair_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P13",
-          "title": "悬浮篮子",
-          "final": "output/ep01/page-13.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P13-record-chair_1.webp",
-            "generated/ep01-v4/approved/EP01-P13-record-chair_2.webp",
-            "generated/ep01-v4/approved/EP01-P13-record-chair_3.webp",
-            "generated/ep01-v4/approved/EP01-P13-record-chair_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P14",
-          "title": "第三条记录",
-          "final": "output/ep01/page-14.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P14-record-invisible_1.webp",
-            "generated/ep01-v4/approved/EP01-P14-record-invisible_2.webp",
-            "generated/ep01-v4/approved/EP01-P14-record-invisible_3.webp",
-            "generated/ep01-v4/approved/EP01-P14-record-invisible_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P15",
-          "title": "夜晚房间",
-          "final": "output/ep01/page-15.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P15-night-room_1.webp",
-            "generated/ep01-v4/approved/EP01-P15-night-room_2.webp",
-            "generated/ep01-v4/approved/EP01-P15-night-room_3.webp",
-            "generated/ep01-v4/approved/EP01-P15-night-room_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P16",
-          "title": "整理思绪",
-          "final": "output/ep01/page-16.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P16-organize_1.webp",
-            "generated/ep01-v4/approved/EP01-P16-organize_2.webp",
-            "generated/ep01-v4/approved/EP01-P16-organize_3.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P17",
-          "title": "决心",
-          "final": "output/ep01/page-17.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P17-decision_1.webp",
-            "generated/ep01-v4/approved/EP01-P17-decision_2.webp",
-            "generated/ep01-v4/approved/EP01-P17-decision_3.webp",
-            "generated/ep01-v4/approved/EP01-P17-decision_4.webp"
-          ],
-          "selected": 0
-        },
-        {
-          "id": "P18",
-          "title": "预告页",
-          "final": "output/ep01/page-18.webp",
-          "candidates": [
-            "generated/ep01-v4/approved/EP01-P18-preview_1.webp",
-            "generated/ep01-v4/approved/EP01-P18-preview_2.webp",
-            "generated/ep01-v4/approved/EP01-P18-preview_3.webp",
-            "generated/ep01-v4/approved/EP01-P18-preview_4.webp"
+            "generated/ch01/raw/CH01-P08_1.webp"
           ],
           "selected": 0
         }
       ]
     },
     {
-      "id": "ep02",
-      "title": "深入",
-      "status": "completed",
-      "chapters": "第3-5章",
+      "id": "ch02",
+      "title": "CH02",
+      "status": "in_progress",
       "pages": [
         {
-          "id": "p01",
-          "title": "无限延伸的走廊（扉页）",
+          "id": "P01",
+          "title": "薄墙巷口：白得发冷（2x2 四格，竖版 9:16）",
+          "final": "output/ch02/page-01.webp",
           "candidates": [
-            "generated/ep02/p01_1.webp",
-            "generated/ep02/p01_2.webp",
-            "generated/ep02/p01_3.webp",
-            "generated/ep02/p01_4.webp"
+            "generated/ch02/raw/CH02-P01_1.webp"
           ],
-          "selected": 0,
-          "final": "output/ep02/page-01.webp"
+          "selected": 0
         },
         {
-          "id": "p02",
-          "title": "门牌17-06",
+          "id": "P02",
+          "title": "裂纹与贴纸：一切都很顺（2x2 四格，竖版 9:16）",
+          "final": "output/ch02/page-02.webp",
           "candidates": [
-            "generated/ep02/p02_1.webp",
-            "generated/ep02/p02_2.webp",
-            "generated/ep02/p02_3.webp",
-            "generated/ep02/p02_4.webp"
+            "generated/ch02/raw/CH02-P02_1.webp",
+            "generated/ch02/raw/CH02-P02_2.webp"
           ],
-          "selected": 0,
-          "final": "output/ep02/page-02.webp"
+          "selected": 0
         },
         {
-          "id": "p03",
-          "title": "进入异常走廊",
+          "id": "P03",
+          "title": "地面塌陷：红色很真（2x2 四格，竖版 9:16）",
+          "final": "output/ch02/page-03.webp",
           "candidates": [
-            "generated/ep02/p03_1.webp",
-            "generated/ep02/p03_2.webp",
-            "generated/ep02/p03_3.webp",
-            "generated/ep02/p03_4.webp"
+            "generated/ch02/raw/CH02-P03_1.webp"
           ],
-          "selected": 0,
-          "final": "output/ep02/page-03.webp"
+          "selected": 0
         },
         {
-          "id": "p04",
-          "title": "迷宫奔跑",
+          "id": "P04",
+          "title": "墙里回声：里面是空的（2x2 四格，竖版 9:16）",
+          "final": "output/ch02/page-04.webp",
           "candidates": [
-            "generated/ep02/p04_1.webp",
-            "generated/ep02/p04_2.webp",
-            "generated/ep02/p04_3.webp",
-            "generated/ep02/p04_4.webp"
+            "generated/ch02/raw/CH02-P04_1.webp",
+            "generated/ch02/raw/CH02-P04_2.webp",
+            "generated/ch02/raw/CH02-P04_3.webp"
           ],
-          "selected": 0,
-          "final": "output/ep02/page-04.webp"
+          "selected": 0
         },
         {
-          "id": "p05",
-          "title": "发现门框逃离",
+          "id": "P05",
+          "title": "备注被更正：正常（2x2 四格，竖版 9:16）",
+          "final": "output/ch02/page-05.webp",
           "candidates": [
-            "generated/ep02/p05_1.webp",
-            "generated/ep02/p05_2.webp",
-            "generated/ep02/p05_3.webp",
-            "generated/ep02/p05_4.webp"
+            "generated/ch02/raw/CH02-P05_1.webp"
           ],
-          "selected": 0,
-          "final": "output/ep02/page-05.webp"
+          "selected": 0
         },
         {
-          "id": "p06",
-          "title": "遇见宋岚",
-          "candidates": [
-            "generated/ep02/p06_1.webp",
-            "generated/ep02/p06_2.webp",
-            "generated/ep02/p06_3.webp",
-            "generated/ep02/p06_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-06.webp"
+          "id": "P06",
+          "title": "指甲敲墙：别动（2x2 四格，竖版 9:16）",
+          "final": null,
+          "candidates": [],
+          "selected": null
         },
         {
-          "id": "p07",
-          "title": "差异规则",
-          "candidates": [
-            "generated/ep02/p07_1.webp",
-            "generated/ep02/p07_2.webp",
-            "generated/ep02/p07_3.webp",
-            "generated/ep02/p07_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-07.webp"
+          "id": "P07",
+          "title": "栖蓝修补路标：没用不是事实（2x2 四格，竖版 9:16）",
+          "final": null,
+          "candidates": [],
+          "selected": null
         },
         {
-          "id": "p08",
-          "title": "便签告别",
-          "candidates": [
-            "generated/ep02/p08_1.webp",
-            "generated/ep02/p08_2.webp",
-            "generated/ep02/p08_3.webp",
-            "generated/ep02/p08_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-08.webp"
-        },
-        {
-          "id": "p09",
-          "title": "市政大厅",
-          "candidates": [
-            "generated/ep02/p09_1.webp",
-            "generated/ep02/p09_2.webp",
-            "generated/ep02/p09_3.webp",
-            "generated/ep02/p09_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-09.webp"
-        },
-        {
-          "id": "p10",
-          "title": "自动更正",
-          "candidates": [
-            "generated/ep02/p10_1.webp",
-            "generated/ep02/p10_2.webp",
-            "generated/ep02/p10_3.webp",
-            "generated/ep02/p10_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-10.webp"
-        },
-        {
-          "id": "p11",
-          "title": "帮老人填表",
-          "candidates": [
-            "generated/ep02/p11_1.webp",
-            "generated/ep02/p11_2.webp",
-            "generated/ep02/p11_3.webp",
-            "generated/ep02/p11_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-11.webp"
-        },
-        {
-          "id": "p12",
-          "title": "离开办事厅",
-          "candidates": [
-            "generated/ep02/p12_1.webp",
-            "generated/ep02/p12_2.webp",
-            "generated/ep02/p12_3.webp",
-            "generated/ep02/p12_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-12.webp"
-        },
-        {
-          "id": "p13",
-          "title": "医疗站",
-          "candidates": [
-            "generated/ep02/p13_1.webp",
-            "generated/ep02/p13_2.webp",
-            "generated/ep02/p13_3.webp",
-            "generated/ep02/p13_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-13.webp"
-        },
-        {
-          "id": "p14",
-          "title": "填问卷",
-          "candidates": [
-            "generated/ep02/p14_1.webp",
-            "generated/ep02/p14_2.webp",
-            "generated/ep02/p14_3.webp",
-            "generated/ep02/p14_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-14.webp"
-        },
-        {
-          "id": "p15",
-          "title": "许澄医生",
-          "candidates": [
-            "generated/ep02/p15_1.webp",
-            "generated/ep02/p15_2.webp",
-            "generated/ep02/p15_3.webp",
-            "generated/ep02/p15_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-15.webp"
-        },
-        {
-          "id": "p16",
-          "title": "遇到阿棠",
-          "candidates": [
-            "generated/ep02/p16_1.webp",
-            "generated/ep02/p16_2.webp",
-            "generated/ep02/p16_3.webp",
-            "generated/ep02/p16_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-16.webp"
-        },
-        {
-          "id": "p17",
-          "title": "对日期不敏感",
-          "candidates": [
-            "generated/ep02/p17_1.webp",
-            "generated/ep02/p17_2.webp",
-            "generated/ep02/p17_3.webp",
-            "generated/ep02/p17_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-17.webp"
-        },
-        {
-          "id": "p18",
-          "title": "结论单：稳定",
-          "candidates": [
-            "generated/ep02/p18_1.webp",
-            "generated/ep02/p18_2.webp",
-            "generated/ep02/p18_3.webp",
-            "generated/ep02/p18_4.webp"
-          ],
-          "selected": 0,
-          "final": "output/ep02/page-18.webp"
+          "id": "P08",
+          "title": "插页文件B-01：薄墙回声记录-01（文件页占满画面，竖版 9:16）",
+          "final": null,
+          "candidates": [],
+          "selected": null
         }
       ]
-    },
-    {
-      "id": "ep03",
-      "title": "觉醒",
-      "status": "pending",
-      "chapters": "第6-8章",
-      "pages": []
-    },
-    {
-      "id": "ep04",
-      "title": "断口",
-      "status": "pending",
-      "chapters": "第9-12章",
-      "pages": []
-    },
-    {
-      "id": "ep05",
-      "title": "结局",
-      "status": "pending",
-      "chapters": "第13-15章",
-      "pages": []
     }
   ]
 }

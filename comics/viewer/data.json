@@ -100,7 +100,7 @@
     {
       "id": "ch02",
       "title": "CH02",
-      "status": "in_progress",
+      "status": "completed",
       "pages": [
         {
           "id": "P01",
@@ -153,23 +153,38 @@
         {
           "id": "P06",
           "title": "指甲敲墙：别动（2x2 四格，竖版 9:16）",
-          "final": null,
-          "candidates": [],
-          "selected": null
+          "final": "output/ch02/page-06.webp",
+          "candidates": [
+            "generated/ch02/raw/CH02-P06_1.webp",
+            "generated/ch02/raw/CH02-P06_2.webp",
+            "generated/ch02/raw/CH02-P06_3.webp",
+            "generated/ch02/raw/CH02-P06_4.webp"
+          ],
+          "selected": 0
         },
         {
           "id": "P07",
           "title": "栖蓝修补路标：没用不是事实（2x2 四格，竖版 9:16）",
-          "final": null,
-          "candidates": [],
-          "selected": null
+          "final": "output/ch02/page-07.webp",
+          "candidates": [
+            "generated/ch02/raw/CH02-P07_1.webp",
+            "generated/ch02/raw/CH02-P07_2.webp",
+            "generated/ch02/raw/CH02-P07_3.webp",
+            "generated/ch02/raw/CH02-P07_4.webp"
+          ],
+          "selected": 0
         },
         {
           "id": "P08",
           "title": "插页文件B-01：薄墙回声记录-01（文件页占满画面，竖版 9:16）",
-          "final": null,
-          "candidates": [],
-          "selected": null
+          "final": "output/ch02/page-08.webp",
+          "candidates": [
+            "generated/ch02/raw/CH02-P08_1.webp",
+            "generated/ch02/raw/CH02-P08_2.webp",
+            "generated/ch02/raw/CH02-P08_3.webp",
+            "generated/ch02/raw/CH02-P08_4.webp"
+          ],
+          "selected": 0
         }
       ]
     }

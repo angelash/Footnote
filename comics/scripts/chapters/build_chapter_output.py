@@ -76,6 +76,7 @@ def main() -> None:
     raw_dir = repo_root / "comics" / "generated" / ch / "raw"
     out_dir = repo_root / "comics" / "output" / ch
     viewer_data_path = repo_root / "comics" / "viewer" / "data.json"
+    selection_path = repo_root / "comics" / "scripts" / "chapters" / ch / f"{ch}-selection.json"
 
     out_dir.mkdir(parents=True, exist_ok=True)
     raw_dir.mkdir(parents=True, exist_ok=True)
@@ -127,9 +128,28 @@ def main() -> None:
     # 完成判定：所有页都有 final
     chapter_entry["status"] = "completed" if all(p.get("final") for p in chapter_pages) else "in_progress"
 
+    # 写入 selection.json（用于验收与后续人工改选）
+    selection_payload: Dict = {
+        "chapter": int(ch[2:]) if ch.startswith("ch") and ch[2:].isdigit() else ch,
+        "title": str(ch_upper),
+        "status": chapter_entry["status"],
+        "pages": [
+            {
+                "id": p.get("id"),
+                "title": p.get("title"),
+                "selected": p.get("selected"),
+                "final": p.get("final"),
+                "candidates": p.get("candidates", []),
+            }
+            for p in chapter_pages
+        ],
+    }
+    selection_path.write_text(json.dumps(selection_payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
     viewer_data_path.write_text(json.dumps(viewer, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"[OK] viewer updated: {viewer_data_path}")
     print(f"[OK] output updated: {out_dir}")
+    print(f"[OK] selection updated: {selection_path}")
 
 
 if __name__ == "__main__":

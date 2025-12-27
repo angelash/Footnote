@@ -187,6 +187,109 @@
           "selected": 0
         }
       ]
+    },
+    {
+      "id": "ch03",
+      "title": "CH03",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "纸缝走廊与门牌17-06（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-01.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P01_1.webp",
+            "generated/ch03/raw/CH03-P01_2.webp",
+            "generated/ch03/raw/CH03-P01_3.webp",
+            "generated/ch03/raw/CH03-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "错门内侧：窄走廊与贴墙的窗（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-02.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P02_1.webp",
+            "generated/ch03/raw/CH03-P02_2.webp",
+            "generated/ch03/raw/CH03-P02_3.webp",
+            "generated/ch03/raw/CH03-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "门消失：建议撤离与重复纹理（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-03.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P03_1.webp",
+            "generated/ch03/raw/CH03-P03_2.webp",
+            "generated/ch03/raw/CH03-P03_3.webp",
+            "generated/ch03/raw/CH03-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "纸贴墙：我是真的 / 路线已更正（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-04.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P04_1.webp",
+            "generated/ch03/raw/CH03-P04_2.webp",
+            "generated/ch03/raw/CH03-P04_3.webp",
+            "generated/ch03/raw/CH03-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "快照与门再出现：音效未截断（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-05.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P05_1.webp",
+            "generated/ch03/raw/CH03-P05_2.webp",
+            "generated/ch03/raw/CH03-P05_3.webp",
+            "generated/ch03/raw/CH03-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "纸味与摊位：你走错了（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-06.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P06_1.webp",
+            "generated/ch03/raw/CH03-P06_2.webp",
+            "generated/ch03/raw/CH03-P06_3.webp",
+            "generated/ch03/raw/CH03-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "少解释，多对比：我卖差异（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-07.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P07_1.webp",
+            "generated/ch03/raw/CH03-P07_2.webp",
+            "generated/ch03/raw/CH03-P07_3.webp",
+            "generated/ch03/raw/CH03-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "插页拼贴：错门快照 & 差异规则（2x2 四格，竖版 9:16）",
+          "final": "output/ch03/page-08.webp",
+          "candidates": [
+            "generated/ch03/raw/CH03-P08_1.webp",
+            "generated/ch03/raw/CH03-P08_2.webp",
+            "generated/ch03/raw/CH03-P08_3.webp",
+            "generated/ch03/raw/CH03-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
     }
   ]
 }

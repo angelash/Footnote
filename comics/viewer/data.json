@@ -1419,6 +1419,830 @@
           "selected": 0
         }
       ]
+    },
+    {
+      "id": "ch15",
+      "title": "CH15",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "厚门与提示牌：未经授权禁止进入",
+          "final": "output/ch15/page-01.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P01_1.webp",
+            "generated/ch15/raw/CH15-P01_2.webp",
+            "generated/ch15/raw/CH15-P01_3.webp",
+            "generated/ch15/raw/CH15-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "室内与边界线：你只看，不碰",
+          "final": "output/ch15/page-02.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P02_1.webp",
+            "generated/ch15/raw/CH15-P02_2.webp",
+            "generated/ch15/raw/CH15-P02_3.webp",
+            "generated/ch15/raw/CH15-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "冷光与骨架：深度感知（只读）",
+          "final": "output/ch15/page-03.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P03_1.webp",
+            "generated/ch15/raw/CH15-P03_2.webp",
+            "generated/ch15/raw/CH15-P03_3.webp",
+            "generated/ch15/raw/CH15-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "为什么给我：复走、残差、队列",
+          "final": "output/ch15/page-04.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P04_1.webp",
+            "generated/ch15/raw/CH15-P04_2.webp",
+            "generated/ch15/raw/CH15-P04_3.webp",
+            "generated/ch15/raw/CH15-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "授权记录：观察可用，写入禁用",
+          "final": "output/ch15/page-05.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P05_1.webp",
+            "generated/ch15/raw/CH15-P05_2.webp",
+            "generated/ch15/raw/CH15-P05_3.webp",
+            "generated/ch15/raw/CH15-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "离开与克制：先记录",
+          "final": "output/ch15/page-06.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P06_1.webp",
+            "generated/ch15/raw/CH15-P06_2.webp",
+            "generated/ch15/raw/CH15-P06_3.webp",
+            "generated/ch15/raw/CH15-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "走廊尽头：阿棠说“只读很累”",
+          "final": "output/ch15/page-07.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P07_1.webp",
+            "generated/ch15/raw/CH15-P07_2.webp",
+            "generated/ch15/raw/CH15-P07_3.webp",
+            "generated/ch15/raw/CH15-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "纸片与插页：对象不存在 / 行为可执行",
+          "final": "output/ch15/page-08.webp",
+          "candidates": [
+            "generated/ch15/raw/CH15-P08_1.webp",
+            "generated/ch15/raw/CH15-P08_2.webp",
+            "generated/ch15/raw/CH15-P08_3.webp",
+            "generated/ch15/raw/CH15-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch16",
+      "title": "CH16",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "薄墙更白：授权记录更硬，警告回响",
+          "final": "output/ch16/page-01.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P01_1.webp",
+            "generated/ch16/raw/CH16-P01_2.webp",
+            "generated/ch16/raw/CH16-P01_3.webp",
+            "generated/ch16/raw/CH16-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "冷光：深度视野开启",
+          "final": "output/ch16/page-02.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P02_1.webp",
+            "generated/ch16/raw/CH16-P02_2.webp",
+            "generated/ch16/raw/CH16-P02_3.webp",
+            "generated/ch16/raw/CH16-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "骨架线：不均匀的线框",
+          "final": "output/ch16/page-03.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P03_1.webp",
+            "generated/ch16/raw/CH16-P03_2.webp",
+            "generated/ch16/raw/CH16-P03_3.webp",
+            "generated/ch16/raw/CH16-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "最刺眼的空：近乎矩形的门框影子",
+          "final": "output/ch16/page-04.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P04_1.webp",
+            "generated/ch16/raw/CH16-P04_2.webp",
+            "generated/ch16/raw/CH16-P04_3.webp",
+            "generated/ch16/raw/CH16-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "只读 / 观察：建议降低观察频率",
+          "final": "output/ch16/page-05.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P05_1.webp",
+            "generated/ch16/raw/CH16-P05_2.webp",
+            "generated/ch16/raw/CH16-P05_3.webp",
+            "generated/ch16/raw/CH16-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "回声：别碰 / 别替它更正",
+          "final": "output/ch16/page-06.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P06_1.webp",
+            "generated/ch16/raw/CH16-P06_2.webp",
+            "generated/ch16/raw/CH16-P06_3.webp",
+            "generated/ch16/raw/CH16-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "差异卡：写得太满→改成更干的词",
+          "final": "output/ch16/page-07.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P07_1.webp",
+            "generated/ch16/raw/CH16-P07_2.webp",
+            "generated/ch16/raw/CH16-P07_3.webp",
+            "generated/ch16/raw/CH16-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "快照与覆盖：状态：正常（已更正）＋插页文件B-17",
+          "final": "output/ch16/page-08.webp",
+          "candidates": [
+            "generated/ch16/raw/CH16-P08_1.webp",
+            "generated/ch16/raw/CH16-P08_2.webp",
+            "generated/ch16/raw/CH16-P08_3.webp",
+            "generated/ch16/raw/CH16-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch17",
+      "title": "CH17",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "后巷阴影：你看了",
+          "final": "output/ch17/page-01.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P01_1.webp",
+            "generated/ch17/raw/CH17-P01_2.webp",
+            "generated/ch17/raw/CH17-P01_3.webp",
+            "generated/ch17/raw/CH17-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "无牌门与封条：已封存",
+          "final": "output/ch17/page-02.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P02_1.webp",
+            "generated/ch17/raw/CH17-P02_2.webp",
+            "generated/ch17/raw/CH17-P02_3.webp",
+            "generated/ch17/raw/CH17-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "地下室：旧纸味与抽屉标签",
+          "final": "output/ch17/page-03.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P03_1.webp",
+            "generated/ch17/raw/CH17-P03_2.webp",
+            "generated/ch17/raw/CH17-P03_3.webp",
+            "generated/ch17/raw/CH17-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "版本库底层：索引卡与更正赛跑",
+          "final": "output/ch17/page-04.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P04_1.webp",
+            "generated/ch17/raw/CH17-P04_2.webp",
+            "generated/ch17/raw/CH17-P04_3.webp",
+            "generated/ch17/raw/CH17-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "早餐小票条目：互斥双日期",
+          "final": "output/ch17/page-05.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P05_1.webp",
+            "generated/ch17/raw/CH17-P05_2.webp",
+            "generated/ch17/raw/CH17-P05_3.webp",
+            "generated/ch17/raw/CH17-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "三份地图互斥：别合并；不问真，问运行",
+          "final": "output/ch17/page-06.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P06_1.webp",
+            "generated/ch17/raw/CH17-P06_2.webp",
+            "generated/ch17/raw/CH17-P06_3.webp",
+            "generated/ch17/raw/CH17-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "底层索引卡：请勿合并；◦◦；对账；只读警告",
+          "final": "output/ch17/page-07.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P07_1.webp",
+            "generated/ch17/raw/CH17-P07_2.webp",
+            "generated/ch17/raw/CH17-P07_3.webp",
+            "generated/ch17/raw/CH17-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "制造成本：口袋别太轻 + 插页文件B-18",
+          "final": "output/ch17/page-08.webp",
+          "candidates": [
+            "generated/ch17/raw/CH17-P08_1.webp",
+            "generated/ch17/raw/CH17-P08_2.webp",
+            "generated/ch17/raw/CH17-P08_3.webp",
+            "generated/ch17/raw/CH17-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch18",
+      "title": "CH18",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "进门先看眼睛：你看得更用力了",
+          "final": "output/ch18/page-01.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P01_1.webp",
+            "generated/ch18/raw/CH18-P01_2.webp",
+            "generated/ch18/raw/CH18-P01_3.webp",
+            "generated/ch18/raw/CH18-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "告知书抬头：稳定疗程告知书（试行）/ 降低解释成本",
+          "final": "output/ch18/page-02.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P02_1.webp",
+            "generated/ch18/raw/CH18-P02_2.webp",
+            "generated/ch18/raw/CH18-P02_3.webp",
+            "generated/ch18/raw/CH18-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "疗程是什么：对齐 / 把不一致压平 / 让人轻松一点",
+          "final": "output/ch18/page-03.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P03_1.webp",
+            "generated/ch18/raw/CH18-P03_2.webp",
+            "generated/ch18/raw/CH18-P03_3.webp",
+            "generated/ch18/raw/CH18-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "代价：口袋里的纸可能变空白 / 手写：轻松不是唯一目标",
+          "final": "output/ch18/page-04.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P04_1.webp",
+            "generated/ch18/raw/CH18-P04_2.webp",
+            "generated/ch18/raw/CH18-P04_3.webp",
+            "generated/ch18/raw/CH18-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "备注栏是最小伤口 / 很多人撑不住 / 被抹掉也许是一部分",
+          "final": "output/ch18/page-05.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P05_1.webp",
+            "generated/ch18/raw/CH18-P05_2.webp",
+            "generated/ch18/raw/CH18-P05_3.webp",
+            "generated/ch18/raw/CH18-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "选择与后果：不代表善恶 / 承担哪种累（插页 B-19）",
+          "final": "output/ch18/page-06.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P06_1.webp",
+            "generated/ch18/raw/CH18-P06_2.webp",
+            "generated/ch18/raw/CH18-P06_3.webp",
+            "generated/ch18/raw/CH18-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "不签：夹进差异卡 / 留下就别偷懒",
+          "final": "output/ch18/page-07.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P07_1.webp",
+            "generated/ch18/raw/CH18-P07_2.webp",
+            "generated/ch18/raw/CH18-P07_3.webp",
+            "generated/ch18/raw/CH18-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "离开：你又多了一张 / 太轻的人会消失得很快（插页 A-15）",
+          "final": "output/ch18/page-08.webp",
+          "candidates": [
+            "generated/ch18/raw/CH18-P08_1.webp",
+            "generated/ch18/raw/CH18-P08_2.webp",
+            "generated/ch18/raw/CH18-P08_3.webp",
+            "generated/ch18/raw/CH18-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch19",
+      "title": "CH19",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "礼堂街更暗：岑回不打开终端",
+          "final": "output/ch19/page-01.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P01_1.webp",
+            "generated/ch19/raw/CH19-P01_2.webp",
+            "generated/ch19/raw/CH19-P01_3.webp",
+            "generated/ch19/raw/CH19-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "刻度点：◦ 折痕；◦◦ 对账",
+          "final": "output/ch19/page-02.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P02_1.webp",
+            "generated/ch19/raw/CH19-P02_2.webp",
+            "generated/ch19/raw/CH19-P02_3.webp",
+            "generated/ch19/raw/CH19-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "第三个点：◦◦◦ 不可合并；点是删法的反面",
+          "final": "output/ch19/page-03.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P03_1.webp",
+            "generated/ch19/raw/CH19-P03_2.webp",
+            "generated/ch19/raw/CH19-P03_3.webp",
+            "generated/ch19/raw/CH19-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "祷文四行：尺度不问你累不累",
+          "final": "output/ch19/page-04.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P04_1.webp",
+            "generated/ch19/raw/CH19-P04_2.webp",
+            "generated/ch19/raw/CH19-P04_3.webp",
+            "generated/ch19/raw/CH19-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "递抄本：◦◦◦；带着但别用来解释",
+          "final": "output/ch19/page-05.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P05_1.webp",
+            "generated/ch19/raw/CH19-P05_2.webp",
+            "generated/ch19/raw/CH19-P05_3.webp",
+            "generated/ch19/raw/CH19-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "疗程之问：反对太轻；在抹之前让它多花一次力气",
+          "final": "output/ch19/page-06.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P06_1.webp",
+            "generated/ch19/raw/CH19-P06_2.webp",
+            "generated/ch19/raw/CH19-P06_3.webp",
+            "generated/ch19/raw/CH19-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "同一件事：让删法付出动作；别急着胜利",
+          "final": "output/ch19/page-07.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P07_1.webp",
+            "generated/ch19/raw/CH19-P07_2.webp",
+            "generated/ch19/raw/CH19-P07_3.webp",
+            "generated/ch19/raw/CH19-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "插页A-16：祷文抄本-06（刻度点版）+ 页脚小字",
+          "final": "output/ch19/page-08.webp",
+          "candidates": [
+            "generated/ch19/raw/CH19-P08_1.webp",
+            "generated/ch19/raw/CH19-P08_2.webp",
+            "generated/ch19/raw/CH19-P08_3.webp",
+            "generated/ch19/raw/CH19-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch20",
+      "title": "CH20",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "小院空地：被删掉的东西",
+          "final": "output/ch20/page-01.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P01_1.webp",
+            "generated/ch20/raw/CH20-P01_2.webp",
+            "generated/ch20/raw/CH20-P01_3.webp",
+            "generated/ch20/raw/CH20-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "开启深度视野：椅子骨架浮现",
+          "final": "output/ch20/page-02.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P02_1.webp",
+            "generated/ch20/raw/CH20-P02_2.webp",
+            "generated/ch20/raw/CH20-P02_3.webp",
+            "generated/ch20/raw/CH20-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "菜篮子放在“空地”上：没有掉下去",
+          "final": "output/ch20/page-03.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P03_1.webp",
+            "generated/ch20/raw/CH20-P03_2.webp",
+            "generated/ch20/raw/CH20-P03_3.webp",
+            "generated/ch20/raw/CH20-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "坐在空气上：椅子在深度里存在",
+          "final": "output/ch20/page-04.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P04_1.webp",
+            "generated/ch20/raw/CH20-P04_2.webp",
+            "generated/ch20/raw/CH20-P04_3.webp",
+            "generated/ch20/raw/CH20-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "小孩绊倒与“吞句”：放着什么？",
+          "final": "output/ch20/page-05.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P05_1.webp",
+            "generated/ch20/raw/CH20-P05_2.webp",
+            "generated/ch20/raw/CH20-P05_3.webp",
+            "generated/ch20/raw/CH20-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "写下差异卡：同一处 / 空椅",
+          "final": "output/ch20/page-06.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P06_1.webp",
+            "generated/ch20/raw/CH20-P06_2.webp",
+            "generated/ch20/raw/CH20-P06_3.webp",
+            "generated/ch20/raw/CH20-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "想拍快照又停住：条目→队列→结算",
+          "final": "output/ch20/page-07.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P07_1.webp",
+            "generated/ch20/raw/CH20-P07_2.webp",
+            "generated/ch20/raw/CH20-P07_3.webp",
+            "generated/ch20/raw/CH20-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "轻请求与成本：插页B-20《空椅观测记录-02》",
+          "final": "output/ch20/page-08.webp",
+          "candidates": [
+            "generated/ch20/raw/CH20-P08_1.webp",
+            "generated/ch20/raw/CH20-P08_2.webp",
+            "generated/ch20/raw/CH20-P08_3.webp",
+            "generated/ch20/raw/CH20-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch21",
+      "title": "CH21",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "口袋像抽屉：互斥证据累积",
+          "final": "output/ch21/page-01.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P01_1.webp",
+            "generated/ch21/raw/CH21-P01_2.webp",
+            "generated/ch21/raw/CH21-P01_3.webp",
+            "generated/ch21/raw/CH21-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "走廊纸队列外溢：更正牌子“结算延迟属正常现象”",
+          "final": "output/ch21/page-02.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P02_1.webp",
+            "generated/ch21/raw/CH21-P02_2.webp",
+            "generated/ch21/raw/CH21-P02_3.webp",
+            "generated/ch21/raw/CH21-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "顾临：你做了写在底层的事；不监控只看结果",
+          "final": "output/ch21/page-03.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P03_1.webp",
+            "generated/ch21/raw/CH21-P03_2.webp",
+            "generated/ch21/raw/CH21-P03_3.webp",
+            "generated/ch21/raw/CH21-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "队列新增12：互斥证据未合并；你们希望我合并",
+          "final": "output/ch21/page-04.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P04_1.webp",
+            "generated/ch21/raw/CH21-P04_2.webp",
+            "generated/ch21/raw/CH21-P04_3.webp",
+            "generated/ch21/raw/CH21-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "因为只读已经不够了：必须处理，避免事故",
+          "final": "output/ch21/page-05.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P05_1.webp",
+            "generated/ch21/raw/CH21-P05_2.webp",
+            "generated/ch21/raw/CH21-P05_3.webp",
+            "generated/ch21/raw/CH21-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "《例外许可》：深度介入（写入）与代价（永久补丁痕迹）",
+          "final": "output/ch21/page-06.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P06_1.webp",
+            "generated/ch21/raw/CH21-P06_2.webp",
+            "generated/ch21/raw/CH21-P06_3.webp",
+            "generated/ch21/raw/CH21-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "为什么选我：你已在复走；字段：＿（空格占位）",
+          "final": "output/ch21/page-07.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P07_1.webp",
+            "generated/ch21/raw/CH21-P07_2.webp",
+            "generated/ch21/raw/CH21-P07_3.webp",
+            "generated/ch21/raw/CH21-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "签下许可：授权卡“深度介入（写入）/永久伤痕/结算方式待定” + 插页C-01",
+          "final": "output/ch21/page-08.webp",
+          "candidates": [
+            "generated/ch21/raw/CH21-P08_1.webp",
+            "generated/ch21/raw/CH21-P08_2.webp",
+            "generated/ch21/raw/CH21-P08_3.webp",
+            "generated/ch21/raw/CH21-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch22",
+      "title": "CH22",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "救援请求：断口西段·不可撤离",
+          "final": "output/ch22/page-01.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P01_1.webp",
+            "generated/ch22/raw/CH22-P01_2.webp",
+            "generated/ch22/raw/CH22-P01_3.webp",
+            "generated/ch22/raw/CH22-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "封锁线人群：顾临站在线内却不跨线",
+          "final": "output/ch22/page-02.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P02_1.webp",
+            "generated/ch22/raw/CH22-P02_2.webp",
+            "generated/ch22/raw/CH22-P02_3.webp",
+            "generated/ch22/raw/CH22-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "表层实/深度空：空洞与回弹层",
+          "final": "output/ch22/page-03.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P03_1.webp",
+            "generated/ch22/raw/CH22-P03_2.webp",
+            "generated/ch22/raw/CH22-P03_3.webp",
+            "generated/ch22/raw/CH22-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "绳子不成立：只写一小段边界；“有人吗——”",
+          "final": "output/ch22/page-04.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P04_1.webp",
+            "generated/ch22/raw/CH22-P04_2.webp",
+            "generated/ch22/raw/CH22-P04_3.webp",
+            "generated/ch22/raw/CH22-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "介入（写入）：细线让绳子成立",
+          "final": "output/ch22/page-05.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P05_1.webp",
+            "generated/ch22/raw/CH22-P05_2.webp",
+            "generated/ch22/raw/CH22-P05_3.webp",
+            "generated/ch22/raw/CH22-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "下！介入保持：12s",
+          "final": "output/ch22/page-06.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P06_1.webp",
+            "generated/ch22/raw/CH22-P06_2.webp",
+            "generated/ch22/raw/CH22-P06_3.webp",
+            "generated/ch22/raw/CH22-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "抓住绳子：拉！从版本缝里出来",
+          "final": "output/ch22/page-07.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P07_1.webp",
+            "generated/ch22/raw/CH22-P07_2.webp",
+            "generated/ch22/raw/CH22-P07_3.webp",
+            "generated/ch22/raw/CH22-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "介入结束：补丁痕迹与插页C-02/C-03（字段：——）",
+          "final": "output/ch22/page-08.webp",
+          "candidates": [
+            "generated/ch22/raw/CH22-P08_1.webp",
+            "generated/ch22/raw/CH22-P08_2.webp",
+            "generated/ch22/raw/CH22-P08_3.webp",
+            "generated/ch22/raw/CH22-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
     }
   ]
 }

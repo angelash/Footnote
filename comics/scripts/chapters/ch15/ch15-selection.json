@@ -1,0 +1,103 @@
+{
+  "chapter": 15,
+  "title": "CH15",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "厚门与提示牌：未经授权禁止进入",
+      "selected": 0,
+      "final": "output/ch15/page-01.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P01_1.webp",
+        "generated/ch15/raw/CH15-P01_2.webp",
+        "generated/ch15/raw/CH15-P01_3.webp",
+        "generated/ch15/raw/CH15-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "室内与边界线：你只看，不碰",
+      "selected": 0,
+      "final": "output/ch15/page-02.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P02_1.webp",
+        "generated/ch15/raw/CH15-P02_2.webp",
+        "generated/ch15/raw/CH15-P02_3.webp",
+        "generated/ch15/raw/CH15-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "冷光与骨架：深度感知（只读）",
+      "selected": 0,
+      "final": "output/ch15/page-03.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P03_1.webp",
+        "generated/ch15/raw/CH15-P03_2.webp",
+        "generated/ch15/raw/CH15-P03_3.webp",
+        "generated/ch15/raw/CH15-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "为什么给我：复走、残差、队列",
+      "selected": 0,
+      "final": "output/ch15/page-04.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P04_1.webp",
+        "generated/ch15/raw/CH15-P04_2.webp",
+        "generated/ch15/raw/CH15-P04_3.webp",
+        "generated/ch15/raw/CH15-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "授权记录：观察可用，写入禁用",
+      "selected": 0,
+      "final": "output/ch15/page-05.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P05_1.webp",
+        "generated/ch15/raw/CH15-P05_2.webp",
+        "generated/ch15/raw/CH15-P05_3.webp",
+        "generated/ch15/raw/CH15-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "离开与克制：先记录",
+      "selected": 0,
+      "final": "output/ch15/page-06.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P06_1.webp",
+        "generated/ch15/raw/CH15-P06_2.webp",
+        "generated/ch15/raw/CH15-P06_3.webp",
+        "generated/ch15/raw/CH15-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "走廊尽头：阿棠说“只读很累”",
+      "selected": 0,
+      "final": "output/ch15/page-07.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P07_1.webp",
+        "generated/ch15/raw/CH15-P07_2.webp",
+        "generated/ch15/raw/CH15-P07_3.webp",
+        "generated/ch15/raw/CH15-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "纸片与插页：对象不存在 / 行为可执行",
+      "selected": 0,
+      "final": "output/ch15/page-08.webp",
+      "candidates": [
+        "generated/ch15/raw/CH15-P08_1.webp",
+        "generated/ch15/raw/CH15-P08_2.webp",
+        "generated/ch15/raw/CH15-P08_3.webp",
+        "generated/ch15/raw/CH15-P08_4.webp"
+      ]
+    }
+  ]
+}

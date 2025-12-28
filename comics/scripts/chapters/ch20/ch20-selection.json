@@ -1,0 +1,103 @@
+{
+  "chapter": 20,
+  "title": "CH20",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "小院空地：被删掉的东西",
+      "selected": 0,
+      "final": "output/ch20/page-01.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P01_1.webp",
+        "generated/ch20/raw/CH20-P01_2.webp",
+        "generated/ch20/raw/CH20-P01_3.webp",
+        "generated/ch20/raw/CH20-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "开启深度视野：椅子骨架浮现",
+      "selected": 0,
+      "final": "output/ch20/page-02.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P02_1.webp",
+        "generated/ch20/raw/CH20-P02_2.webp",
+        "generated/ch20/raw/CH20-P02_3.webp",
+        "generated/ch20/raw/CH20-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "菜篮子放在“空地”上：没有掉下去",
+      "selected": 0,
+      "final": "output/ch20/page-03.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P03_1.webp",
+        "generated/ch20/raw/CH20-P03_2.webp",
+        "generated/ch20/raw/CH20-P03_3.webp",
+        "generated/ch20/raw/CH20-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "坐在空气上：椅子在深度里存在",
+      "selected": 0,
+      "final": "output/ch20/page-04.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P04_1.webp",
+        "generated/ch20/raw/CH20-P04_2.webp",
+        "generated/ch20/raw/CH20-P04_3.webp",
+        "generated/ch20/raw/CH20-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "小孩绊倒与“吞句”：放着什么？",
+      "selected": 0,
+      "final": "output/ch20/page-05.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P05_1.webp",
+        "generated/ch20/raw/CH20-P05_2.webp",
+        "generated/ch20/raw/CH20-P05_3.webp",
+        "generated/ch20/raw/CH20-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "写下差异卡：同一处 / 空椅",
+      "selected": 0,
+      "final": "output/ch20/page-06.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P06_1.webp",
+        "generated/ch20/raw/CH20-P06_2.webp",
+        "generated/ch20/raw/CH20-P06_3.webp",
+        "generated/ch20/raw/CH20-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "想拍快照又停住：条目→队列→结算",
+      "selected": 0,
+      "final": "output/ch20/page-07.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P07_1.webp",
+        "generated/ch20/raw/CH20-P07_2.webp",
+        "generated/ch20/raw/CH20-P07_3.webp",
+        "generated/ch20/raw/CH20-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "轻请求与成本：插页B-20《空椅观测记录-02》",
+      "selected": 0,
+      "final": "output/ch20/page-08.webp",
+      "candidates": [
+        "generated/ch20/raw/CH20-P08_1.webp",
+        "generated/ch20/raw/CH20-P08_2.webp",
+        "generated/ch20/raw/CH20-P08_3.webp",
+        "generated/ch20/raw/CH20-P08_4.webp"
+      ]
+    }
+  ]
+}

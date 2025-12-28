@@ -1,0 +1,103 @@
+{
+  "chapter": 17,
+  "title": "CH17",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "后巷阴影：你看了",
+      "selected": 0,
+      "final": "output/ch17/page-01.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P01_1.webp",
+        "generated/ch17/raw/CH17-P01_2.webp",
+        "generated/ch17/raw/CH17-P01_3.webp",
+        "generated/ch17/raw/CH17-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "无牌门与封条：已封存",
+      "selected": 0,
+      "final": "output/ch17/page-02.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P02_1.webp",
+        "generated/ch17/raw/CH17-P02_2.webp",
+        "generated/ch17/raw/CH17-P02_3.webp",
+        "generated/ch17/raw/CH17-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "地下室：旧纸味与抽屉标签",
+      "selected": 0,
+      "final": "output/ch17/page-03.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P03_1.webp",
+        "generated/ch17/raw/CH17-P03_2.webp",
+        "generated/ch17/raw/CH17-P03_3.webp",
+        "generated/ch17/raw/CH17-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "版本库底层：索引卡与更正赛跑",
+      "selected": 0,
+      "final": "output/ch17/page-04.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P04_1.webp",
+        "generated/ch17/raw/CH17-P04_2.webp",
+        "generated/ch17/raw/CH17-P04_3.webp",
+        "generated/ch17/raw/CH17-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "早餐小票条目：互斥双日期",
+      "selected": 0,
+      "final": "output/ch17/page-05.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P05_1.webp",
+        "generated/ch17/raw/CH17-P05_2.webp",
+        "generated/ch17/raw/CH17-P05_3.webp",
+        "generated/ch17/raw/CH17-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "三份地图互斥：别合并；不问真，问运行",
+      "selected": 0,
+      "final": "output/ch17/page-06.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P06_1.webp",
+        "generated/ch17/raw/CH17-P06_2.webp",
+        "generated/ch17/raw/CH17-P06_3.webp",
+        "generated/ch17/raw/CH17-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "底层索引卡：请勿合并；◦◦；对账；只读警告",
+      "selected": 0,
+      "final": "output/ch17/page-07.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P07_1.webp",
+        "generated/ch17/raw/CH17-P07_2.webp",
+        "generated/ch17/raw/CH17-P07_3.webp",
+        "generated/ch17/raw/CH17-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "制造成本：口袋别太轻 + 插页文件B-18",
+      "selected": 0,
+      "final": "output/ch17/page-08.webp",
+      "candidates": [
+        "generated/ch17/raw/CH17-P08_1.webp",
+        "generated/ch17/raw/CH17-P08_2.webp",
+        "generated/ch17/raw/CH17-P08_3.webp",
+        "generated/ch17/raw/CH17-P08_4.webp"
+      ]
+    }
+  ]
+}

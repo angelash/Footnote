@@ -1,0 +1,103 @@
+{
+  "chapter": 19,
+  "title": "CH19",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "礼堂街更暗：岑回不打开终端",
+      "selected": 0,
+      "final": "output/ch19/page-01.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P01_1.webp",
+        "generated/ch19/raw/CH19-P01_2.webp",
+        "generated/ch19/raw/CH19-P01_3.webp",
+        "generated/ch19/raw/CH19-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "刻度点：◦ 折痕；◦◦ 对账",
+      "selected": 0,
+      "final": "output/ch19/page-02.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P02_1.webp",
+        "generated/ch19/raw/CH19-P02_2.webp",
+        "generated/ch19/raw/CH19-P02_3.webp",
+        "generated/ch19/raw/CH19-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "第三个点：◦◦◦ 不可合并；点是删法的反面",
+      "selected": 0,
+      "final": "output/ch19/page-03.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P03_1.webp",
+        "generated/ch19/raw/CH19-P03_2.webp",
+        "generated/ch19/raw/CH19-P03_3.webp",
+        "generated/ch19/raw/CH19-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "祷文四行：尺度不问你累不累",
+      "selected": 0,
+      "final": "output/ch19/page-04.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P04_1.webp",
+        "generated/ch19/raw/CH19-P04_2.webp",
+        "generated/ch19/raw/CH19-P04_3.webp",
+        "generated/ch19/raw/CH19-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "递抄本：◦◦◦；带着但别用来解释",
+      "selected": 0,
+      "final": "output/ch19/page-05.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P05_1.webp",
+        "generated/ch19/raw/CH19-P05_2.webp",
+        "generated/ch19/raw/CH19-P05_3.webp",
+        "generated/ch19/raw/CH19-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "疗程之问：反对太轻；在抹之前让它多花一次力气",
+      "selected": 0,
+      "final": "output/ch19/page-06.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P06_1.webp",
+        "generated/ch19/raw/CH19-P06_2.webp",
+        "generated/ch19/raw/CH19-P06_3.webp",
+        "generated/ch19/raw/CH19-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "同一件事：让删法付出动作；别急着胜利",
+      "selected": 0,
+      "final": "output/ch19/page-07.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P07_1.webp",
+        "generated/ch19/raw/CH19-P07_2.webp",
+        "generated/ch19/raw/CH19-P07_3.webp",
+        "generated/ch19/raw/CH19-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "插页A-16：祷文抄本-06（刻度点版）+ 页脚小字",
+      "selected": 0,
+      "final": "output/ch19/page-08.webp",
+      "candidates": [
+        "generated/ch19/raw/CH19-P08_1.webp",
+        "generated/ch19/raw/CH19-P08_2.webp",
+        "generated/ch19/raw/CH19-P08_3.webp",
+        "generated/ch19/raw/CH19-P08_4.webp"
+      ]
+    }
+  ]
+}

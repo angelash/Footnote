@@ -1,0 +1,12 @@
+# CH23《旧灯芯》生成URL记录（Phase 3）
+
+## 说明
+- 每页 4 条 URL
+- 以截图确认完成（不看进度条）
+
+## P01
+
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766916750274_c6d29faa-60ac-4012-b0ee-a9b06c9eb70a_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766916746068_c284b472-da5d-445f-97a1-9f7e335c37cf_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766916753552_edbd7699-474e-4558-8ddb-3f5d63464320_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766916745750_4b83e58f-9bd1-45a0-85b9-ebcb5aec78a9_small.webp

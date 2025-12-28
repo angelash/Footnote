@@ -1,0 +1,53 @@
+# CH16《骨架线》生成URL记录（Phase 3）
+
+## 说明
+- 每页 4 条 URL
+- 以截图确认完成（不看进度条）
+
+## P01
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908775413_2dc2d67b-96f3-41db-b407-dd3117c8f4d6_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908778072_e2fd1bff-69c0-40bf-987c-03bfec2828ec_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908775662_b133a24e-c315-455a-816e-1d3087c22bc0_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908776098_15b1f318-ee34-4a19-b545-db31c3710363_small.webp
+
+## P02
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908886724_3b83fc25-c3c0-4fb3-9685-65c6b0df1313_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908888753_0d67bcda-07b7-4036-9948-1fcd0e4983a2_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908887248_976348b5-80b4-427e-b1a9-3bcb8cb69957_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908887384_10146830-4608-4e6f-99a6-e136ad6a2387_small.webp
+
+## P03
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908975088_9b8dc22a-831f-4e30-b56c-4c1a9126d937_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908976593_d0bc57fd-100e-4db7-80cf-12aeaf293ed2_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908977447_8ea95d12-8035-4d0c-965f-4b5fb0dcf438_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766908978740_d3586cdb-6a94-4f62-952e-013df11fef95_small.webp
+
+## P04
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909064901_c0947089-26b7-422f-9b10-0c0d9b414f0d_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909065980_f7022359-5783-49d5-9036-512872d5e440_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909066604_bcca0478-8b75-4519-8ced-2ca21dba0425_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909067958_503549fc-b943-4b6e-a920-b39fefa3e52b_small.webp
+
+## P05
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909186613_c0b07d31-d955-4602-b13e-a149b51d2832_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909186836_199ab799-2576-41d5-93f6-81fa7356faa8_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909186883_0f8046aa-78a4-4bc8-b9b1-fa6c9bb3de42_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909188940_883e1e22-9af3-4fdc-818a-5a64b6877701_small.webp
+
+## P06
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909325573_297b6537-24f5-46fb-aa77-1f70a35438a8_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909325961_fd5ecdfe-6890-4b4a-a20f-4471b0aba4e3_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909326598_09b1da11-106b-4aa7-b24a-e93ee0e58468_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909328855_f879da42-4753-4594-95ed-9e150d4c45f5_small.webp
+
+## P07
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909407116_4b7d58be-d735-43e5-9ff9-ca6c6616fedd_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909407652_9f1cdc71-a158-4976-a294-748b2ec4b918_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909409514_755d65ee-c809-46c7-a306-5da3c7c43155_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909411778_58b315d8-4712-41f2-bac7-a8a94694e043_small.webp
+
+## P08
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909485560_041db9ae-2209-426e-bd91-deb7a2ee54d7_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909487702_bfd8afa5-21b0-4c50-86fa-17d75ddaf817_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909488872_57c856e8-f986-4d4f-8889-ee385cf61f84_small.webp
+https://artflow.gz4399.com/cosres/apps-ai-tools/nextimage/storage_out/user_130/1766909492512_f3387cc4-1421-4687-8422-33d3778753ab_small.webp

@@ -1,0 +1,103 @@
+{
+  "chapter": 16,
+  "title": "CH16",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "薄墙更白：授权记录更硬，警告回响",
+      "selected": 0,
+      "final": "output/ch16/page-01.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P01_1.webp",
+        "generated/ch16/raw/CH16-P01_2.webp",
+        "generated/ch16/raw/CH16-P01_3.webp",
+        "generated/ch16/raw/CH16-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "冷光：深度视野开启",
+      "selected": 0,
+      "final": "output/ch16/page-02.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P02_1.webp",
+        "generated/ch16/raw/CH16-P02_2.webp",
+        "generated/ch16/raw/CH16-P02_3.webp",
+        "generated/ch16/raw/CH16-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "骨架线：不均匀的线框",
+      "selected": 0,
+      "final": "output/ch16/page-03.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P03_1.webp",
+        "generated/ch16/raw/CH16-P03_2.webp",
+        "generated/ch16/raw/CH16-P03_3.webp",
+        "generated/ch16/raw/CH16-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "最刺眼的空：近乎矩形的门框影子",
+      "selected": 0,
+      "final": "output/ch16/page-04.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P04_1.webp",
+        "generated/ch16/raw/CH16-P04_2.webp",
+        "generated/ch16/raw/CH16-P04_3.webp",
+        "generated/ch16/raw/CH16-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "只读 / 观察：建议降低观察频率",
+      "selected": 0,
+      "final": "output/ch16/page-05.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P05_1.webp",
+        "generated/ch16/raw/CH16-P05_2.webp",
+        "generated/ch16/raw/CH16-P05_3.webp",
+        "generated/ch16/raw/CH16-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "回声：别碰 / 别替它更正",
+      "selected": 0,
+      "final": "output/ch16/page-06.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P06_1.webp",
+        "generated/ch16/raw/CH16-P06_2.webp",
+        "generated/ch16/raw/CH16-P06_3.webp",
+        "generated/ch16/raw/CH16-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "差异卡：写得太满→改成更干的词",
+      "selected": 0,
+      "final": "output/ch16/page-07.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P07_1.webp",
+        "generated/ch16/raw/CH16-P07_2.webp",
+        "generated/ch16/raw/CH16-P07_3.webp",
+        "generated/ch16/raw/CH16-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "快照与覆盖：状态：正常（已更正）＋插页文件B-17",
+      "selected": 0,
+      "final": "output/ch16/page-08.webp",
+      "candidates": [
+        "generated/ch16/raw/CH16-P08_1.webp",
+        "generated/ch16/raw/CH16-P08_2.webp",
+        "generated/ch16/raw/CH16-P08_3.webp",
+        "generated/ch16/raw/CH16-P08_4.webp"
+      ]
+    }
+  ]
+}

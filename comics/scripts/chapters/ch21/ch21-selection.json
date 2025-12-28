@@ -1,0 +1,103 @@
+{
+  "chapter": 21,
+  "title": "CH21",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "口袋像抽屉：互斥证据累积",
+      "selected": 0,
+      "final": "output/ch21/page-01.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P01_1.webp",
+        "generated/ch21/raw/CH21-P01_2.webp",
+        "generated/ch21/raw/CH21-P01_3.webp",
+        "generated/ch21/raw/CH21-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "走廊纸队列外溢：更正牌子“结算延迟属正常现象”",
+      "selected": 0,
+      "final": "output/ch21/page-02.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P02_1.webp",
+        "generated/ch21/raw/CH21-P02_2.webp",
+        "generated/ch21/raw/CH21-P02_3.webp",
+        "generated/ch21/raw/CH21-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "顾临：你做了写在底层的事；不监控只看结果",
+      "selected": 0,
+      "final": "output/ch21/page-03.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P03_1.webp",
+        "generated/ch21/raw/CH21-P03_2.webp",
+        "generated/ch21/raw/CH21-P03_3.webp",
+        "generated/ch21/raw/CH21-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "队列新增12：互斥证据未合并；你们希望我合并",
+      "selected": 0,
+      "final": "output/ch21/page-04.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P04_1.webp",
+        "generated/ch21/raw/CH21-P04_2.webp",
+        "generated/ch21/raw/CH21-P04_3.webp",
+        "generated/ch21/raw/CH21-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "因为只读已经不够了：必须处理，避免事故",
+      "selected": 0,
+      "final": "output/ch21/page-05.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P05_1.webp",
+        "generated/ch21/raw/CH21-P05_2.webp",
+        "generated/ch21/raw/CH21-P05_3.webp",
+        "generated/ch21/raw/CH21-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "《例外许可》：深度介入（写入）与代价（永久补丁痕迹）",
+      "selected": 0,
+      "final": "output/ch21/page-06.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P06_1.webp",
+        "generated/ch21/raw/CH21-P06_2.webp",
+        "generated/ch21/raw/CH21-P06_3.webp",
+        "generated/ch21/raw/CH21-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "为什么选我：你已在复走；字段：＿（空格占位）",
+      "selected": 0,
+      "final": "output/ch21/page-07.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P07_1.webp",
+        "generated/ch21/raw/CH21-P07_2.webp",
+        "generated/ch21/raw/CH21-P07_3.webp",
+        "generated/ch21/raw/CH21-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "签下许可：授权卡“深度介入（写入）/永久伤痕/结算方式待定” + 插页C-01",
+      "selected": 0,
+      "final": "output/ch21/page-08.webp",
+      "candidates": [
+        "generated/ch21/raw/CH21-P08_1.webp",
+        "generated/ch21/raw/CH21-P08_2.webp",
+        "generated/ch21/raw/CH21-P08_3.webp",
+        "generated/ch21/raw/CH21-P08_4.webp"
+      ]
+    }
+  ]
+}

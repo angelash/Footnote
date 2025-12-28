@@ -1,0 +1,103 @@
+{
+  "chapter": 18,
+  "title": "CH18",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "进门先看眼睛：你看得更用力了",
+      "selected": 0,
+      "final": "output/ch18/page-01.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P01_1.webp",
+        "generated/ch18/raw/CH18-P01_2.webp",
+        "generated/ch18/raw/CH18-P01_3.webp",
+        "generated/ch18/raw/CH18-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "告知书抬头：稳定疗程告知书（试行）/ 降低解释成本",
+      "selected": 0,
+      "final": "output/ch18/page-02.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P02_1.webp",
+        "generated/ch18/raw/CH18-P02_2.webp",
+        "generated/ch18/raw/CH18-P02_3.webp",
+        "generated/ch18/raw/CH18-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "疗程是什么：对齐 / 把不一致压平 / 让人轻松一点",
+      "selected": 0,
+      "final": "output/ch18/page-03.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P03_1.webp",
+        "generated/ch18/raw/CH18-P03_2.webp",
+        "generated/ch18/raw/CH18-P03_3.webp",
+        "generated/ch18/raw/CH18-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "代价：口袋里的纸可能变空白 / 手写：轻松不是唯一目标",
+      "selected": 0,
+      "final": "output/ch18/page-04.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P04_1.webp",
+        "generated/ch18/raw/CH18-P04_2.webp",
+        "generated/ch18/raw/CH18-P04_3.webp",
+        "generated/ch18/raw/CH18-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "备注栏是最小伤口 / 很多人撑不住 / 被抹掉也许是一部分",
+      "selected": 0,
+      "final": "output/ch18/page-05.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P05_1.webp",
+        "generated/ch18/raw/CH18-P05_2.webp",
+        "generated/ch18/raw/CH18-P05_3.webp",
+        "generated/ch18/raw/CH18-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "选择与后果：不代表善恶 / 承担哪种累（插页 B-19）",
+      "selected": 0,
+      "final": "output/ch18/page-06.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P06_1.webp",
+        "generated/ch18/raw/CH18-P06_2.webp",
+        "generated/ch18/raw/CH18-P06_3.webp",
+        "generated/ch18/raw/CH18-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "不签：夹进差异卡 / 留下就别偷懒",
+      "selected": 0,
+      "final": "output/ch18/page-07.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P07_1.webp",
+        "generated/ch18/raw/CH18-P07_2.webp",
+        "generated/ch18/raw/CH18-P07_3.webp",
+        "generated/ch18/raw/CH18-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "离开：你又多了一张 / 太轻的人会消失得很快（插页 A-15）",
+      "selected": 0,
+      "final": "output/ch18/page-08.webp",
+      "candidates": [
+        "generated/ch18/raw/CH18-P08_1.webp",
+        "generated/ch18/raw/CH18-P08_2.webp",
+        "generated/ch18/raw/CH18-P08_3.webp",
+        "generated/ch18/raw/CH18-P08_4.webp"
+      ]
+    }
+  ]
+}

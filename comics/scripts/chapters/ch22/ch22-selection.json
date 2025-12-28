@@ -1,0 +1,103 @@
+{
+  "chapter": 22,
+  "title": "CH22",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "救援请求：断口西段·不可撤离",
+      "selected": 0,
+      "final": "output/ch22/page-01.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P01_1.webp",
+        "generated/ch22/raw/CH22-P01_2.webp",
+        "generated/ch22/raw/CH22-P01_3.webp",
+        "generated/ch22/raw/CH22-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "封锁线人群：顾临站在线内却不跨线",
+      "selected": 0,
+      "final": "output/ch22/page-02.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P02_1.webp",
+        "generated/ch22/raw/CH22-P02_2.webp",
+        "generated/ch22/raw/CH22-P02_3.webp",
+        "generated/ch22/raw/CH22-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "表层实/深度空：空洞与回弹层",
+      "selected": 0,
+      "final": "output/ch22/page-03.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P03_1.webp",
+        "generated/ch22/raw/CH22-P03_2.webp",
+        "generated/ch22/raw/CH22-P03_3.webp",
+        "generated/ch22/raw/CH22-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "绳子不成立：只写一小段边界；“有人吗——”",
+      "selected": 0,
+      "final": "output/ch22/page-04.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P04_1.webp",
+        "generated/ch22/raw/CH22-P04_2.webp",
+        "generated/ch22/raw/CH22-P04_3.webp",
+        "generated/ch22/raw/CH22-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "介入（写入）：细线让绳子成立",
+      "selected": 0,
+      "final": "output/ch22/page-05.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P05_1.webp",
+        "generated/ch22/raw/CH22-P05_2.webp",
+        "generated/ch22/raw/CH22-P05_3.webp",
+        "generated/ch22/raw/CH22-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "下！介入保持：12s",
+      "selected": 0,
+      "final": "output/ch22/page-06.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P06_1.webp",
+        "generated/ch22/raw/CH22-P06_2.webp",
+        "generated/ch22/raw/CH22-P06_3.webp",
+        "generated/ch22/raw/CH22-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "抓住绳子：拉！从版本缝里出来",
+      "selected": 0,
+      "final": "output/ch22/page-07.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P07_1.webp",
+        "generated/ch22/raw/CH22-P07_2.webp",
+        "generated/ch22/raw/CH22-P07_3.webp",
+        "generated/ch22/raw/CH22-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "介入结束：补丁痕迹与插页C-02/C-03（字段：——）",
+      "selected": 0,
+      "final": "output/ch22/page-08.webp",
+      "candidates": [
+        "generated/ch22/raw/CH22-P08_1.webp",
+        "generated/ch22/raw/CH22-P08_2.webp",
+        "generated/ch22/raw/CH22-P08_3.webp",
+        "generated/ch22/raw/CH22-P08_4.webp"
+      ]
+    }
+  ]
+}

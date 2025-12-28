@@ -1,0 +1,103 @@
+{
+  "chapter": 12,
+  "title": "CH12",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "清晨返岗（版本 1.4 / 路线既定）",
+      "selected": 0,
+      "final": "output/ch12/page-01.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P01_1.webp",
+        "generated/ch12/raw/CH12-P01_2.webp",
+        "generated/ch12/raw/CH12-P01_3.webp",
+        "generated/ch12/raw/CH12-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "两版本对照（被擦掉的一句）",
+      "selected": 0,
+      "final": "output/ch12/page-02.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P02_1.webp",
+        "generated/ch12/raw/CH12-P02_2.webp",
+        "generated/ch12/raw/CH12-P02_3.webp",
+        "generated/ch12/raw/CH12-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "窗口询问（解释成本）",
+      "selected": 0,
+      "final": "output/ch12/page-03.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P03_1.webp",
+        "generated/ch12/raw/CH12-P03_2.webp",
+        "generated/ch12/raw/CH12-P03_3.webp",
+        "generated/ch12/raw/CH12-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "公共屏溢出（纠偏队列 Q-██-17）",
+      "selected": 0,
+      "final": "output/ch12/page-04.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P04_1.webp",
+        "generated/ch12/raw/CH12-P04_2.webp",
+        "generated/ch12/raw/CH12-P04_3.webp",
+        "generated/ch12/raw/CH12-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "宋岚在阴影里（别盯太久 / 我在差异里）",
+      "selected": 0,
+      "final": "output/ch12/page-05.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P05_1.webp",
+        "generated/ch12/raw/CH12-P05_2.webp",
+        "generated/ch12/raw/CH12-P05_3.webp",
+        "generated/ch12/raw/CH12-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "差异卡（别写进终端）",
+      "selected": 0,
+      "final": "output/ch12/page-06.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P06_1.webp",
+        "generated/ch12/raw/CH12-P06_2.webp",
+        "generated/ch12/raw/CH12-P06_3.webp",
+        "generated/ch12/raw/CH12-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "少解释多对比（别合成一份）",
+      "selected": 0,
+      "final": "output/ch12/page-07.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P07_1.webp",
+        "generated/ch12/raw/CH12-P07_2.webp",
+        "generated/ch12/raw/CH12-P07_3.webp",
+        "generated/ch12/raw/CH12-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "让它难删（我先留下）",
+      "selected": 0,
+      "final": "output/ch12/page-08.webp",
+      "candidates": [
+        "generated/ch12/raw/CH12-P08_1.webp",
+        "generated/ch12/raw/CH12-P08_2.webp",
+        "generated/ch12/raw/CH12-P08_3.webp",
+        "generated/ch12/raw/CH12-P08_4.webp"
+      ]
+    }
+  ]
+}

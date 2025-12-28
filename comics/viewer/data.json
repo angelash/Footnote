@@ -393,6 +393,1032 @@
           "selected": 0
         }
       ]
+    },
+    {
+      "id": "ch05",
+      "title": "CH05",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "医疗站：树与稳定宣传画（2x2 四格，竖版 9:16）",
+          "final": "output/ch05/page-01.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P01_1.webp",
+            "generated/ch05/raw/CH05-P01_2.webp",
+            "generated/ch05/raw/CH05-P01_3.webp",
+            "generated/ch05/raw/CH05-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "问卷：字段很多但只为结论（2x2 四格，竖版 9:16）",
+          "final": "output/ch05/page-02.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P02_1.webp",
+            "generated/ch05/raw/CH05-P02_2.webp",
+            "generated/ch05/raw/CH05-P02_3.webp",
+            "generated/ch05/raw/CH05-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "停顿：是否听见不应存在的声音（2x2 四格，竖版 9:16）",
+          "final": "output/ch05/page-03.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P03_1.webp",
+            "generated/ch05/raw/CH05-P03_2.webp",
+            "generated/ch05/raw/CH05-P03_3.webp",
+            "generated/ch05/raw/CH05-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "许澄：你不需要记住每一件事（2x2 四格，竖版 9:16）",
+          "final": "output/ch05/page-04.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P04_1.webp",
+            "generated/ch05/raw/CH05-P04_2.webp",
+            "generated/ch05/raw/CH05-P04_3.webp",
+            "generated/ch05/raw/CH05-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "结论单：稳定（2x2 四格，竖版 9:16）",
+          "final": "output/ch05/page-05.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P05_1.webp",
+            "generated/ch05/raw/CH05-P05_2.webp",
+            "generated/ch05/raw/CH05-P05_3.webp",
+            "generated/ch05/raw/CH05-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "角落的声音：你今天像昨天（2x2 四格，竖版 9:16）",
+          "final": "output/ch05/page-06.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P06_1.webp",
+            "generated/ch05/raw/CH05-P06_2.webp",
+            "generated/ch05/raw/CH05-P06_3.webp",
+            "generated/ch05/raw/CH05-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "边界：别吓人 / 对日期不敏感（2x2 四格，竖版 9:16）",
+          "final": "output/ch05/page-07.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P07_1.webp",
+            "generated/ch05/raw/CH05-P07_2.webp",
+            "generated/ch05/raw/CH05-P07_3.webp",
+            "generated/ch05/raw/CH05-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "插页文件：A-09 结论单 / B-06 碎片日记（文件页占满画面，竖版 9:16）",
+          "final": "output/ch05/page-08.webp",
+          "candidates": [
+            "generated/ch05/raw/CH05-P08_1.webp",
+            "generated/ch05/raw/CH05-P08_2.webp",
+            "generated/ch05/raw/CH05-P08_3.webp",
+            "generated/ch05/raw/CH05-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch06",
+      "title": "CH06",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "礼堂街：暗灯与旧灯（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-01.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P01_1.webp",
+            "generated/ch06/raw/CH06-P01_2.webp",
+            "generated/ch06/raw/CH06-P01_3.webp",
+            "generated/ch06/raw/CH06-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "礼堂内：尘土与纸味，木椅咯吱（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-02.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P02_1.webp",
+            "generated/ch06/raw/CH06-P02_2.webp",
+            "generated/ch06/raw/CH06-P02_3.webp",
+            "generated/ch06/raw/CH06-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "牧平：风与墨（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-03.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P03_1.webp",
+            "generated/ch06/raw/CH06-P03_2.webp",
+            "generated/ch06/raw/CH06-P03_3.webp",
+            "generated/ch06/raw/CH06-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "墨多纸裂（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-04.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P04_1.webp",
+            "generated/ch06/raw/CH06-P04_2.webp",
+            "generated/ch06/raw/CH06-P04_3.webp",
+            "generated/ch06/raw/CH06-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "写得轻一点（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-05.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P05_1.webp",
+            "generated/ch06/raw/CH06-P05_2.webp",
+            "generated/ch06/raw/CH06-P05_3.webp",
+            "generated/ch06/raw/CH06-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "抄写与折痕（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-06.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P06_1.webp",
+            "generated/ch06/raw/CH06-P06_2.webp",
+            "generated/ch06/raw/CH06-P06_3.webp",
+            "generated/ch06/raw/CH06-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "散场：至少纸不会自动更正（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-07.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P07_1.webp",
+            "generated/ch06/raw/CH06-P07_2.webp",
+            "generated/ch06/raw/CH06-P07_3.webp",
+            "generated/ch06/raw/CH06-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "夜风与插页：祷文抄本-02（2x2 四格，竖版 9:16）",
+          "final": "output/ch06/page-08.webp",
+          "candidates": [
+            "generated/ch06/raw/CH06-P08_1.webp",
+            "generated/ch06/raw/CH06-P08_2.webp",
+            "generated/ch06/raw/CH06-P08_3.webp",
+            "generated/ch06/raw/CH06-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch07",
+      "title": "CH07",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "回到维修局：亮与顺（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-01.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P01_1.webp",
+            "generated/ch07/raw/CH07-P01_2.webp",
+            "generated/ch07/raw/CH07-P01_3.webp",
+            "generated/ch07/raw/CH07-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "字段与已更正（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-02.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P02_1.webp",
+            "generated/ch07/raw/CH07-P02_2.webp",
+            "generated/ch07/raw/CH07-P02_3.webp",
+            "generated/ch07/raw/CH07-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "顾临出现：停一瞬（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-03.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P03_1.webp",
+            "generated/ch07/raw/CH07-P03_2.webp",
+            "generated/ch07/raw/CH07-P03_3.webp",
+            "generated/ch07/raw/CH07-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "备注会长（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-04.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P04_1.webp",
+            "generated/ch07/raw/CH07-P04_2.webp",
+            "generated/ch07/raw/CH07-P04_3.webp",
+            "generated/ch07/raw/CH07-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "阈值的停顿（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-05.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P05_1.webp",
+            "generated/ch07/raw/CH07-P05_2.webp",
+            "generated/ch07/raw/CH07-P05_3.webp",
+            "generated/ch07/raw/CH07-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "任务单：权限收紧（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-06.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P06_1.webp",
+            "generated/ch07/raw/CH07-P06_2.webp",
+            "generated/ch07/raw/CH07-P06_3.webp",
+            "generated/ch07/raw/CH07-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "更正是维护（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-07.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P07_1.webp",
+            "generated/ch07/raw/CH07-P07_2.webp",
+            "generated/ch07/raw/CH07-P07_3.webp",
+            "generated/ch07/raw/CH07-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "出口与插页：路线既定（2x2 四格，竖版 9:16）",
+          "final": "output/ch07/page-08.webp",
+          "candidates": [
+            "generated/ch07/raw/CH07-P08_1.webp",
+            "generated/ch07/raw/CH07-P08_2.webp",
+            "generated/ch07/raw/CH07-P08_3.webp",
+            "generated/ch07/raw/CH07-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch08",
+      "title": "CH08",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "风与通行贴（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-01.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P01_1.webp",
+            "generated/ch08/raw/CH08-P01_2.webp",
+            "generated/ch08/raw/CH08-P01_3.webp",
+            "generated/ch08/raw/CH08-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "封锁线外侧（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-02.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P02_1.webp",
+            "generated/ch08/raw/CH08-P02_2.webp",
+            "generated/ch08/raw/CH08-P02_3.webp",
+            "generated/ch08/raw/CH08-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "校准员与灰线（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-03.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P03_1.webp",
+            "generated/ch08/raw/CH08-P03_2.webp",
+            "generated/ch08/raw/CH08-P03_3.webp",
+            "generated/ch08/raw/CH08-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "裂缝与已记录（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-04.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P04_1.webp",
+            "generated/ch08/raw/CH08-P04_2.webp",
+            "generated/ch08/raw/CH08-P04_3.webp",
+            "generated/ch08/raw/CH08-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "数字最安全（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-05.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P05_1.webp",
+            "generated/ch08/raw/CH08-P05_2.webp",
+            "generated/ch08/raw/CH08-P05_3.webp",
+            "generated/ch08/raw/CH08-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "阴影异常（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-06.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P06_1.webp",
+            "generated/ch08/raw/CH08-P06_2.webp",
+            "generated/ch08/raw/CH08-P06_3.webp",
+            "generated/ch08/raw/CH08-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "客观描述 → 已更正（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-07.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P07_1.webp",
+            "generated/ch08/raw/CH08-P07_2.webp",
+            "generated/ch08/raw/CH08-P07_3.webp",
+            "generated/ch08/raw/CH08-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "撤离与回执（2x2 四格，竖版 9:16）",
+          "final": "output/ch08/page-08.webp",
+          "candidates": [
+            "generated/ch08/raw/CH08-P08_1.webp",
+            "generated/ch08/raw/CH08-P08_2.webp",
+            "generated/ch08/raw/CH08-P08_3.webp",
+            "generated/ch08/raw/CH08-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch09",
+      "title": "CH09",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "绕路（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-01.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P01_1.webp",
+            "generated/ch09/raw/CH09-P01_2.webp",
+            "generated/ch09/raw/CH09-P01_3.webp",
+            "generated/ch09/raw/CH09-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "公告墙（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-02.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P02_1.webp",
+            "generated/ch09/raw/CH09-P02_2.webp",
+            "generated/ch09/raw/CH09-P02_3.webp",
+            "generated/ch09/raw/CH09-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "栖蓝在贴（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-03.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P03_1.webp",
+            "generated/ch09/raw/CH09-P03_2.webp",
+            "generated/ch09/raw/CH09-P03_3.webp",
+            "generated/ch09/raw/CH09-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "没用只是删法（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-04.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P04_1.webp",
+            "generated/ch09/raw/CH09-P04_2.webp",
+            "generated/ch09/raw/CH09-P04_3.webp",
+            "generated/ch09/raw/CH09-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "贴牢一点（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-05.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P05_1.webp",
+            "generated/ch09/raw/CH09-P05_2.webp",
+            "generated/ch09/raw/CH09-P05_3.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "没有字段（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-06.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P06_1.webp",
+            "generated/ch09/raw/CH09-P06_2.webp",
+            "generated/ch09/raw/CH09-P06_3.webp",
+            "generated/ch09/raw/CH09-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "不指望（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-07.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P07_1.webp",
+            "generated/ch09/raw/CH09-P07_2.webp",
+            "generated/ch09/raw/CH09-P07_3.webp",
+            "generated/ch09/raw/CH09-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "修补记录-02（贴图）（2x2 四格，竖版 9:16）",
+          "final": "output/ch09/page-08.webp",
+          "candidates": [
+            "generated/ch09/raw/CH09-P08_1.webp",
+            "generated/ch09/raw/CH09-P08_2.webp",
+            "generated/ch09/raw/CH09-P08_3.webp",
+            "generated/ch09/raw/CH09-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch10",
+      "title": "CH10",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "闸机：路线既定（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-01.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P01_1.webp",
+            "generated/ch10/raw/CH10-P01_2.webp",
+            "generated/ch10/raw/CH10-P01_3.webp",
+            "generated/ch10/raw/CH10-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "提交：已记录（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-02.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P02_1.webp",
+            "generated/ch10/raw/CH10-P02_2.webp",
+            "generated/ch10/raw/CH10-P02_3.webp",
+            "generated/ch10/raw/CH10-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "公告：一致性维护（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-03.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P03_1.webp",
+            "generated/ch10/raw/CH10-P03_2.webp",
+            "generated/ch10/raw/CH10-P03_3.webp",
+            "generated/ch10/raw/CH10-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "身份卡背面：已更正（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-04.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P04_1.webp",
+            "generated/ch10/raw/CH10-P04_2.webp",
+            "generated/ch10/raw/CH10-P04_3.webp",
+            "generated/ch10/raw/CH10-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "身份卡正面：涂改痕（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-05.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P05_1.webp",
+            "generated/ch10/raw/CH10-P05_2.webp",
+            "generated/ch10/raw/CH10-P05_3.webp",
+            "generated/ch10/raw/CH10-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "转角：阿棠出现（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-06.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P06_1.webp",
+            "generated/ch10/raw/CH10-P06_2.webp",
+            "generated/ch10/raw/CH10-P06_3.webp",
+            "generated/ch10/raw/CH10-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "指向：你带回来的东西（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-07.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P07_1.webp",
+            "generated/ch10/raw/CH10-P07_2.webp",
+            "generated/ch10/raw/CH10-P07_3.webp",
+            "generated/ch10/raw/CH10-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "线前：我不是在猜（2x2 四格，竖版 9:16）",
+          "final": "output/ch10/page-08.webp",
+          "candidates": [
+            "generated/ch10/raw/CH10-P08_1.webp",
+            "generated/ch10/raw/CH10-P08_2.webp",
+            "generated/ch10/raw/CH10-P08_3.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch11",
+      "title": "CH11",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "早餐店再来（风铃半响）",
+          "final": "output/ch11/page-01.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P01_1.webp",
+            "generated/ch11/raw/CH11-P01_2.webp",
+            "generated/ch11/raw/CH11-P01_3.webp",
+            "generated/ch11/raw/CH11-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "昨天没来（宋岚两份）",
+          "final": "output/ch11/page-02.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P02_1.webp",
+            "generated/ch11/raw/CH11-P02_2.webp",
+            "generated/ch11/raw/CH11-P02_3.webp",
+            "generated/ch11/raw/CH11-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "口袋里的小票（固定套餐/已完成）",
+          "final": "output/ch11/page-03.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P03_1.webp",
+            "generated/ch11/raw/CH11-P03_2.webp",
+            "generated/ch11/raw/CH11-P03_3.webp",
+            "generated/ch11/raw/CH11-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "不是昨天，是今天（日期小字）",
+          "final": "output/ch11/page-04.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P04_1.webp",
+            "generated/ch11/raw/CH11-P04_2.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "温热纸袋（证明不了冷）",
+          "final": "output/ch11/page-05.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P05_1.webp",
+            "generated/ch11/raw/CH11-P05_2.webp",
+            "generated/ch11/raw/CH11-P05_3.webp",
+            "generated/ch11/raw/CH11-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "街边再看（删掉昨天/贴上今天）",
+          "final": "output/ch11/page-06.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P06_1.webp",
+            "generated/ch11/raw/CH11-P06_2.webp",
+            "generated/ch11/raw/CH11-P06_3.webp",
+            "generated/ch11/raw/CH11-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "公告墙地图还在（留下=成本）",
+          "final": "output/ch11/page-07.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P07_1.webp",
+            "generated/ch11/raw/CH11-P07_2.webp",
+            "generated/ch11/raw/CH11-P07_3.webp",
+            "generated/ch11/raw/CH11-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "走向维修局（路线既定，但不敢保证）",
+          "final": "output/ch11/page-08.webp",
+          "candidates": [
+            "generated/ch11/raw/CH11-P08_1.webp",
+            "generated/ch11/raw/CH11-P08_2.webp",
+            "generated/ch11/raw/CH11-P08_3.webp",
+            "generated/ch11/raw/CH11-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch12",
+      "title": "CH12",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "清晨返岗（版本 1.4 / 路线既定）",
+          "final": "output/ch12/page-01.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P01_1.webp",
+            "generated/ch12/raw/CH12-P01_2.webp",
+            "generated/ch12/raw/CH12-P01_3.webp",
+            "generated/ch12/raw/CH12-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "两版本对照（被擦掉的一句）",
+          "final": "output/ch12/page-02.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P02_1.webp",
+            "generated/ch12/raw/CH12-P02_2.webp",
+            "generated/ch12/raw/CH12-P02_3.webp",
+            "generated/ch12/raw/CH12-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "窗口询问（解释成本）",
+          "final": "output/ch12/page-03.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P03_1.webp",
+            "generated/ch12/raw/CH12-P03_2.webp",
+            "generated/ch12/raw/CH12-P03_3.webp",
+            "generated/ch12/raw/CH12-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "公共屏溢出（纠偏队列 Q-██-17）",
+          "final": "output/ch12/page-04.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P04_1.webp",
+            "generated/ch12/raw/CH12-P04_2.webp",
+            "generated/ch12/raw/CH12-P04_3.webp",
+            "generated/ch12/raw/CH12-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "宋岚在阴影里（别盯太久 / 我在差异里）",
+          "final": "output/ch12/page-05.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P05_1.webp",
+            "generated/ch12/raw/CH12-P05_2.webp",
+            "generated/ch12/raw/CH12-P05_3.webp",
+            "generated/ch12/raw/CH12-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "差异卡（别写进终端）",
+          "final": "output/ch12/page-06.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P06_1.webp",
+            "generated/ch12/raw/CH12-P06_2.webp",
+            "generated/ch12/raw/CH12-P06_3.webp",
+            "generated/ch12/raw/CH12-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "少解释多对比（别合成一份）",
+          "final": "output/ch12/page-07.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P07_1.webp",
+            "generated/ch12/raw/CH12-P07_2.webp",
+            "generated/ch12/raw/CH12-P07_3.webp",
+            "generated/ch12/raw/CH12-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "让它难删（我先留下）",
+          "final": "output/ch12/page-08.webp",
+          "candidates": [
+            "generated/ch12/raw/CH12-P08_1.webp",
+            "generated/ch12/raw/CH12-P08_2.webp",
+            "generated/ch12/raw/CH12-P08_3.webp",
+            "generated/ch12/raw/CH12-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch13",
+      "title": "CH13",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "决定复走（写得很小）",
+          "final": "output/ch13/page-01.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P01_1.webp",
+            "generated/ch13/raw/CH13-P01_2.webp",
+            "generated/ch13/raw/CH13-P01_3.webp",
+            "generated/ch13/raw/CH13-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "第一趟早餐店（07:12）",
+          "final": "output/ch13/page-02.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P02_1.webp",
+            "generated/ch13/raw/CH13-P02_2.webp",
+            "generated/ch13/raw/CH13-P02_3.webp",
+            "generated/ch13/raw/CH13-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "薄墙巷（未触发）",
+          "final": "output/ch13/page-03.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P03_1.webp",
+            "generated/ch13/raw/CH13-P03_2.webp",
+            "generated/ch13/raw/CH13-P03_3.webp",
+            "generated/ch13/raw/CH13-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "第一趟回维修局（路线既定 / Q-██-17）",
+          "final": "output/ch13/page-04.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P04_1.webp",
+            "generated/ch13/raw/CH13-P04_2.webp",
+            "generated/ch13/raw/CH13-P04_3.webp",
+            "generated/ch13/raw/CH13-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "第二趟早餐店（系统显示你没来过 / 日期变昨天）",
+          "final": "output/ch13/page-05.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P05_1.webp",
+            "generated/ch13/raw/CH13-P05_2.webp",
+            "generated/ch13/raw/CH13-P05_3.webp",
+            "generated/ch13/raw/CH13-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "薄墙回声（无触发出现）",
+          "final": "output/ch13/page-06.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P06_1.webp",
+            "generated/ch13/raw/CH13-P06_2.webp",
+            "generated/ch13/raw/CH13-P06_3.webp",
+            "generated/ch13/raw/CH13-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "闸机闪字（重复路径：已检测）",
+          "final": "output/ch13/page-07.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P07_1.webp",
+            "generated/ch13/raw/CH13-P07_2.webp",
+            "generated/ch13/raw/CH13-P07_3.webp",
+            "generated/ch13/raw/CH13-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "两张小票与插页（B-14 / B-15）",
+          "final": "output/ch13/page-08.webp",
+          "candidates": [
+            "generated/ch13/raw/CH13-P08_1.webp",
+            "generated/ch13/raw/CH13-P08_2.webp",
+            "generated/ch13/raw/CH13-P08_3.webp",
+            "generated/ch13/raw/CH13-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
+    },
+    {
+      "id": "ch14",
+      "title": "CH14",
+      "status": "completed",
+      "pages": [
+        {
+          "id": "P01",
+          "title": "终端通知：去纠偏中心",
+          "final": "output/ch14/page-01.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P01_1.webp",
+            "generated/ch14/raw/CH14-P01_2.webp",
+            "generated/ch14/raw/CH14-P01_3.webp",
+            "generated/ch14/raw/CH14-P01_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P02",
+          "title": "小窗口：编号Q条目 / 延迟很久",
+          "final": "output/ch14/page-02.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P02_1.webp",
+            "generated/ch14/raw/CH14-P02_2.webp",
+            "generated/ch14/raw/CH14-P02_3.webp",
+            "generated/ch14/raw/CH14-P02_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P03",
+          "title": "回执：结算将延迟 / 解释成本上升",
+          "final": "output/ch14/page-03.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P03_1.webp",
+            "generated/ch14/raw/CH14-P03_2.webp",
+            "generated/ch14/raw/CH14-P03_3.webp",
+            "generated/ch14/raw/CH14-P03_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P04",
+          "title": "小票被拒：纸质证据不纳入结算 / 表格字段",
+          "final": "output/ch14/page-04.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P04_1.webp",
+            "generated/ch14/raw/CH14-P04_2.webp",
+            "generated/ch14/raw/CH14-P04_3.webp",
+            "generated/ch14/raw/CH14-P04_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P05",
+          "title": "填表：只写“出现延迟结算”",
+          "final": "output/ch14/page-05.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P05_1.webp",
+            "generated/ch14/raw/CH14-P05_2.webp",
+            "generated/ch14/raw/CH14-P05_3.webp",
+            "generated/ch14/raw/CH14-P05_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P06",
+          "title": "走廊出口：顾临叫他 / 重复路径",
+          "final": "output/ch14/page-06.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P06_1.webp",
+            "generated/ch14/raw/CH14-P06_2.webp",
+            "generated/ch14/raw/CH14-P06_3.webp",
+            "generated/ch14/raw/CH14-P06_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P07",
+          "title": "对峙：维护可读性 / 两个选择",
+          "final": "output/ch14/page-07.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P07_1.webp",
+            "generated/ch14/raw/CH14-P07_2.webp",
+            "generated/ch14/raw/CH14-P07_3.webp",
+            "generated/ch14/raw/CH14-P07_4.webp"
+          ],
+          "selected": 0
+        },
+        {
+          "id": "P08",
+          "title": "插页文件E-01/E-02 + 只读校准室（带我去）",
+          "final": "output/ch14/page-08.webp",
+          "candidates": [
+            "generated/ch14/raw/CH14-P08_1.webp",
+            "generated/ch14/raw/CH14-P08_2.webp",
+            "generated/ch14/raw/CH14-P08_3.webp",
+            "generated/ch14/raw/CH14-P08_4.webp"
+          ],
+          "selected": 0
+        }
+      ]
     }
   ]
 }

@@ -1,6 +1,103 @@
 {
   "chapter": 7,
-  "title": "阈值",
-  "status": "draft",
-  "pages": []
+  "title": "CH07",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "回到维修局：亮与顺（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-01.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P01_1.webp",
+        "generated/ch07/raw/CH07-P01_2.webp",
+        "generated/ch07/raw/CH07-P01_3.webp",
+        "generated/ch07/raw/CH07-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "字段与已更正（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-02.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P02_1.webp",
+        "generated/ch07/raw/CH07-P02_2.webp",
+        "generated/ch07/raw/CH07-P02_3.webp",
+        "generated/ch07/raw/CH07-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "顾临出现：停一瞬（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-03.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P03_1.webp",
+        "generated/ch07/raw/CH07-P03_2.webp",
+        "generated/ch07/raw/CH07-P03_3.webp",
+        "generated/ch07/raw/CH07-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "备注会长（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-04.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P04_1.webp",
+        "generated/ch07/raw/CH07-P04_2.webp",
+        "generated/ch07/raw/CH07-P04_3.webp",
+        "generated/ch07/raw/CH07-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "阈值的停顿（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-05.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P05_1.webp",
+        "generated/ch07/raw/CH07-P05_2.webp",
+        "generated/ch07/raw/CH07-P05_3.webp",
+        "generated/ch07/raw/CH07-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "任务单：权限收紧（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-06.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P06_1.webp",
+        "generated/ch07/raw/CH07-P06_2.webp",
+        "generated/ch07/raw/CH07-P06_3.webp",
+        "generated/ch07/raw/CH07-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "更正是维护（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-07.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P07_1.webp",
+        "generated/ch07/raw/CH07-P07_2.webp",
+        "generated/ch07/raw/CH07-P07_3.webp",
+        "generated/ch07/raw/CH07-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "出口与插页：路线既定（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch07/page-08.webp",
+      "candidates": [
+        "generated/ch07/raw/CH07-P08_1.webp",
+        "generated/ch07/raw/CH07-P08_2.webp",
+        "generated/ch07/raw/CH07-P08_3.webp",
+        "generated/ch07/raw/CH07-P08_4.webp"
+      ]
+    }
+  ]
 }

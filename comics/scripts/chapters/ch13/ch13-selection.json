@@ -1,0 +1,103 @@
+{
+  "chapter": 13,
+  "title": "CH13",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "决定复走（写得很小）",
+      "selected": 0,
+      "final": "output/ch13/page-01.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P01_1.webp",
+        "generated/ch13/raw/CH13-P01_2.webp",
+        "generated/ch13/raw/CH13-P01_3.webp",
+        "generated/ch13/raw/CH13-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "第一趟早餐店（07:12）",
+      "selected": 0,
+      "final": "output/ch13/page-02.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P02_1.webp",
+        "generated/ch13/raw/CH13-P02_2.webp",
+        "generated/ch13/raw/CH13-P02_3.webp",
+        "generated/ch13/raw/CH13-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "薄墙巷（未触发）",
+      "selected": 0,
+      "final": "output/ch13/page-03.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P03_1.webp",
+        "generated/ch13/raw/CH13-P03_2.webp",
+        "generated/ch13/raw/CH13-P03_3.webp",
+        "generated/ch13/raw/CH13-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "第一趟回维修局（路线既定 / Q-██-17）",
+      "selected": 0,
+      "final": "output/ch13/page-04.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P04_1.webp",
+        "generated/ch13/raw/CH13-P04_2.webp",
+        "generated/ch13/raw/CH13-P04_3.webp",
+        "generated/ch13/raw/CH13-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "第二趟早餐店（系统显示你没来过 / 日期变昨天）",
+      "selected": 0,
+      "final": "output/ch13/page-05.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P05_1.webp",
+        "generated/ch13/raw/CH13-P05_2.webp",
+        "generated/ch13/raw/CH13-P05_3.webp",
+        "generated/ch13/raw/CH13-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "薄墙回声（无触发出现）",
+      "selected": 0,
+      "final": "output/ch13/page-06.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P06_1.webp",
+        "generated/ch13/raw/CH13-P06_2.webp",
+        "generated/ch13/raw/CH13-P06_3.webp",
+        "generated/ch13/raw/CH13-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "闸机闪字（重复路径：已检测）",
+      "selected": 0,
+      "final": "output/ch13/page-07.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P07_1.webp",
+        "generated/ch13/raw/CH13-P07_2.webp",
+        "generated/ch13/raw/CH13-P07_3.webp",
+        "generated/ch13/raw/CH13-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "两张小票与插页（B-14 / B-15）",
+      "selected": 0,
+      "final": "output/ch13/page-08.webp",
+      "candidates": [
+        "generated/ch13/raw/CH13-P08_1.webp",
+        "generated/ch13/raw/CH13-P08_2.webp",
+        "generated/ch13/raw/CH13-P08_3.webp",
+        "generated/ch13/raw/CH13-P08_4.webp"
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 逐章节漫画生产骨架初始化
 
 目标：
-- 基于 docs/alignment/story_index.json 生成 CH01-CH10 的目录与“阶段性文档”
+- 基于 docs/alignment/story_index.json 生成指定范围的章节目录与“阶段性文档”
 - 每章按 Phase1-4 产出可逐级验收的文件占位
 
 产物（每章）：
@@ -18,6 +18,7 @@ docs/chapters/CHXX-验收.md          # 验收入口（每章一份）
 
 from __future__ import annotations
 
+import argparse
 import json
 from dataclasses import dataclass
 from pathlib import Path
@@ -68,17 +69,39 @@ def _write_if_missing(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
 
+def _get_max_chapter_no(index: dict[str, Any]) -> int:
+    max_no = 0
+    for ch in index.get("chapters", []):
+        try:
+            max_no = max(max_no, int(ch["number"]))
+        except Exception:
+            continue
+    if max_no <= 0:
+        raise ValueError("no chapters found in story_index.json")
+    return max_no
+
 
 def main() -> None:
     repo_root = Path(__file__).resolve().parents[3]
     idx = _load_story_index(repo_root)
+    max_ch_no = _get_max_chapter_no(idx)
+
+    parser = argparse.ArgumentParser(description="init chapter scaffolding from story_index.json")
+    parser.add_argument("--start", type=int, default=1, help="start chapter number (inclusive)")
+    parser.add_argument("--end", type=int, default=max_ch_no, help="end chapter number (inclusive)")
+    args = parser.parse_args()
+
+    start_no = max(1, int(args.start))
+    end_no = min(max_ch_no, int(args.end))
+    if start_no > end_no:
+        raise SystemExit(f"invalid range: start={start_no} > end={end_no}")
 
     chapters_dir = repo_root / "comics" / "scripts" / "chapters"
     docs_dir = repo_root / "docs" / "chapters"
     chapters_dir.mkdir(parents=True, exist_ok=True)
     docs_dir.mkdir(parents=True, exist_ok=True)
 
-    for ch_no in range(1, 11):
+    for ch_no in range(start_no, end_no + 1):
         ref = _get_chapter(idx, ch_no)
         ch_id = f"ch{ch_no:02d}"
         ch_folder = chapters_dir / ch_id
@@ -215,7 +238,7 @@ def main() -> None:
             encoding="utf-8",
         )
 
-    print("[OK] chapter scaffolding generated: CH01-CH10")
+    print(f"[OK] chapter scaffolding generated: CH{start_no:02d}-CH{end_no:02d} (max=CH{max_ch_no:02d})")
 
 
 if __name__ == "__main__":

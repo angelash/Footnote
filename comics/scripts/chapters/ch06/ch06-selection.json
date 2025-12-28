@@ -1,6 +1,103 @@
 {
   "chapter": 6,
-  "title": "纸背的风",
-  "status": "draft",
-  "pages": []
+  "title": "CH06",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "礼堂街：暗灯与旧灯（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-01.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P01_1.webp",
+        "generated/ch06/raw/CH06-P01_2.webp",
+        "generated/ch06/raw/CH06-P01_3.webp",
+        "generated/ch06/raw/CH06-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "礼堂内：尘土与纸味，木椅咯吱（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-02.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P02_1.webp",
+        "generated/ch06/raw/CH06-P02_2.webp",
+        "generated/ch06/raw/CH06-P02_3.webp",
+        "generated/ch06/raw/CH06-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "牧平：风与墨（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-03.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P03_1.webp",
+        "generated/ch06/raw/CH06-P03_2.webp",
+        "generated/ch06/raw/CH06-P03_3.webp",
+        "generated/ch06/raw/CH06-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "墨多纸裂（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-04.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P04_1.webp",
+        "generated/ch06/raw/CH06-P04_2.webp",
+        "generated/ch06/raw/CH06-P04_3.webp",
+        "generated/ch06/raw/CH06-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "写得轻一点（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-05.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P05_1.webp",
+        "generated/ch06/raw/CH06-P05_2.webp",
+        "generated/ch06/raw/CH06-P05_3.webp",
+        "generated/ch06/raw/CH06-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "抄写与折痕（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-06.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P06_1.webp",
+        "generated/ch06/raw/CH06-P06_2.webp",
+        "generated/ch06/raw/CH06-P06_3.webp",
+        "generated/ch06/raw/CH06-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "散场：至少纸不会自动更正（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-07.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P07_1.webp",
+        "generated/ch06/raw/CH06-P07_2.webp",
+        "generated/ch06/raw/CH06-P07_3.webp",
+        "generated/ch06/raw/CH06-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "夜风与插页：祷文抄本-02（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch06/page-08.webp",
+      "candidates": [
+        "generated/ch06/raw/CH06-P08_1.webp",
+        "generated/ch06/raw/CH06-P08_2.webp",
+        "generated/ch06/raw/CH06-P08_3.webp",
+        "generated/ch06/raw/CH06-P08_4.webp"
+      ]
+    }
+  ]
 }

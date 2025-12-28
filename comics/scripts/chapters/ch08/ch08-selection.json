@@ -1,6 +1,103 @@
 {
   "chapter": 8,
-  "title": "封锁线外侧",
-  "status": "draft",
-  "pages": []
+  "title": "CH08",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "风与通行贴（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-01.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P01_1.webp",
+        "generated/ch08/raw/CH08-P01_2.webp",
+        "generated/ch08/raw/CH08-P01_3.webp",
+        "generated/ch08/raw/CH08-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "封锁线外侧（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-02.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P02_1.webp",
+        "generated/ch08/raw/CH08-P02_2.webp",
+        "generated/ch08/raw/CH08-P02_3.webp",
+        "generated/ch08/raw/CH08-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "校准员与灰线（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-03.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P03_1.webp",
+        "generated/ch08/raw/CH08-P03_2.webp",
+        "generated/ch08/raw/CH08-P03_3.webp",
+        "generated/ch08/raw/CH08-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "裂缝与已记录（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-04.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P04_1.webp",
+        "generated/ch08/raw/CH08-P04_2.webp",
+        "generated/ch08/raw/CH08-P04_3.webp",
+        "generated/ch08/raw/CH08-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "数字最安全（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-05.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P05_1.webp",
+        "generated/ch08/raw/CH08-P05_2.webp",
+        "generated/ch08/raw/CH08-P05_3.webp",
+        "generated/ch08/raw/CH08-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "阴影异常（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-06.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P06_1.webp",
+        "generated/ch08/raw/CH08-P06_2.webp",
+        "generated/ch08/raw/CH08-P06_3.webp",
+        "generated/ch08/raw/CH08-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "客观描述 → 已更正（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-07.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P07_1.webp",
+        "generated/ch08/raw/CH08-P07_2.webp",
+        "generated/ch08/raw/CH08-P07_3.webp",
+        "generated/ch08/raw/CH08-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "撤离与回执（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch08/page-08.webp",
+      "candidates": [
+        "generated/ch08/raw/CH08-P08_1.webp",
+        "generated/ch08/raw/CH08-P08_2.webp",
+        "generated/ch08/raw/CH08-P08_3.webp",
+        "generated/ch08/raw/CH08-P08_4.webp"
+      ]
+    }
+  ]
 }

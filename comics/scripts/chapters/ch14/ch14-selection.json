@@ -1,0 +1,103 @@
+{
+  "chapter": 14,
+  "title": "CH14",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "终端通知：去纠偏中心",
+      "selected": 0,
+      "final": "output/ch14/page-01.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P01_1.webp",
+        "generated/ch14/raw/CH14-P01_2.webp",
+        "generated/ch14/raw/CH14-P01_3.webp",
+        "generated/ch14/raw/CH14-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "小窗口：编号Q条目 / 延迟很久",
+      "selected": 0,
+      "final": "output/ch14/page-02.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P02_1.webp",
+        "generated/ch14/raw/CH14-P02_2.webp",
+        "generated/ch14/raw/CH14-P02_3.webp",
+        "generated/ch14/raw/CH14-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "回执：结算将延迟 / 解释成本上升",
+      "selected": 0,
+      "final": "output/ch14/page-03.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P03_1.webp",
+        "generated/ch14/raw/CH14-P03_2.webp",
+        "generated/ch14/raw/CH14-P03_3.webp",
+        "generated/ch14/raw/CH14-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "小票被拒：纸质证据不纳入结算 / 表格字段",
+      "selected": 0,
+      "final": "output/ch14/page-04.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P04_1.webp",
+        "generated/ch14/raw/CH14-P04_2.webp",
+        "generated/ch14/raw/CH14-P04_3.webp",
+        "generated/ch14/raw/CH14-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "填表：只写“出现延迟结算”",
+      "selected": 0,
+      "final": "output/ch14/page-05.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P05_1.webp",
+        "generated/ch14/raw/CH14-P05_2.webp",
+        "generated/ch14/raw/CH14-P05_3.webp",
+        "generated/ch14/raw/CH14-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "走廊出口：顾临叫他 / 重复路径",
+      "selected": 0,
+      "final": "output/ch14/page-06.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P06_1.webp",
+        "generated/ch14/raw/CH14-P06_2.webp",
+        "generated/ch14/raw/CH14-P06_3.webp",
+        "generated/ch14/raw/CH14-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "对峙：维护可读性 / 两个选择",
+      "selected": 0,
+      "final": "output/ch14/page-07.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P07_1.webp",
+        "generated/ch14/raw/CH14-P07_2.webp",
+        "generated/ch14/raw/CH14-P07_3.webp",
+        "generated/ch14/raw/CH14-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "插页文件E-01/E-02 + 只读校准室（带我去）",
+      "selected": 0,
+      "final": "output/ch14/page-08.webp",
+      "candidates": [
+        "generated/ch14/raw/CH14-P08_1.webp",
+        "generated/ch14/raw/CH14-P08_2.webp",
+        "generated/ch14/raw/CH14-P08_3.webp",
+        "generated/ch14/raw/CH14-P08_4.webp"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,103 @@
 {
   "chapter": 5,
-  "title": "稳定结论",
-  "status": "draft",
-  "pages": []
+  "title": "CH05",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "医疗站：树与稳定宣传画（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-01.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P01_1.webp",
+        "generated/ch05/raw/CH05-P01_2.webp",
+        "generated/ch05/raw/CH05-P01_3.webp",
+        "generated/ch05/raw/CH05-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "问卷：字段很多但只为结论（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-02.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P02_1.webp",
+        "generated/ch05/raw/CH05-P02_2.webp",
+        "generated/ch05/raw/CH05-P02_3.webp",
+        "generated/ch05/raw/CH05-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "停顿：是否听见不应存在的声音（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-03.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P03_1.webp",
+        "generated/ch05/raw/CH05-P03_2.webp",
+        "generated/ch05/raw/CH05-P03_3.webp",
+        "generated/ch05/raw/CH05-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "许澄：你不需要记住每一件事（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-04.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P04_1.webp",
+        "generated/ch05/raw/CH05-P04_2.webp",
+        "generated/ch05/raw/CH05-P04_3.webp",
+        "generated/ch05/raw/CH05-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "结论单：稳定（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-05.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P05_1.webp",
+        "generated/ch05/raw/CH05-P05_2.webp",
+        "generated/ch05/raw/CH05-P05_3.webp",
+        "generated/ch05/raw/CH05-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "角落的声音：你今天像昨天（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-06.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P06_1.webp",
+        "generated/ch05/raw/CH05-P06_2.webp",
+        "generated/ch05/raw/CH05-P06_3.webp",
+        "generated/ch05/raw/CH05-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "边界：别吓人 / 对日期不敏感（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-07.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P07_1.webp",
+        "generated/ch05/raw/CH05-P07_2.webp",
+        "generated/ch05/raw/CH05-P07_3.webp",
+        "generated/ch05/raw/CH05-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "插页文件：A-09 结论单 / B-06 碎片日记（文件页占满画面，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch05/page-08.webp",
+      "candidates": [
+        "generated/ch05/raw/CH05-P08_1.webp",
+        "generated/ch05/raw/CH05-P08_2.webp",
+        "generated/ch05/raw/CH05-P08_3.webp",
+        "generated/ch05/raw/CH05-P08_4.webp"
+      ]
+    }
+  ]
 }

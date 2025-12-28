@@ -1,6 +1,102 @@
 {
   "chapter": 9,
-  "title": "贴牢一点",
-  "status": "draft",
-  "pages": []
+  "title": "CH09",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "绕路（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-01.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P01_1.webp",
+        "generated/ch09/raw/CH09-P01_2.webp",
+        "generated/ch09/raw/CH09-P01_3.webp",
+        "generated/ch09/raw/CH09-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "公告墙（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-02.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P02_1.webp",
+        "generated/ch09/raw/CH09-P02_2.webp",
+        "generated/ch09/raw/CH09-P02_3.webp",
+        "generated/ch09/raw/CH09-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "栖蓝在贴（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-03.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P03_1.webp",
+        "generated/ch09/raw/CH09-P03_2.webp",
+        "generated/ch09/raw/CH09-P03_3.webp",
+        "generated/ch09/raw/CH09-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "没用只是删法（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-04.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P04_1.webp",
+        "generated/ch09/raw/CH09-P04_2.webp",
+        "generated/ch09/raw/CH09-P04_3.webp",
+        "generated/ch09/raw/CH09-P04_4.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "贴牢一点（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-05.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P05_1.webp",
+        "generated/ch09/raw/CH09-P05_2.webp",
+        "generated/ch09/raw/CH09-P05_3.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "没有字段（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-06.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P06_1.webp",
+        "generated/ch09/raw/CH09-P06_2.webp",
+        "generated/ch09/raw/CH09-P06_3.webp",
+        "generated/ch09/raw/CH09-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "不指望（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-07.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P07_1.webp",
+        "generated/ch09/raw/CH09-P07_2.webp",
+        "generated/ch09/raw/CH09-P07_3.webp",
+        "generated/ch09/raw/CH09-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "修补记录-02（贴图）（2x2 四格，竖版 9:16）",
+      "selected": 0,
+      "final": "output/ch09/page-08.webp",
+      "candidates": [
+        "generated/ch09/raw/CH09-P08_1.webp",
+        "generated/ch09/raw/CH09-P08_2.webp",
+        "generated/ch09/raw/CH09-P08_3.webp",
+        "generated/ch09/raw/CH09-P08_4.webp"
+      ]
+    }
+  ]
 }

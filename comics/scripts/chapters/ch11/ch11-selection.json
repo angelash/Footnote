@@ -1,0 +1,101 @@
+{
+  "chapter": 11,
+  "title": "CH11",
+  "status": "completed",
+  "pages": [
+    {
+      "id": "P01",
+      "title": "早餐店再来（风铃半响）",
+      "selected": 0,
+      "final": "output/ch11/page-01.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P01_1.webp",
+        "generated/ch11/raw/CH11-P01_2.webp",
+        "generated/ch11/raw/CH11-P01_3.webp",
+        "generated/ch11/raw/CH11-P01_4.webp"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "昨天没来（宋岚两份）",
+      "selected": 0,
+      "final": "output/ch11/page-02.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P02_1.webp",
+        "generated/ch11/raw/CH11-P02_2.webp",
+        "generated/ch11/raw/CH11-P02_3.webp",
+        "generated/ch11/raw/CH11-P02_4.webp"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "口袋里的小票（固定套餐/已完成）",
+      "selected": 0,
+      "final": "output/ch11/page-03.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P03_1.webp",
+        "generated/ch11/raw/CH11-P03_2.webp",
+        "generated/ch11/raw/CH11-P03_3.webp",
+        "generated/ch11/raw/CH11-P03_4.webp"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "不是昨天，是今天（日期小字）",
+      "selected": 0,
+      "final": "output/ch11/page-04.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P04_1.webp",
+        "generated/ch11/raw/CH11-P04_2.webp"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "温热纸袋（证明不了冷）",
+      "selected": 0,
+      "final": "output/ch11/page-05.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P05_1.webp",
+        "generated/ch11/raw/CH11-P05_2.webp",
+        "generated/ch11/raw/CH11-P05_3.webp",
+        "generated/ch11/raw/CH11-P05_4.webp"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "街边再看（删掉昨天/贴上今天）",
+      "selected": 0,
+      "final": "output/ch11/page-06.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P06_1.webp",
+        "generated/ch11/raw/CH11-P06_2.webp",
+        "generated/ch11/raw/CH11-P06_3.webp",
+        "generated/ch11/raw/CH11-P06_4.webp"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "公告墙地图还在（留下=成本）",
+      "selected": 0,
+      "final": "output/ch11/page-07.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P07_1.webp",
+        "generated/ch11/raw/CH11-P07_2.webp",
+        "generated/ch11/raw/CH11-P07_3.webp",
+        "generated/ch11/raw/CH11-P07_4.webp"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "走向维修局（路线既定，但不敢保证）",
+      "selected": 0,
+      "final": "output/ch11/page-08.webp",
+      "candidates": [
+        "generated/ch11/raw/CH11-P08_1.webp",
+        "generated/ch11/raw/CH11-P08_2.webp",
+        "generated/ch11/raw/CH11-P08_3.webp",
+        "generated/ch11/raw/CH11-P08_4.webp"
+      ]
+    }
+  ]
+}

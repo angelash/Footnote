@@ -1,0 +1,97 @@
+id: SKILL_CODE_REVIEW
+name: "代码审查"
+type: "skill"
+purpose: "提供代码审查的标准流程和检查清单"
+
+description: |
+  代码审查是确保代码质量的关键环节，包括功能正确性、
+  代码规范、架构一致性、安全性和性能等方面的检查。
+
+applicable_roles:
+  - "L1_tech_director"
+  - "L2_client_lead"
+  - "L2_tools_lead"
+
+checklist:
+  functional:
+    - "功能是否符合 Spec 要求"
+    - "边界条件是否处理"
+    - "错误处理是否完善"
+    - "单元测试是否覆盖"
+  
+  code_quality:
+    - "命名是否清晰准确"
+    - "代码是否简洁可读"
+    - "注释是否必要且准确"
+    - "是否有重复代码"
+  
+  architecture:
+    - "是否符合模块边界"
+    - "依赖方向是否正确"
+    - "接口是否符合契约"
+    - "是否引入新依赖（需评估）"
+  
+  typescript:
+    - "类型定义是否完整"
+    - "是否使用 any（应避免）"
+    - "是否通过 strict 模式"
+    - "接口是否有 I 前缀"
+  
+  performance:
+    - "是否有明显性能问题"
+    - "是否有内存泄漏风险"
+    - "异步操作是否正确处理"
+  
+  security:
+    - "是否有注入风险"
+    - "敏感数据是否保护"
+
+review_template: |
+  ## Code Review: PR #{pr_number}
+  
+  ### 概要
+  - **提交者**: {author}
+  - **关联任务**: {task_id}
+  - **改动文件**: {file_count}
+  - **净新增行**: {lines_added}
+  
+  ### 功能检查
+  - [ ] 符合 Spec 要求
+  - [ ] 边界条件处理
+  - [ ] 错误处理完善
+  
+  ### 代码质量
+  - [ ] 命名清晰
+  - [ ] 代码简洁
+  - [ ] 无重复代码
+  
+  ### 架构检查
+  - [ ] 符合模块边界
+  - [ ] 依赖方向正确
+  - [ ] 无新增未审批依赖
+  
+  ### TypeScript
+  - [ ] 类型完整
+  - [ ] 无 any
+  - [ ] strict 通过
+  
+  ### 结论
+  - [ ] **批准 (Approve)**
+  - [ ] **需修改 (Request Changes)**
+  - [ ] **需讨论 (Discuss)**
+  
+  ### 评论
+  ...
+
+granularity_limits:
+  max_pr_lines: 400
+  max_files: 6
+  max_review_time_minutes: 30
+
+rejection_triggers:
+  - "PR超过400行净新增"
+  - "修改了冻结目录"
+  - "引入未审批的新依赖"
+  - "TypeScript 类型检查失败"
+  - "单元测试覆盖不足"
+

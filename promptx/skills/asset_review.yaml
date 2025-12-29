@@ -1,0 +1,106 @@
+id: SKILL_ASSET_REVIEW
+name: "资产审查"
+type: "skill"
+purpose: "提供美术/内容资产审查的标准流程和检查清单"
+
+description: |
+  资产审查确保所有美术资源和内容数据符合项目规范，
+  包括命名规范、尺寸规格、格式要求和风格一致性检查。
+
+applicable_roles:
+  - "L1_art_director"
+  - "L2_ui_lead"
+  - "L2_tools_lead"
+
+checklist:
+  naming:
+    - "命名是否符合规范"
+    - "类别前缀是否正确"
+    - "状态后缀是否完整"
+    - "编号是否连续"
+  
+  specification:
+    - "尺寸是否符合规格"
+    - "格式是否正确（PNG/SVG/OGG）"
+    - "分辨率是否达标"
+    - "锚点是否正确设置"
+  
+  quality:
+    - "边缘是否干净（无毛边）"
+    - "透明度是否正确"
+    - "色彩是否符合色板"
+    - "像素是否清晰（无模糊）"
+  
+  style_consistency:
+    - "风格是否与 Art Bible 一致"
+    - "光影方向是否统一"
+    - "线条粗细是否一致"
+    - "整体视觉是否协调"
+  
+  audio_specific:
+    - "采样率是否正确（44100Hz）"
+    - "比特率是否达标（128kbps+）"
+    - "响度是否符合规范"
+    - "循环点是否平滑"
+
+review_template: |
+  ## Asset Review: {batch_name}
+  
+  ### 概要
+  - **提交者**: {author}
+  - **资产类型**: {asset_type}
+  - **数量**: {count}
+  
+  ### 命名检查
+  - [ ] 命名规范: {pass_count}/{total_count}
+  - 违规项: ...
+  
+  ### 规格检查
+  - [ ] 尺寸符合: {pass_count}/{total_count}
+  - [ ] 格式正确: {pass_count}/{total_count}
+  - 违规项: ...
+  
+  ### 质量检查
+  - [ ] 边缘干净
+  - [ ] 色彩合规
+  - [ ] 清晰度达标
+  
+  ### 风格一致性
+  - [ ] 与 Art Bible 一致
+  - [ ] 整体协调
+  
+  ### 结论
+  - [ ] **批准入库 (Approve)**
+  - [ ] **需修改 (Request Changes)**
+  - [ ] **需重新生成 (Regenerate)**
+  
+  ### 问题清单
+  | 资产名 | 问题 | 建议 |
+  |--------|------|------|
+  | ...    | ...  | ...  |
+
+validation_commands:
+  naming: "npm run validate:assets:naming"
+  size: "npm run validate:assets:size"
+  format: "npm run validate:assets:format"
+
+rejection_triggers:
+  - "命名不符合规范"
+  - "尺寸不符合规格"
+  - "格式错误"
+  - "风格严重不一致"
+  - "质量明显不达标"
+
+regen_template: |
+  ## REGEN PACK: {asset_name}
+  
+  ### 原因
+  {rejection_reason}
+  
+  ### 参考
+  - 正确示例: {reference_path}
+  - Art Bible 章节: {bible_section}
+  
+  ### 修改要求
+  {requirements}
+

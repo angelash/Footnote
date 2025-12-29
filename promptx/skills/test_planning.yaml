@@ -1,0 +1,145 @@
+id: SKILL_TEST_PLANNING
+name: "测试规划"
+type: "skill"
+purpose: "提供测试计划制定和用例设计的标准方法"
+
+description: |
+  测试规划技能用于制定测试策略、设计测试用例、
+  评估测试覆盖率和管理测试执行过程。
+
+applicable_roles:
+  - "L1_qa_director"
+  - "L2_qa_lead"
+  - "L3_tester"
+
+checklist:
+  test_strategy:
+    - "测试目标是否明确"
+    - "测试范围是否定义"
+    - "测试类型是否覆盖（冒烟/功能/回归）"
+    - "优先级是否排序"
+  
+  test_case_design:
+    - "正向路径是否覆盖"
+    - "边界条件是否考虑"
+    - "异常路径是否覆盖"
+    - "前置条件是否明确"
+    - "期望结果是否具体"
+  
+  coverage:
+    - "核心功能是否覆盖"
+    - "关键路径是否覆盖"
+    - "风险点是否重点关注"
+  
+  automation:
+    - "可自动化用例是否标记"
+    - "E2E脚本是否可行"
+    - "数据准备是否可脚本化"
+
+test_case_template: |
+  ## 测试用例: {case_id}
+  
+  ### 基本信息
+  - **模块**: {module}
+  - **优先级**: P0/P1/P2/P3
+  - **类型**: 冒烟/功能/回归
+  - **自动化**: 是/否
+  
+  ### 前置条件
+  1. {precondition_1}
+  2. {precondition_2}
+  
+  ### 测试步骤
+  | 步骤 | 操作 | 期望结果 |
+  |------|------|----------|
+  | 1    | ...  | ...      |
+  | 2    | ...  | ...      |
+  
+  ### 测试数据
+  - {data_item_1}
+  - {data_item_2}
+  
+  ### 备注
+  ...
+
+test_plan_template: |
+  ## 测试计划: {plan_name}
+  
+  ### 1. 测试目标
+  {objectives}
+  
+  ### 2. 测试范围
+  #### In-Scope
+  - {in_scope_items}
+  
+  #### Out-of-Scope
+  - {out_of_scope_items}
+  
+  ### 3. 测试策略
+  | 类型 | 范围 | 执行方式 |
+  |------|------|----------|
+  | 冒烟 | 核心路径 | 每日/自动化 |
+  | 功能 | 全功能 | 里程碑/人工 |
+  | 回归 | 变更影响 | PR/自动化 |
+  
+  ### 4. 资源需求
+  - 人员: ...
+  - 环境: ...
+  - 工具: ...
+  
+  ### 5. 时间安排
+  | 阶段 | 开始 | 结束 |
+  |------|------|------|
+  | ...  | ...  | ...  |
+  
+  ### 6. 风险与应对
+  | 风险 | 影响 | 应对 |
+  |------|------|------|
+  | ...  | ...  | ...  |
+  
+  ### 7. 验收标准
+  - {acceptance_criteria}
+
+defect_template: |
+  ## 缺陷报告: {bug_id}
+  
+  ### 基本信息
+  - **标题**: {title}
+  - **级别**: Blocker/Critical/Major/Minor
+  - **发现版本**: {version}
+  - **模块**: {module}
+  - **发现人**: {reporter}
+  
+  ### 复现步骤
+  1. {step_1}
+  2. {step_2}
+  3. {step_3}
+  
+  ### 期望结果
+  {expected}
+  
+  ### 实际结果
+  {actual}
+  
+  ### 环境信息
+  - 浏览器: {browser}
+  - 系统: {os}
+  - 设备: {device}
+  
+  ### 附件
+  - 截图: {screenshot_link}
+  - 日志: {log_link}
+
+granularity_limits:
+  smoke_cases_max: 30
+  functional_cases_per_module_max: 50
+  regression_cases_per_group_max: 40
+  defect_steps_max: 10
+
+quality_gates:
+  smoke_pass_rate: 100
+  functional_pass_rate: 95
+  regression_pass_rate: 98
+  blocker_count_max: 0
+  critical_count_max: 2
+

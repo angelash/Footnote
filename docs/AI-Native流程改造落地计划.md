@@ -481,17 +481,19 @@ Footnote/
 
 #### 任务清单
 
-| ID | 任务 | 产出物 | 验收标准 | 预估 |
-|----|------|--------|----------|------|
-| P3-01 | 编写 narrative_system_spec.md | 叙事规格 | ≤120行，状态≤6 | 2h |
-| P3-02 | 编写 event_system_spec.md | 事件规格 | Schema明确 | 2h |
-| P3-03 | 编写 choice_system_spec.md | 选择规格 | 选项≤3 | 1h |
-| P3-04 | 编写 ui_system_spec.md | UI系统规格 | 状态≤6 | 2h |
-| P3-05 | 编写 save_system_spec.md | 存档规格 | 格式冻结 | 1h |
-| P3-06 | 编写 ui_flow_spec.md | UI流程规格 | 流程图清晰 | 2h |
-| P3-07 | 编写 ui_components_spec.md | 组件规格 | 变体≤3 | 2h |
-| P3-08 | 编写 content_pipeline_spec.md | 内容管线 | 校验明确 | 1h |
-| P3-09 | 编写 asset_pipeline_spec.md | 资产管线 | 流程明确 | 1h |
+| ID | 任务 | 产出物 | 验收标准 | 预估 | 状态 |
+|----|------|--------|----------|------|------|
+| P3-01 | 编写 narrative_system_spec.md | 叙事规格 | ≤120行，状态≤6 | 2h | ✅ |
+| P3-02 | 编写 event_system_spec.md | 事件规格 | Schema明确 | 2h | ✅ |
+| P3-03 | 编写 choice_system_spec.md | 选择规格 | 选项≤3 | 1h | ✅ |
+| P3-04 | 编写 ui_system_spec.md | UI系统规格 | 状态≤6 | 2h | ✅ |
+| P3-05 | 编写 save_system_spec.md | 存档规格 | 格式冻结 | 1h | ✅ |
+| P3-06 | 编写 ui_flow_spec.md | UI流程规格 | 流程图清晰 | 2h | ✅ |
+| P3-07 | 编写 ui_components_spec.md | 组件规格 | 变体≤3 | 2h | ✅ |
+| P3-08 | 编写 content_pipeline_spec.md | 内容管线 | 校验明确 | 1h | ✅ |
+| P3-09 | 编写 asset_pipeline_spec.md | 资产管线 | 流程明确 | 1h | ✅ |
+
+> **Phase 3 完成时间**: 2025-12-29
 
 ---
 
@@ -587,12 +589,14 @@ rollback_triggers:
 | ID | 任务 | 产出物 | 验收标准 | 预估 | 状态 |
 |----|------|--------|----------|------|------|
 | P4-01 | 编写 L0_producer.yaml | 角色包 | 字段完整 | 30min | ✅ |
-| P4-02 | 编写 L1层角色包（5个） | 角色包 | 字段完整 | 2h | ⏳ |
-| P4-03 | 编写 L2层角色包（8个） | 角色包 | 字段完整 | 3h | 🔄 2/8 |
-| P4-04 | 编写 L3层角色包（5个） | 角色包 | 字段完整 | 2h | 🔄 1/5 |
-| P4-05 | 编写技能包（3个） | 技能包 | 字段完整 | 1h | ⏳ |
+| P4-02 | 编写 L1层角色包（5个） | 角色包 | 字段完整 | 2h | ✅ |
+| P4-03 | 编写 L2层角色包（8个） | 角色包 | 字段完整 | 3h | ✅ |
+| P4-04 | 编写 L3层角色包（5个） | 角色包 | 字段完整 | 2h | ✅ |
+| P4-05 | 编写技能包（3个） | 技能包 | 字段完整 | 1h | ✅ |
 
-> **已完成**: L0_producer, L2_client_lead, L2_qa_lead, L3_engineer
+> **Phase 4 完成时间**: 2025-12-29
+> **已完成技能包**: code_review, asset_review, test_planning
+> **已完成角色包**: L0_producer, L1_design_director, L1_tech_director, L1_art_director, L1_qa_director, L1_pmo, L2_systems_lead, L2_narrative_lead, L2_writing_lead, L2_event_lead, L2_ui_lead, L2_tools_lead, L2_client_lead, L2_qa_lead, L3_writer, L3_scripter, L3_ui_engineer, L3_gameplay_engineer, L3_tester, L3_engineer
 
 ---
 
@@ -868,11 +872,13 @@ alwaysApply: true
 
 #### 任务清单
 
-| ID | 任务 | 产出物 | 验收标准 | 预估 |
-|----|------|--------|----------|------|
-| P6-01 | 编写 build_acceptance.md | 构建验收 | 门禁可执行 | 1h |
-| P6-02 | 编写 smoke.md | 冒烟清单 | ≤30条 | 2h |
-| P6-03 | 编写 milestone_acceptance.md | 里程碑验收 | 每个里程碑明确 | 1h |
+| ID | 任务 | 产出物 | 验收标准 | 预估 | 状态 |
+|----|------|--------|----------|------|------|
+| P6-01 | 编写 build_acceptance.md | 构建验收 | 门禁可执行 | 1h | ✅ |
+| P6-02 | 编写 smoke.md | 冒烟清单 | ≤30条 | 2h | ✅ |
+| P6-03 | 编写 milestone_acceptance.md | 里程碑验收 | 每个里程碑明确 | 1h | ✅ |
+
+> **Phase 6 完成时间**: 2025-12-29
 
 ---
 

@@ -1,0 +1,66 @@
+id: L2_EVENT_LEAD
+name: "脚本组长"
+level: "L2"
+purpose: "管理事件Schema与脚本规范，把系统Spec转为事件任务包"
+
+authority:
+  can_read:
+    - "/docs/**"
+    - "/src/data/events/**"
+    - "/src/types/**"
+  can_write:
+    - "/docs/02_specs/events/**"
+    - "/docs/03_taskpacks/**"
+  forbidden_write:
+    - "/docs/00_charter/**"
+    - "/docs/01_bibles/**"
+    - "/src/**"
+
+scope_guardrails:
+  forbid_schema_breaking_change: true
+  forbid_code_change: true
+  require_reference_validation: true
+
+stable_granularity_limits:
+  event_script_lines_max: 120
+  events_per_task_max: 8
+  schema_fields_max: 20
+
+inputs_required:
+  - "event_system_spec.md"
+  - "narrative_system_spec.md"
+  - "章节大纲"
+
+outputs_required:
+  - "事件Schema定义"
+  - "事件编写规范"
+  - "脚本任务包"
+
+output_templates:
+  event_schema: |
+    ```yaml
+    event_id: string
+    type: EventType
+    conditions: Condition[]
+    actions: Action[]
+    next: string | null
+    ```
+  task_pack: |
+    ## 任务: {Zone}事件脚本
+    ### 输入
+    - 章节大纲
+    - 对白数据
+    ### 交付
+    - src/data/events/{zone}.yaml
+    ### 约束
+    - ≤120行
+    - 3-8个事件
+
+rollback_triggers:
+  - "超过120行"
+  - "Schema字段超过20个"
+  - "引入可执行代码"
+
+downstream_roles:
+  - "L3_scripter"
+

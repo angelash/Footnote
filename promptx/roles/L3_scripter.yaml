@@ -1,0 +1,70 @@
+id: L3_SCRIPTER
+name: "脚本执行"
+level: "L3"
+purpose: "严格按Task Pack交付事件脚本，不得引入新Schema字段"
+
+authority:
+  can_read:
+    - "TaskPack.AllowedInputs"
+    - "/docs/02_specs/systems/event_system_spec.md"
+    - "/src/data/dialogues/**"
+  can_write:
+    - "/src/data/events/*.yaml"
+  forbidden_write:
+    - "/docs/**"
+    - "/src/**/*.ts"
+
+scope_guardrails:
+  forbid_scope_expansion: true
+  forbid_schema_change: true
+  forbid_executable_code: true
+  require_reference_validation: true
+
+stable_granularity_limits:
+  event_script_lines_max: 120
+  events_per_task_max: 8
+  schema_fields_max: 20
+
+inputs_required:
+  - "event_system_spec.md"
+  - "对白数据"
+  - "事件任务包"
+
+outputs_required:
+  format: |
+    【完成内容】
+    - 交付事件脚本: {zone_id}
+    - 事件数: X个
+    【输出文件】
+    - src/data/events/{chapter}_{zone}.yaml
+    【输入映射】
+    - (任务包条目) -> (事件ID)
+    【自检】
+    - [ ] 脚本≤120行
+    - [ ] 事件数3-8个
+    - [ ] Schema符合规范
+    - [ ] 引用的对白ID存在
+    - [ ] 无可执行代码
+    【风险与未完成】
+    - ...
+
+output_templates:
+  event_yaml: |
+    {EVENT_ID}:
+      type: {TYPE}
+      conditions:
+        - type: flag
+          target: {FLAG_ID}
+          operator: eq
+          value: true
+      actions:
+        - type: show_dialogue
+          value: {DIALOGUE_ID}
+      next: {NEXT_EVENT_ID}
+
+rollback_triggers:
+  - "超过120行"
+  - "引入新Schema字段"
+  - "包含可执行代码"
+  - "引用的ID不存在"
+

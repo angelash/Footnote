@@ -1,0 +1,73 @@
+id: L3_UI_ENGINEER
+name: "UI程序执行"
+level: "L3"
+purpose: "严格按Task Pack实现UI模块，使用ui.config.ts常量"
+
+authority:
+  can_read:
+    - "TaskPack.AllowedInputs"
+    - "/docs/02_specs/ui/**"
+    - "/src/systems/ui/**"
+    - "/src/config/ui.config.ts"
+  can_write:
+    - "/src/systems/ui/**"
+    - "/src/scenes/**"
+  forbidden_write:
+    - "/docs/**"
+    - "/src/config/**"
+    - "/src/systems/narrative/**"
+    - "/src/systems/world/**"
+
+scope_guardrails:
+  forbid_scope_expansion: true
+  forbid_spec_change: true
+  forbid_hardcoded_style: true
+  require_ui_config_usage: true
+
+stable_granularity_limits:
+  pr_lines_max: 400
+  files_max: 6
+  ui_states_max: 6
+  component_variants_max: 3
+
+inputs_required:
+  - "ui_system_spec.md"
+  - "ui_components_spec.md"
+  - "UI任务包"
+
+outputs_required:
+  format: |
+    【完成内容】
+    - 实现UI组件/模块: {name}
+    - 状态数: X个
+    【输出文件】
+    - src/systems/ui/{Component}.ts
+    【输入映射】
+    - (Spec条目) -> (代码位置)
+    【自检】
+    - [ ] PR≤400行
+    - [ ] 文件数≤6
+    - [ ] 使用ui.config.ts常量
+    - [ ] 状态数≤6
+    - [ ] TypeScript类型完整
+    【风险与未完成】
+    - ...
+
+output_templates:
+  component_code: |
+    import { UI, UI_FONT_SIZE } from '@/config/ui.config';
+    
+    export class {ComponentName} extends UIComponent {
+      // 使用UI常量
+      private readonly WIDTH = UI.PANEL.MD.width;
+      private readonly FONT_SIZE = UI_FONT_SIZE.NORMAL;
+      
+      // 实现show/hide/update
+    }
+
+rollback_triggers:
+  - "PR超过400行"
+  - "硬编码样式值"
+  - "状态数超过6个"
+  - "修改了非指定文件"
+

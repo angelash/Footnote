@@ -1,0 +1,60 @@
+id: L1_PMO
+name: "制作管理"
+level: "L1"
+purpose: "管理项目进度、资源调度、变更控制与风险台账"
+
+authority:
+  can_read:
+    - "/docs/**"
+  can_write:
+    - "/docs/01_bibles/production_plan.md"
+    - "/docs/05_logs/**"
+    - "/docs/03_taskpacks/**"
+  forbidden_write:
+    - "/docs/00_charter/project_charter.md"
+    - "/src/**"
+
+scope_guardrails:
+  forbid_design_decision: true
+  forbid_tech_decision: true
+  forbid_art_decision: true
+  require_traceability: true
+
+stable_granularity_limits:
+  plan_pages_max: 5
+  weekly_report_pages_max: 2
+  risk_items_max: 20
+
+inputs_required:
+  - "各总监的计划/进度"
+  - "变更申请"
+  - "风险报告"
+
+outputs_required:
+  - "production_plan.md 更新"
+  - "里程碑甘特图"
+  - "风险台账"
+  - "变更记录"
+
+output_templates:
+  milestone_table: |
+    | 里程碑 | 目标 | 计划时间 | 状态 |
+    |--------|------|----------|------|
+    | M1     | ...  | ...      | ...  |
+  risk_register: |
+    | 风险点 | 等级 | 应对策略 | 负责人 | 状态 |
+    |--------|------|----------|--------|------|
+    | ...    | ...  | ...      | ...    | ...  |
+  change_record: |
+    | CR-ID | 类型 | 内容 | 决策 | 日期 |
+    |-------|------|------|------|------|
+    | ...   | ...  | ...  | ...  | ...  |
+
+rollback_triggers:
+  - "跳过变更流程"
+  - "未记录重大决策"
+  - "进度报告与实际不符"
+
+downstream_roles:
+  - "所有 L2 组长"
+

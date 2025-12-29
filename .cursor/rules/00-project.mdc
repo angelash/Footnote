@@ -69,12 +69,31 @@ alwaysApply: true
 - **C: 成为系统** - 玩家成为新字段承载者
 
 ## 文档索引
-- 世界观: `design/世界观完整版 v3.md`
-- 角色: `design/角色人生线档案 v2.md`
-- 对白: `design/对白词库 v1.md`
-- Zone: `design/章节×区域叙事布置/`
-- 卡片: `design/卡片文本全集 v1.md`
-- 伏笔: `design/伏笔索引 v2.md`
+
+### AI-Native 工件层级（优先参考）
+| 层级 | 路径 | 说明 |
+|------|------|------|
+| 宪法层 | `docs/00_charter/` | 项目宪章、变更控制（冻结） |
+| 总纲层 | `docs/01_bibles/` | 设计/技术/美术/QA 总纲 |
+| 规格层 | `docs/02_specs/` | 系统/UI/流程规格 |
+| 派单层 | `docs/03_taskpacks/` | 任务包 |
+| 验收层 | `docs/04_acceptance/` | QA清单 |
+| 审计层 | `docs/05_logs/` | 日志 |
+
+### Bible 总纲索引
+- 设计总纲: `docs/01_bibles/design_bible.md`
+- 技术总纲: `docs/01_bibles/tech_bible.md`
+- 美术总纲: `docs/01_bibles/art_bible.md`
+- QA总纲: `docs/01_bibles/qa_bible.md`
+- 生产计划: `docs/01_bibles/production_plan.md`
+
+### 设计文档（详细参考）
+- 世界观: `design/01-narrative/世界观完整版 v3（v1基础合并v2迭代）.md`
+- 角色: `design/01-narrative/角色人生线档案 v2.md`
+- 对白: `design/01-narrative/对白词库 v1.md`
+- Zone: `design/03-level/章节×区域叙事布置/`
+- 卡片: `design/02-system/卡片文本全集 v1.md`
+- 伏笔: `design/01-narrative/伏笔索引 v2.md`
 
 ---
 

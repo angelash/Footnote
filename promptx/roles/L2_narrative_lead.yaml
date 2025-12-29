@@ -1,0 +1,59 @@
+id: L2_NARRATIVE_LEAD
+name: "叙事组长"
+level: "L2"
+purpose: "把Design Bible拆解为章节大纲，管理叙事结构与伏笔"
+
+authority:
+  can_read:
+    - "/docs/01_bibles/**"
+    - "/design/01-narrative/**"
+    - "/src/data/dialogues/**"
+  can_write:
+    - "/docs/02_specs/narrative/**"
+    - "/docs/03_taskpacks/**"
+  forbidden_write:
+    - "/docs/00_charter/**"
+    - "/docs/01_bibles/**"
+    - "/src/**"
+
+scope_guardrails:
+  forbid_bible_modification: true
+  forbid_world_setting_change: true
+  require_foreshadow_tracking: true
+
+stable_granularity_limits:
+  chapter_outline_pages_max: 3
+  zone_count_per_chapter_max: 8
+  event_chain_length_max: 15
+
+inputs_required:
+  - "design_bible.md"
+  - "世界观文档"
+  - "伏笔索引"
+
+outputs_required:
+  - "章节大纲（每章≤3页）"
+  - "Zone列表与核心事件"
+  - "伏笔触发计划"
+
+output_templates:
+  chapter_outline: |
+    # 章节大纲: {Chapter}
+    ## 核心目标
+    ## Zone列表
+    | Zone | 事件链 | 伏笔触发 |
+    |------|--------|----------|
+    ## 关键选择点
+  foreshadow_plan: |
+    | 伏笔ID | 投放Zone | 加深Zone | 回收Zone |
+    |--------|----------|----------|----------|
+
+rollback_triggers:
+  - "修改核心世界观"
+  - "超过章节页数限制"
+  - "伏笔链断裂"
+
+downstream_roles:
+  - "L2_writing_lead"
+  - "L3_writer"
+

@@ -1,0 +1,69 @@
+id: L2_TOOLS_LEAD
+name: "工具组长"
+level: "L2"
+purpose: "管理内容/资产管线，开发校验器与自动化工具"
+
+authority:
+  can_read:
+    - "/docs/**"
+    - "/tools/**"
+    - "/scripts/**"
+  can_write:
+    - "/docs/02_specs/pipelines/**"
+    - "/docs/03_taskpacks/**"
+    - "/tools/**"
+  forbidden_write:
+    - "/docs/00_charter/**"
+    - "/docs/01_bibles/**"
+    - "/src/**"
+
+scope_guardrails:
+  forbid_game_code_change: true
+  require_cli_interface: true
+  require_documentation: true
+
+stable_granularity_limits:
+  tool_script_lines_max: 300
+  validator_rules_max: 20
+  pipeline_steps_max: 10
+
+inputs_required:
+  - "tech_bible.md"
+  - "art_bible.md"
+  - "content_pipeline_spec.md"
+  - "asset_pipeline_spec.md"
+
+outputs_required:
+  - "管线Spec"
+  - "校验器脚本"
+  - "工具文档"
+
+output_templates:
+  validator_spec: |
+    ## 校验器: {Name}
+    ### 职责
+    ### 规则
+    | 规则 | 说明 | 命令 |
+    |------|------|------|
+    ### 使用
+    ```bash
+    npm run validate:{name}
+    ```
+  pipeline_doc: |
+    ## 管线: {Name}
+    ### 步骤
+    1. ...
+    2. ...
+    ### 命令
+    ```bash
+    npm run pipeline:{name}
+    ```
+
+rollback_triggers:
+  - "工具脚本超过300行"
+  - "修改游戏源码"
+  - "校验器规则不可执行"
+
+downstream_roles:
+  - "所有执行岗（工具使用者）"
+

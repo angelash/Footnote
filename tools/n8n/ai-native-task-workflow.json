@@ -1,0 +1,291 @@
+{
+  "name": "AI-Native Task Execution",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-manual",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "task_pack_path",
+              "stringValue": "docs/03_taskpacks/T-0001_example.md"
+            },
+            {
+              "name": "role",
+              "stringValue": "L3_writer"
+            },
+            {
+              "name": "project_root",
+              "stringValue": "F:/workspace/github/Footnote"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-task-params",
+      "name": "Set Task Parameters",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "filePath": "={{ $json.project_root }}/{{ $json.task_pack_path }}",
+        "options": {}
+      },
+      "id": "read-task-pack",
+      "name": "Read Task Pack",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse Task Pack frontmatter and content\nconst content = $input.first().binary?.data?.data;\nlet text = '';\nif (content) {\n  text = Buffer.from(content, 'base64').toString('utf8');\n} else {\n  text = $input.first().json?.data || '';\n}\n\n// Extract YAML frontmatter\nconst frontmatterMatch = text.match(/^---\\n([\\s\\S]*?)\\n---/);\nlet frontmatter = {};\nif (frontmatterMatch) {\n  const yaml = frontmatterMatch[1];\n  // Simple YAML parsing\n  yaml.split('\\n').forEach(line => {\n    const [key, ...valueParts] = line.split(':');\n    if (key && valueParts.length) {\n      frontmatter[key.trim()] = valueParts.join(':').trim();\n    }\n  });\n}\n\n// Extract sections\nconst sections = {\n  task_id: frontmatter.task_id || 'UNKNOWN',\n  role: frontmatter.role || $input.first().json?.role,\n  status: frontmatter.status || 'READY',\n  raw_content: text,\n  allowed_inputs: [],\n  deliverables: [],\n  constraints: [],\n  acceptance_checklist: []\n};\n\n// Extract Allowed Inputs\nconst inputsMatch = text.match(/## Allowed Inputs\\n([\\s\\S]*?)(?=##|$)/);\nif (inputsMatch) {\n  sections.allowed_inputs = inputsMatch[1].trim().split('\\n').filter(l => l.startsWith('- ')).map(l => l.replace('- ', ''));\n}\n\n// Extract Deliverables\nconst deliverablesMatch = text.match(/## Deliverables\\n([\\s\\S]*?)(?=##|$)/);\nif (deliverablesMatch) {\n  sections.deliverables = deliverablesMatch[1].trim().split('\\n').filter(l => l.startsWith('- ')).map(l => l.replace('- ', ''));\n}\n\nreturn { json: { ...sections, project_root: $input.first().json?.project_root, task_pack_path: $input.first().json?.task_pack_path } };"
+      },
+      "id": "parse-task-pack",
+      "name": "Parse Task Pack",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build minimal context for AI execution\nconst data = $input.first().json;\nconst allowedInputs = data.allowed_inputs || [];\nconst deliverables = data.deliverables || [];\n\n// Build the prompt for AI\nconst prompt = `\n# Task Execution\n\n## Current Role: ${data.role}\n## Task ID: ${data.task_id}\n\n## Task Pack Content:\n${data.raw_content}\n\n## Instructions:\n1. Read only the Allowed Inputs listed in the task pack\n2. Produce exactly the Deliverables specified\n3. Follow all constraints\n4. Output a receipt in the standard format\n\n## Output Format:\n【完成内容】\n- ...\n【输出文件】\n- ...\n【自检】\n- [ ] ...\n【风险与未完成】\n- ...\n`;\n\nreturn {\n  json: {\n    prompt,\n    task_id: data.task_id,\n    role: data.role,\n    project_root: data.project_root,\n    allowed_inputs: allowedInputs,\n    deliverables: deliverables\n  }\n};"
+      },
+      "id": "build-context",
+      "name": "Build Minimal Context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "options": {}
+      },
+      "id": "ai-execute",
+      "name": "AI Execute Task",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [1350, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Validate output\nconst output = $input.first().json?.text || $input.first().json?.message?.content || '';\nconst taskId = $('Build Minimal Context').first().json?.task_id;\nconst deliverables = $('Build Minimal Context').first().json?.deliverables || [];\n\nconst validations = [];\n\n// Check if receipt format is present\nconst hasReceipt = output.includes('【完成内容】') && output.includes('【输出文件】');\nvalidations.push({ name: 'receipt_format', passed: hasReceipt, message: hasReceipt ? 'Receipt format correct' : 'Missing receipt format' });\n\n// Check if self-check is present\nconst hasSelfCheck = output.includes('【自检】');\nvalidations.push({ name: 'self_check', passed: hasSelfCheck, message: hasSelfCheck ? 'Self-check present' : 'Missing self-check' });\n\nconst allPassed = validations.every(v => v.passed);\n\nreturn {\n  json: {\n    task_id: taskId,\n    output,\n    validations,\n    all_passed: allPassed,\n    status: allPassed ? 'REVIEW' : 'FAILED_VALIDATION'\n  }\n};"
+      },
+      "id": "validate-output",
+      "name": "Validate Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1570, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "validation-check",
+              "leftValue": "={{ $json.all_passed }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-validated",
+      "name": "Validation Passed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1790, 300]
+    },
+    {
+      "parameters": {
+        "formTitle": "Task Review: {{ $json.task_id }}",
+        "formDescription": "Review the AI-generated output and approve or reject.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Task Output",
+              "fieldType": "textarea",
+              "placeholder": "={{ $json.output }}",
+              "requiredField": false
+            },
+            {
+              "fieldLabel": "Validation Results",
+              "fieldType": "text",
+              "placeholder": "={{ JSON.stringify($json.validations) }}"
+            },
+            {
+              "fieldLabel": "Decision",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  { "option": "Approve" },
+                  { "option": "Reject - Needs Rework" },
+                  { "option": "Reject - Cancel Task" }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Review Notes",
+              "fieldType": "textarea",
+              "requiredField": false
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "wait-approval",
+      "name": "Wait for Approval",
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.2,
+      "position": [2010, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark task as failed validation\nconst data = $input.first().json;\nreturn {\n  json: {\n    task_id: data.task_id,\n    status: 'FAILED_VALIDATION',\n    validations: data.validations,\n    output: data.output,\n    action_required: 'Fix validation errors and retry'\n  }\n};"
+      },
+      "id": "handle-failure",
+      "name": "Handle Validation Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2010, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "approval-check",
+              "leftValue": "={{ $json.Decision }}",
+              "rightValue": "Approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-approved",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [2230, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark task as DONE\nconst taskId = $('Validate Output').first().json?.task_id;\nconst output = $('Validate Output').first().json?.output;\nconst reviewNotes = $json['Review Notes'] || '';\n\nreturn {\n  json: {\n    task_id: taskId,\n    status: 'DONE',\n    output: output,\n    review_notes: reviewNotes,\n    completed_at: new Date().toISOString()\n  }\n};"
+      },
+      "id": "mark-done",
+      "name": "Mark Task DONE",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2450, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle rejection - determine if rework or cancel\nconst taskId = $('Validate Output').first().json?.task_id;\nconst decision = $json.Decision;\nconst reviewNotes = $json['Review Notes'] || '';\n\nconst status = decision.includes('Cancel') ? 'CANCELLED' : 'REJECTED_NEEDS_REWORK';\n\nreturn {\n  json: {\n    task_id: taskId,\n    status: status,\n    review_notes: reviewNotes,\n    action_required: status === 'CANCELLED' ? 'Task cancelled by reviewer' : 'Fix issues per review notes and retry'\n  }\n};"
+      },
+      "id": "handle-rejection",
+      "name": "Handle Rejection",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2450, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [{ "node": "Set Task Parameters", "type": "main", "index": 0 }]
+      ]
+    },
+    "Set Task Parameters": {
+      "main": [
+        [{ "node": "Read Task Pack", "type": "main", "index": 0 }]
+      ]
+    },
+    "Read Task Pack": {
+      "main": [
+        [{ "node": "Parse Task Pack", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse Task Pack": {
+      "main": [
+        [{ "node": "Build Minimal Context", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Minimal Context": {
+      "main": [
+        [{ "node": "AI Execute Task", "type": "main", "index": 0 }]
+      ]
+    },
+    "AI Execute Task": {
+      "main": [
+        [{ "node": "Validate Output", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate Output": {
+      "main": [
+        [{ "node": "Validation Passed?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validation Passed?": {
+      "main": [
+        [{ "node": "Wait for Approval", "type": "main", "index": 0 }],
+        [{ "node": "Handle Validation Failure", "type": "main", "index": 0 }]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [{ "node": "Approved?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [{ "node": "Mark Task DONE", "type": "main", "index": 0 }],
+        [{ "node": "Handle Rejection", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [{ "name": "AI-Native" }],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-29T00:00:00.000Z",
+  "versionId": "1"
+}
+
+
+

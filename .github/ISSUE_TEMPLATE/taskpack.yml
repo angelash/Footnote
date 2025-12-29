@@ -1,0 +1,92 @@
+name: Task Pack
+description: 派单包任务（L2→L3 / L2→L2）
+title: "[T-XXXX] <短描述>"
+labels: ["taskpack", "ready"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 任务包派单
+        请填写以下信息创建任务派单。
+
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      description: 任务唯一标识符
+      placeholder: "T-0001"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: level
+    attributes:
+      label: Level
+      description: 任务层级
+      options:
+        - "L1"
+        - "L2"
+        - "L3"
+    validations:
+      required: true
+
+  - type: input
+    id: taskpack_path
+    attributes:
+      label: Task Pack 路径
+      description: 任务包文档的路径
+      placeholder: "/docs/03_taskpacks/T-0001_taskpack.md"
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Owner（上游负责人）
+      description: 负责派单的角色
+      placeholder: "L2_CLIENT_LEAD"
+    validations:
+      required: true
+
+  - type: input
+    id: executor
+    attributes:
+      label: Executor（执行者）
+      description: 负责执行的角色
+      placeholder: "L3_GAMEPLAY_ENGINEER"
+    validations:
+      required: true
+
+  - type: input
+    id: reviewer
+    attributes:
+      label: Reviewer（验收人）
+      description: 负责验收的角色
+      placeholder: "L2_CLIENT_LEAD / L2_QA_LEAD"
+    validations:
+      required: true
+
+  - type: input
+    id: budget
+    attributes:
+      label: 对话预算
+      description: 预计需要的对话轮数
+      placeholder: "1~2 / 3~7"
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: 依赖任务
+      description: 本任务开始前必须完成的任务
+      placeholder: |
+        - T-0001 ✅
+        - T-0002 ⏳
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 备注
+      description: 风险/依赖说明（不写需求正文，正文在Task Pack里）
+

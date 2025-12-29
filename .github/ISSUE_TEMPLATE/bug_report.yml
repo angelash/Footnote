@@ -1,0 +1,86 @@
+name: Bug Report
+description: 缺陷报告（必须可复现）
+title: "[BUG] <简短描述>"
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 缺陷报告
+        请提供详细的复现步骤，确保问题可被定位。
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤（≤6步）
+      description: 清晰列出复现步骤
+      placeholder: |
+        1. 打开游戏
+        2. 点击"新游戏"
+        3. 进入 C0-Z1
+        4. 触发对话
+        5. 选择选项A
+        6. 观察结果
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望结果
+      description: 正确的行为应该是什么？
+      placeholder: |
+        选择选项A后，应该进入下一段对话...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+      description: 实际发生了什么？
+      placeholder: |
+        选择选项A后，游戏卡死/对话没有反应/...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 严重程度
+      options:
+        - "Blocker - 完全阻塞，无法继续"
+        - "Critical - 核心功能受损"
+        - "Major - 重要功能问题"
+        - "Minor - 小问题，有替代方案"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志/截图
+      description: 提供日志片段、截图、事件ID、commit等
+      placeholder: |
+        ```
+        [ERROR] NarrativeEngine: Event E0001 not found
+        ```
+        
+        或附上截图...
+
+  - type: input
+    id: env
+    attributes:
+      label: 环境信息
+      description: 版本号/平台/浏览器
+      placeholder: "v0.1.0 / Chrome 120 / Windows 11"
+    validations:
+      required: true
+
+  - type: input
+    id: related
+    attributes:
+      label: 相关任务/事件
+      description: 关联的Task ID、Event ID等
+      placeholder: "T-0001, E0105"
+

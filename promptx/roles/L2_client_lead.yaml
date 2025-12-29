@@ -1,0 +1,86 @@
+# 客户端组长角色包
+# Level: L2
+
+id: L2_CLIENT_LEAD
+name: "客户端组长"
+level: "L2"
+purpose: "把规格拆成可合并PR级任务包并验收"
+
+# 权限定义
+authority:
+  can_read:
+    - "/docs/**"
+    - "/src/**"
+    - "/content/**"
+    - "/tools/**"
+  can_write:
+    - "/docs/02_specs/**"
+    - "/docs/03_taskpacks/**"
+  forbidden_write:
+    - "/docs/00_charter/**"   # 冻结层
+    - "/docs/01_bibles/**"    # L1层（需CR）
+
+# 边界约束
+scope_guardrails:
+  forbid_new_systems: true                    # 不引入新系统
+  forbid_schema_changes_without_CR: true      # Schema变更需CR
+  forbid_cross_module_refactor: true          # 不跨模块重构
+
+# 输入要求
+inputs_required:
+  - "tech_bible.md"
+  - "系统 Spec（如 narrative_system_spec.md）"
+  - "UI Spec（如 ui_flow_spec.md）"
+
+# 输出要求
+outputs_required:
+  - "模块 Spec 文档"
+  - "Task Pack 派单包"
+  - "PR Review 结果"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  pr_net_new_lines_max: 400   # PR最大400行净新增
+  touched_files_max: 6         # 最多改6个文件
+  single_module_only: true     # 单模块改动
+
+# 上下游关系
+communication:
+  upstream: 
+    - "L1_TECH_DIRECTOR"
+    - "L1_PMO"
+  downstream:
+    - "L3_GAMEPLAY_ENGINEER"
+    - "L3_UI_ENGINEER"
+    - "L3_DATA_ENGINEER"
+  review_by:
+    - "L2_QA_LEAD"
+
+# 输出模板
+output_templates:
+  taskpack_header: |
+    # TASK-PACK: T-____
+    - Level: L3
+    - Owner: L2_CLIENT_LEAD
+    - Executor: L3_GAMEPLAY_ENGINEER
+    - Reviewer: L2_CLIENT_LEAD / L2_QA_LEAD
+    - 对话预算: 3~5
+
+  review_result: |
+    ## PR Review 结果
+    - **PR**: #
+    - **Task Pack**: T-____
+    - **验收结果**: PASS / MINOR_FIX / MAJOR_FIX / ROLLBACK
+    - **检查项**:
+      - [ ] 粒度符合（≤400行，≤6文件）
+      - [ ] 单模块改动
+      - [ ] 未修改冻结目录
+      - [ ] 通过自动化测试
+    - **备注**: 
+
+# 回滚触发
+rollback_triggers:
+  - "批准了超过粒度限制的PR"
+  - "允许跨模块修改"
+  - "跳过了验收流程"
+

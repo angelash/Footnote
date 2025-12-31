@@ -116,6 +116,17 @@ Task Pack 必须包含：
 - **是否需要封装**：强烈建议封装（见 Rollout Plan 的 P0-4）。
   - 理由：cursor-agent 具备执行命令/写文件能力，必须用“Deliverables 白名单校验 + git diff 审计 + 校验器阻断”防止跑偏/越权改动。
 
+### 5.5 MCP（含 ChromeMCP/Browser MCP）落地策略
+
+> 你要求“浏览器测试在 Windows 环境下走 ChromeMCP/Browser MCP”，这通常与 WSL 执行器天然分离。
+
+- **WSL Runner（默认）**：用于代码/文档任务，依赖 `--approve-mcps` 但不要求浏览器 MCP。
+- **Windows Runner（浏览器任务）**：用于 UI/E2E/多模态识别等需要浏览器自动化的任务
+  - 建议：Task Pack 标记 `execution_runtime: windows` 或 `requires_mcp: browser`
+  - 执行：Windows 上的 `cursor-agent --browser`（并确保 `~/.cursor/mcp.json` 已配置 Browser MCP 服务）
+
+> 具体 Browser MCP 配置示例仓库已有（见 `docs/智绘AI生图自动化演示文案.md`）。
+
 ### 5.3 关键环境变量（建议）
 最低限建议：
 - `N8N_PORT`, `N8N_HOST`, `N8N_PROTOCOL`

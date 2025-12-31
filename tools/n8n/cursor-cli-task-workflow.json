@@ -23,6 +23,18 @@
               "stringValue": "L3_writer"
             },
             {
+              "name": "task_type",
+              "stringValue": "doc"
+            },
+            {
+              "name": "complexity",
+              "stringValue": "normal"
+            },
+            {
+              "name": "model_override",
+              "stringValue": "auto"
+            },
+            {
               "name": "project_root",
               "stringValue": "/home/shash/work/Footnote"
             },
@@ -76,7 +88,7 @@
     },
     {
       "parameters": {
-        "command": "bash -c 'cd {{ $(''Set Task Parameters'').first().json.project_root }} && ~/.local/bin/cursor-agent --print --force --approve-mcps --output-format text \"$(cat .cursor/current_task_prompt.md)\"'",
+        "command": "bash -c 'cd {{ $(''Set Task Parameters'').first().json.project_root }} && tools/n8n/run-cursor-task.sh --task-pack {{ $(''Set Task Parameters'').first().json.task_pack_path }} --prompt-file .cursor/current_task_prompt.md --task-type {{ $(''Set Task Parameters'').first().json.task_type }} --complexity {{ $(''Set Task Parameters'').first().json.complexity }} --model-override {{ $(''Set Task Parameters'').first().json.model_override }}'",
         "options": {
           "cwd": "={{ $('Set Task Parameters').first().json.project_root }}"
         }

@@ -2,6 +2,14 @@
 
 > **模板说明**：复制此模板创建新任务包，命名格式为 `T-XXXX_<简短描述>.md`
 
+> **可选前置字段（建议写在 YAML frontmatter 里，供自动化选模型/选执行器）**：
+>
+> - `task_type`: `doc` | `code` | `multimodal`
+> - `complexity`: `normal` | `high` | `max`
+> - `model_override`: (可选) 直接指定 cursor-agent `--model`，例如 `gpt-5.2-high`
+> - `execution_runtime`: `wsl` | `windows`（默认 `wsl`）
+> - `requires_mcp`: (可选) 例如 `browser`（需要 ChromeMCP/Browser MCP）
+
 ---
 
 ## 基本信息

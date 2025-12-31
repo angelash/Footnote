@@ -76,6 +76,15 @@ Check Validation (检查结果)
 **项目路径**: `/home/shash/work/Footnote`  
 **Cursor Agent**: `~/.local/bin/cursor-agent`
 
+### 模型选择（按任务类型）
+
+> 推荐在工作流里通过参数控制（`task_type / complexity / model_override`），并由封装脚本 `tools/n8n/run-cursor-task.sh` 统一选择模型与做变更护栏。
+
+- **doc** → 默认 `gpt-5.2`（复杂/Max → `gpt-5.2-high`）
+- **code** → 默认 `opus-4.5`（复杂/Max → `opus-4.5-thinking`）
+- **multimodal** → 默认 `gemini-3-pro`
+- **model_override**：直接指定 `cursor-agent --model`（例如 `gpt-5.2-high`），填 `auto` 表示走默认映射
+
 ### 修改任务参数
 
 在 **Set Task Parameters** 节点中修改：
@@ -84,6 +93,9 @@ Check Validation (检查结果)
 |------|------|------|
 | `task_pack_path` | Task Pack 文件路径 | `docs/03_taskpacks/T-0001.md` |
 | `role` | 执行角色 | `L3_writer` |
+| `task_type` | 任务类型（用于选模型） | `doc` / `code` / `multimodal` |
+| `complexity` | 复杂度（用于选高/Max档） | `normal` / `high` / `max` |
+| `model_override` | 显式指定模型（可选） | `auto` / `gpt-5.2-high` |
 | `project_root` | 项目根目录（WSL 路径） | `/home/shash/work/Footnote` |
 | `wsl_user` | WSL 用户名 | `shash` |
 

@@ -29,6 +29,45 @@
 
 ---
 
+## 1.1 模型选择策略（落地约定）
+
+> 目标：运行 `cursor-agent` 时**按任务类型自动指定模型**，并支持按复杂度启用“高/Max”档。
+
+### Task Pack 字段（建议）
+- `task_type`: `doc` | `code` | `multimodal`
+- `complexity`: `normal` | `high` | `max`
+- `model_override`: 可选，显式指定 `cursor-agent --model`（优先级最高）
+
+### 默认映射（你要求的策略）
+- **文档类（doc）**：`gpt-5.2`
+  - `high/max`：优先 `gpt-5.2-high`（若不可用则回退 `gpt-5.2`）
+- **代码类（code）**：`opus-4.5`
+  - `high/max`：优先 `opus-4.5-thinking`（若不可用则回退 `opus-4.5`）
+- **多模态识别（multimodal）**：`gemini-3-pro`
+  - `high/max`：仍使用 `gemini-3-pro`（目前无明确高档变体则不切）
+
+> 注：可用模型列表以运行时为准；`cursor-agent --help` 支持 `--model`，传错会返回可用列表（已实测）。
+
+---
+
+## 1.2 MCP/ChromeMCP 策略（落地约定）
+
+### 原则
+- **代码/文档任务**：默认只跑 **WSL 执行器**（执行副本 A）。
+- **需要浏览器自动化/ChromeMCP 的任务**：建议使用 **Windows 执行器**（因为 Chrome/扩展/MCP 通常在 Windows 侧）。
+
+### 两种执行器（建议落地为两个 runner）
+- **Runner-WSL（默认）**：`n8n-secondary (WSL 5680)` → `cursor-agent`（WSL）→ 文件/命令/WSL 工具链
+- **Runner-Windows（浏览器任务）**：`n8n-primary (Windows 5678)` → `cursor-agent --browser`（Windows）→ ChromeMCP/Browser MCP
+
+### Task Pack 字段（建议）
+- `execution_runtime`: `wsl` | `windows`（默认 `wsl`）
+- `requires_mcp`: 可选，例如 `browser`（浏览器自动化）
+
+> 浏览器 MCP 的具体配置可参考仓库内已有文档（例如 `docs/智绘AI生图自动化演示文案.md` 中的 `~/.cursor/mcp.json` 配置示例）。
+
+---
+
 ## 2. 里程碑（Milestones）
 
 ### M0：跑通一次端到端（E2E）冒烟（目标：今天）

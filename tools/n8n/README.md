@@ -4,11 +4,16 @@
 
 ### 1. 启动 n8n
 
+**当前配置**: 手动启动
+
 ```bash
 n8n
 ```
 
 访问 http://localhost:5678
+
+**配置为常驻服务**: 参见 [SERVICE-SETUP.md](./SERVICE-SETUP.md)  
+**主从集群架构**: 参见 [CLUSTER-SETUP.md](./CLUSTER-SETUP.md)
 
 ### 2. 登录信息
 

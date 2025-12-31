@@ -3,7 +3,7 @@
 ## 当前状态
 
 ✅ **WSL 从实例**: 运行中（端口 5680）  
-⚠️ **Windows 主实例**: 需要修复启动方式
+⚠️ **Windows 主实例**: 5678 端口已监听，但建议统一纳入 PM2 托管（避免状态漂移）
 
 ---
 
@@ -12,8 +12,13 @@
 ### Windows 主实例
 
 ```powershell
-pm2 delete n8n-primary
-pm2 start n8n --name n8n-primary -- --port 5678 --host 0.0.0.0
+# 注意：n8n v2 不支持 --port 参数，端口/host 用环境变量配置
+$env:N8N_PORT=5678
+$env:N8N_HOST='0.0.0.0'
+$env:N8N_PROTOCOL='http'
+
+pm2 delete n8n-primary 2>$null
+pm2 start n8n --name n8n-primary -- start
 pm2 save
 ```
 

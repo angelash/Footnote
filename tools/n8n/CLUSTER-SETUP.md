@@ -251,24 +251,44 @@ wsl bash -c "cd /home/shash/work/Footnote && $wslCommand"
 # tools/n8n/sync-workflows.ps1
 # 从主实例同步工作流到从实例
 
-$primaryUrl = "http://localhost:5678"
-$secondaryUrl = "http://localhost:5680"
-$auth = "admin@footnote.local:Footnote2025!"
+$primaryUrl = "http://localhost:5678/api/v1"
+$secondaryUrl = "http://localhost:5680/api/v1"
+
+# ⚠️ Public API 需要 API Key（不是 Basic Auth）
+# 在两个实例：Settings → n8n API 创建 API Key
+# 然后用环境变量注入（不要提交到仓库）
+$primaryApiKey = $env:N8N_PRIMARY_API_KEY
+$secondaryApiKey = $env:N8N_SECONDARY_API_KEY
+
+if (-not $primaryApiKey -or -not $secondaryApiKey) {
+    throw "Missing API keys. Set N8N_PRIMARY_API_KEY and N8N_SECONDARY_API_KEY."
+}
+
+$headersPrimary = @{ 'X-N8N-API-KEY' = $primaryApiKey }
+$headersSecondary = @{ 'X-N8N-API-KEY' = $secondaryApiKey }
 
 # 获取主实例的所有工作流
-$workflows = Invoke-RestMethod -Uri "$primaryUrl/api/v1/workflows" `
-    -Headers @{Authorization = "Basic $([Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($auth)))"}
+$workflows = Invoke-RestMethod -Uri "$primaryUrl/workflows" -Headers $headersPrimary
 
 foreach ($workflow in $workflows.data) {
     # 导出工作流
-    $workflowJson = Invoke-RestMethod -Uri "$primaryUrl/api/v1/workflows/$($workflow.id)" `
-        -Headers @{Authorization = "Basic $([Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($auth)))"}
+    $workflowJson = Invoke-RestMethod -Uri "$primaryUrl/workflows/$($workflow.id)" -Headers $headersPrimary
     
-    # 导入到从实例
-    Invoke-RestMethod -Uri "$secondaryUrl/api/v1/workflows" `
+    # ⚠️ 注意：Public API 对 Create/Update 的 schema 很严格
+    # 导出的 workflow 对象包含大量额外字段，需要 sanitize（只保留 name/nodes/connections/settings/active 等）
+    $payload = @{
+        name        = $workflowJson.name
+        nodes       = $workflowJson.nodes
+        connections = $workflowJson.connections
+        settings    = $workflowJson.settings
+        active      = $workflowJson.active
+    } | ConvertTo-Json -Depth 100
+
+    # 导入到从实例（示例：创建；如需“更新同名”，建议先查重再 PUT）
+    Invoke-RestMethod -Uri "$secondaryUrl/workflows" `
         -Method Post `
-        -Headers @{Authorization = "Basic $([Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($auth)))"} `
-        -Body ($workflowJson | ConvertTo-Json -Depth 10) `
+        -Headers $headersSecondary `
+        -Body $payload `
         -ContentType "application/json"
 }
 ```
@@ -308,7 +328,7 @@ foreach ($workflow in $workflows.data) {
 // 调用从实例的 Webhook
 POST http://localhost:5680/webhook/execute-task
 {
-  "task_pack_path": "docs/03_taskpacks/T-0001.md",
+  "task_pack_path": "docs/03_taskpacks/T-0001_c0_z1_dialogue.md",
   "role": "L3_writer"
 }
 ```

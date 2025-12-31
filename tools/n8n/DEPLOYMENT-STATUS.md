@@ -1,65 +1,49 @@
 # n8n 集群部署状态
 
-**部署时间**: 2025-12-31
+**更新时间**: 2025-12-31
 
 ---
 
-## ✅ 已完成
+## ✅ 当前运行态（实测）
 
-### Windows 环境
-- ✅ Node.js v22.15.0 已安装
-- ✅ npm 11.6.2 已安装
-- ✅ PM2 已安装
-- ✅ n8n 已安装
+### Windows 主实例（5678）
+- ✅ **端口**：5678 已监听
+- ✅ **UI**：http://localhost:5678（Sign in 页面可访问）
+- ⚠️ **进程托管**：当前是 `node.exe ... n8n start` 直接启动在前台/后台进程中  
+  - `pm2 status` 中 `n8n-primary` 显示为 **stopped**（需要把主实例纳入 PM2 托管，避免“端口在但 PM2 漂移”）
 
-### 待完成
-
-### WSL 环境
-- ⏳ **需要安装 Node.js**（WSL 中未检测到 Node.js）
-- ⏳ 安装 PM2（需要先有 Node.js）
-- ⏳ 安装 n8n（需要先有 Node.js）
-- ⏳ 配置并启动从实例
+### WSL 从实例（5680）
+- ✅ **PM2**：`n8n-secondary` online
+- ✅ **UI**：http://localhost:5680
 
 ---
 
-## 下一步操作
+## ✅ 环境检查（实测）
 
-### 1. 在 WSL 中安装 Node.js
+### Windows
+- ✅ Node.js / npm / n8n / PM2 可用
 
-```bash
-# 方法 1: 使用 NodeSource（推荐）
-wsl bash -c "curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs"
-
-# 方法 2: 使用 nvm
-wsl bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash"
-wsl bash -c "source ~/.bashrc && nvm install 22"
-```
-
-### 2. 在 WSL 中安装 PM2 和 n8n
-
-```bash
-wsl bash -c "cd /home/shash/work/Footnote && npm install -g pm2 n8n"
-```
-
-### 3. 启动 WSL 从实例
-
-```bash
-wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/ecosystem.config.wsl.js --only n8n-secondary"
-```
+### WSL
+- ✅ Node.js `v22.21.0`
+- ✅ npm `10.9.4`
+- ✅ n8n `2.1.4`
+- ✅ PM2 `6.0.14`
 
 ---
 
-## 当前状态
+## ✅ 已完成（对“二级 n8n + Cursor CLI”方案的基础支撑）
+- ✅ 主/从实例端口就绪（5678 / 5680）
+- ✅ WSL 执行环境就绪（Node/n8n/PM2）
 
-### Windows 主实例
-- **状态**: 配置中
-- **端口**: 5678
-- **PM2 进程**: 待启动
+---
 
-### WSL 从实例
-- **状态**: 等待 Node.js 安装
-- **端口**: 5680
-- **PM2 进程**: 未启动
+## ⏳ 待完成（P0 阻塞项）
+1. **主实例纳入 PM2 管理**（并清理当前手动启动的 `n8n start` 进程）
+2. **导入/同步工作流**
+   - 主实例：`tools/n8n/cursor-cli-task-workflow-windows.json`（Windows→WSL 桥接版本）
+   - 从实例：`tools/n8n/cursor-cli-task-workflow.json`（WSL 直跑版本）
+3. **跑通一次端到端冒烟**：Task Pack → cursor-agent → 校验器 → 回执/日志
+4. **明确 repo 同步策略**：Windows 工作区与 WSL 工作副本的一致性如何保证
 
 ---
 

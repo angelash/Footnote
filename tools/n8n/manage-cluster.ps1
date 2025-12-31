@@ -16,8 +16,16 @@ function Show-Status {
 
 function Start-All {
     Write-Host "启动所有实例..." -ForegroundColor Cyan
-    pm2 start ecosystem.config.js --only n8n-primary
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/ecosystem.config.wsl.js --only n8n-secondary"
+    # Windows 主实例：n8n v2 不支持 --port 参数，端口/host 用环境变量配置
+    $env:N8N_PORT = "5678"
+    $env:N8N_HOST = "0.0.0.0"
+    $env:N8N_PROTOCOL = "http"
+    pm2 delete n8n-primary 2>$null
+    pm2 start n8n --name n8n-primary -- start
+
+    # WSL 从实例：使用仓库内启动脚本（包含端口 5680 配置）
+    wsl bash -c "cd /home/shash/work/Footnote && pm2 delete n8n-secondary 2>/dev/null"
+    wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
     Write-Host "完成！" -ForegroundColor Green
 }
 

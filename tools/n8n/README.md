@@ -1,16 +1,21 @@
 # n8n AI-Native 工作流
 
+> **推荐先读架构规格**：`docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
+
 ## 快速开始
 
 ### 1. 启动 n8n
 
-**当前配置**: 手动启动
+**当前工程支持两种形态**：
+- **单实例（最简）**：只跑一个 n8n（常见是 5678）
+- **主从（推荐）**：Windows 主实例 `5678` + WSL 从实例 `5680`（执行都落到 WSL）
 
 ```bash
-n8n
+n8n start
 ```
 
-访问 http://localhost:5678
+默认访问（主实例）：http://localhost:5678  
+从实例（WSL）：http://localhost:5680
 
 **配置为常驻服务**: 参见 [SERVICE-SETUP.md](./SERVICE-SETUP.md)  
 **主从集群架构**: 参见 [CLUSTER-SETUP.md](./CLUSTER-SETUP.md)
@@ -181,7 +186,9 @@ npm run lint && npm run test:unit
 
 ## 下一步
 
-1. **创建第一个 Task Pack**: `docs/03_taskpacks/T-0001_example.md`
+1. **创建/选择第一个 Task Pack**:
+   - 模板：`docs/03_taskpacks/_template.md`
+   - 示例：`docs/03_taskpacks/T-0001_c0_z1_dialogue.md`
 2. **测试工作流**: 手动执行一次
 3. **添加校验器**: 根据项目需求
 4. **切换到 Webhook**: 实现自动触发

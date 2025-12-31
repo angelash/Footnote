@@ -33,7 +33,7 @@ Environment="NODE_ENV=production"
 Environment="N8N_BASIC_AUTH_ACTIVE=true"
 Environment="N8N_BASIC_AUTH_USER=admin@footnote.local"
 Environment="N8N_BASIC_AUTH_PASSWORD=Footnote2025!"
-ExecStart=/mnt/c/Users/Lenovo/AppData/Roaming/npm/n8n start
+ExecStart=/usr/bin/n8n start
 Restart=always
 RestartSec=10
 

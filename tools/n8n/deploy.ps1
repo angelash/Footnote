@@ -138,21 +138,19 @@ function Configure-PM2 {
     
     # Windows 主实例
     Write-Host "  配置 Windows 主实例..." -ForegroundColor Cyan
-    $ecosystemPath = "tools\n8n\ecosystem.config.js"
-    if (Test-Path $ecosystemPath) {
-        pm2 delete n8n-primary 2>&1 | Out-Null
-        pm2 start $ecosystemPath --only n8n-primary
-        Write-Host "  ✓ Windows 主实例已启动" -ForegroundColor Green
-    } else {
-        Write-Host "  ✗ 配置文件不存在: $ecosystemPath" -ForegroundColor Red
-    }
+    # 注意：n8n v2 不支持 --port 参数，端口/host 需用环境变量配置
+    $env:N8N_PORT = "5678"
+    $env:N8N_HOST = "0.0.0.0"
+    $env:N8N_PROTOCOL = "http"
+    pm2 delete n8n-primary 2>&1 | Out-Null
+    pm2 start n8n --name n8n-primary -- start
+    Write-Host "  ✓ Windows 主实例已启动（PM2: n8n-primary）" -ForegroundColor Green
     
     # WSL 从实例
     Write-Host "  配置 WSL 从实例..." -ForegroundColor Cyan
-    $wslEcosystemPath = "tools/n8n/ecosystem.config.wsl.js"
     $wslDelete = "cd /home/shash/work/Footnote; pm2 delete n8n-secondary 2>&1"
     wsl bash -c $wslDelete | Out-Null
-    $wslStart = "cd /home/shash/work/Footnote; pm2 start $wslEcosystemPath --only n8n-secondary"
+    $wslStart = "cd /home/shash/work/Footnote; pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
     wsl bash -c $wslStart
     Write-Host "  ✓ WSL 从实例已启动" -ForegroundColor Green
     

@@ -103,7 +103,7 @@ pm2 start "C:\Users\Lenovo\AppData\Roaming\npm\node_modules\n8n\bin\n8n" --name 
 ### WSL 从实例启动方式
 
 ```bash
-wsl bash -c "cd /home/shash/work/Footnote && pm2 start n8n --name n8n-secondary -- --port 5680 --host 0.0.0.0"
+wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
 ```
 
 ---

@@ -58,7 +58,7 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/ecosystem.confi
 
 ### WSL 从实例
 - **状态**: 等待 Node.js 安装
-- **端口**: 5679
+- **端口**: 5680
 - **PM2 进程**: 未启动
 
 ---

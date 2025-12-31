@@ -41,10 +41,10 @@ wsl bash -c "curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - &
 wsl bash -c "cd /home/shash/work/Footnote && npm install -g pm2 n8n"
 
 # 3. 启动从实例
-wsl bash -c "cd /home/shash/work/Footnote && N8N_PORT=5679 N8N_HOST=0.0.0.0 n8n start"
+wsl bash -c "cd /home/shash/work/Footnote && N8N_PORT=5680 N8N_HOST=0.0.0.0 n8n start"
 ```
 
-访问: http://localhost:5679
+访问: http://localhost:5680
 
 ---
 

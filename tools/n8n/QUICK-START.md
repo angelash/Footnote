@@ -2,7 +2,7 @@
 
 ## 当前状态
 
-✅ **WSL 从实例**: 运行中（端口 5679）  
+✅ **WSL 从实例**: 运行中（端口 5680）  
 ⚠️ **Windows 主实例**: 需要修复启动方式
 
 ---
@@ -20,8 +20,8 @@ pm2 save
 ### WSL 从实例
 
 ```bash
-wsl bash -c "cd /home/shash/work/Footnote && pm2 delete n8n-secondary"
-wsl bash -c "cd /home/shash/work/Footnote && pm2 start n8n --name n8n-secondary -- --port 5679 --host 0.0.0.0"
+wsl bash -c "cd /home/shash/work/Footnote && pm2 delete n8n-secondary 2>/dev/null"
+wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
 wsl bash -c "cd /home/shash/work/Footnote && pm2 save"
 ```
 
@@ -30,7 +30,7 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 save"
 ## 访问地址
 
 - **主实例**: http://localhost:5678
-- **从实例**: http://localhost:5679
+- **从实例**: http://localhost:5680
 
 **登录信息**:
 - Email: `admin@footnote.local`

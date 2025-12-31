@@ -15,7 +15,7 @@ Windows 环境（主）
 
 WSL 环境（从）
 ├── PM2 (进程管理器)
-│   └── n8n-secondary (从实例，端口 5679)
+│   └── n8n-secondary (从实例，端口 5680)
 │       ├── 辅助执行
 │       ├── WSL 专用任务
 │       └── cursor-agent 集成
@@ -35,7 +35,7 @@ WSL 环境（从）
 - ✅ 用户界面访问
 - ✅ 工作流同步到从实例
 
-**从实例 (WSL, 5679)**：
+**从实例 (WSL, 5680)**：
 - ✅ 执行需要 WSL 环境的任务
 - ✅ cursor-agent 集成
 - ✅ Git 操作（SSH）
@@ -142,7 +142,7 @@ npm install -g n8n pm2
 
 ```bash
 # .env.n8n.secondary
-N8N_PORT=5679
+N8N_PORT=5680
 N8N_HOST=0.0.0.0
 N8N_PROTOCOL=http
 N8N_BASIC_AUTH_ACTIVE=true
@@ -164,7 +164,7 @@ module.exports = {
       args: 'start',
       cwd: '/home/shash/work/Footnote',
       env: {
-        N8N_PORT: 5679,
+        N8N_PORT: 5680,
         N8N_HOST: '0.0.0.0',
         N8N_BASIC_AUTH_ACTIVE: 'true',
         N8N_BASIC_AUTH_USER: 'admin@footnote.local',
@@ -252,7 +252,7 @@ wsl bash -c "cd /home/shash/work/Footnote && $wslCommand"
 # 从主实例同步工作流到从实例
 
 $primaryUrl = "http://localhost:5678"
-$secondaryUrl = "http://localhost:5679"
+$secondaryUrl = "http://localhost:5680"
 $auth = "admin@footnote.local:Footnote2025!"
 
 # 获取主实例的所有工作流
@@ -306,7 +306,7 @@ foreach ($workflow in $workflows.data) {
 ```javascript
 // 在主实例工作流中使用 HTTP Request 节点
 // 调用从实例的 Webhook
-POST http://localhost:5679/webhook/execute-task
+POST http://localhost:5680/webhook/execute-task
 {
   "task_pack_path": "docs/03_taskpacks/T-0001.md",
   "role": "L3_writer"
@@ -357,7 +357,7 @@ Show-Status
 ## 访问地址
 
 - **主实例**: http://localhost:5678
-- **从实例**: http://localhost:5679
+- **从实例**: http://localhost:5680
 
 ---
 

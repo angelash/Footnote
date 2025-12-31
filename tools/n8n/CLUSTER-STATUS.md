@@ -15,7 +15,7 @@
 - ✅ Node.js: 已安装
 - ✅ PM2: 6.0.14
 - ✅ n8n: 2.1.4
-- ✅ 从实例: 已启动（端口 5679）
+- ✅ 从实例: 已启动（端口 5680）
 
 ---
 
@@ -28,9 +28,10 @@
 - **状态**: ✅ 运行中
 
 ### 从实例 (WSL)
-- **端口**: 5679
+- **端口**: 5680
 - **PM2 名称**: n8n-secondary
-- **访问地址**: http://localhost:5679
+- **访问地址**: http://localhost:5680
+- **启动方式**: `pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary`
 - **状态**: ✅ 运行中
 
 ---
@@ -80,7 +81,7 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 stop n8n-secondary"
 1. **访问主实例**: http://localhost:5678
    - 登录: admin@footnote.local / Footnote2025!
 
-2. **访问从实例**: http://localhost:5679
+2. **访问从实例**: http://localhost:5680
    - 登录: admin@footnote.local / Footnote2025!
 
 3. **导入工作流**:

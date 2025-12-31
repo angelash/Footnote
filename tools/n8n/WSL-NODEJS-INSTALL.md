@@ -108,7 +108,7 @@ n8n --version
 
 ```bash
 cd /home/shash/work/Footnote
-N8N_PORT=5679 N8N_HOST=0.0.0.0 n8n start
+N8N_PORT=5680 N8N_HOST=0.0.0.0 n8n start
 ```
 
 ---

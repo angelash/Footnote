@@ -16,11 +16,11 @@
 
 ### ✅ WSL 从实例
 - **状态**: ✅ **运行中** (online)
-- **端口**: 5679
+- **端口**: 5680
 - **PM2 名称**: n8n-secondary
 - **PID**: 3358
 - **内存**: 53.8mb
-- **访问地址**: http://localhost:5679
+- **访问地址**: http://localhost:5680
 
 ---
 
@@ -32,7 +32,7 @@
 
 ### 访问地址
 - **主实例**: http://localhost:5678
-- **从实例**: http://localhost:5679
+- **从实例**: http://localhost:5680
 
 ---
 
@@ -81,7 +81,7 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 stop n8n-secondary"
 1. **访问主实例**: http://localhost:5678
    - 导入工作流: `cursor-cli-task-workflow-windows.json`
 
-2. **访问从实例**: http://localhost:5679
+2. **访问从实例**: http://localhost:5680
    - 导入工作流: `cursor-cli-task-workflow.json`
 
 3. **配置工作流同步**: 参见 `CLUSTER-SETUP.md`
@@ -103,7 +103,7 @@ pm2 start "C:\Users\Lenovo\AppData\Roaming\npm\node_modules\n8n\bin\n8n" --name 
 ### WSL 从实例启动方式
 
 ```bash
-wsl bash -c "cd /home/shash/work/Footnote && pm2 start n8n --name n8n-secondary -- --port 5679 --host 0.0.0.0"
+wsl bash -c "cd /home/shash/work/Footnote && pm2 start n8n --name n8n-secondary -- --port 5680 --host 0.0.0.0"
 ```
 
 ---

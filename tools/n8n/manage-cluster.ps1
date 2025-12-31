@@ -6,12 +6,12 @@ function Show-Status {
     Write-Host "`n[Windows] 主实例 (端口 5678):" -ForegroundColor Yellow
     pm2 status n8n-primary 2>&1
     
-    Write-Host "`n[WSL] 从实例 (端口 5679):" -ForegroundColor Yellow
+    Write-Host "`n[WSL] 从实例 (端口 5680):" -ForegroundColor Yellow
     wsl bash -c "cd /home/shash/work/Footnote && pm2 status n8n-secondary" 2>&1
     
     Write-Host "`n访问地址:" -ForegroundColor Green
     Write-Host "  主实例: http://localhost:5678" -ForegroundColor White
-    Write-Host "  从实例: http://localhost:5679" -ForegroundColor White
+    Write-Host "  从实例: http://localhost:5680" -ForegroundColor White
 }
 
 function Start-All {

@@ -182,14 +182,14 @@ function Verify-Deployment {
     $secondaryStatusScript = "cd /home/shash/work/Footnote; pm2 status n8n-secondary"
     $secondaryStatus = wsl bash -c $secondaryStatusScript 2>&1
     if ($secondaryStatus -match "online") {
-        Write-Host "  ✓ WSL 从实例运行中 (端口 5679)" -ForegroundColor Green
+        Write-Host "  ✓ WSL 从实例运行中 (端口 5680)" -ForegroundColor Green
     } else {
         Write-Host "  ✗ WSL 从实例未运行" -ForegroundColor Red
     }
     
     # 检查端口
     $port5678 = netstat -ano | findstr :5678
-    $port5679 = netstat -ano | findstr :5679
+    $port5680 = netstat -ano | findstr :5680
     
     if ($port5678) {
         Write-Host "  ✓ 端口 5678 已监听" -ForegroundColor Green
@@ -197,10 +197,10 @@ function Verify-Deployment {
         Write-Host "  ✗ 端口 5678 未监听" -ForegroundColor Red
     }
     
-    if ($port5679) {
-        Write-Host "  ✓ 端口 5679 已监听" -ForegroundColor Green
+    if ($port5680) {
+        Write-Host "  ✓ 端口 5680 已监听" -ForegroundColor Green
     } else {
-        Write-Host "  ✗ 端口 5679 未监听" -ForegroundColor Red
+        Write-Host "  ✗ 端口 5680 未监听" -ForegroundColor Red
     }
     
     Write-Host ""
@@ -219,7 +219,7 @@ try {
     Write-Host ""
     Write-Host "访问地址:" -ForegroundColor Cyan
     Write-Host "  主实例: http://localhost:5678" -ForegroundColor White
-    Write-Host "  从实例: http://localhost:5679" -ForegroundColor White
+    Write-Host "  从实例: http://localhost:5680" -ForegroundColor White
     Write-Host ""
     Write-Host "管理命令:" -ForegroundColor Cyan
     Write-Host "  查看状态: .\tools\n8n\manage-cluster.ps1 -Action status" -ForegroundColor White

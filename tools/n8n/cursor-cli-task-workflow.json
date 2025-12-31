@@ -76,7 +76,7 @@
     },
     {
       "parameters": {
-        "command": "cd {{ $('Set Task Parameters').first().json.project_root }} && ~/.local/bin/cursor-agent --print --force --approve-mcps --output-format text \"$(cat .cursor/current_task_prompt.md)\"",
+        "command": "bash -c 'cd {{ $(''Set Task Parameters'').first().json.project_root }} && ~/.local/bin/cursor-agent --print --force --approve-mcps --output-format text \"$(cat .cursor/current_task_prompt.md)\"'",
         "options": {
           "cwd": "={{ $('Set Task Parameters').first().json.project_root }}"
         }
@@ -90,7 +90,7 @@
     },
     {
       "parameters": {
-        "command": "cd {{ $('Set Task Parameters').first().json.project_root }} && npm run validate --if-present 2>&1 || echo 'No validator configured'",
+        "command": "bash -c 'cd {{ $(''Set Task Parameters'').first().json.project_root }} && npm run validate --if-present 2>&1 || echo \"No validator configured\"'",
         "options": {
           "cwd": "={{ $('Set Task Parameters').first().json.project_root }}"
         }

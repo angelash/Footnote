@@ -61,6 +61,11 @@ Check Validation (检查结果)
 
 ## 配置项
 
+### WSL 环境配置（当前使用）
+
+**项目路径**: `/home/shash/work/Footnote`  
+**Cursor Agent**: `~/.local/bin/cursor-agent`
+
 ### 修改任务参数
 
 在 **Set Task Parameters** 节点中修改：
@@ -69,7 +74,12 @@ Check Validation (检查结果)
 |------|------|------|
 | `task_pack_path` | Task Pack 文件路径 | `docs/03_taskpacks/T-0001.md` |
 | `role` | 执行角色 | `L3_writer` |
-| `project_root` | 项目根目录 | `F:/workspace/github/Footnote` |
+| `project_root` | 项目根目录（WSL 路径） | `/home/shash/work/Footnote` |
+| `wsl_user` | WSL 用户名 | `shash` |
+
+**重要**: 
+- 项目必须在 WSL 文件系统中（`/home/...`），不能在 Windows 挂载点（`/mnt/...`）
+- 使用 `cursor-agent` 而不是 `cursor` 命令
 
 ### GitHub 集成（可选）
 
@@ -112,7 +122,17 @@ curl -X POST http://localhost:5678/webhook/xxx \
 
 ### Q: Cursor CLI 不可用？
 
-确保 Cursor 已安装并添加到 PATH：
+**WSL 环境**（当前配置）:
+
+```bash
+# 在 WSL 中检查 cursor-agent
+~/.local/bin/cursor-agent --version
+
+# 如果不存在，检查安装位置
+find ~ -name cursor-agent -type f 2>/dev/null
+```
+
+**Windows 环境**:
 
 ```bash
 # 检查 Cursor CLI
@@ -121,6 +141,22 @@ cursor --version
 # 如果不行，手动添加到 PATH
 # Windows: 通常在 %LOCALAPPDATA%\Programs\cursor\
 ```
+
+### Q: n8n 在 Windows 还是 WSL 中运行？
+
+**如果 n8n 在 Windows 中运行**，需要在工作流的命令前加 `wsl`：
+
+```bash
+wsl bash -c "cd /home/shash/work/Footnote && ~/.local/bin/cursor-agent ..."
+```
+
+**如果 n8n 在 WSL 中运行**，可以直接执行：
+
+```bash
+cd /home/shash/work/Footnote && ~/.local/bin/cursor-agent ...
+```
+
+当前工作流配置为**直接在 WSL 中执行**（假设 n8n 在 WSL 中运行）。如果 n8n 在 Windows 中，需要修改 **Execute Cursor CLI** 和 **Run Validators** 节点的命令。
 
 ### Q: 如何添加新的校验器？
 

@@ -85,6 +85,13 @@ Check Validation (检查结果)
 - **multimodal** → 默认 `gemini-3-pro`
 - **model_override**：直接指定 `cursor-agent --model`（例如 `gpt-5.2-high`），填 `auto` 表示走默认映射
 
+### Windows 浏览器/MCP 任务（无 Cursor CLI）
+
+> 约束：Windows 环境没有 `cursor-agent` 时，浏览器测试/ChromeMCP 任务应使用 **独立 MCP Runner**（模型 API 驱动 MCP），而不是 `cursor-agent --browser`。
+
+- MCP Runner：`tools/mcp-runner/mcp-runner.mjs`
+- Browser MCP 配置示例：`docs/智绘AI生图自动化演示文案.md`
+
 ### 修改任务参数
 
 在 **Set Task Parameters** 节点中修改：

@@ -58,7 +58,8 @@
 
 ### 两种执行器（建议落地为两个 runner）
 - **Runner-WSL（默认）**：`n8n-secondary (WSL 5680)` → `cursor-agent`（WSL）→ 文件/命令/WSL 工具链
-- **Runner-Windows（浏览器任务）**：`n8n-primary (Windows 5678)` → `cursor-agent --browser`（Windows）→ ChromeMCP/Browser MCP
+- **Runner-Windows（浏览器任务）**：`n8n-primary (Windows 5678)` → **独立 MCP Runner 程序** → ChromeMCP/Browser MCP  
+  - 约束：Windows **没有 cursor-agent**，因此必须改为“模型 API 驱动 MCP”的独立程序
 
 ### Task Pack 字段（建议）
 - `execution_runtime`: `wsl` | `windows`（默认 `wsl`）

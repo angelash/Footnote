@@ -116,16 +116,15 @@ Task Pack 必须包含：
 - **是否需要封装**：强烈建议封装（见 Rollout Plan 的 P0-4）。
   - 理由：cursor-agent 具备执行命令/写文件能力，必须用“Deliverables 白名单校验 + git diff 审计 + 校验器阻断”防止跑偏/越权改动。
 
-### 5.5 MCP（含 ChromeMCP/Browser MCP）落地策略
+### 5.5 MCP（含 ChromeMCP/Browser MCP）落地策略（Windows 无 cursor-agent 版本）
 
-> 你要求“浏览器测试在 Windows 环境下走 ChromeMCP/Browser MCP”，这通常与 WSL 执行器天然分离。
+> 最新约束：**Windows 环境没有 Cursor CLI（cursor-agent）**。因此 Windows 侧需要用**独立程序**对接大模型 API，再由程序驱动 MCP（Browser/Chrome MCP）完成浏览器测试/多模态任务。
 
-- **WSL Runner（默认）**：用于代码/文档任务，依赖 `--approve-mcps` 但不要求浏览器 MCP。
-- **Windows Runner（浏览器任务）**：用于 UI/E2E/多模态识别等需要浏览器自动化的任务
-  - 建议：Task Pack 标记 `execution_runtime: windows` 或 `requires_mcp: browser`
-  - 执行：Windows 上的 `cursor-agent --browser`（并确保 `~/.cursor/mcp.json` 已配置 Browser MCP 服务）
-
-> 具体 Browser MCP 配置示例仓库已有（见 `docs/智绘AI生图自动化演示文案.md`）。
+- **WSL Runner（默认）**：用于代码/文档任务，执行器为 WSL 的 `cursor-agent` + 护栏脚本（`tools/n8n/run-cursor-task.sh`）。
+- **Windows Runner（浏览器/MCP任务）**：用于 UI/E2E/多模态识别/需要 ChromeMCP 的任务
+  - Task Pack 标记：`execution_runtime: windows` 或 `requires_mcp: browser`
+  - 执行器：`tools/mcp-runner/mcp-runner.mjs`（独立 MCP Runner，使用模型 API 驱动 MCP 工具）
+  - Browser MCP 配置示例：`docs/智绘AI生图自动化演示文案.md`（`~/.cursor/mcp.json` 指向 `http://localhost:3000/mcp`）
 
 ### 5.3 关键环境变量（建议）
 最低限建议：

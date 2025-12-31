@@ -8,7 +8,7 @@
 > - `complexity`: `normal` | `high` | `max`
 > - `model_override`: (可选) 直接指定 cursor-agent `--model`，例如 `gpt-5.2-high`
 > - `execution_runtime`: `wsl` | `windows`（默认 `wsl`）
-> - `requires_mcp`: (可选) 例如 `browser`（需要 ChromeMCP/Browser MCP）
+> - `requires_mcp`: (可选) 例如 `browser`（需要 ChromeMCP/Browser MCP；Windows 无 cursor-agent 时由独立 MCP Runner 执行）
 
 ---
 

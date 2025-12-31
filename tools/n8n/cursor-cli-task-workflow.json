@@ -24,7 +24,11 @@
             },
             {
               "name": "project_root",
-              "stringValue": "F:/workspace/github/Footnote"
+              "stringValue": "/home/shash/work/Footnote"
+            },
+            {
+              "name": "wsl_user",
+              "stringValue": "shash"
             }
           ]
         },
@@ -72,7 +76,7 @@
     },
     {
       "parameters": {
-        "command": "cd {{ $('Set Task Parameters').first().json.project_root }} && cursor --message \"Execute the task in .cursor/current_task_prompt.md. Read it first, then execute.\" --no-input",
+        "command": "cd {{ $('Set Task Parameters').first().json.project_root }} && ~/.local/bin/cursor-agent --print --force --approve-mcps --output-format text \"$(cat .cursor/current_task_prompt.md)\"",
         "options": {
           "cwd": "={{ $('Set Task Parameters').first().json.project_root }}"
         }
@@ -82,11 +86,11 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [1350, 300],
-      "notes": "Requires Cursor CLI to be installed and in PATH"
+      "notes": "Requires cursor-agent in WSL: ~/.local/bin/cursor-agent. Project must be in WSL filesystem (not /mnt/)."
     },
     {
       "parameters": {
-        "command": "npm run validate --if-present 2>&1 || echo 'No validator configured'",
+        "command": "cd {{ $('Set Task Parameters').first().json.project_root }} && npm run validate --if-present 2>&1 || echo 'No validator configured'",
         "options": {
           "cwd": "={{ $('Set Task Parameters').first().json.project_root }}"
         }

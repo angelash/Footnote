@@ -14,7 +14,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "dispatch-task",
-        "responseMode": "onReceived",
+        "responseMode": "lastNode",
         "options": {}
       },
       "id": "trigger-webhook",
@@ -25,45 +25,11 @@
     },
     {
       "parameters": {
-        "fields": {
-          "values": [
-            {
-              "name": "task_pack_path",
-              "stringValue": "={{ $json.body?.task_pack_path || 'docs/03_taskpacks/T-0001_c0_z1_dialogue.md' }}"
-            },
-            {
-              "name": "role",
-              "stringValue": "={{ $json.body?.role || 'L3_writer' }}"
-            },
-            {
-              "name": "task_type",
-              "stringValue": "={{ $json.body?.task_type || 'doc' }}"
-            },
-            {
-              "name": "complexity",
-              "stringValue": "={{ $json.body?.complexity || 'normal' }}"
-            },
-            {
-              "name": "model_override",
-              "stringValue": "={{ $json.body?.model_override || 'auto' }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "id": "set-params",
-      "name": "Set Dispatch Payload",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [460, 300]
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "http://localhost:5680/webhook/execute-task",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\"task_pack_path\": $json.task_pack_path, \"role\": $json.role, \"task_type\": $json.task_type, \"complexity\": $json.complexity, \"model_override\": $json.model_override}",
+        "jsonBody": "={{ $json.body || {} }}",
         "options": {}
       },
       "id": "http-dispatch",
@@ -76,12 +42,9 @@
   ],
   "connections": {
     "Manual Trigger": {
-      "main": [[{ "node": "Set Dispatch Payload", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "HTTP Dispatch to Secondary", "type": "main", "index": 0 }]]
     },
     "Webhook Trigger": {
-      "main": [[{ "node": "Set Dispatch Payload", "type": "main", "index": 0 }]]
-    },
-    "Set Dispatch Payload": {
       "main": [[{ "node": "HTTP Dispatch to Secondary", "type": "main", "index": 0 }]]
     }
   },

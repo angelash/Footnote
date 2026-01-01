@@ -1,10 +1,15 @@
 // PM2 配置文件 - Windows 主实例
-// 注意：PM2 需要 CommonJS 格式
+// NOTE: 工程 root 的 package.json 可能是 "type": "module"
+// 为避免 PM2 按 ESM 解析导致 "module is not defined"，这里使用 .cjs 强制 CommonJS。
+
 module.exports = {
   apps: [
     {
       name: 'n8n-primary',
-      script: 'tools\\n8n\\start-n8n-primary.cmd',
+      // 在 Windows 上，PM2 直接 spawn .cmd 偶发 EINVAL；
+      // 用 cmd /c 显式执行更稳定。
+      script: 'cmd',
+      args: ['/c', 'tools\\n8n\\start-n8n-primary.cmd'],
       interpreter: 'none',
       cwd: 'F:\\workspace\\github\\Footnote',
       env: {
@@ -15,7 +20,7 @@ module.exports = {
         N8N_BASIC_AUTH_USER: 'admin@footnote.local',
         N8N_BASIC_AUTH_PASSWORD: 'Footnote2025!',
         N8N_METRICS: 'true',
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
       },
       instances: 1,
       exec_mode: 'fork',
@@ -25,8 +30,9 @@ module.exports = {
       out_file: './logs/n8n-primary-out.log',
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       merge_logs: true,
-      time: true
-    }
-  ]
+      time: true,
+    },
+  ],
 };
+
 

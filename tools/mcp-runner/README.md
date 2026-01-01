@@ -6,10 +6,10 @@
 
 ---
 
-## 1. 与现有方案的关系
+## 1. 与现有方案的关系（重要澄清）
 
-- **WSL 侧（默认执行器）**：仍使用 `cursor-agent` 执行代码/文档任务（见 `tools/n8n/run-cursor-task.sh`）。
-- **Windows 侧（浏览器/MCP任务）**：使用本目录下的 `mcp-runner.mjs` 驱动 MCP（代替 `cursor-agent --browser`）。
+- **Cursor CLI（cursor-agent）不会被本工具替换**：WSL 侧继续用 `cursor-agent` 跑代码/文档任务（见 `tools/n8n/run-cursor-task.sh`），并使用 Cursor 自有模型体系。
+- **本工具只解决一个问题**：当 **Windows 没有 cursor-agent** 但需要跑浏览器/ChromeMCP/Browser MCP 时，用 `CUSTOM_API_URL` 的模型 API 来驱动 MCP 工具。
 
 规格文档：
 - `docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
@@ -36,9 +36,14 @@
 
 > 注意：`mcp-runner` 直接连 `http://localhost:3000/mcp`，不依赖 Cursor。
 
-### 2.2 大模型 API Key
-MCP Runner 将从环境变量读取 API Key（不要提交到仓库）：
-- `OPENAI_API_KEY`（后续可扩展 Anthropic/Gemini）
+### 2.2 自定义模型 API（CUSTOM_*，仅用于 Windows MCP Runner）
+
+MCP Runner 从环境变量读取（**不要提交到仓库**）：
+- `CUSTOM_API_URL`：例如 `https://aihub.gz4399.com/v1`
+- `CUSTOM_API_KEY`：Bearer key
+- `CUSTOM_MODELS`：JSON 字符串，描述可用模型与默认温度等
+
+> 注意：仓库 `.gitignore` 已忽略 `.env/.env.local`，你可以在本机用 `.env.local` 管理这些值。
 
 ---
 
@@ -47,6 +52,9 @@ MCP Runner 将从环境变量读取 API Key（不要提交到仓库）：
 `mcp-runner.mjs` 目前提供 **MCP 连通性冒烟**（不含完整 agent loop）：
 - `tools/list`：列出 MCP server 暴露的工具
 - `tools/call`：按名称调用一个工具（参数为 JSON）
+
+并新增 **LLM 驱动 MCP 的最小闭环**（beta）：
+- `agent`：调用 `CUSTOM_API_URL` 的 `chat/completions` 让模型产出工具调用 JSON → 执行 MCP tools/call → 回灌结果循环
 
 这两项足以验证 “Windows 上独立程序 ↔ MCP 服务” 的链路是通的。
 
@@ -69,6 +77,27 @@ node tools/mcp-runner/mcp-runner.mjs call-tool \
   --args "{\"url\":\"http://localhost:5173\"}"
 ```
 
+### 4.3 运行 agent（模型 API 驱动 MCP）
+
+先在本机环境变量中设置（示例，不要写入仓库）：
+
+```bash
+setx CUSTOM_API_URL "https://aihub.gz4399.com/v1"
+setx CUSTOM_API_KEY "YOUR_KEY"
+setx CUSTOM_MODELS "{\"gpt-5-chat-latest\":{\"temperature\":0.2,\"visible\":true}}"
+```
+
+然后执行：
+
+```bash
+node tools/mcp-runner/mcp-runner.mjs agent ^
+  --mcp-url http://localhost:3000/mcp ^
+  --task-type doc ^
+  --complexity normal ^
+  --model gpt-5-chat-latest ^
+  --prompt "打开 http://localhost:5173 ，等待 2 秒，然后截图。"
+```
+
 ---
 
 ## 5. 下一步（落地到“模型 API 驱动 MCP”）
@@ -76,11 +105,11 @@ node tools/mcp-runner/mcp-runner.mjs call-tool \
 1. **把 MCP tools/list 的 schema 转换为 LLM function/tool schema**
 2. **实现 agent loop**：
    - prompt → LLM 产出 tool call → MCP tools/call → 结果回灌 → 直到输出 final
-3. **接入模型策略**（与你的约定一致）：
-   - doc → `gpt-5.2`
-   - code → `opus-4.5`
-   - multimodal → `gemini-3-pro`
-   - complexity=high/max → 对应 high/max 档
+3. **接入模型策略**（以你提供的 `CUSTOM_MODELS` 为准）：
+   - doc → `gpt-5-chat-latest`
+   - code → `claude-opus-4-5-20251101`
+   - reasoning/复杂任务 → `deepseek-reasoner`（可作为 high/max 默认）
+   - ⚠️ multimodal：当前 `CUSTOM_MODELS` 未提供对应模型 ID，需补充（否则必须 `--model` 覆盖）
 4. **加入护栏**：
    - 浏览器任务默认只读/只测（禁止写代码）
    - 若允许写代码，必须限制到 Deliverables 白名单

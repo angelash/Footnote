@@ -31,20 +31,30 @@
 
 ## 1.1 模型选择策略（落地约定）
 
-> 目标：运行 `cursor-agent` 时**按任务类型自动指定模型**，并支持按复杂度启用“高/Max”档。
+> 重要澄清：**Cursor CLI（cursor-agent）使用 Cursor 自己的模型体系**；你提供的 `CUSTOM_API_*` 是另一条独立能力（Windows MCP Runner），两者不要混用。
 
-### Task Pack 字段（建议）
+### A) WSL Runner（cursor-agent）模型策略（Cursor 自有模型）
+
+目标：运行 `cursor-agent` 时**按任务类型自动指定模型**，并支持按复杂度启用“高/Max”档。
+
+**Task Pack 字段（建议）**
 - `task_type`: `doc` | `code` | `multimodal`
 - `complexity`: `normal` | `high` | `max`
 - `model_override`: 可选，显式指定 `cursor-agent --model`（优先级最高）
 
-### 默认映射（你要求的策略）
+**默认映射（cursor-agent）**
 - **文档类（doc）**：`gpt-5.2`
   - `high/max`：优先 `gpt-5.2-high`（若不可用则回退 `gpt-5.2`）
 - **代码类（code）**：`opus-4.5`
   - `high/max`：优先 `opus-4.5-thinking`（若不可用则回退 `opus-4.5`）
 - **多模态识别（multimodal）**：`gemini-3-pro`
   - `high/max`：仍使用 `gemini-3-pro`（目前无明确高档变体则不切）
+
+> 注：可用模型列表以 Cursor 运行时为准；`cursor-agent --model` 传错会返回可用列表（已实测）。
+
+### B) Windows Runner（独立 MCP Runner）模型策略（CUSTOM_API_*）
+
+Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立程序走 `CUSTOM_API_URL`（`/chat/completions`）来驱动 MCP。该 Runner 的模型映射以 `CUSTOM_MODELS` 为准，并通过 `--model` 显式选择。
 
 > 注：可用模型列表以运行时为准；`cursor-agent --help` 支持 `--model`，传错会返回可用列表（已实测）。
 

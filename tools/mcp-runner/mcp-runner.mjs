@@ -126,6 +126,12 @@ function pickModelFromPolicy({ taskType, complexity }) {
     if (complexity === "high" || complexity === "max") return SONNET;
     return DOC;
   }
+  if (taskType === "browser-test") {
+    // Windows 浏览器测试/ChromeMCP 任务：默认用文档/通用模型驱动工具调用
+    // 如需更强推理或特定模型，使用 --model 覆盖。
+    if (complexity === "high" || complexity === "max") return SONNET;
+    return DOC;
+  }
   if (taskType === "multimodal") {
     // No explicit multimodal model provided in CUSTOM_MODELS; require override for correctness.
     return DOC;
@@ -284,7 +290,7 @@ async function main() {
     console.log(`Usage:
   node tools/mcp-runner/mcp-runner.mjs list-tools --mcp-url <url>
   node tools/mcp-runner/mcp-runner.mjs call-tool  --mcp-url <url> --tool <name> --args <json>
-  node tools/mcp-runner/mcp-runner.mjs agent     --mcp-url <url> --prompt <text> [--task-type doc|code|multimodal] [--complexity normal|high|max] [--model <id>]
+  node tools/mcp-runner/mcp-runner.mjs agent     --mcp-url <url> --prompt <text> [--task-type doc|code|multimodal|browser-test] [--complexity normal|high|max] [--model <id>]
 
 Examples:
   node tools/mcp-runner/mcp-runner.mjs list-tools --mcp-url http://localhost:3000/mcp

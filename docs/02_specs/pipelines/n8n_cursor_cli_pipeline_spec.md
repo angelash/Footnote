@@ -126,6 +126,20 @@ Task Pack 必须包含：
   - 执行器：`tools/mcp-runner/mcp-runner.mjs`（独立 MCP Runner，使用 **CUSTOM_API_URL/CUSTOM_API_KEY** 驱动 MCP 工具；与 cursor-agent 模型无关）
   - Browser MCP 配置示例：`docs/智绘AI生图自动化演示文案.md`（`~/.cursor/mcp.json` 指向 `http://localhost:3000/mcp`）
 
+#### 5.5.1 n8n 接入：Windows Browser Test Webhook
+
+提供可导入工作流：
+- `tools/n8n/windows-mcp-runner-browser-test-workflow.json`
+  - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
+  - 内部执行：`powershell ... tools/mcp-runner/run-agent.ps1` → `node tools/mcp-runner/mcp-runner.mjs agent ...`
+
+请求体字段（JSON）：
+- `mcp_url`：MCP server endpoint（默认读取 `$env.MCP_URL`；建议 `http://localhost:3000/mcp`）
+- `prompt`：测试指令（工作流会自动 base64 传参，避免引号/换行问题）
+- `task_type`：默认 `browser-test`
+- `complexity`：`normal|high|max`
+- `model_override`：可选，CUSTOM_API 的模型 id（不影响 WSL cursor-agent）
+
 ### 5.3 关键环境变量（建议）
 最低限建议：
 - `N8N_PORT`, `N8N_HOST`, `N8N_PROTOCOL`

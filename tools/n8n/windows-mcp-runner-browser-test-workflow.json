@@ -1,0 +1,79 @@
+{
+  "name": "Windows MCP Runner (Browser Test)",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "browser-test",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "trigger-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "mcp_url",
+              "stringValue": "={{ $json.body?.mcp_url || $env.MCP_URL || 'http://localhost:3000/mcp' }}"
+            },
+            {
+              "name": "task_type",
+              "stringValue": "={{ $json.body?.task_type || 'browser-test' }}"
+            },
+            {
+              "name": "complexity",
+              "stringValue": "={{ $json.body?.complexity || 'normal' }}"
+            },
+            {
+              "name": "model_override",
+              "stringValue": "={{ $json.body?.model_override || '' }}"
+            },
+            {
+              "name": "prompt_b64",
+              "stringValue": "={{ Buffer.from(($json.body?.prompt || 'Open browser and run the test.'), 'utf8').toString('base64') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-params",
+      "name": "Set Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File tools\\\\mcp-runner\\\\run-agent.ps1 -McpUrl \"{{ $json.mcp_url }}\" -PromptB64 \"{{ $json.prompt_b64 }}\" -TaskType \"{{ $json.task_type }}\" -Complexity \"{{ $json.complexity }}\" -Model \"{{ $json.model_override }}\""
+      },
+      "id": "exec-runner",
+      "name": "Execute MCP Runner",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [720, 300],
+      "notes": "Calls tools/mcp-runner/run-agent.ps1 which runs node tools/mcp-runner/mcp-runner.mjs agent ..."
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Set Params", "type": "main", "index": 0 }]]
+    },
+    "Set Params": {
+      "main": [[{ "node": "Execute MCP Runner", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [{ "name": "AI-Native" }, { "name": "MCP" }, { "name": "BrowserTest" }]
+}
+
+

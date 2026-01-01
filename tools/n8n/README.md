@@ -33,6 +33,7 @@ n8n start
 3. 选择要导入的工作流：
    - `cursor-cli-task-workflow.json` - 使用 Cursor CLI 执行
    - `ai-native-task-workflow.json` - 使用 OpenAI API 执行
+   - `windows-mcp-runner-browser-test-workflow.json` - Windows 侧用 MCP Runner 跑 ChromeMCP/Browser MCP（无 cursor-agent）
 
 ---
 
@@ -91,6 +92,18 @@ Check Validation (检查结果)
 
 - MCP Runner：`tools/mcp-runner/mcp-runner.mjs`
 - Browser MCP 配置示例：`docs/智绘AI生图自动化演示文案.md`
+
+#### Windows 浏览器测试工作流（Webhook）
+
+主实例导入并启用：
+- `tools/n8n/windows-mcp-runner-browser-test-workflow.json`
+  - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
+  - body 示例：
+    - `mcp_url`: MCP server endpoint（默认读取 `$env.MCP_URL`，例：`http://localhost:3000/mcp`）
+    - `prompt`: 测试指令（会被自动 base64 传递给 `tools/mcp-runner/run-agent.ps1`）
+    - `task_type`: `browser-test`
+    - `complexity`: `normal|high|max`
+    - `model_override`: 可选，指定 CUSTOM_API 中的 model id
 
 ### 修改任务参数
 

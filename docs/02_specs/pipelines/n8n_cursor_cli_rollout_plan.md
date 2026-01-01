@@ -133,6 +133,14 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 - 选用：`docs/03_taskpacks/T-0001_c0_z1_dialogue.md`
 - 目标：一次跑通 M0
 
+### P0-6 Windows 浏览器/MCP 测试链路（ChromeMCP / Browser MCP）
+
+- **目标**：当 Windows 侧没有 `cursor-agent` 时，仍能通过 n8n 触发浏览器自动化测试
+- **执行器**：`tools/mcp-runner/mcp-runner.mjs` + `tools/mcp-runner/run-agent.ps1`
+- **工作流（主实例导入）**：`tools/n8n/windows-mcp-runner-browser-test-workflow.json`
+  - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
+  - body：`{ mcp_url, prompt, task_type:'browser-test', complexity, model_override }`
+
 ---
 
 ## 4. P1 可用性/工程化任务清单（建议做）

@@ -62,6 +62,11 @@ MCP Runner 从环境变量读取（**不要提交到仓库**）：
 
 ## 4. 使用方法
 
+### 4.0 Windows 侧推荐入口（避免引号/换行坑）
+
+当通过 n8n 的 Execute Command 节点调用时，建议使用包装脚本 `tools/mcp-runner/run-agent.ps1`，
+通过 `PromptB64` 传入提示词，避免命令行引号/换行导致参数截断。
+
 ### 4.1 列出 MCP 工具
 
 ```bash
@@ -96,6 +101,16 @@ node tools/mcp-runner/mcp-runner.mjs agent ^
   --complexity normal ^
   --model gpt-5-chat-latest ^
   --prompt "打开 http://localhost:5173 ，等待 2 秒，然后截图。"
+```
+
+### 4.4 浏览器测试任务（browser-test）
+
+```bash
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/mcp-runner/run-agent.ps1 `
+  -McpUrl "http://localhost:3000/mcp" `
+  -TaskType "browser-test" `
+  -Complexity "normal" `
+  -Prompt "打开目标页面，执行关键点击与截图，然后输出结论。"
 ```
 
 ---

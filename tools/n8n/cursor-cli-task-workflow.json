@@ -12,27 +12,40 @@
     },
     {
       "parameters": {
+        "httpMethod": "POST",
+        "path": "execute-task",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "trigger-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 120]
+    },
+    {
+      "parameters": {
         "fields": {
           "values": [
             {
               "name": "task_pack_path",
-              "stringValue": "docs/03_taskpacks/T-0001_c0_z1_dialogue.md"
+              "stringValue": "={{ $json.body?.task_pack_path || 'docs/03_taskpacks/T-0001_c0_z1_dialogue.md' }}"
             },
             {
               "name": "role",
-              "stringValue": "L3_writer"
+              "stringValue": "={{ $json.body?.role || 'L3_writer' }}"
             },
             {
               "name": "task_type",
-              "stringValue": "doc"
+              "stringValue": "={{ $json.body?.task_type || 'doc' }}"
             },
             {
               "name": "complexity",
-              "stringValue": "normal"
+              "stringValue": "={{ $json.body?.complexity || 'normal' }}"
             },
             {
               "name": "model_override",
-              "stringValue": "auto"
+              "stringValue": "={{ $json.body?.model_override || 'auto' }}"
             },
             {
               "name": "project_root",
@@ -221,6 +234,11 @@
   ],
   "connections": {
     "Manual Trigger": {
+      "main": [
+        [{ "node": "Set Task Parameters", "type": "main", "index": 0 }]
+      ]
+    },
+    "Webhook Trigger": {
       "main": [
         [{ "node": "Set Task Parameters", "type": "main", "index": 0 }]
       ]

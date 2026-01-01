@@ -9,7 +9,7 @@
 ### Windows 环境
 - ✅ PM2: 已安装
 - ✅ n8n: 已安装
-- ⚠️ 主实例: 5678 端口已监听（当前由 `n8n start` 直接启动；建议纳入 PM2 托管）
+- ✅ 主实例: 5678 端口已监听（PM2 托管 `n8n-primary` online）
 
 ### WSL 环境
 - ✅ Node.js: 已安装
@@ -25,7 +25,7 @@
 - **端口**: 5678
 - **PM2 名称**: n8n-primary
 - **访问地址**: http://localhost:5678
-- **状态**: ⚠️ 端口运行中 / PM2 显示可能为 stopped（需要统一）
+- **状态**: ✅ PM2 online
 
 ### 从实例 (WSL)
 - **端口**: 5680
@@ -85,8 +85,11 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 stop n8n-secondary"
    - 登录: admin@footnote.local / Footnote2025!
 
 3. **导入工作流**:
-   - 主实例: 导入 `cursor-cli-task-workflow-windows.json`
-   - 从实例: 导入 `cursor-cli-task-workflow.json`
+   - 主实例: 导入 `dispatch-to-secondary-workflow.json`（主→从分发）
+   - 从实例: 导入 `cursor-cli-task-workflow.json`（WSL 执行，含 Webhook `execute-task`）
+
+4. **端到端冒烟**:
+   - Windows：运行 `tools/n8n/smoke-dispatch.ps1`
 
 4. **配置工作流同步**: 参见 `CLUSTER-SETUP.md`
 

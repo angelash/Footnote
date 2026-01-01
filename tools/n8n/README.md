@@ -106,6 +106,19 @@ Check Validation (检查结果)
 | `project_root` | 项目根目录（WSL 路径） | `/home/shash/work/Footnote` |
 | `wsl_user` | WSL 用户名 | `shash` |
 
+### 主→从分发（Webhook）
+
+为实现“主实例统一入口 → 从实例执行”，主实例导入并启用：
+- `tools/n8n/dispatch-to-secondary-workflow.json`
+  - Webhook：`POST http://localhost:5678/webhook/dispatch-task`
+
+从实例导入并启用：
+- `tools/n8n/cursor-cli-task-workflow.json`
+  - Webhook：`POST http://localhost:5680/webhook/execute-task`
+
+冒烟脚本：
+- `tools/n8n/smoke-dispatch.ps1`
+
 **重要**: 
 - 项目必须在 WSL 文件系统中（`/home/...`），不能在 Windows 挂载点（`/mnt/...`）
 - 使用 `cursor-agent` 而不是 `cursor` 命令

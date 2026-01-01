@@ -3,7 +3,7 @@
 ## 当前状态
 
 ✅ **WSL 从实例**: 运行中（端口 5680）  
-⚠️ **Windows 主实例**: 5678 端口已监听，但建议统一纳入 PM2 托管（避免状态漂移）
+✅ **Windows 主实例**: PM2 托管运行中（端口 5678）
 
 ---
 
@@ -54,6 +54,31 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 status"
 ```
 
 ---
+
+## 导入工作流（P0-2）
+
+> ⚠️ 需要在两个实例的 n8n UI 中分别 Import。
+
+### 从实例（WSL 5680）
+- 导入：`tools/n8n/cursor-cli-task-workflow.json`
+  - 已包含 Webhook Trigger：`POST http://localhost:5680/webhook/execute-task`
+
+### 主实例（Windows 5678）
+- 导入：`tools/n8n/dispatch-to-secondary-workflow.json`
+  - Webhook：`POST http://localhost:5678/webhook/dispatch-task`
+  - 内部会转发到从实例 `execute-task`
+
+导入后把这两个工作流都切到 **Active**。
+
+---
+
+## 端到端冒烟（P0-4）
+
+导入并 Active 后，在 Windows PowerShell 运行：
+
+```powershell
+.\tools\n8n\smoke-dispatch.ps1 -TaskPackPath "docs/03_taskpacks/T-0001_c0_z1_dialogue.md"
+```
 
 *最后更新: 2025-12-31*
 

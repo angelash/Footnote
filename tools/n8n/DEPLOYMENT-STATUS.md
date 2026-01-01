@@ -9,8 +9,7 @@
 ### Windows 主实例（5678）
 - ✅ **端口**：5678 已监听
 - ✅ **UI**：http://localhost:5678（Sign in 页面可访问）
-- ⚠️ **进程托管**：当前是 `node.exe ... n8n start` 直接启动在前台/后台进程中  
-  - `pm2 status` 中 `n8n-primary` 显示为 **stopped**（需要把主实例纳入 PM2 托管，避免“端口在但 PM2 漂移”）
+- ✅ **进程托管**：`pm2 status` 中 `n8n-primary` 为 **online**（PID 与 5678 监听一致）
 
 ### WSL 从实例（5680）
 - ✅ **PM2**：`n8n-secondary` online
@@ -38,12 +37,11 @@
 ---
 
 ## ⏳ 待完成（P0 阻塞项）
-1. **主实例纳入 PM2 管理**（并清理当前手动启动的 `n8n start` 进程）
-2. **导入/同步工作流**
-   - 主实例：`tools/n8n/cursor-cli-task-workflow-windows.json`（Windows→WSL 桥接版本）
-   - 从实例：`tools/n8n/cursor-cli-task-workflow.json`（WSL 直跑版本）
-3. **跑通一次端到端冒烟**：Task Pack → cursor-agent → 校验器 → 回执/日志
-4. **明确 repo 同步策略**：Windows 工作区与 WSL 工作副本的一致性如何保证
+1. **导入/同步工作流**
+   - 主实例：`tools/n8n/dispatch-to-secondary-workflow.json`（主→从分发）
+   - 从实例：`tools/n8n/cursor-cli-task-workflow.json`（WSL 直跑，含 Webhook `execute-task`）
+2. **跑通一次端到端冒烟**：Task Pack → cursor-agent → 校验器 → 回执/日志
+3. **明确 repo 同步策略**：Windows 工作区与 WSL 工作副本的一致性如何保证
 
 ---
 

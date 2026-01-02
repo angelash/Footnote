@@ -1,0 +1,121 @@
+[
+  {
+    "id": "lOR7W5B4bC2RpjLS",
+    "name": "Windows MCP Runner (Browser Test)",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "browser-test",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "trigger-webhook",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          300
+        ],
+        "webhookId": "ca51f94f-b1cc-413d-899e-6ebb834f0e44"
+      },
+      {
+        "parameters": {
+          "fields": {
+            "values": [
+              {
+                "name": "mcp_url",
+                "stringValue": "={{ $json.body?.mcp_url || $env.MCP_URL || 'http://localhost:3000/mcp' }}"
+              },
+              {
+                "name": "task_type",
+                "stringValue": "={{ $json.body?.task_type || 'browser-test' }}"
+              },
+              {
+                "name": "complexity",
+                "stringValue": "={{ $json.body?.complexity || 'normal' }}"
+              },
+              {
+                "name": "model_override",
+                "stringValue": "={{ $json.body?.model_override || '' }}"
+              },
+              {
+                "name": "prompt",
+                "stringValue": "={{ $json.body?.prompt || 'Open browser and run the test.' }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "set-params",
+        "name": "Set Params",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://127.0.0.1:3211/agent",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ { mcp_url: $json.mcp_url, prompt: $json.prompt, task_type: $json.task_type, complexity: $json.complexity, model_override: $json.model_override } }}"
+        },
+        "id": "exec-runner",
+        "name": "Call MCP Runner Server",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          720,
+          300
+        ],
+        "notes": "Calls tools/mcp-runner/server.mjs (HTTP) to run the agent without using ExecuteCommand node."
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Params": {
+        "main": [
+          [
+            {
+              "node": "Call MCP Runner Server",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "b8b91339-a7b4-46b3-80e1-1169c10b98d0",
+    "activeVersionId": "b8b91339-a7b4-46b3-80e1-1169c10b98d0",
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "tags": [],
+    "createdAt": "2026-01-02T09:07:04.440Z",
+    "updatedAt": "2026-01-02T09:07:04.440Z",
+    "shared": []
+  }
+]

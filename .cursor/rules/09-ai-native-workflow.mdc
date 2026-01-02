@@ -71,6 +71,7 @@ docs/
 - [ ] 只写 Deliverables 指定的路径
 - [ ] 禁止修改冻结目录
 - [ ] 禁止引入新系统/Schema（除非 Task Pack 明确授权）
+- [ ] （UI 自动化）任何会触发“未保存/关闭确认弹窗”的动作前，必须先保存并清空弹窗（见下方《UI 自动化：防弹窗协议》）
 
 ### 3. 交付时
 - [ ] 使用标准回执格式
@@ -78,6 +79,27 @@ docs/
 - [ ] 明确列出风险与未完成
 
 ---
+
+## UI 自动化：防弹窗协议（ChromeMCP / n8n UI 必须遵守）
+
+### 目标
+避免频繁触发“未保存/关闭确认”“Unauthorized”“Result/Expression 覆层”等弹窗，导致自动化点击/输入被遮挡、拦截或卡死。
+
+### 规则内容（强制）
+- [ ] **保存优先**：任何可能切换页面/切换工作流/关闭设置面板/发布前，先点击 **Save**（必要时再 **Publish**）。
+- [ ] **禁止带脏跳转**：当出现 “Problem saving workflow / Unauthorized / Unsaved changes” 等提示时，**先恢复登录/刷新会话**，再继续编辑；不要继续堆叠操作。
+- [ ] **弹窗哨兵**：每一段 UI 操作链的开头与结尾都执行一次“清弹窗”：
+  - **Esc**（优先）关闭浮层/表达式编辑器/引导弹窗
+  - 点击右上角 **X** 关闭 Result/弹窗
+  - 关闭 node settings 面板（否则会拦截 canvas 点击）
+- [ ] **覆盖拦截处理**：当日志显示 “... intercepts pointer events” 时，不要继续重试点击 canvas；先关掉拦截源（Result/Parameter/Expression/Settings 面板），再继续。
+- [ ] **变更后重取快照**：关闭任何弹窗/面板后，必须重新 `snapshot` 获取新的 element ref，再做下一步操作（避免 ref 失效/指向错误元素）。
+- [ ] **缩短链路**：不要在一个节点里长时间停留/连续编辑多处；每完成一个节点的关键字段就 Save，降低丢会话风险。
+
+### 推荐操作顺序（模板）
+1. Save（或 Ctrl+S）→ 等待提示消失  
+2. 关闭 node settings → 关闭 Result/Expression 覆层（Esc/X）  
+3. snapshot → 再进行下一步点击/输入  
 
 ## 粒度上限（超出必须拆分）
 

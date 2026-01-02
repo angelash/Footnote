@@ -1,5 +1,5 @@
 {
-  "name": "TaskPack Factory (WSL): compose-taskpack",
+  "name": "TaskPack Factory (WSL via Runner): compose-taskpack",
   "active": false,
   "nodes": [
     {
@@ -17,129 +17,23 @@
     },
     {
       "parameters": {
-        "fields": {
-          "values": [
-            {
-              "name": "task_id",
-              "stringValue": "={{ $json.body?.task_id || ('T-' + $now.toFormat('yyyyLLdd-HHmmss') + '_auto') }}"
-            },
-            {
-              "name": "title",
-              "stringValue": "={{ $json.body?.title || 'Auto TaskPack' }}"
-            },
-            {
-              "name": "level",
-              "stringValue": "={{ $json.body?.level || 'L3' }}"
-            },
-            {
-              "name": "owner",
-              "stringValue": "={{ $json.body?.owner || 'L0_producer' }}"
-            },
-            {
-              "name": "executor",
-              "stringValue": "={{ $json.body?.executor || $json.body?.role || 'L3_engineer' }}"
-            },
-            {
-              "name": "reviewer",
-              "stringValue": "={{ $json.body?.reviewer || 'L2_tools_lead' }}"
-            },
-            {
-              "name": "task_type",
-              "stringValue": "={{ $json.body?.task_type || 'code' }}"
-            },
-            {
-              "name": "complexity",
-              "stringValue": "={{ $json.body?.complexity || 'normal' }}"
-            },
-            {
-              "name": "model_override",
-              "stringValue": "={{ $json.body?.model_override || 'auto' }}"
-            },
-            {
-              "name": "execution_runtime",
-              "stringValue": "={{ $json.body?.execution_runtime || 'wsl' }}"
-            },
-            {
-              "name": "requires_mcp",
-              "stringValue": "={{ $json.body?.requires_mcp || '' }}"
-            },
-            {
-              "name": "outcome",
-              "stringValue": "={{ $json.body?.outcome || $json.body?.description || '' }}"
-            },
-            {
-              "name": "allowed_inputs",
-              "stringValue": "={{ JSON.stringify($json.body?.allowed_inputs || []) }}"
-            },
-            {
-              "name": "deliverables",
-              "stringValue": "={{ JSON.stringify($json.body?.deliverables || []) }}"
-            },
-            {
-              "name": "constraints",
-              "stringValue": "={{ JSON.stringify($json.body?.constraints || []) }}"
-            },
-            {
-              "name": "acceptance",
-              "stringValue": "={{ JSON.stringify($json.body?.acceptance || []) }}"
-            },
-            {
-              "name": "notes",
-              "stringValue": "={{ $json.body?.notes || '' }}"
-            },
-            {
-              "name": "project_root",
-              "stringValue": "/home/shash/work/Footnote"
-            }
-          ]
-        },
+        "method": "POST",
+        "url": "http://127.0.0.1:3210/compose-taskpack",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body || {} }}",
         "options": {}
       },
-      "id": "set-params",
-      "name": "Set TaskPack Params",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [480, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "const input = $input.first().json;\n\nconst safe = (v) => String(v ?? '').replace(/\\r\\n/g, '\\n');\nconst today = new Date().toISOString().slice(0, 10);\n\nconst taskId = safe(input.task_id);\nconst fileName = `${taskId.replace(/[^A-Za-z0-9_-]/g, '_')}.md`;\nconst relativePath = `docs/03_taskpacks/${fileName}`;\n\nconst ensureArray = (x) => {\n  if (Array.isArray(x)) return x;\n  if (typeof x === 'string' && x.trim()) {\n    try {\n      const parsed = JSON.parse(x);\n      return Array.isArray(parsed) ? parsed : [];\n    } catch {\n      return [x];\n    }\n  }\n  return [];\n};\n\nconst mdList = (arr) => {\n  const a = ensureArray(arr).map(safe).filter(Boolean);\n  return a.length ? a.map((v) => `- ${v}`).join('\\n') : '-';\n};\n\nconst title = safe(input.title).replace(/\"/g, '\\\\\"');\n\nconst content = [\n  '---',\n  `task_id: ${taskId}`,\n  `title: \"${title}\"`,\n  `task_type: ${safe(input.task_type) || 'code'}`,\n  `complexity: ${safe(input.complexity) || 'normal'}`,\n  `model_override: ${safe(input.model_override) || 'auto'}`,\n  `execution_runtime: ${safe(input.execution_runtime) || 'wsl'}`,\n  `requires_mcp: ${safe(input.requires_mcp) || ''}`,\n  '---',\n  '',\n  `# TASK-PACK: ${taskId}`,\n  '',\n  '## 基本信息',\n  '',\n  '| 字段 | 值 |',\n  '|------|---|',\n  `| **Task ID** | ${taskId} |`,\n  `| **Level** | ${safe(input.level) || 'L3'} |`,\n  `| **Owner** | ${safe(input.owner) || 'L0_producer'} |`,\n  `| **Executor** | ${safe(input.executor) || safe(input.role) || 'L3_engineer'} |`,\n  `| **Reviewer** | ${safe(input.reviewer) || 'L2_tools_lead'} |`,\n  `| **创建日期** | ${today} |`,\n  '| **状态** | Ready |',\n  '',\n  '## 1. Outcome（可观察结果）',\n  '',\n  safe(input.outcome) || '-',\n  '',\n  '## 2. Allowed Inputs（允许引用的输入）',\n  '',\n  mdList(input.allowed_inputs),\n  '',\n  '## 3. Deliverables（必须交付物）',\n  '',\n  mdList(input.deliverables),\n  '',\n  '## 4. Constraints（硬约束 / 禁止事项）',\n  '',\n  mdList(input.constraints),\n  '',\n  '## 5. Acceptance Checklist（验收清单）',\n  '',\n  mdList(input.acceptance),\n  '',\n  '## 6. Self-Check（执行者自检回执格式）',\n  '',\n  '```',\n  '【完成内容】',\n  '- ...',\n  '',\n  '【输出文件】',\n  '- ...',\n  '',\n  '【自检】',\n  '- [ ] ...',\n  '',\n  '【风险与未完成】',\n  '- (如有)',\n  '```',\n  '',\n  '## 9. Notes（备注）',\n  '',\n  safe(input.notes) || '-',\n  '',\n].join('\\n');\n\nreturn {\n  json: {\n    ...input,\n    task_pack_path: relativePath,\n    task_pack_abs_path: `${safe(input.project_root)}/${relativePath}`,\n    task_pack_content: content,\n  },\n};"
-      },
-      "id": "build-md",
-      "name": "Build TaskPack Markdown",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [720, 300]
-    },
-    {
-      "parameters": {
-        "operation": "write",
-        "fileName": "={{ $json.task_pack_abs_path }}",
-        "fileContent": "={{ $json.task_pack_content }}",
-        "options": {}
-      },
-      "id": "write-file",
-      "name": "Write TaskPack File",
-      "type": "n8n-nodes-base.readWriteFile",
-      "typeVersion": 1,
-      "position": [940, 300]
-    },
-    {
-      "parameters": {
-        "jsCode": "const input = $input.first().json;\nreturn { json: { task_id: input.task_id, task_pack_path: input.task_pack_path } };"
-      },
-      "id": "return",
-      "name": "Return Result",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1160, 300]
+      "id": "call-runner",
+      "name": "Call WSL Cursor Runner (compose-taskpack)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 300],
+      "notes": "No WriteFile/Code node required. Runner composes and writes the TaskPack file."
     }
   ],
   "connections": {
-    "Webhook Trigger": { "main": [[{ "node": "Set TaskPack Params", "type": "main", "index": 0 }]] },
-    "Set TaskPack Params": { "main": [[{ "node": "Build TaskPack Markdown", "type": "main", "index": 0 }]] },
-    "Build TaskPack Markdown": { "main": [[{ "node": "Write TaskPack File", "type": "main", "index": 0 }]] },
-    "Write TaskPack File": { "main": [[{ "node": "Return Result", "type": "main", "index": 0 }]] }
+    "Webhook Trigger": { "main": [[{ "node": "Call WSL Cursor Runner (compose-taskpack)", "type": "main", "index": 0 }]] }
   },
   "settings": { "executionOrder": "v1" },
   "staticData": null,

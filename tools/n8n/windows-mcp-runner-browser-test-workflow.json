@@ -36,8 +36,8 @@
               "stringValue": "={{ $json.body?.model_override || '' }}"
             },
             {
-              "name": "prompt_b64",
-              "stringValue": "={{ Buffer.from(($json.body?.prompt || 'Open browser and run the test.'), 'utf8').toString('base64') }}"
+              "name": "prompt",
+              "stringValue": "={{ $json.body?.prompt || 'Open browser and run the test.' }}"
             }
           ]
         },
@@ -51,14 +51,18 @@
     },
     {
       "parameters": {
-        "command": "powershell -NoProfile -ExecutionPolicy Bypass -File tools\\\\mcp-runner\\\\run-agent.ps1 -McpUrl \"{{ $json.mcp_url }}\" -PromptB64 \"{{ $json.prompt_b64 }}\" -TaskType \"{{ $json.task_type }}\" -Complexity \"{{ $json.complexity }}\" -Model \"{{ $json.model_override }}\""
+        "method": "POST",
+        "url": "http://127.0.0.1:3211/agent",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { mcp_url: $json.mcp_url, prompt: $json.prompt, task_type: $json.task_type, complexity: $json.complexity, model_override: $json.model_override } }}"
       },
       "id": "exec-runner",
-      "name": "Execute MCP Runner",
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
+      "name": "Call MCP Runner Server",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [720, 300],
-      "notes": "Calls tools/mcp-runner/run-agent.ps1 which runs node tools/mcp-runner/mcp-runner.mjs agent ..."
+      "notes": "Calls tools/mcp-runner/server.mjs (HTTP) to run the agent without using ExecuteCommand node."
     }
   ],
   "connections": {
@@ -66,7 +70,7 @@
       "main": [[{ "node": "Set Params", "type": "main", "index": 0 }]]
     },
     "Set Params": {
-      "main": [[{ "node": "Execute MCP Runner", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Call MCP Runner Server", "type": "main", "index": 0 }]]
     }
   },
   "settings": {

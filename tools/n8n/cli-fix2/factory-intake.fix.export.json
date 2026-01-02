@@ -1,0 +1,290 @@
+[
+  {
+    "id": "I1DEAKDEPOGhQ8sZ",
+    "name": "Factory Intake (PM) → Route/Compose/Execute",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "intake",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "trigger-webhook",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          300
+        ],
+        "webhookId": "86424c52-d23f-441b-b879-6d8dae3fe60e"
+      },
+      {
+        "parameters": {
+          "fields": {
+            "values": [
+              {
+                "name": "task_pack_path",
+                "stringValue": "={{ $json.body?.task_pack_path || '' }}"
+              },
+              {
+                "name": "role",
+                "stringValue": "={{ $json.body?.role || 'L3_engineer' }}"
+              },
+              {
+                "name": "task_type",
+                "stringValue": "={{ $json.body?.task_type || 'code' }}"
+              },
+              {
+                "name": "complexity",
+                "stringValue": "={{ $json.body?.complexity || 'normal' }}"
+              },
+              {
+                "name": "model_override",
+                "stringValue": "={{ $json.body?.model_override || 'auto' }}"
+              },
+              {
+                "name": "execution_runtime",
+                "stringValue": "={{ $json.body?.execution_runtime || 'wsl' }}"
+              },
+              {
+                "name": "requires_mcp",
+                "stringValue": "={{ $json.body?.requires_mcp || '' }}"
+              },
+              {
+                "name": "title",
+                "stringValue": "={{ $json.body?.title || 'Auto TaskPack' }}"
+              },
+              {
+                "name": "description",
+                "stringValue": "={{ $json.body?.description || '' }}"
+              },
+              {
+                "name": "outcome",
+                "stringValue": "={{ $json.body?.outcome || '' }}"
+              },
+              {
+                "name": "allowed_inputs",
+                "stringValue": "={{ JSON.stringify($json.body?.allowed_inputs || []) }}"
+              },
+              {
+                "name": "deliverables",
+                "stringValue": "={{ JSON.stringify($json.body?.deliverables || []) }}"
+              },
+              {
+                "name": "constraints",
+                "stringValue": "={{ JSON.stringify($json.body?.constraints || []) }}"
+              },
+              {
+                "name": "acceptance",
+                "stringValue": "={{ JSON.stringify($json.body?.acceptance || []) }}"
+              },
+              {
+                "name": "notes",
+                "stringValue": "={{ $json.body?.notes || '' }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "set",
+        "name": "Set Intake Params",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": false,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "has-task-pack",
+                "leftValue": "={{ $json.task_pack_path }}",
+                "rightValue": "",
+                "operator": "notEmpty"
+              }
+            ],
+            "combinator": "and"
+          }
+        },
+        "id": "if-has-taskpack",
+        "name": "IF Has TaskPack",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          700,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "url": "http://localhost:5680/webhook/execute-task",
+          "method": "POST",
+          "sendBody": true,
+          "bodyContentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ { task_pack_path: $json.task_pack_path, role: $json.role, task_type: $json.task_type, complexity: $json.complexity, model_override: $json.model_override } }}",
+          "options": {}
+        },
+        "id": "exec-existing",
+        "name": "Execute Existing TaskPack (WSL)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          940,
+          220
+        ]
+      },
+      {
+        "parameters": {
+          "url": "http://localhost:5680/webhook/compose-taskpack",
+          "method": "POST",
+          "sendBody": true,
+          "bodyContentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ { title: $json.title, description: $json.description, outcome: $json.outcome || $json.description, role: $json.role, executor: $json.role, task_type: $json.task_type, complexity: $json.complexity, model_override: $json.model_override, execution_runtime: $json.execution_runtime, requires_mcp: $json.requires_mcp, allowed_inputs: JSON.parse($json.allowed_inputs || '[]'), deliverables: JSON.parse($json.deliverables || '[]'), constraints: JSON.parse($json.constraints || '[]'), acceptance: JSON.parse($json.acceptance || '[]'), notes: $json.notes } }}",
+          "options": {}
+        },
+        "id": "compose",
+        "name": "Compose TaskPack (WSL)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          940,
+          380
+        ]
+      },
+      {
+        "parameters": {
+          "fields": {
+            "values": [
+              {
+                "name": "task_pack_path",
+                "stringValue": "={{ $json.task_pack_path }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "adopt-path",
+        "name": "Adopt Composed Path",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1160,
+          380
+        ]
+      },
+      {
+        "parameters": {
+          "url": "http://localhost:5680/webhook/execute-task",
+          "method": "POST",
+          "sendBody": true,
+          "bodyContentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ { task_pack_path: $json.task_pack_path, role: $('Set Intake Params').first().json.role, task_type: $('Set Intake Params').first().json.task_type, complexity: $('Set Intake Params').first().json.complexity, model_override: $('Set Intake Params').first().json.model_override } }}",
+          "options": {}
+        },
+        "id": "exec-composed",
+        "name": "Execute Composed TaskPack (WSL)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1380,
+          380
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Intake Params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Intake Params": {
+        "main": [
+          [
+            {
+              "node": "IF Has TaskPack",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF Has TaskPack": {
+        "main": [
+          [
+            {
+              "node": "Execute Existing TaskPack (WSL)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Compose TaskPack (WSL)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Compose TaskPack (WSL)": {
+        "main": [
+          [
+            {
+              "node": "Adopt Composed Path",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Adopt Composed Path": {
+        "main": [
+          [
+            {
+              "node": "Execute Composed TaskPack (WSL)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "availableInMCP": false
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "eaf353e9-ab97-4074-9458-7ca024ad54c0",
+    "activeVersionId": "eaf353e9-ab97-4074-9458-7ca024ad54c0",
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "tags": [],
+    "createdAt": "2026-01-02T08:34:26.584Z",
+    "updatedAt": "2026-01-02T08:34:26.584Z",
+    "shared": []
+  }
+]

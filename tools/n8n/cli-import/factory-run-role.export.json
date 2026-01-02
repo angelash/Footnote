@@ -1,0 +1,202 @@
+[
+  {
+    "id": "TkHLuXUH6q4a4FSm",
+    "name": "Factory Run Role → Route (WSL/Windows)",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "run-role",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "trigger-webhook",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "fields": {
+            "values": [
+              {
+                "name": "execution_runtime",
+                "stringValue": "={{ $json.body?.execution_runtime || 'wsl' }}"
+              },
+              {
+                "name": "requires_mcp",
+                "stringValue": "={{ $json.body?.requires_mcp || '' }}"
+              },
+              {
+                "name": "task_pack_path",
+                "stringValue": "={{ $json.body?.task_pack_path || '' }}"
+              },
+              {
+                "name": "role",
+                "stringValue": "={{ $json.body?.role || 'L3_engineer' }}"
+              },
+              {
+                "name": "task_type",
+                "stringValue": "={{ $json.body?.task_type || 'code' }}"
+              },
+              {
+                "name": "complexity",
+                "stringValue": "={{ $json.body?.complexity || 'normal' }}"
+              },
+              {
+                "name": "model_override",
+                "stringValue": "={{ $json.body?.model_override || 'auto' }}"
+              },
+              {
+                "name": "mcp_url",
+                "stringValue": "={{ $json.body?.mcp_url || $env.MCP_URL || 'http://localhost:3000/mcp' }}"
+              },
+              {
+                "name": "prompt",
+                "stringValue": "={{ $json.body?.prompt || '' }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "set",
+        "name": "Set Params",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": false,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "is-windows",
+                "leftValue": "={{ ($json.execution_runtime === 'windows') || ($json.requires_mcp === 'browser') || ($json.task_type === 'browser-test') }}",
+                "rightValue": "={{ true }}",
+                "operator": "equal"
+              }
+            ],
+            "combinator": "and"
+          }
+        },
+        "id": "if-win",
+        "name": "IF Windows Runner",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          700,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "url": "http://127.0.0.1:5678/webhook/browser-test",
+          "method": "POST",
+          "sendBody": true,
+          "bodyContentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ { mcp_url: $json.mcp_url, prompt: $json.prompt, task_type: 'browser-test', complexity: $json.complexity, model_override: $json.model_override } }}",
+          "options": {}
+        },
+        "id": "call-browser",
+        "name": "Run Browser Test (Windows MCP Runner)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          940,
+          220
+        ]
+      },
+      {
+        "parameters": {
+          "url": "http://localhost:5680/webhook/execute-task",
+          "method": "POST",
+          "sendBody": true,
+          "bodyContentType": "json",
+          "specifyBody": "json",
+          "jsonBody": "={{ { task_pack_path: $json.task_pack_path, role: $json.role, task_type: $json.task_type, complexity: $json.complexity, model_override: $json.model_override } }}",
+          "options": {}
+        },
+        "id": "call-wsl",
+        "name": "Run TaskPack (WSL)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          940,
+          380
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Params": {
+        "main": [
+          [
+            {
+              "node": "IF Windows Runner",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "IF Windows Runner": {
+        "main": [
+          [
+            {
+              "node": "Run Browser Test (Windows MCP Runner)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Run TaskPack (WSL)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": null,
+    "versionId": "1",
+    "activeVersionId": null,
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "tags": [],
+    "createdAt": "2026-01-02T08:10:50.065Z",
+    "updatedAt": "2026-01-02T08:10:50.065Z",
+    "shared": []
+  }
+]

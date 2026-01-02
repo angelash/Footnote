@@ -32,6 +32,28 @@ module.exports = {
       merge_logs: true,
       time: true,
     },
+    {
+      name: 'mcp-runner-server',
+      script: 'node',
+      args: ['tools\\mcp-runner\\server.mjs'],
+      interpreter: 'none',
+      cwd: 'F:\\workspace\\github\\Footnote',
+      env: {
+        HOST: '127.0.0.1',
+        PORT: 3211,
+        // NOTE: Do NOT commit secrets here.
+        // Configure CUSTOM_API_URL / CUSTOM_API_KEY / CUSTOM_MODELS via user env or .env.local.
+      },
+      instances: 1,
+      exec_mode: 'fork',
+      watch: false,
+      max_memory_restart: '512M',
+      error_file: './logs/mcp-runner-server-error.log',
+      out_file: './logs/mcp-runner-server-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      merge_logs: true,
+      time: true,
+    },
   ],
 };
 

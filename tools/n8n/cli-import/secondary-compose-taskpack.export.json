@@ -1,0 +1,73 @@
+[
+  {
+    "name": "TaskPack Factory (WSL via Runner): compose-taskpack",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "compose-taskpack",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "trigger-webhook",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          300
+        ],
+        "webhookId": "d8a9237e-e511-4b87-8644-574ff63a33bb"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://127.0.0.1:3210/compose-taskpack",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.body || {} }}",
+          "options": {}
+        },
+        "id": "call-runner",
+        "name": "Call WSL Cursor Runner (compose-taskpack)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          520,
+          300
+        ],
+        "notes": "No WriteFile/Code node required. Runner composes and writes the TaskPack file."
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Call WSL Cursor Runner (compose-taskpack)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "bd2fd823-881f-4630-b097-bed53d75614c",
+    "activeVersionId": "bd2fd823-881f-4630-b097-bed53d75614c",
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "tags": [],
+    "createdAt": "2026-01-02T09:12:59.935Z",
+    "updatedAt": "2026-01-02T09:12:59.935Z",
+    "shared": []
+  }
+]

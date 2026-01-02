@@ -1,0 +1,120 @@
+[
+  {
+    "id": "VQXTCvFJtMzOMgKb",
+    "name": "Launcher: L3_writer → WSL execute-task",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "run-writer",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "trigger-webhook",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "fields": {
+            "values": [
+              {
+                "name": "task_pack_path",
+                "stringValue": "={{ $json.body?.task_pack_path || 'docs/03_taskpacks/T-0001_c0_z1_dialogue.md' }}"
+              },
+              {
+                "name": "role",
+                "stringValue": "L3_writer"
+              },
+              {
+                "name": "task_type",
+                "stringValue": "={{ $json.body?.task_type || 'doc' }}"
+              },
+              {
+                "name": "complexity",
+                "stringValue": "={{ $json.body?.complexity || 'normal' }}"
+              },
+              {
+                "name": "model_override",
+                "stringValue": "={{ $json.body?.model_override || 'auto' }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "set-params",
+        "name": "Set Params",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          480,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://localhost:5680/webhook/execute-task",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json }}",
+          "options": {}
+        },
+        "id": "http-dispatch",
+        "name": "HTTP Dispatch to WSL",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          720,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Set Params",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Set Params": {
+        "main": [
+          [
+            {
+              "node": "HTTP Dispatch to WSL",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": null,
+    "versionId": "1",
+    "activeVersionId": null,
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "tags": [],
+    "createdAt": "2026-01-02T08:10:50.472Z",
+    "updatedAt": "2026-01-02T08:10:50.472Z",
+    "shared": []
+  }
+]

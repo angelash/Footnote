@@ -13,6 +13,8 @@
  * - It exists to validate infrastructure and unblock n8n integration.
  */
 
+import { pathToFileURL } from "node:url";
+
 const die = (msg) => {
   // eslint-disable-next-line no-console
   console.error(`[mcp-runner] ERROR: ${msg}`);
@@ -21,6 +23,8 @@ const die = (msg) => {
 
 const argv = process.argv.slice(2);
 const command = argv[0];
+
+const hasArg = (name) => argv.includes(name);
 
 const getArg = (name, fallback = undefined) => {
   const idx = argv.indexOf(name);
@@ -253,11 +257,7 @@ async function runAgent({ mcpUrl, prompt, taskType, complexity, modelOverride })
     const parsed = extractFirstJson(content);
     if (!parsed) die(`Agent output is not valid JSON: ${content}`);
 
-    if (typeof parsed.final === "string") {
-      // eslint-disable-next-line no-console
-      console.log(parsed.final);
-      return;
-    }
+    if (typeof parsed.final === "string") return parsed.final;
 
     const toolCalls = Array.isArray(parsed.toolCalls) ? parsed.toolCalls : [];
     if (toolCalls.length === 0) {
@@ -321,24 +321,54 @@ Examples:
   }
 
   if (command === "agent") {
-    const prompt = getArg("--prompt");
-    if (!prompt) die("--prompt required");
+    const prompt = getArg("--prompt", "");
+    const promptB64 = getArg("--prompt-b64", "");
+    const promptFile = getArg("--prompt-file", "");
+
+    let finalPrompt = "";
+    if (hasArg("--prompt") && prompt) finalPrompt = prompt;
+    if (!finalPrompt && hasArg("--prompt-b64") && promptB64) {
+      try {
+        finalPrompt = Buffer.from(promptB64, "base64").toString("utf8");
+      } catch (e) {
+        die(`Invalid base64 for --prompt-b64: ${String(e)}`);
+      }
+    }
+    if (!finalPrompt && hasArg("--prompt-file") && promptFile) {
+      const fs = await import("node:fs/promises");
+      try {
+        finalPrompt = await fs.readFile(promptFile, "utf8");
+      } catch (e) {
+        die(`Failed to read --prompt-file: ${promptFile} (${String(e)})`);
+      }
+    }
+
+    if (!finalPrompt) {
+      die("agent requires one of: --prompt | --prompt-b64 | --prompt-file");
+    }
     const taskType = getArg("--task-type", "doc");
     const complexity = getArg("--complexity", "normal");
     const modelOverride = getArg("--model", "");
-    await runAgent({
+    const final = await runAgent({
       mcpUrl,
-      prompt,
+      prompt: finalPrompt,
       taskType,
       complexity,
       modelOverride: modelOverride || "",
     });
+    // eslint-disable-next-line no-console
+    console.log(final);
     return;
   }
 
   die(`Unknown command: ${command}`);
 }
 
-await main();
+const isCli = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isCli) {
+  await main();
+}
+
+export { runAgent, listTools, callTool, pickModelFromPolicy };
 
 

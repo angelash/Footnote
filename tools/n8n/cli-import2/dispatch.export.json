@@ -1,0 +1,96 @@
+[
+  {
+    "id": "kEYu1qiXhPApUhXZ",
+    "name": "Dispatch Task to Secondary (WSL Runner)",
+    "description": null,
+    "active": false,
+    "isArchived": false,
+    "nodes": [
+      {
+        "parameters": {},
+        "id": "trigger-manual",
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          240,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "dispatch-task",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "trigger-webhook",
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          240,
+          120
+        ],
+        "webhookId": "8cbd27eb-36fc-4984-8be0-cfbe76fe5a64"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "http://localhost:5680/webhook/execute-task",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ $json.body || {} }}",
+          "options": {}
+        },
+        "id": "http-dispatch",
+        "name": "HTTP Dispatch to Secondary",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          700,
+          300
+        ],
+        "notes": "Requires secondary workflow to be ACTIVE and expose Webhook path /webhook/execute-task"
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "HTTP Dispatch to Secondary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "HTTP Dispatch to Secondary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "staticData": null,
+    "meta": null,
+    "pinData": {},
+    "versionId": "a27cad75-49cb-419a-90de-6f1812224f71",
+    "activeVersionId": "a27cad75-49cb-419a-90de-6f1812224f71",
+    "versionCounter": 1,
+    "triggerCount": 0,
+    "tags": [],
+    "createdAt": "2026-01-02T08:15:19.265Z",
+    "updatedAt": "2026-01-02T08:15:19.265Z",
+    "shared": []
+  }
+]

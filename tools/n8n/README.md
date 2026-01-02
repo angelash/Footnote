@@ -34,6 +34,10 @@ n8n start
    - `cursor-cli-task-workflow.json` - 使用 Cursor CLI 执行
    - `ai-native-task-workflow.json` - 使用 OpenAI API 执行
    - `windows-mcp-runner-browser-test-workflow.json` - Windows 侧用 MCP Runner 跑 ChromeMCP/Browser MCP（无 cursor-agent）
+   - `launcher-l3-writer-to-wsl.json` - 文案执行入口（固定 role=L3_writer，转发到 5680）
+   - `launcher-l3-engineer-to-wsl.json` - 程序执行入口（固定 role=L3_engineer，转发到 5680）
+   
+工作流目录（按岗位/工种）：`tools/n8n/WORKFLOW-CATALOG.md`
 
 ---
 

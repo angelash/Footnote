@@ -36,6 +36,11 @@ n8n start
    - `windows-mcp-runner-browser-test-workflow.json` - Windows 侧用 MCP Runner 跑 ChromeMCP/Browser MCP（无 cursor-agent）
    - `launcher-l3-writer-to-wsl.json` - 文案执行入口（固定 role=L3_writer，转发到 5680）
    - `launcher-l3-engineer-to-wsl.json` - 程序执行入口（固定 role=L3_engineer，转发到 5680）
+   - `factory-intake-workflow.json` - 工厂入口（制作人统一入口：/intake）
+   - `factory-run-role-workflow.json` - 工厂入口（通用岗位入口：/run-role）
+
+从实例（WSL 5680）额外导入：
+- `taskpack-factory-workflow.json` - 生成 Task Pack（/compose-taskpack）
    
 工作流目录（按岗位/工种）：`tools/n8n/WORKFLOW-CATALOG.md`
 

@@ -35,6 +35,17 @@
 - **Windows MCP Runner（浏览器测试）**：`tools/n8n/windows-mcp-runner-browser-test-workflow.json`
   - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
 
+### 2.4 工厂入口（覆盖所有岗位/工种）
+
+- **制作人入口（统一入口）**：`tools/n8n/factory-intake-workflow.json`
+  - Webhook：`POST http://127.0.0.1:5678/webhook/intake`
+  - 规则：有 `task_pack_path` → 直接执行；无 `task_pack_path` → 先生成 Task Pack 再执行
+- **岗位入口（通用）**：`tools/n8n/factory-run-role-workflow.json`
+  - Webhook：`POST http://127.0.0.1:5678/webhook/run-role`
+  - 规则：按 `execution_runtime/requires_mcp/task_type` 分流到 WSL 执行或 Windows 浏览器测试
+- **从实例：生成 Task Pack**：`tools/n8n/taskpack-factory-workflow.json`
+  - Webhook：`POST http://localhost:5680/webhook/compose-taskpack`
+
 ---
 
 ## 3) “岗位/工种工作流”如何落地到 n8n（推荐做法）
@@ -54,5 +65,11 @@
 
 - `tools/n8n/launcher-l3-writer-to-wsl.json`
 - `tools/n8n/launcher-l3-engineer-to-wsl.json`
+
+---
+
+## 5) 对应的“工厂流水线规格”
+
+- `docs/02_specs/pipelines/factory_pipeline_spec.md`
 
 

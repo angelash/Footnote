@@ -8,7 +8,11 @@ import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
-import { CharacterId, getPortraitKey as getCharacterPortraitKey, type CharacterExpression } from '@/config/characters.config';
+import {
+  CharacterId,
+  getPortraitKey as getCharacterPortraitKey,
+  type CharacterExpression,
+} from '@/config/characters.config';
 import type { IDialogue, IDialogueChoice } from '@/types';
 
 // ==================== 配置常量 ====================
@@ -115,7 +119,7 @@ export class DialogueUI {
     // 显示容器
     this._container.setVisible(true);
     this._container.setAlpha(0);
-    
+
     this._scene.tweens.add({
       targets: this._container,
       alpha: 1,
@@ -144,14 +148,14 @@ export class DialogueUI {
       onComplete: () => {
         this._container.setVisible(false);
         this._hidePortrait();
-        
+
         if (this._state.currentDialogue) {
-          eventBus.emit(GameEvent.DIALOGUE_END, { 
-            dialogueId: this._state.currentDialogue.id 
+          eventBus.emit(GameEvent.DIALOGUE_END, {
+            dialogueId: this._state.currentDialogue.id,
           });
           this._onDialogueEnd?.(this._state.currentDialogue.id);
         }
-        
+
         this._state.currentDialogue = null;
       },
     });
@@ -230,14 +234,7 @@ export class DialogueUI {
     this._container.setVisible(false);
 
     // 半透明背景遮罩
-    const overlay = this._scene.add.rectangle(
-      width / 2,
-      height / 2,
-      width,
-      height,
-      0x000000,
-      0.3
-    );
+    const overlay = this._scene.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.3);
     this._container.add(overlay);
 
     // 对话框背景
@@ -296,7 +293,10 @@ export class DialogueUI {
     });
 
     // 选项容器
-    this._choicesContainer = this._scene.add.container(width / 2, height - CONFIG.BOX_MARGIN_BOTTOM - CONFIG.BOX_HEIGHT - 20);
+    this._choicesContainer = this._scene.add.container(
+      width / 2,
+      height - CONFIG.BOX_MARGIN_BOTTOM - CONFIG.BOX_HEIGHT - 20
+    );
     this._choicesContainer.setVisible(false);
     this._container.add(this._choicesContainer);
 
@@ -310,11 +310,11 @@ export class DialogueUI {
     const boxY = height - CONFIG.BOX_MARGIN_BOTTOM - CONFIG.BOX_HEIGHT;
 
     this._background.clear();
-    
+
     // 背景
     this._background.fillStyle(COLORS.BG_SECONDARY, 0.95);
     this._background.fillRoundedRect(boxX, boxY, CONFIG.BOX_WIDTH, CONFIG.BOX_HEIGHT, 12);
-    
+
     // 边框
     this._background.lineStyle(2, COLORS.ACCENT, 0.5);
     this._background.strokeRoundedRect(boxX, boxY, CONFIG.BOX_WIDTH, CONFIG.BOX_HEIGHT, 12);
@@ -371,7 +371,11 @@ export class DialogueUI {
     const startY = -((choices.length - 1) * (CONFIG.CHOICE_HEIGHT + CONFIG.CHOICE_SPACING)) / 2;
 
     choices.forEach((choice, index) => {
-      const button = this._createChoiceButton(choice.label, index, startY + index * (CONFIG.CHOICE_HEIGHT + CONFIG.CHOICE_SPACING));
+      const button = this._createChoiceButton(
+        choice.label,
+        index,
+        startY + index * (CONFIG.CHOICE_HEIGHT + CONFIG.CHOICE_SPACING)
+      );
       this._choiceButtons.push(button);
       this._choicesContainer.add(button);
     });
@@ -388,47 +392,90 @@ export class DialogueUI {
   }
 
   private _hideChoices(): void {
-    this._choiceButtons.forEach(btn => btn.destroy());
+    this._choiceButtons.forEach((btn) => btn.destroy());
     this._choiceButtons = [];
     this._choicesContainer.setVisible(false);
   }
 
-  private _createChoiceButton(text: string, index: number, y: number): Phaser.GameObjects.Container {
+  private _createChoiceButton(
+    text: string,
+    index: number,
+    y: number
+  ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(0, y);
     const buttonWidth = CONFIG.BOX_WIDTH - 100;
 
     // 背景
     const bg = this._scene.add.graphics();
     bg.fillStyle(COLORS.BG_PRIMARY, 0.9);
-    bg.fillRoundedRect(-buttonWidth / 2, -CONFIG.CHOICE_HEIGHT / 2, buttonWidth, CONFIG.CHOICE_HEIGHT, 8);
+    bg.fillRoundedRect(
+      -buttonWidth / 2,
+      -CONFIG.CHOICE_HEIGHT / 2,
+      buttonWidth,
+      CONFIG.CHOICE_HEIGHT,
+      8
+    );
     bg.lineStyle(1, COLORS.BORDER, 1);
-    bg.strokeRoundedRect(-buttonWidth / 2, -CONFIG.CHOICE_HEIGHT / 2, buttonWidth, CONFIG.CHOICE_HEIGHT, 8);
+    bg.strokeRoundedRect(
+      -buttonWidth / 2,
+      -CONFIG.CHOICE_HEIGHT / 2,
+      buttonWidth,
+      CONFIG.CHOICE_HEIGHT,
+      8
+    );
 
     // 文字
-    const label = this._scene.add.text(0, 0, text, {
-      ...TEXT_STYLES.BODY,
-      fontSize: UI_FONT_SIZE.SMALL,
-    }).setOrigin(0.5);
+    const label = this._scene.add
+      .text(0, 0, text, {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+      })
+      .setOrigin(0.5);
 
     container.add([bg, label]);
     container.setSize(buttonWidth, CONFIG.CHOICE_HEIGHT);
 
     // 交互
-    container.setInteractive({ useHandCursor: true })
+    container
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         bg.clear();
         bg.fillStyle(COLORS.BG_SECONDARY, 1);
-        bg.fillRoundedRect(-buttonWidth / 2, -CONFIG.CHOICE_HEIGHT / 2, buttonWidth, CONFIG.CHOICE_HEIGHT, 8);
+        bg.fillRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.CHOICE_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.CHOICE_HEIGHT,
+          8
+        );
         bg.lineStyle(2, COLORS.ACCENT, 1);
-        bg.strokeRoundedRect(-buttonWidth / 2, -CONFIG.CHOICE_HEIGHT / 2, buttonWidth, CONFIG.CHOICE_HEIGHT, 8);
+        bg.strokeRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.CHOICE_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.CHOICE_HEIGHT,
+          8
+        );
         label.setColor('#00FFAA');
       })
       .on('pointerout', () => {
         bg.clear();
         bg.fillStyle(COLORS.BG_PRIMARY, 0.9);
-        bg.fillRoundedRect(-buttonWidth / 2, -CONFIG.CHOICE_HEIGHT / 2, buttonWidth, CONFIG.CHOICE_HEIGHT, 8);
+        bg.fillRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.CHOICE_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.CHOICE_HEIGHT,
+          8
+        );
         bg.lineStyle(1, COLORS.BORDER, 1);
-        bg.strokeRoundedRect(-buttonWidth / 2, -CONFIG.CHOICE_HEIGHT / 2, buttonWidth, CONFIG.CHOICE_HEIGHT, 8);
+        bg.strokeRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.CHOICE_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.CHOICE_HEIGHT,
+          8
+        );
         label.setColor('#E8E6E3');
       })
       .on('pointerdown', () => {
@@ -479,17 +526,20 @@ export class DialogueUI {
     }
   }
 
-  private _getPortraitKey(speaker: string, expression: CharacterExpression = 'neutral'): string | null {
+  private _getPortraitKey(
+    speaker: string,
+    expression: CharacterExpression = 'neutral'
+  ): string | null {
     // 映射说话者名称到角色ID
     const speakerToCharId: Record<string, CharacterId> = {
-      '岑回': CharacterId.CENHUI,
-      '顾临': CharacterId.GULIN,
-      '宋岚': CharacterId.SONGLAN,
-      '许澄': CharacterId.XUCHENG,
-      '阿棠': CharacterId.ATANG,
-      '牧平': CharacterId.MUPING,
-      '栖蓝': CharacterId.QILAN,
-      '陈匠': CharacterId.CHENJIANG,
+      岑回: CharacterId.CENHUI,
+      顾临: CharacterId.GULIN,
+      宋岚: CharacterId.SONGLAN,
+      许澄: CharacterId.XUCHENG,
+      阿棠: CharacterId.ATANG,
+      牧平: CharacterId.MUPING,
+      栖蓝: CharacterId.QILAN,
+      陈匠: CharacterId.CHENJIANG,
     };
 
     const charId = speakerToCharId[speaker];
@@ -529,7 +579,7 @@ export class DialogueUI {
           return;
         }
       }
-      
+
       this.advance();
     });
 
@@ -541,4 +591,3 @@ export class DialogueUI {
     });
   }
 }
-

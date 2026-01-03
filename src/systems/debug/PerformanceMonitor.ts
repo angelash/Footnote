@@ -44,7 +44,7 @@ export class PerformanceMonitor {
   private _scene: Phaser.Scene | null = null;
   private _isEnabled: boolean = false;
   private _overlay: HTMLDivElement | null = null;
-  
+
   // FPS追踪
   private _fpsHistory: IFpsHistory = {
     values: new Array(60).fill(60),
@@ -53,7 +53,7 @@ export class PerformanceMonitor {
   };
   private _minFps: number = 60;
   private _maxFps: number = 60;
-  
+
   // 加载追踪
   private _loadStartTime: number = 0;
   private _loadMetrics: ILoadMetrics = {
@@ -62,7 +62,7 @@ export class PerformanceMonitor {
     assetsFailed: 0,
     breakdown: { images: 0, audio: 0, data: 0 },
   };
-  
+
   // 更新间隔
   private _updateInterval: number = 500; // ms
   private _lastUpdate: number = 0;
@@ -278,7 +278,7 @@ export class PerformanceMonitor {
     if (!this._overlay) return;
 
     const m = this.getMetrics();
-    
+
     // FPS颜色
     let fpsColor = '#00ffaa';
     if (m.fps < 30) fpsColor = '#ff4444';
@@ -315,21 +315,24 @@ export class PerformanceMonitor {
   public exportReport(): string {
     const metrics = this.getMetrics();
     const loadMetrics = this.getLoadMetrics();
-    
-    return JSON.stringify({
-      timestamp: new Date().toISOString(),
-      performance: metrics,
-      loading: loadMetrics,
-      userAgent: navigator.userAgent,
-      screen: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        devicePixelRatio: window.devicePixelRatio,
+
+    return JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        performance: metrics,
+        loading: loadMetrics,
+        userAgent: navigator.userAgent,
+        screen: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          devicePixelRatio: window.devicePixelRatio,
+        },
       },
-    }, null, 2);
+      null,
+      2
+    );
   }
 }
 
 // 单例导出
 export const performanceMonitor = new PerformanceMonitor();
-

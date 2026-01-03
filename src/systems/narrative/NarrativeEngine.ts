@@ -225,7 +225,7 @@ class NarrativeEngine {
    * 批量注册对话
    */
   registerDialogues(dialogues: IDialogueData[]): void {
-    dialogues.forEach(d => this.registerDialogue(d));
+    dialogues.forEach((d) => this.registerDialogue(d));
   }
 
   /**
@@ -260,7 +260,9 @@ class NarrativeEngine {
       // 直接传入对话行数组
       dialogue = {
         id: `temp_${Date.now()}`,
-        lines: dialogueIdOrData.map(line => (typeof line === 'string' ? { speaker: '', text: line } : line)) as IDialogueLine[],
+        lines: dialogueIdOrData.map((line) =>
+          typeof line === 'string' ? { speaker: '', text: line } : line
+        ) as IDialogueLine[],
       };
     }
 
@@ -329,7 +331,7 @@ class NarrativeEngine {
   selectChoice(choiceId: string): void {
     if (!this._currentDialogue?.choices) return;
 
-    const choice = this._currentDialogue.choices.find(c => c.id === choiceId);
+    const choice = this._currentDialogue.choices.find((c) => c.id === choiceId);
     if (!choice) return;
 
     eventBus.emit(GameEvent.DIALOGUE_CHOICE, {
@@ -374,6 +376,14 @@ class NarrativeEngine {
     this._onDialogueEnd = callbacks.onEnd;
   }
 
+  /**
+   * 跳过当前对话（用于调试/自动化）
+   */
+  skipCurrentDialogue(): void {
+    if (!this._isDialogueActive) return;
+    this._endDialogue();
+  }
+
   private _showCurrentLine(): void {
     const line = this.getCurrentLine();
     if (!line) return;
@@ -390,7 +400,7 @@ class NarrativeEngine {
     if (!this._currentDialogue?.choices) return;
 
     // 过滤可用选项
-    const availableChoices = this._currentDialogue.choices.filter(c => {
+    const availableChoices = this._currentDialogue.choices.filter((c) => {
       if (!c.condition) return true;
       return this._checkChoiceCondition(c.condition);
     });
@@ -403,7 +413,7 @@ class NarrativeEngine {
 
     // 执行完成动作
     if (this._currentDialogue.onComplete) {
-      this._currentDialogue.onComplete.forEach(action => {
+      this._currentDialogue.onComplete.forEach((action) => {
         this._handleDialogueAction(action);
       });
     }
@@ -486,7 +496,7 @@ class NarrativeEngine {
    * 批量注册卡片
    */
   registerCards(cards: ICard[]): void {
-    cards.forEach(c => this.registerCard(c));
+    cards.forEach((c) => this.registerCard(c));
   }
 
   /**
@@ -532,7 +542,7 @@ class NarrativeEngine {
    */
   getObtainedCards(): ICard[] {
     return Array.from(this._obtainedCards)
-      .map(id => this._cardRegistry.get(id))
+      .map((id) => this._cardRegistry.get(id))
       .filter((c): c is ICard => c !== undefined);
   }
 
@@ -547,7 +557,7 @@ class NarrativeEngine {
    * 按类别获取卡片
    */
   getCardsByCategory(category: CardCategory | string): ICard[] {
-    return this.getObtainedCards().filter(c => c.category === category);
+    return this.getObtainedCards().filter((c) => c.category === category);
   }
 
   /**
@@ -585,7 +595,7 @@ class NarrativeEngine {
    * 批量注册伏笔
    */
   registerForeshadows(foreshadows: IForeshadow[]): void {
-    foreshadows.forEach(f => this.registerForeshadow(f));
+    foreshadows.forEach((f) => this.registerForeshadow(f));
   }
 
   /**
@@ -738,4 +748,3 @@ class NarrativeEngine {
 
 // 导出单例
 export const narrativeEngine = NarrativeEngine.getInstance();
-

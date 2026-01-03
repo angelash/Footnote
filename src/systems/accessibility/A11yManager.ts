@@ -163,7 +163,7 @@ class A11yManager {
   private _injectA11yStyles(): void {
     const styleId = 'a11y-styles';
     let styleEl = document.getElementById(styleId);
-    
+
     if (!styleEl) {
       styleEl = document.createElement('style');
       styleEl.id = styleId;
@@ -245,13 +245,13 @@ class A11yManager {
   private _createColorBlindFilters(): void {
     const svgNS = 'http://www.w3.org/2000/svg';
     const filterId = 'a11y-filters';
-    
+
     if (document.getElementById(filterId)) return;
 
     const svg = document.createElementNS(svgNS, 'svg');
     svg.id = filterId;
     svg.style.cssText = 'position: absolute; width: 0; height: 0;';
-    
+
     // 红色盲（Protanopia）
     svg.innerHTML = `
       <defs>
@@ -281,7 +281,7 @@ class A11yManager {
         </filter>
       </defs>
     `;
-    
+
     document.body.appendChild(svg);
   }
 
@@ -299,7 +299,7 @@ class A11yManager {
     this._settings[key] = value;
     this._saveSettings();
     this._applySettings();
-    
+
     eventBus.emit(GameEvent.SETTINGS_UPDATE, { settings: { a11y: { [key]: value } } });
     console.log(`[A11y] 设置更新: ${key} = ${value}`);
   }
@@ -321,7 +321,7 @@ class A11yManager {
 
     this._liveRegion.setAttribute('aria-live', priority);
     this._liveRegion.textContent = '';
-    
+
     // 短暂延迟确保屏幕阅读器能捕获变化
     requestAnimationFrame(() => {
       if (this._liveRegion) {
@@ -363,12 +363,12 @@ class A11yManager {
    */
   public setFocusTrap(element: HTMLElement): void {
     this._focusTrapElement = element;
-    
+
     // 找到所有可聚焦元素
     const focusables = element.querySelectorAll<HTMLElement>(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
-    
+
     if (focusables.length === 0) return;
 
     const first = focusables[0];
@@ -443,4 +443,3 @@ class A11yManager {
 
 // 单例导出
 export const a11yManager = new A11yManager();
-

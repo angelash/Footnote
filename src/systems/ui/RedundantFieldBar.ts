@@ -68,18 +68,24 @@ export class RedundantFieldBar extends Phaser.GameObjects.Container {
   private _createComponents(): void {
     // 发光效果层（底层）
     this._glowEffect = this.scene.add.rectangle(
-      0, 0,
-      this._barWidth + 10, this._barHeight + 10,
-      0x6666ff, 0.3
+      0,
+      0,
+      this._barWidth + 10,
+      this._barHeight + 10,
+      0x6666ff,
+      0.3
     );
     this._glowEffect.setVisible(false);
     this.add(this._glowEffect as Phaser.GameObjects.GameObject);
 
     // 背景
     this._background = this.scene.add.rectangle(
-      0, 0,
-      this._barWidth, this._barHeight,
-      0x1a1a2e, 0.95
+      0,
+      0,
+      this._barWidth,
+      this._barHeight,
+      0x1a1a2e,
+      0.95
     );
     this._background.setStrokeStyle(2, 0x4a4a6a);
     this.add(this._background);
@@ -155,7 +161,7 @@ export class RedundantFieldBar extends Phaser.GameObjects.Container {
     if (this._state !== FieldState.PENDING) return;
 
     this._clickCount++;
-    
+
     // 触发对话
     eventBus.emit(GameEvent.DIALOGUE_START, { dialogueId: `CFZ3_ADD_POINT_${this._clickCount}` });
   }
@@ -238,7 +244,7 @@ export class RedundantFieldBar extends Phaser.GameObjects.Container {
   private _acceptAnimation(): void {
     // 停止脉冲
     this.scene.tweens.killTweensOf(this._glowEffect);
-    
+
     // 闪烁确认
     this.scene.tweens.add({
       targets: this._background,
@@ -283,4 +289,3 @@ export class RedundantFieldBar extends Phaser.GameObjects.Container {
     super.destroy();
   }
 }
-

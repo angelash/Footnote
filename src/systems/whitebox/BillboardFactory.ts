@@ -80,14 +80,7 @@ export class BillboardFactory {
    * 显示：名称、角色定位、颜色标识点
    */
   createCharacter(config: ICharacterBillboardConfig): Phaser.GameObjects.Container {
-    const {
-      name,
-      characterId,
-      role = '角色',
-      color,
-      width = 60,
-      height = 80,
-    } = config;
+    const { name, characterId, role = '角色', color, width = 60, height = 80 } = config;
 
     const actualColor = color ?? getCharacterColor(characterId);
     const container = this._scene.add.container(0, 0);
@@ -180,7 +173,7 @@ export class BillboardFactory {
     bg.fillRoundedRect(-width / 2, -height / 2, width, height, 6);
 
     // 边框（交互物件用强调色）
-    const borderColor = interactive ? 0x00ffaa : 0x3a3a40;
+    const borderColor = interactive ? 0x00ffaa : color;
     const borderWidth = interactive ? 2 : 1;
     bg.lineStyle(borderWidth, borderColor, 1);
     bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 6);
@@ -475,11 +468,7 @@ export class BillboardFactory {
   /**
    * 创建线框面板
    */
-  createPanel(
-    width: number,
-    height: number,
-    title?: string
-  ): Phaser.GameObjects.Container {
+  createPanel(width: number, height: number, title?: string): Phaser.GameObjects.Container {
     const container = this._scene.add.container(0, 0);
 
     const g = this._scene.add.graphics();
@@ -519,11 +508,7 @@ export class BillboardFactory {
   /**
    * 创建白盒特效（简单几何动画）
    */
-  createEffect(
-    effectType: string,
-    x: number,
-    y: number
-  ): Phaser.GameObjects.Container {
+  createEffect(effectType: string, x: number, y: number): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
 
     switch (effectType) {
@@ -550,11 +535,7 @@ export class BillboardFactory {
 
   // ==================== 私有辅助方法 ====================
 
-  private _createLandmarkMarker(
-    x: number,
-    y: number,
-    label: string
-  ): Phaser.GameObjects.Container {
+  private _createLandmarkMarker(x: number, y: number, label: string): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
 
     // 标记点
@@ -726,4 +707,3 @@ export class BillboardFactory {
     container.add(label);
   }
 }
-

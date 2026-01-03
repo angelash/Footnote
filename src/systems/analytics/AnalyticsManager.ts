@@ -204,10 +204,7 @@ class AnalyticsManager {
 
     // 页面可见性
     document.addEventListener('visibilitychange', () => {
-      this.track(
-        document.hidden ? 'page_hidden' : 'page_visible',
-        'system'
-      );
+      this.track(document.hidden ? 'page_hidden' : 'page_visible', 'system');
     });
 
     // 页面卸载
@@ -244,9 +241,10 @@ class AnalyticsManager {
    */
   private _trackSessionEnd(): void {
     const duration = Date.now() - this._sessionStartTime;
-    const avgFps = this._fpsHistory.length > 0
-      ? this._fpsHistory.reduce((a, b) => a + b, 0) / this._fpsHistory.length
-      : 0;
+    const avgFps =
+      this._fpsHistory.length > 0
+        ? this._fpsHistory.reduce((a, b) => a + b, 0) / this._fpsHistory.length
+        : 0;
 
     this.track('session_end', 'system', {
       duration,
@@ -405,9 +403,10 @@ class AnalyticsManager {
    * 获取会话数据
    */
   public getSessionData(): ISessionData {
-    const avgFps = this._fpsHistory.length > 0
-      ? this._fpsHistory.reduce((a, b) => a + b, 0) / this._fpsHistory.length
-      : 0;
+    const avgFps =
+      this._fpsHistory.length > 0
+        ? this._fpsHistory.reduce((a, b) => a + b, 0) / this._fpsHistory.length
+        : 0;
 
     return {
       id: this._sessionId,
@@ -466,4 +465,3 @@ class AnalyticsManager {
 
 // 单例导出
 export const analyticsManager = new AnalyticsManager();
-

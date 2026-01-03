@@ -71,57 +71,103 @@ const CHAPTER_ASSET_MAP: Record<string, IGroupConfig> = {
     effects: [],
   },
   [AssetGroup.CHAPTER_0]: {
-    backgrounds: ['bg_c0z1_corridor', 'bg_c0z2_cenhui_room', 'bg_c0z3_thin_wall_alley', 
-                  'bg_c0z4_archive_room', 'bg_c0z5_abandoned_clinic', 'bg_c0z6_auditorium_street'],
+    backgrounds: [
+      'bg_c0z1_corridor',
+      'bg_c0z2_cenhui_room',
+      'bg_c0z3_thin_wall_alley',
+      'bg_c0z4_archive_room',
+      'bg_c0z5_abandoned_clinic',
+      'bg_c0z6_auditorium_street',
+    ],
     characters: ['cenhui', 'gulin'],
     audio: ['bgm_prologue', 'amb_indoor_office'],
     objects: ['obj_bed', 'obj_desk', 'obj_lamp', 'obj_door'],
     effects: ['fx_depth_perception'],
   },
   [AssetGroup.CHAPTER_1]: {
-    backgrounds: ['bg_c1z1_municipal_hall', 'bg_c1z2_gulin_office', 'bg_c1z3_residential_crossing',
-                  'bg_c1z4_songlan_map_house', 'bg_c1z5_clinic_waiting', 'bg_c1z6_auditorium_entrance'],
+    backgrounds: [
+      'bg_c1z1_municipal_hall',
+      'bg_c1z2_gulin_office',
+      'bg_c1z3_residential_crossing',
+      'bg_c1z4_songlan_map_house',
+      'bg_c1z5_clinic_waiting',
+      'bg_c1z6_auditorium_entrance',
+    ],
     characters: ['cenhui', 'gulin', 'songlan'],
     audio: ['bgm_archive', 'amb_indoor_archive'],
     objects: ['obj_office_desk', 'obj_filing_cabinet', 'obj_bookshelf'],
     effects: [],
   },
   [AssetGroup.CHAPTER_2]: {
-    backgrounds: ['bg_c2z1_edge_breach', 'bg_c2z2_crack_edge', 'bg_c2z3_clinic', 
-                  'bg_c2z4_drifter_zone', 'bg_c2z5_altar', 'bg_c2z6_cottage', 'bg_c2z7_rift'],
+    backgrounds: [
+      'bg_c2z1_edge_breach',
+      'bg_c2z2_crack_edge',
+      'bg_c2z3_clinic',
+      'bg_c2z4_drifter_zone',
+      'bg_c2z5_altar',
+      'bg_c2z6_cottage',
+      'bg_c2z7_rift',
+    ],
     characters: ['cenhui', 'xucheng', 'atang'],
     audio: ['bgm_anomaly', 'amb_anomaly_zone'],
     objects: ['obj_hospital_bed', 'obj_crack', 'obj_altar'],
     effects: ['fx_depth_intervention'],
   },
   [AssetGroup.CHAPTER_3]: {
-    backgrounds: ['bg_c3z1_collapse', 'bg_c3z2_intervention', 'bg_c3z3_drift_trail',
-                  'bg_c3z4_version_conflict', 'bg_c3z5_lighthouse', 'bg_c3z6_server_room', 'bg_c3z7_rescue'],
+    backgrounds: [
+      'bg_c3z1_collapse',
+      'bg_c3z2_intervention',
+      'bg_c3z3_drift_trail',
+      'bg_c3z4_version_conflict',
+      'bg_c3z5_lighthouse',
+      'bg_c3z6_server_room',
+      'bg_c3z7_rescue',
+    ],
     characters: ['cenhui', 'songlan', 'atang', 'muping'],
     audio: ['bgm_depth_perception', 'amb_drifter_area'],
     objects: ['obj_monitor', 'obj_rune'],
     effects: ['fx_time_manipulation'],
   },
   [AssetGroup.CHAPTER_4]: {
-    backgrounds: ['bg_c4z1_time_training', 'bg_c4z2_ledger', 'bg_c4z3_time_pollution',
-                  'bg_c4z4_permission', 'bg_c4z5_version_archive', 'bg_c4z6_rewind_fail',
-                  'bg_c4z7_myth_echo', 'bg_c4z8_patch_boundary'],
+    backgrounds: [
+      'bg_c4z1_time_training',
+      'bg_c4z2_ledger',
+      'bg_c4z3_time_pollution',
+      'bg_c4z4_permission',
+      'bg_c4z5_version_archive',
+      'bg_c4z6_rewind_fail',
+      'bg_c4z7_myth_echo',
+      'bg_c4z8_patch_boundary',
+    ],
     characters: ['cenhui', 'gulin', 'muping', 'qilan'],
     audio: ['amb_time_distortion'],
     objects: [],
     effects: ['fx_time_manipulation', 'fx_drift'],
   },
   [AssetGroup.CHAPTER_5]: {
-    backgrounds: ['bg_c5z1_non_convergent', 'bg_c5z2_judgment', 'bg_c5z3_damaged_cottage',
-                  'bg_c5z4_stutter', 'bg_c5z5_residue', 'bg_c5z6_museum', 'bg_c5z7_model_boundary'],
+    backgrounds: [
+      'bg_c5z1_non_convergent',
+      'bg_c5z2_judgment',
+      'bg_c5z3_damaged_cottage',
+      'bg_c5z4_stutter',
+      'bg_c5z5_residue',
+      'bg_c5z6_museum',
+      'bg_c5z7_model_boundary',
+    ],
     characters: ['cenhui', 'gulin', 'songlan', 'xucheng', 'atang', 'muping', 'qilan', 'chenjiang'],
     audio: ['bgm_finale', 'amb_finale'],
     objects: [],
     effects: ['fx_verdict', 'fx_scar'],
   },
   [AssetGroup.CHAPTER_FINALE]: {
-    backgrounds: ['bg_cfz1_viewing_space', 'bg_cfz2_field_accept', 'bg_cfz3_ending_a',
-                  'bg_cfz4_ending_b', 'bg_cfz5_ending_c', 'bg_cfz6_epilogue'],
+    backgrounds: [
+      'bg_cfz1_viewing_space',
+      'bg_cfz2_field_accept',
+      'bg_cfz3_ending_a',
+      'bg_cfz4_ending_b',
+      'bg_cfz5_ending_c',
+      'bg_cfz6_epilogue',
+    ],
     characters: ['cenhui'],
     audio: ['bgm_ending'],
     objects: [],
@@ -174,7 +220,7 @@ class AssetManager {
     }
 
     console.log(`[AssetManager] 开始加载章节资源: ${group}`);
-    
+
     const config = CHAPTER_ASSET_MAP[group];
     if (!config) {
       return;
@@ -182,10 +228,10 @@ class AssetManager {
 
     // 加载背景
     await this._loadBackgrounds(config.backgrounds);
-    
+
     // 加载角色头像
     await this._loadCharacterPortraits(config.characters);
-    
+
     // 加载音频
     await this._loadAudio(config.audio);
 
@@ -241,13 +287,13 @@ class AssetManager {
 
   private _getGroupFromChapter(chapter: string): AssetGroup | null {
     const chapterMap: Record<string, AssetGroup> = {
-      'C0': AssetGroup.CHAPTER_0,
-      'C1': AssetGroup.CHAPTER_1,
-      'C2': AssetGroup.CHAPTER_2,
-      'C3': AssetGroup.CHAPTER_3,
-      'C4': AssetGroup.CHAPTER_4,
-      'C5': AssetGroup.CHAPTER_5,
-      'CF': AssetGroup.CHAPTER_FINALE,
+      C0: AssetGroup.CHAPTER_0,
+      C1: AssetGroup.CHAPTER_1,
+      C2: AssetGroup.CHAPTER_2,
+      C3: AssetGroup.CHAPTER_3,
+      C4: AssetGroup.CHAPTER_4,
+      C5: AssetGroup.CHAPTER_5,
+      CF: AssetGroup.CHAPTER_FINALE,
     };
     return chapterMap[chapter] || null;
   }
@@ -263,7 +309,7 @@ class AssetManager {
 
     for (const key of keys) {
       if (this._scene.textures.exists(key)) continue;
-      
+
       const url = SCENE_BACKGROUNDS[key];
       if (url) {
         this._scene.load.image(key, url);
@@ -303,9 +349,9 @@ class AssetManager {
       if (this._scene.cache.audio.exists(key)) continue;
 
       // 查找音频配置
-      const bgm = BGM_CONFIGS.find(b => b.id === key);
-      const sfx = SFX_CONFIGS.find(s => s.id === key);
-      const amb = AMBIENCE_CONFIGS.find(a => a.id === key);
+      const bgm = BGM_CONFIGS.find((b) => b.id === key);
+      const sfx = SFX_CONFIGS.find((s) => s.id === key);
+      const amb = AMBIENCE_CONFIGS.find((a) => a.id === key);
 
       const config = bgm || sfx || amb;
       if (config) {
@@ -321,4 +367,3 @@ class AssetManager {
 }
 
 export const assetManager = AssetManager.getInstance();
-

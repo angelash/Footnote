@@ -14,7 +14,7 @@ interface IRawDialogue {
   id: string;
   speaker: string;
   text: string;
-  expression?: string;  // 角色表情
+  expression?: string; // 角色表情
   next?: string | null;
   choices?: {
     label: string;
@@ -44,10 +44,13 @@ interface IRawCard {
     value: number;
     condition?: IRawCondition;
   }[];
-  states?: Record<string, {
-    front?: string[];
-    detail?: string[];
-  }>;
+  states?: Record<
+    string,
+    {
+      front?: string[];
+      detail?: string[];
+    }
+  >;
 }
 
 interface IRawForeshadow {
@@ -102,18 +105,22 @@ export function loadDialogues(yamlContent: string): IDialogue[] {
         text: dialogue.text,
         expression: dialogue.expression as IDialogue['expression'],
         next: dialogue.next ?? null,
-        choices: dialogue.choices?.map(c => ({
+        choices: dialogue.choices?.map((c) => ({
           label: c.label,
           next: c.next,
           effect: c.effect,
           condition: c.condition ? transformCondition(c.condition) : undefined,
         })),
-        trigger: dialogue.trigger ? {
-          card: dialogue.trigger.card,
-          foreshadow: dialogue.trigger.foreshadow as [string, 'plant' | 'deepen' | 'resolve'] | undefined,
-          ability: dialogue.trigger.ability as AbilityType | undefined,
-          event: dialogue.trigger.event,
-        } : undefined,
+        trigger: dialogue.trigger
+          ? {
+              card: dialogue.trigger.card,
+              foreshadow: dialogue.trigger.foreshadow as
+                | [string, 'plant' | 'deepen' | 'resolve']
+                | undefined,
+              ability: dialogue.trigger.ability as AbilityType | undefined,
+              event: dialogue.trigger.event,
+            }
+          : undefined,
         condition: dialogue.condition ? transformCondition(dialogue.condition) : undefined,
       } as IDialogue;
     });
@@ -141,7 +148,7 @@ export function loadCards(yamlContent: string): ICard[] {
         zone: card.zone,
         front: card.front,
         detail: card.detail,
-        fx: card.fx?.map(f => ({
+        fx: card.fx?.map((f) => ({
           type: f.type,
           value: f.value,
           condition: f.condition ? transformCondition(f.condition) : undefined,
@@ -222,12 +229,7 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
   const foreshadows: IForeshadow[] = [];
 
   // 加载对话文件
-  const dialogueFiles = [
-    'c0_z1',
-    'c0_z2',
-    'c0_z3',
-    'c0_z4',
-  ];
+  const dialogueFiles = ['c0_z1', 'c0_z2', 'c0_z3', 'c0_z4'];
 
   for (const file of dialogueFiles) {
     try {
@@ -275,4 +277,3 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
 
   return { dialogues, cards, foreshadows };
 }
-

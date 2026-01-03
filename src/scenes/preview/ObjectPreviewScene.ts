@@ -1,6 +1,6 @@
 /**
  * 物件预览场景 (Prefab 模式)
- * 
+ *
  * 展示所有场景物件的 Prefab 定义：
  * - 物件类型（装饰、交互、动画）
  * - 碰撞区域可视化
@@ -80,12 +80,18 @@ export class ObjectPreviewScene extends BasePreviewScene {
 
     // 统计信息
     const stats = this._calculateStats();
-    const statsText = this.add.text(width / 2, currentY, 
-      `共 ${stats.total} 个物件 | 🎯 ${stats.interactive} 交互 | 🎬 ${stats.animated} 动画 | 🏛️ ${stats.decoration} 装饰`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#686868',
-    }).setOrigin(0.5);
+    const statsText = this.add
+      .text(
+        width / 2,
+        currentY,
+        `共 ${stats.total} 个物件 | 🎯 ${stats.interactive} 交互 | 🎬 ${stats.animated} 动画 | 🏛️ ${stats.decoration} 装饰`,
+        {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.NORMAL,
+          color: '#686868',
+        }
+      )
+      .setOrigin(0.5);
     this.contentContainer.add(statsText);
     currentY += 50;
 
@@ -96,7 +102,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
     // 分页信息和物件列表
     this._applyFilter();
     this._totalPages = Math.ceil(this._filteredObjects.length / PAGE_SIZE);
-    
+
     // 分页控制器
     currentY = this._createPaginationControls(currentY, width);
     currentY += 20;
@@ -111,22 +117,31 @@ export class ObjectPreviewScene extends BasePreviewScene {
    * 创建分页控制器
    */
   private _createPaginationControls(startY: number, width: number): number {
-    const pageInfo = this.add.text(width / 2, startY, 
-      `第 ${this._currentPage + 1} / ${this._totalPages} 页 (显示 ${PAGE_SIZE} 项/页)`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#4A9EFF',
-    }).setOrigin(0.5);
+    const pageInfo = this.add
+      .text(
+        width / 2,
+        startY,
+        `第 ${this._currentPage + 1} / ${this._totalPages} 页 (显示 ${PAGE_SIZE} 项/页)`,
+        {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.NORMAL,
+          color: '#4A9EFF',
+        }
+      )
+      .setOrigin(0.5);
     this.contentContainer.add(pageInfo);
 
     // 上一页按钮
     if (this._currentPage > 0) {
-      const prevBtn = this.add.text(width / 2 - 150, startY, '← 上一页', {
-        fontFamily: 'Noto Sans SC',
-        fontSize: this.FONT_SIZE.NORMAL,
-        color: '#00FFAA',
-      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-      
+      const prevBtn = this.add
+        .text(width / 2 - 150, startY, '← 上一页', {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.NORMAL,
+          color: '#00FFAA',
+        })
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true });
+
       prevBtn.on('pointerover', () => prevBtn.setColor('#FFFFFF'));
       prevBtn.on('pointerout', () => prevBtn.setColor('#00FFAA'));
       prevBtn.on('pointerdown', () => {
@@ -138,12 +153,15 @@ export class ObjectPreviewScene extends BasePreviewScene {
 
     // 下一页按钮
     if (this._currentPage < this._totalPages - 1) {
-      const nextBtn = this.add.text(width / 2 + 150, startY, '下一页 →', {
-        fontFamily: 'Noto Sans SC',
-        fontSize: this.FONT_SIZE.NORMAL,
-        color: '#00FFAA',
-      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-      
+      const nextBtn = this.add
+        .text(width / 2 + 150, startY, '下一页 →', {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.NORMAL,
+          color: '#00FFAA',
+        })
+        .setOrigin(0.5)
+        .setInteractive({ useHandCursor: true });
+
       nextBtn.on('pointerover', () => nextBtn.setColor('#FFFFFF'));
       nextBtn.on('pointerout', () => nextBtn.setColor('#00FFAA'));
       nextBtn.on('pointerdown', () => {
@@ -163,13 +181,13 @@ export class ObjectPreviewScene extends BasePreviewScene {
     this._allObjects = [];
 
     const zoneIds = getAllZoneIds();
-    zoneIds.forEach(zoneId => {
+    zoneIds.forEach((zoneId) => {
       const config = getSceneConfig(zoneId);
       if (!config?.objects) return;
 
       const zoneName = config.title || zoneId;
-      
-      config.objects.forEach(obj => {
+
+      config.objects.forEach((obj) => {
         this._allObjects.push({
           zoneId,
           zoneName,
@@ -193,19 +211,19 @@ export class ObjectPreviewScene extends BasePreviewScene {
       byActionType: {},
     };
 
-    this._allObjects.forEach(item => {
+    this._allObjects.forEach((item) => {
       const obj = item.object;
-      
+
       if (obj.interactive) {
         stats.interactive++;
         const actionType = obj.interactive.action?.type || 'none';
         stats.byActionType[actionType] = (stats.byActionType[actionType] || 0) + 1;
       }
-      
+
       if (obj.animation) {
         stats.animated++;
       }
-      
+
       if (!obj.interactive && !obj.animation) {
         stats.decoration++;
       }
@@ -243,21 +261,30 @@ export class ObjectPreviewScene extends BasePreviewScene {
         bg.fillStyle(Phaser.Display.Color.HexStringToColor(tab.color).color, 0.2);
         bg.fillRoundedRect(0, 0, tabWidth, tabHeight, 8);
       }
-      bg.lineStyle(isActive ? 2 : 1, Phaser.Display.Color.HexStringToColor(tab.color).color, isActive ? 1 : 0.5);
+      bg.lineStyle(
+        isActive ? 2 : 1,
+        Phaser.Display.Color.HexStringToColor(tab.color).color,
+        isActive ? 1 : 0.5
+      );
       bg.strokeRoundedRect(0, 0, tabWidth, tabHeight, 8);
       tabContainer.add(bg);
 
       // 文字
       const count = this._getCountByCategory(tab.id);
-      const text = this.add.text(tabWidth / 2, tabHeight / 2, `${tab.icon} ${tab.name} (${count})`, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: this.FONT_SIZE.NORMAL,
-        color: isActive ? tab.color : '#686868',
-      }).setOrigin(0.5);
+      const text = this.add
+        .text(tabWidth / 2, tabHeight / 2, `${tab.icon} ${tab.name} (${count})`, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.NORMAL,
+          color: isActive ? tab.color : '#686868',
+        })
+        .setOrigin(0.5);
       tabContainer.add(text);
 
       // 交互
-      tabContainer.setInteractive(new Phaser.Geom.Rectangle(0, 0, tabWidth, tabHeight), Phaser.Geom.Rectangle.Contains);
+      tabContainer.setInteractive(
+        new Phaser.Geom.Rectangle(0, 0, tabWidth, tabHeight),
+        Phaser.Geom.Rectangle.Contains
+      );
       tabContainer.on('pointerdown', () => {
         if (tab.id !== this._currentCategory) {
           this._currentCategory = tab.id;
@@ -278,11 +305,11 @@ export class ObjectPreviewScene extends BasePreviewScene {
       case 'all':
         return this._allObjects.length;
       case 'interactive':
-        return this._allObjects.filter(o => o.object.interactive).length;
+        return this._allObjects.filter((o) => o.object.interactive).length;
       case 'animated':
-        return this._allObjects.filter(o => o.object.animation).length;
+        return this._allObjects.filter((o) => o.object.animation).length;
       case 'decoration':
-        return this._allObjects.filter(o => !o.object.interactive && !o.object.animation).length;
+        return this._allObjects.filter((o) => !o.object.interactive && !o.object.animation).length;
     }
   }
 
@@ -295,13 +322,15 @@ export class ObjectPreviewScene extends BasePreviewScene {
         this._filteredObjects = [...this._allObjects];
         break;
       case 'interactive':
-        this._filteredObjects = this._allObjects.filter(o => o.object.interactive);
+        this._filteredObjects = this._allObjects.filter((o) => o.object.interactive);
         break;
       case 'animated':
-        this._filteredObjects = this._allObjects.filter(o => o.object.animation);
+        this._filteredObjects = this._allObjects.filter((o) => o.object.animation);
         break;
       case 'decoration':
-        this._filteredObjects = this._allObjects.filter(o => !o.object.interactive && !o.object.animation);
+        this._filteredObjects = this._allObjects.filter(
+          (o) => !o.object.interactive && !o.object.animation
+        );
         break;
     }
   }
@@ -327,7 +356,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
 
     // 按Zone分组
     const byZone = new Map<string, IFlatObject[]>();
-    pageObjects.forEach(item => {
+    pageObjects.forEach((item) => {
       const key = item.zoneId;
       if (!byZone.has(key)) {
         byZone.set(key, []);
@@ -348,11 +377,13 @@ export class ObjectPreviewScene extends BasePreviewScene {
       });
       this.contentContainer.add(zoneTitle);
 
-      const countText = this.add.text(width - 40, currentY, `${objects.length} 个物件`, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: this.FONT_SIZE.SMALL,
-        color: '#4A4A4A',
-      }).setOrigin(1, 0);
+      const countText = this.add
+        .text(width - 40, currentY, `${objects.length} 个物件`, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.SMALL,
+          color: '#4A4A4A',
+        })
+        .setOrigin(1, 0);
       this.contentContainer.add(countText);
 
       currentY += 45;
@@ -405,29 +436,29 @@ export class ObjectPreviewScene extends BasePreviewScene {
       switch (obj.interactive.action?.type) {
         case 'card':
           typeIcon = '📇';
-          typeColor = 0x00FFAA;
+          typeColor = 0x00ffaa;
           typeName = '卡片';
           break;
         case 'dialogue':
           typeIcon = '💬';
-          typeColor = 0x4A9EFF;
+          typeColor = 0x4a9eff;
           typeName = '对话';
           break;
         case 'gotoZone':
           typeIcon = '🚪';
-          typeColor = 0xFFD700;
+          typeColor = 0xffd700;
           typeName = '传送';
           break;
         default:
           typeIcon = '🎯';
-          typeColor = 0xFF6600;
+          typeColor = 0xff6600;
           typeName = '交互';
       }
     }
 
     if (obj.animation) {
       typeIcon = '🎬';
-      typeColor = 0xFF00FF;
+      typeColor = 0xff00ff;
       typeName = '动画';
     }
 
@@ -445,9 +476,11 @@ export class ObjectPreviewScene extends BasePreviewScene {
     iconBg.fillCircle(40, 40, 28);
     container.add(iconBg);
 
-    const icon = this.add.text(40, 40, typeIcon, {
-      fontSize: '32px',
-    }).setOrigin(0.5);
+    const icon = this.add
+      .text(40, 40, typeIcon, {
+        fontSize: '32px',
+      })
+      .setOrigin(0.5);
     container.add(icon);
 
     // 物件ID
@@ -486,20 +519,25 @@ export class ObjectPreviewScene extends BasePreviewScene {
 
     // 缩放信息
     if (typeof obj.scale === 'number') {
-      const scaleText = this.add.text(width - 18, height - 35, `×${obj.scale}`, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: this.FONT_SIZE.SMALL,
-        color: '#4A4A4A',
-      }).setOrigin(1, 0);
+      const scaleText = this.add
+        .text(width - 18, height - 35, `×${obj.scale}`, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.SMALL,
+          color: '#4A4A4A',
+        })
+        .setOrigin(1, 0);
       container.add(scaleText);
     }
 
     // 交互
-    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, width, height),
+      Phaser.Geom.Rectangle.Contains
+    );
 
     container.on('pointerover', () => {
       bg.clear();
-      bg.fillStyle(0x1E1E24, 1);
+      bg.fillStyle(0x1e1e24, 1);
       bg.fillRoundedRect(0, 0, width, height, 10);
       bg.lineStyle(2, typeColor, 1);
       bg.strokeRoundedRect(0, 0, width, height, 10);
@@ -546,7 +584,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
     const panel = this.add.graphics();
     panel.fillStyle(0x141419, 1);
     panel.fillRoundedRect(panelX, panelY, panelWidth, panelHeight, 15);
-    panel.lineStyle(2, 0x00FFAA, 1);
+    panel.lineStyle(2, 0x00ffaa, 1);
     panel.strokeRoundedRect(panelX, panelY, panelWidth, panelHeight, 15);
     this._detailPanel.add(panel);
 
@@ -560,21 +598,28 @@ export class ObjectPreviewScene extends BasePreviewScene {
     this._detailPanel.add(title);
 
     // 关闭按钮
-    const closeBtn = this.add.text(panelX + panelWidth - 40, panelY + 25, '✕', {
-      fontSize: '36px',
-      color: '#686868',
-    }).setInteractive({ useHandCursor: true });
+    const closeBtn = this.add
+      .text(panelX + panelWidth - 40, panelY + 25, '✕', {
+        fontSize: '36px',
+        color: '#686868',
+      })
+      .setInteractive({ useHandCursor: true });
     closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
     closeBtn.on('pointerout', () => closeBtn.setColor('#686868'));
     closeBtn.on('pointerdown', () => this._hideObjectDetail());
     this._detailPanel.add(closeBtn);
 
     // 所属Zone
-    const zoneInfo = this.add.text(panelX + 30, panelY + 70, `📍 所属: ${item.zoneId} - ${item.zoneName}`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#4A9EFF',
-    });
+    const zoneInfo = this.add.text(
+      panelX + 30,
+      panelY + 70,
+      `📍 所属: ${item.zoneId} - ${item.zoneName}`,
+      {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#4A9EFF',
+      }
+    );
     this._detailPanel.add(zoneInfo);
 
     // 基础信息
@@ -598,7 +643,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
       `标签: ${obj.label || '无'}`,
     ];
 
-    basicInfo.forEach(info => {
+    basicInfo.forEach((info) => {
       const text = this.add.text(panelX + 40, detailY, info, {
         fontFamily: 'Noto Sans SC',
         fontSize: this.FONT_SIZE.SMALL,
@@ -636,7 +681,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
         interactiveInfo.push(`目标Zone: ${action.zoneId}`);
       }
 
-      interactiveInfo.forEach(info => {
+      interactiveInfo.forEach((info) => {
         const text = this.add.text(panelX + 40, detailY, info, {
           fontFamily: 'Noto Sans SC',
           fontSize: this.FONT_SIZE.SMALL,
@@ -665,7 +710,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
         `循环: ${obj.animation.repeat === -1 ? '无限' : obj.animation.repeat}`,
       ];
 
-      animInfo.forEach(info => {
+      animInfo.forEach((info) => {
         const text = this.add.text(panelX + 40, detailY, info, {
           fontFamily: 'Noto Sans SC',
           fontSize: this.FONT_SIZE.SMALL,
@@ -681,26 +726,28 @@ export class ObjectPreviewScene extends BasePreviewScene {
     const previewY = panelY + 130;
 
     const previewBg = this.add.graphics();
-    previewBg.fillStyle(0x0A0A0F, 1);
+    previewBg.fillStyle(0x0a0a0f, 1);
     previewBg.fillRect(previewX, previewY, 160, 160);
-    previewBg.lineStyle(1, 0x2A2A30, 1);
+    previewBg.lineStyle(1, 0x2a2a30, 1);
     previewBg.strokeRect(previewX, previewY, 160, 160);
     this._detailPanel.add(previewBg);
 
     // 物件占位符
     const previewObject = this.add.graphics();
-    const objColor = obj.interactive ? 0x00FFAA : (obj.animation ? 0xFF00FF : 0x444444);
+    const objColor = obj.interactive ? 0x00ffaa : obj.animation ? 0xff00ff : 0x444444;
     previewObject.fillStyle(objColor, 0.3);
     previewObject.fillRect(previewX + 45, previewY + 45, 70, 70);
     previewObject.lineStyle(2, objColor, 1);
     previewObject.strokeRect(previewX + 45, previewY + 45, 70, 70);
     this._detailPanel.add(previewObject);
 
-    const previewLabel = this.add.text(previewX + 80, previewY + 175, '白盒预览', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#4A4A4A',
-    }).setOrigin(0.5);
+    const previewLabel = this.add
+      .text(previewX + 80, previewY + 175, '白盒预览', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#4A4A4A',
+      })
+      .setOrigin(0.5);
     this._detailPanel.add(previewLabel);
 
     // 显示面板
@@ -728,4 +775,3 @@ export class ObjectPreviewScene extends BasePreviewScene {
     });
   }
 }
-

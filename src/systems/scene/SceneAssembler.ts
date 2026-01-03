@@ -13,7 +13,7 @@ import type {
 } from '@/types/scene';
 import { TEXT_STYLES } from '@/config/game.config';
 import { assetResolver } from '@/systems/whitebox/AssetResolver';
-import { CURRENT_ASSET_MODE, useProductionAsset, getObjectIcon } from '@/config/assetMode.config';
+import { useProductionAsset } from '@/config/assetMode.config';
 import type { IZoneBillboardConfig, IBillboardConfig } from '@/systems/whitebox/BillboardFactory';
 
 // ==================== Zone类型映射 ====================
@@ -22,24 +22,24 @@ import type { IZoneBillboardConfig, IBillboardConfig } from '@/systems/whitebox/
 function inferZoneType(zoneId: string): string {
   // 根据章节和Zone推断类型
   const chapter = zoneId.split('-')[0];
-  
+
   // 特定Zone类型映射
   const zoneTypeMap: Record<string, string> = {
-    'C0-Z1': 'life',        // 宿舍走廊
-    'C0-Z2': 'life',        // 早餐小店
-    'C0-Z3': 'life',        // 薄墙巷口
-    'C0-Z4': 'municipal',   // 维修局
-    'C1-Z1': 'municipal',   // 市政厅
-    'C1-Z2': 'municipal',   // 档案室
-    'C1-Z3': 'archive',     // 档案巷
-    'C2-Z1': 'municipal',   // 校准室
-    'C2-Z3': 'clinic',      // 诊所
-    'C2-Z5': 'temple',      // 祭坛
-    'C2-Z7': 'edge',        // 边缘断口
-    'C3-Z5': 'temple',      // 灯塔
-    'C4-Z7': 'temple',      // 神话回响
-    'C5-Z6': 'anomaly',     // 审计区
-    'CF-Z1': 'anomaly',     // 冗余字段区
+    'C0-Z1': 'life', // 宿舍走廊
+    'C0-Z2': 'life', // 早餐小店
+    'C0-Z3': 'life', // 薄墙巷口
+    'C0-Z4': 'municipal', // 维修局
+    'C1-Z1': 'municipal', // 市政厅
+    'C1-Z2': 'municipal', // 档案室
+    'C1-Z3': 'archive', // 档案巷
+    'C2-Z1': 'municipal', // 校准室
+    'C2-Z3': 'clinic', // 诊所
+    'C2-Z5': 'temple', // 祭坛
+    'C2-Z7': 'edge', // 边缘断口
+    'C3-Z5': 'temple', // 灯塔
+    'C4-Z7': 'temple', // 神话回响
+    'C5-Z6': 'anomaly', // 审计区
+    'CF-Z1': 'anomaly', // 冗余字段区
   };
 
   if (zoneTypeMap[zoneId]) {
@@ -48,14 +48,14 @@ function inferZoneType(zoneId: string): string {
 
   // 根据章节默认类型
   const chapterDefaults: Record<string, string> = {
-    'C0': 'life',
-    'C1': 'municipal',
-    'C2': 'clinic',
-    'C3': 'archive',
-    'C4': 'anomaly',
-    'C5': 'anomaly',
-    'CF': 'anomaly',
-    'RV': 'edge',
+    C0: 'life',
+    C1: 'municipal',
+    C2: 'clinic',
+    C3: 'archive',
+    C4: 'anomaly',
+    C5: 'anomaly',
+    CF: 'anomaly',
+    RV: 'edge',
   };
 
   return chapterDefaults[chapter] || 'default';
@@ -66,13 +66,11 @@ function inferZoneType(zoneId: string): string {
 export class SceneAssembler {
   private readonly _scene: Phaser.Scene;
   private readonly _callbacks: ISceneAssemblerCallbacks;
-  private _useWhitebox: boolean;
 
   constructor(scene: Phaser.Scene, callbacks: ISceneAssemblerCallbacks) {
     this._scene = scene;
     this._callbacks = callbacks;
-    this._useWhitebox = !useProductionAsset('backgrounds') || !useProductionAsset('objects');
-    
+
     // 初始化资源解析器
     if (!assetResolver.isInitialized()) {
       assetResolver.init(scene);
@@ -118,11 +116,7 @@ export class SceneAssembler {
 
     // 尝试使用正式资源
     if (useProductionAsset('backgrounds') && this._scene.textures.exists(bgConfig.texture)) {
-      const bg = this._scene.add.image(
-        bgConfig.x ?? 0,
-        bgConfig.y ?? 0,
-        bgConfig.texture
-      );
+      const bg = this._scene.add.image(bgConfig.x ?? 0, bgConfig.y ?? 0, bgConfig.texture);
       bg.setOrigin(bgConfig.origin?.[0] ?? 0, bgConfig.origin?.[1] ?? 0);
       if (bgConfig.displaySize) {
         bg.setDisplaySize(bgConfig.displaySize[0], bgConfig.displaySize[1]);
@@ -142,15 +136,19 @@ export class SceneAssembler {
 
       // 提取地标点（从objects中找关键交互物件）
       if (config.objects) {
-        const interactableObjects = config.objects.filter(obj => obj.interactive);
-        zoneBillboardConfig.landmarks = interactableObjects.slice(0, 5).map(obj => ({
+        const interactableObjects = config.objects.filter((obj) => obj.interactive);
+        zoneBillboardConfig.landmarks = interactableObjects.slice(0, 5).map((obj) => ({
           x: obj.x,
           y: obj.y,
           label: obj.label || obj.id,
         }));
       }
 
-      const resolved = assetResolver.resolveBackground(this._scene, zoneBillboardConfig, bgConfig.texture);
+      const resolved = assetResolver.resolveBackground(
+        this._scene,
+        zoneBillboardConfig,
+        bgConfig.texture
+      );
       created.push(resolved.gameObject);
     }
 
@@ -195,13 +193,14 @@ export class SceneAssembler {
       if (obj.animation) {
         const animKey = obj.animation.key;
         if (!this._scene.anims.exists(animKey)) {
-          const frames =
-            obj.animation.frameNumbers
-              ? this._scene.anims.generateFrameNumbers(obj.texture, { frames: obj.animation.frameNumbers })
-              : this._scene.anims.generateFrameNumbers(obj.texture, {
-                  start: obj.animation.frames?.start ?? 0,
-                  end: obj.animation.frames?.end ?? 0,
-                });
+          const frames = obj.animation.frameNumbers
+            ? this._scene.anims.generateFrameNumbers(obj.texture, {
+                frames: obj.animation.frameNumbers,
+              })
+            : this._scene.anims.generateFrameNumbers(obj.texture, {
+                start: obj.animation.frames?.start ?? 0,
+                end: obj.animation.frames?.end ?? 0,
+              });
           this._scene.anims.create({
             key: animKey,
             frames,
@@ -348,27 +347,27 @@ export class SceneAssembler {
    */
   private _inferObjectSubtype(obj: ISceneObjectConfig): string | undefined {
     const textureKey = obj.texture.toLowerCase();
-    
+
     // 从纹理名称推断
     const subtypePatterns: Record<string, string[]> = {
-      'bed': ['bed'],
-      'desk': ['desk', 'table'],
-      'lamp': ['lamp', 'light'],
-      'plant': ['plant', 'tree'],
-      'door': ['door', 'gate'],
-      'bookshelf': ['bookshelf', 'shelf', 'book'],
-      'monitor': ['monitor', 'screen', 'computer'],
-      'filing_cabinet': ['filing', 'cabinet', 'drawer'],
-      'altar': ['altar'],
-      'crack': ['crack', 'rift'],
-      'sign': ['sign', 'notice', 'board'],
-      'chair': ['chair', 'seat'],
-      'candle': ['candle'],
-      'rune': ['rune', 'symbol'],
+      bed: ['bed'],
+      desk: ['desk', 'table'],
+      lamp: ['lamp', 'light'],
+      plant: ['plant', 'tree'],
+      door: ['door', 'gate'],
+      bookshelf: ['bookshelf', 'shelf', 'book'],
+      monitor: ['monitor', 'screen', 'computer'],
+      filing_cabinet: ['filing', 'cabinet', 'drawer'],
+      altar: ['altar'],
+      crack: ['crack', 'rift'],
+      sign: ['sign', 'notice', 'board'],
+      chair: ['chair', 'seat'],
+      candle: ['candle'],
+      rune: ['rune', 'symbol'],
     };
 
     for (const [subtype, patterns] of Object.entries(subtypePatterns)) {
-      if (patterns.some(p => textureKey.includes(p))) {
+      if (patterns.some((p) => textureKey.includes(p))) {
         return subtype;
       }
     }
@@ -377,7 +376,7 @@ export class SceneAssembler {
     if (obj.label) {
       const label = obj.label.toLowerCase();
       for (const [subtype, patterns] of Object.entries(subtypePatterns)) {
-        if (patterns.some(p => label.includes(p))) {
+        if (patterns.some((p) => label.includes(p))) {
           return subtype;
         }
       }

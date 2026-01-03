@@ -28,5 +28,4 @@ export const PREVIEW_SCENES = [
   'DialoguePreviewScene',
 ] as const;
 
-export type PreviewSceneKey = typeof PREVIEW_SCENES[number];
-
+export type PreviewSceneKey = (typeof PREVIEW_SCENES)[number];

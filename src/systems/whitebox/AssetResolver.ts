@@ -11,7 +11,12 @@ import {
   useProductionAsset,
   isWhiteboxMode,
 } from '@/config/assetMode.config';
-import { BillboardFactory, IBillboardConfig, ICharacterBillboardConfig, IZoneBillboardConfig } from './BillboardFactory';
+import {
+  BillboardFactory,
+  IBillboardConfig,
+  ICharacterBillboardConfig,
+  IZoneBillboardConfig,
+} from './BillboardFactory';
 
 // ==================== 类型定义 ====================
 
@@ -82,10 +87,8 @@ class AssetResolver {
     // 检查是否使用正式资源
     if (useProductionAsset('backgrounds') && scene.textures.exists(productionKey)) {
       const { width, height } = scene.scale;
-      const image = scene.add.image(0, 0, productionKey)
-        .setOrigin(0)
-        .setDisplaySize(width, height);
-      
+      const image = scene.add.image(0, 0, productionKey).setOrigin(0).setDisplaySize(width, height);
+
       return {
         gameObject: image,
         isWhitebox: false,
@@ -97,7 +100,7 @@ class AssetResolver {
     if (!this._billboardFactory) {
       this._billboardFactory = new BillboardFactory(scene);
     }
-    
+
     const container = this._billboardFactory.createBackground(config);
     return {
       gameObject: container,
@@ -179,11 +182,7 @@ class AssetResolver {
   /**
    * 解析对话框UI
    */
-  resolveDialogueBox(
-    scene: Phaser.Scene,
-    x: number,
-    y: number
-  ): IResolvedAsset {
+  resolveDialogueBox(scene: Phaser.Scene, x: number, y: number): IResolvedAsset {
     // UI 目前全部使用白盒或运行时绘制
     // 正式版UI会通过其他方式加载
     if (!this._billboardFactory) {
@@ -223,11 +222,7 @@ class AssetResolver {
   /**
    * 解析卡片UI
    */
-  resolveCard(
-    scene: Phaser.Scene,
-    width?: number,
-    height?: number
-  ): IResolvedAsset {
+  resolveCard(scene: Phaser.Scene, width?: number, height?: number): IResolvedAsset {
     if (!this._billboardFactory) {
       this._billboardFactory = new BillboardFactory(scene);
     }
@@ -243,12 +238,7 @@ class AssetResolver {
   /**
    * 解析面板UI
    */
-  resolvePanel(
-    scene: Phaser.Scene,
-    width: number,
-    height: number,
-    title?: string
-  ): IResolvedAsset {
+  resolvePanel(scene: Phaser.Scene, width: number, height: number, title?: string): IResolvedAsset {
     if (!this._billboardFactory) {
       this._billboardFactory = new BillboardFactory(scene);
     }
@@ -330,4 +320,3 @@ class AssetResolver {
 
 // 单例导出
 export const assetResolver = new AssetResolver();
-

@@ -455,7 +455,8 @@ class I18nManager {
     // 检测浏览器语言
     const browserLang = navigator.language;
     if (browserLang.startsWith('zh')) {
-      this._currentLocale = browserLang.includes('TW') || browserLang.includes('HK') ? 'zh-TW' : 'zh-CN';
+      this._currentLocale =
+        browserLang.includes('TW') || browserLang.includes('HK') ? 'zh-TW' : 'zh-CN';
     } else if (browserLang.startsWith('ja')) {
       this._currentLocale = 'ja-JP';
     } else if (browserLang.startsWith('en')) {
@@ -476,7 +477,8 @@ class I18nManager {
    * @param params 插值参数
    */
   public t(key: string, params?: Record<string, string | number>): string {
-    const value = this._getValue(key, this._currentLocale) || this._getValue(key, this._fallbackLocale) || key;
+    const value =
+      this._getValue(key, this._currentLocale) || this._getValue(key, this._fallbackLocale) || key;
 
     if (typeof value !== 'string') {
       return key;
@@ -585,4 +587,3 @@ export const i18n = new I18nManager();
 export const t = (key: string, params?: Record<string, string | number>): string => {
   return i18n.t(key, params);
 };
-

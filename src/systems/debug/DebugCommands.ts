@@ -147,7 +147,7 @@ class DebugCommands {
    */
   teleport(zoneId: string): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     try {
       if (!this._scene) {
         return { success: false, message: '场景未初始化' };
@@ -171,7 +171,7 @@ class DebugCommands {
    */
   unlockZone(zoneId: string): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     worldState.unlockZone(zoneId);
     this._logCommand(`unlockZone(${zoneId})`);
     return { success: true, message: `解锁 Zone: ${zoneId}` };
@@ -182,7 +182,7 @@ class DebugCommands {
    */
   completeZone(zoneId?: string): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     const targetZone = zoneId || worldState.getCurrentZone();
     worldState.completeZone(targetZone);
     this._logCommand(`completeZone(${targetZone})`);
@@ -196,7 +196,7 @@ class DebugCommands {
    */
   setR(value: number): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     const current = worldState.getCounters().R;
     worldState.addR(value - current);
     this._logCommand(`setR(${value})`);
@@ -208,7 +208,7 @@ class DebugCommands {
    */
   setP(value: number): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     const current = worldState.getCounters().P;
     worldState.addP(value - current);
     this._logCommand(`setP(${value})`);
@@ -220,7 +220,7 @@ class DebugCommands {
    */
   addR(delta: number): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     worldState.addR(delta);
     this._logCommand(`addR(${delta})`);
     return { success: true, message: `R 值增加 ${delta}`, data: worldState.getCounters() };
@@ -231,7 +231,7 @@ class DebugCommands {
    */
   addP(delta: number): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     worldState.addP(delta);
     this._logCommand(`addP(${delta})`);
     return { success: true, message: `P 值增加 ${delta}`, data: worldState.getCounters() };
@@ -244,7 +244,7 @@ class DebugCommands {
    */
   unlockAbility(ability: AbilityType): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     worldState.unlockAbility(ability);
     this._logCommand(`unlockAbility(${ability})`);
     return { success: true, message: `解锁能力: ${ability}` };
@@ -255,9 +255,13 @@ class DebugCommands {
    */
   unlockAllAbilities(): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
-    const abilities: AbilityType[] = ['DEPTH_PERCEPTION', 'DEPTH_INTERVENTION', 'TIME_INTERVENTION'];
-    abilities.forEach(a => worldState.unlockAbility(a));
+
+    const abilities: AbilityType[] = [
+      'DEPTH_PERCEPTION',
+      'DEPTH_INTERVENTION',
+      'TIME_INTERVENTION',
+    ];
+    abilities.forEach((a) => worldState.unlockAbility(a));
     this._logCommand('unlockAllAbilities()');
     return { success: true, message: '解锁所有能力' };
   }
@@ -269,7 +273,7 @@ class DebugCommands {
    */
   obtainCard(cardId: string): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     try {
       narrativeEngine.obtainCard(cardId);
       this._logCommand(`obtainCard(${cardId})`);
@@ -284,7 +288,7 @@ class DebugCommands {
    */
   obtainAllCards(): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     // TODO: 遍历所有卡片并获得
     this._logCommand('obtainAllCards()');
     return { success: true, message: '获得所有卡片（待实现）' };
@@ -297,7 +301,7 @@ class DebugCommands {
    */
   setFlag(name: string, value: boolean = true): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     worldState.setFlag(name, value);
     this._logCommand(`setFlag(${name}, ${value})`);
     return { success: true, message: `标记 ${name} = ${value}` };
@@ -317,7 +321,7 @@ class DebugCommands {
    */
   async triggerDialogue(dialogueId: string): Promise<ICommandResult> {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     try {
       await narrativeEngine.startDialogue(dialogueId);
       this._logCommand(`triggerDialogue(${dialogueId})`);
@@ -332,7 +336,7 @@ class DebugCommands {
    */
   skipDialogue(): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     narrativeEngine.skipCurrentDialogue();
     this._logCommand('skipDialogue()');
     return { success: true, message: '跳过对话' };
@@ -346,7 +350,7 @@ class DebugCommands {
   movePlayer(x: number, y: number): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
     if (!this._scene) return { success: false, message: '场景未初始化' };
-    
+
     const player = (this._scene as any)._player;
     if (player) {
       player.setPosition(x, y);
@@ -362,7 +366,7 @@ class DebugCommands {
   async navigateTo(x: number, y: number, speed: number = 200): Promise<ICommandResult> {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
     if (!this._scene) return { success: false, message: '场景未初始化' };
-    
+
     const player = (this._scene as any)._player;
     if (!player) return { success: false, message: '玩家不存在' };
 
@@ -393,7 +397,7 @@ class DebugCommands {
    */
   gotoChapter(chapter: ChapterID): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     const chapterStartZones: Record<ChapterID, string> = {
       C0: 'C0-Z1',
       C1: 'C1-Z1',
@@ -409,7 +413,7 @@ class DebugCommands {
 
     // 设置章节前置条件
     this._setupChapterPrerequisites(chapter);
-    
+
     return this.teleport(zoneId);
   }
 
@@ -418,7 +422,7 @@ class DebugCommands {
    */
   setupEnding(ending: 'A' | 'B' | 'C'): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     switch (ending) {
       case 'A': // 平面稳定
         this.setR(2);
@@ -443,7 +447,7 @@ class DebugCommands {
    */
   reset(): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
-    
+
     worldState.reset();
     this._logCommand('reset()');
     return { success: true, message: '游戏状态已重置' };
@@ -548,7 +552,10 @@ class DebugCommands {
   /**
    * 执行动作
    */
-  private async _executeAction(action: string, params?: Record<string, unknown>): Promise<ICommandResult> {
+  private async _executeAction(
+    action: string,
+    params?: Record<string, unknown>
+  ): Promise<ICommandResult> {
     switch (action) {
       case 'teleport':
         return this.teleport(params?.zoneId as string);
@@ -585,7 +592,7 @@ class DebugCommands {
       case 'reset':
         return this.reset();
       case 'wait':
-        await this._delay(params?.ms as number || 1000);
+        await this._delay((params?.ms as number) || 1000);
         return { success: true, message: `等待 ${params?.ms || 1000}ms` };
       default:
         return { success: false, message: `未知动作: ${action}` };
@@ -595,7 +602,11 @@ class DebugCommands {
   /**
    * 检查期望
    */
-  private _checkExpectation(expect: IExpectation): { passed: boolean; actual: unknown; message: string } {
+  private _checkExpectation(expect: IExpectation): {
+    passed: boolean;
+    actual: unknown;
+    message: string;
+  } {
     let actual: unknown;
     let passed = false;
 
@@ -663,7 +674,7 @@ class DebugCommands {
   private _setupChapterPrerequisites(chapter: ChapterID): void {
     // 根据章节设置前置条件
     const chapterNumber = parseInt(chapter.replace('C', ''));
-    
+
     if (chapterNumber >= 2) {
       this.unlockAbility('DEPTH_PERCEPTION');
     }
@@ -681,7 +692,7 @@ class DebugCommands {
   }
 
   private _delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -758,4 +769,3 @@ class DebugCommands {
 
 // 导出单例
 export const debugCommands = DebugCommands.getInstance();
-

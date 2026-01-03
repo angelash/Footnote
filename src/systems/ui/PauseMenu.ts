@@ -52,7 +52,10 @@ export class PauseMenu {
   private _callbacks: IPauseMenuConfig;
 
   // 设置控件引用
-  private _volumeSliders: Map<string, { bar: Phaser.GameObjects.Graphics; handle: Phaser.GameObjects.Rectangle }> = new Map();
+  private _volumeSliders: Map<
+    string,
+    { bar: Phaser.GameObjects.Graphics; handle: Phaser.GameObjects.Rectangle }
+  > = new Map();
 
   constructor(config: IPauseMenuConfig) {
     this._scene = config.scene;
@@ -138,10 +141,12 @@ export class PauseMenu {
     this._mainMenuContainer = this._scene.add.container(width / 2, height / 2);
 
     // 标题
-    const title = this._scene.add.text(0, -200, '暂停', {
-      ...TEXT_STYLES.TITLE,
-      fontSize: UI_FONT_SIZE.TITLE,
-    }).setOrigin(0.5);
+    const title = this._scene.add
+      .text(0, -200, '暂停', {
+        ...TEXT_STYLES.TITLE,
+        fontSize: UI_FONT_SIZE.TITLE,
+      })
+      .setOrigin(0.5);
     this._mainMenuContainer.add(title);
 
     // 菜单按钮
@@ -167,10 +172,12 @@ export class PauseMenu {
     this._settingsContainer.setVisible(false);
 
     // 标题
-    const title = this._scene.add.text(0, -250, '设置', {
-      ...TEXT_STYLES.TITLE,
-      fontSize: UI_FONT_SIZE.SECTION,
-    }).setOrigin(0.5);
+    const title = this._scene.add
+      .text(0, -250, '设置', {
+        ...TEXT_STYLES.TITLE,
+        fontSize: UI_FONT_SIZE.SECTION,
+      })
+      .setOrigin(0.5);
     this._settingsContainer.add(title);
 
     // 音量设置
@@ -180,7 +187,7 @@ export class PauseMenu {
       { key: 'sfxVolume', label: '音效音量', y: -10 },
     ];
 
-    volumeSettings.forEach(setting => {
+    volumeSettings.forEach((setting) => {
       this._createVolumeSlider(setting.label, setting.key, setting.y);
     });
 
@@ -200,11 +207,17 @@ export class PauseMenu {
 
     speeds.forEach((speed, index) => {
       const x = CONFIG.SETTINGS_WIDTH / 2 - 200 + index * 60;
-      const btn = this._createRadioButton(x, 60, speed.label, speed.value === this._settings.textSpeed, () => {
-        this._settings.textSpeed = speed.value as IGameSettings['textSpeed'];
-        this._updateSpeedButtons();
-        this._saveSettings();
-      });
+      const btn = this._createRadioButton(
+        x,
+        60,
+        speed.label,
+        speed.value === this._settings.textSpeed,
+        () => {
+          this._settings.textSpeed = speed.value as IGameSettings['textSpeed'];
+          this._updateSpeedButtons();
+          this._saveSettings();
+        }
+      );
       btn.setName(`speed_${speed.value}`);
       this._settingsContainer.add(btn);
     });
@@ -235,42 +248,86 @@ export class PauseMenu {
     this._container.add(this._settingsContainer);
   }
 
-  private _createButton(x: number, y: number, text: string, callback: () => void): Phaser.GameObjects.Container {
+  private _createButton(
+    x: number,
+    y: number,
+    text: string,
+    callback: () => void
+  ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
     const buttonWidth = CONFIG.MENU_WIDTH;
 
     // 背景
     const bg = this._scene.add.graphics();
     bg.fillStyle(COLORS.BG_TERTIARY, 1);
-    bg.fillRoundedRect(-buttonWidth / 2, -CONFIG.BUTTON_HEIGHT / 2, buttonWidth, CONFIG.BUTTON_HEIGHT, 8);
+    bg.fillRoundedRect(
+      -buttonWidth / 2,
+      -CONFIG.BUTTON_HEIGHT / 2,
+      buttonWidth,
+      CONFIG.BUTTON_HEIGHT,
+      8
+    );
     bg.lineStyle(1, COLORS.BORDER, 1);
-    bg.strokeRoundedRect(-buttonWidth / 2, -CONFIG.BUTTON_HEIGHT / 2, buttonWidth, CONFIG.BUTTON_HEIGHT, 8);
+    bg.strokeRoundedRect(
+      -buttonWidth / 2,
+      -CONFIG.BUTTON_HEIGHT / 2,
+      buttonWidth,
+      CONFIG.BUTTON_HEIGHT,
+      8
+    );
 
     // 文字
-    const label = this._scene.add.text(0, 0, text, {
-      ...TEXT_STYLES.BODY,
-      fontSize: UI_FONT_SIZE.NORMAL,
-    }).setOrigin(0.5);
+    const label = this._scene.add
+      .text(0, 0, text, {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.NORMAL,
+      })
+      .setOrigin(0.5);
 
     container.add([bg, label]);
     container.setSize(buttonWidth, CONFIG.BUTTON_HEIGHT);
 
     // 交互
-    container.setInteractive({ useHandCursor: true })
+    container
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         bg.clear();
         bg.fillStyle(COLORS.BG_SECONDARY, 1);
-        bg.fillRoundedRect(-buttonWidth / 2, -CONFIG.BUTTON_HEIGHT / 2, buttonWidth, CONFIG.BUTTON_HEIGHT, 8);
+        bg.fillRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.BUTTON_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.BUTTON_HEIGHT,
+          8
+        );
         bg.lineStyle(2, COLORS.ACCENT, 1);
-        bg.strokeRoundedRect(-buttonWidth / 2, -CONFIG.BUTTON_HEIGHT / 2, buttonWidth, CONFIG.BUTTON_HEIGHT, 8);
+        bg.strokeRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.BUTTON_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.BUTTON_HEIGHT,
+          8
+        );
         label.setColor('#00FFAA');
       })
       .on('pointerout', () => {
         bg.clear();
         bg.fillStyle(COLORS.BG_TERTIARY, 1);
-        bg.fillRoundedRect(-buttonWidth / 2, -CONFIG.BUTTON_HEIGHT / 2, buttonWidth, CONFIG.BUTTON_HEIGHT, 8);
+        bg.fillRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.BUTTON_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.BUTTON_HEIGHT,
+          8
+        );
         bg.lineStyle(1, COLORS.BORDER, 1);
-        bg.strokeRoundedRect(-buttonWidth / 2, -CONFIG.BUTTON_HEIGHT / 2, buttonWidth, CONFIG.BUTTON_HEIGHT, 8);
+        bg.strokeRoundedRect(
+          -buttonWidth / 2,
+          -CONFIG.BUTTON_HEIGHT / 2,
+          buttonWidth,
+          CONFIG.BUTTON_HEIGHT,
+          8
+        );
         label.setColor('#E8E6E3');
       })
       .on('pointerdown', callback);
@@ -301,17 +358,18 @@ export class PauseMenu {
 
     // 滑块手柄
     const handleX = trackX + value * CONFIG.SLIDER_WIDTH;
-    const handle = this._scene.add.rectangle(handleX, y, 16, 20, COLORS.ACCENT)
+    const handle = this._scene.add
+      .rectangle(handleX, y, 16, 20, COLORS.ACCENT)
       .setInteractive({ useHandCursor: true, draggable: true });
     this._settingsContainer.add(handle);
 
     // 值显示
-    const valueText = this._scene.add.text(
-      CONFIG.SETTINGS_WIDTH / 2 - 10,
-      y,
-      `${Math.round(value * 100)}%`,
-      { ...TEXT_STYLES.BODY, fontSize: UI_FONT_SIZE.SMALL }
-    ).setOrigin(1, 0.5);
+    const valueText = this._scene.add
+      .text(CONFIG.SETTINGS_WIDTH / 2 - 10, y, `${Math.round(value * 100)}%`, {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+      })
+      .setOrigin(1, 0.5);
     this._settingsContainer.add(valueText);
 
     // 保存引用
@@ -362,13 +420,24 @@ export class PauseMenu {
     }
   }
 
-  private _updateSliderFill(graphics: Phaser.GameObjects.Graphics, x: number, y: number, value: number): void {
+  private _updateSliderFill(
+    graphics: Phaser.GameObjects.Graphics,
+    x: number,
+    y: number,
+    value: number
+  ): void {
     graphics.clear();
     graphics.fillStyle(COLORS.ACCENT, 1);
     graphics.fillRoundedRect(x, y - 4, CONFIG.SLIDER_WIDTH * value, 8, 4);
   }
 
-  private _createRadioButton(x: number, y: number, text: string, selected: boolean, callback: () => void): Phaser.GameObjects.Container {
+  private _createRadioButton(
+    x: number,
+    y: number,
+    text: string,
+    selected: boolean,
+    callback: () => void
+  ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
 
     const circle = this._scene.add.graphics();
@@ -379,24 +448,27 @@ export class PauseMenu {
       circle.fillCircle(0, 0, 5);
     }
 
-    const label = this._scene.add.text(20, 0, text, {
-      ...TEXT_STYLES.BODY,
-      fontSize: UI_FONT_SIZE.SMALL,
-      color: selected ? '#00FFAA' : '#A8A6A3',
-    }).setOrigin(0, 0.5);
+    const label = this._scene.add
+      .text(20, 0, text, {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: selected ? '#00FFAA' : '#A8A6A3',
+      })
+      .setOrigin(0, 0.5);
 
     container.add([circle, label]);
     container.setSize(60, 24);
-    container.setInteractive({ useHandCursor: true })
-      .on('pointerdown', callback);
+    container.setInteractive({ useHandCursor: true }).on('pointerdown', callback);
 
     return container;
   }
 
   private _updateSpeedButtons(): void {
     const speeds = ['slow', 'normal', 'fast', 'instant'];
-    speeds.forEach(speed => {
-      const btn = this._settingsContainer.getByName(`speed_${speed}`) as Phaser.GameObjects.Container;
+    speeds.forEach((speed) => {
+      const btn = this._settingsContainer.getByName(
+        `speed_${speed}`
+      ) as Phaser.GameObjects.Container;
       if (btn) {
         const circle = btn.list[0] as Phaser.GameObjects.Graphics;
         const label = btn.list[1] as Phaser.GameObjects.Text;
@@ -414,7 +486,12 @@ export class PauseMenu {
     });
   }
 
-  private _createToggle(x: number, y: number, value: boolean, callback: (value: boolean) => void): Phaser.GameObjects.Container {
+  private _createToggle(
+    x: number,
+    y: number,
+    value: boolean,
+    callback: (value: boolean) => void
+  ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
 
     const track = this._scene.add.graphics();
@@ -426,7 +503,7 @@ export class PauseMenu {
       track.fillRoundedRect(-25, -12, 50, 24, 12);
       track.lineStyle(1, COLORS.BORDER, 1);
       track.strokeRoundedRect(-25, -12, 50, 24, 12);
-      
+
       this._scene.tweens.add({
         targets: handle,
         x: on ? 15 : -15,
@@ -438,13 +515,12 @@ export class PauseMenu {
 
     container.add([track, handle]);
     container.setSize(50, 24);
-    container.setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => {
-        const newValue = !container.getData('value');
-        container.setData('value', newValue);
-        updateToggle(newValue);
-        callback(newValue);
-      });
+    container.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+      const newValue = !container.getData('value');
+      container.setData('value', newValue);
+      updateToggle(newValue);
+      callback(newValue);
+    });
 
     container.setData('value', value);
 
@@ -485,4 +561,3 @@ export class PauseMenu {
     this._scene.scene.start(SCENES.MENU);
   }
 }
-

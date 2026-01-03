@@ -133,11 +133,7 @@ class NewGamePlusManager {
     // 达成所有结局：解锁隐藏对话
     if (this._state.achievedEndings.length >= 3) {
       rewards.features.push('HIDDEN_DIALOGUES');
-      rewards.hiddenDialogues = [
-        'SYSTEM_EPILOGUE_FULL',
-        'GULIN_TRUE_THOUGHTS',
-        'QILAN_BACKSTORY',
-      ];
+      rewards.hiddenDialogues = ['SYSTEM_EPILOGUE_FULL', 'GULIN_TRUE_THOUGHTS', 'QILAN_BACKSTORY'];
     }
 
     // 高R值通关（R >= 10）：解锁特殊收藏品
@@ -164,7 +160,19 @@ class NewGamePlusManager {
    */
   private _getCollectedForeshadowCount(): number {
     // 从世界状态检查伏笔FLAG
-    const foreshadowIds = ['F01', 'F02', 'F03', 'F04', 'F05', 'F06', 'F08', 'F15', 'F21', 'F22', 'F23'];
+    const foreshadowIds = [
+      'F01',
+      'F02',
+      'F03',
+      'F04',
+      'F05',
+      'F06',
+      'F08',
+      'F15',
+      'F21',
+      'F22',
+      'F23',
+    ];
     let count = 0;
     foreshadowIds.forEach((id) => {
       if (worldState.getFlag(`FORESHADOW_${id}_COLLECT`)) {
@@ -262,4 +270,3 @@ class NewGamePlusManager {
 
 // 导出单例
 export const newGamePlusManager = new NewGamePlusManager();
-

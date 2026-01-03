@@ -24,14 +24,14 @@ interface IDepthEffectsConfig {
  */
 export class DepthEffects {
   private _scene: Phaser.Scene;
-  
+
   // 效果层
   private _perceptionOverlay!: Phaser.GameObjects.Rectangle;
   private _interventionGrid!: Phaser.GameObjects.Graphics;
   private _timelineOverlay!: Phaser.GameObjects.Container;
-  
+
   // 粒子效果 (预留)
-  
+
   // 状态
   private _activeAbility: AbilityType | null = null;
 
@@ -49,9 +49,12 @@ export class DepthEffects {
 
     // 深度感知叠加层 - 蓝紫色调
     this._perceptionOverlay = this._scene.add.rectangle(
-      width / 2, height / 2,
-      width, height,
-      0x6644aa, 0
+      width / 2,
+      height / 2,
+      width,
+      height,
+      0x6644aa,
+      0
     );
     this._perceptionOverlay.setDepth(500);
     this._perceptionOverlay.setBlendMode(Phaser.BlendModes.MULTIPLY);
@@ -73,7 +76,7 @@ export class DepthEffects {
    */
   private _createTimelineUI(): void {
     const { width } = this._scene.scale;
-    
+
     // 时间线背景
     const bg = this._scene.add.rectangle(0, 0, width - 100, 60, 0x1a1a2e, 0.9);
     bg.setStrokeStyle(2, 0x4a6a8a);
@@ -91,7 +94,7 @@ export class DepthEffects {
     // 时间节点
     const nodePositions = [-200, -50, 100, 250];
     const nodeLabels = ['T-2', 'T-1', 'NOW', ''];
-    
+
     nodePositions.forEach((x, i) => {
       if (i < 3) {
         const node = this._scene.add.circle(x, 0, 10, 0x88aacc);
@@ -122,7 +125,7 @@ export class DepthEffects {
    */
   private _onAbilityActivated(data: { ability: AbilityType }): void {
     this._activeAbility = data.ability;
-    
+
     switch (data.ability) {
       case AbilityType.DEPTH_PERCEPTION:
         this._activatePerception();
@@ -166,7 +169,7 @@ export class DepthEffects {
   private _activateIntervention(): void {
     // 绘制结构网格
     this._drawInterventionGrid();
-    
+
     this._scene.tweens.add({
       targets: this._interventionGrid,
       alpha: 0.4,
@@ -207,7 +210,7 @@ export class DepthEffects {
    */
   private _drawInterventionGrid(): void {
     const { width, height } = this._scene.scale;
-    
+
     this._interventionGrid.clear();
     this._interventionGrid.lineStyle(1, 0xaa6644, 0.3);
 
@@ -241,15 +244,15 @@ export class DepthEffects {
    */
   private _addEdgeGlow(color: number): void {
     const { width } = this._scene.scale;
-    
+
     // 创建渐变边缘
     const edgeGraphics = this._scene.add.graphics();
     edgeGraphics.setDepth(499);
-    
+
     // 上边缘
     edgeGraphics.fillGradientStyle(color, color, 0x000000, 0x000000, 0.3, 0.3, 0, 0);
     edgeGraphics.fillRect(0, 0, width, 100);
-    
+
     // 动画
     this._scene.tweens.add({
       targets: edgeGraphics,
@@ -303,7 +306,7 @@ export class DepthEffects {
    */
   public revealHiddenElement(target: Phaser.GameObjects.GameObject): void {
     if (!('setAlpha' in target)) return;
-    
+
     // 渐显 + 发光
     this._scene.tweens.add({
       targets: target,
@@ -329,7 +332,7 @@ export class DepthEffects {
   public showScarEffect(x: number, y: number): void {
     const scar = this._scene.add.graphics();
     scar.setDepth(100);
-    
+
     // 绘制裂痕
     scar.lineStyle(2, 0xaa4444, 0.8);
     scar.beginPath();
@@ -353,7 +356,7 @@ export class DepthEffects {
    */
   public showRewindEffect(callback?: () => void): void {
     const { width, height } = this._scene.scale;
-    
+
     // 全屏闪白
     const flash = this._scene.add.rectangle(width / 2, height / 2, width, height, 0xffffff, 0);
     flash.setDepth(1000);
@@ -408,14 +411,13 @@ export class DepthEffects {
   public destroy(): void {
     eventBus.off(GameEvent.ABILITY_ACTIVATED, this._onAbilityActivated, this);
     eventBus.off(GameEvent.ABILITY_DEACTIVATED, this._onAbilityDeactivated, this);
-    
+
     this._perceptionOverlay?.destroy();
     this._interventionGrid?.destroy();
     this._timelineOverlay?.destroy();
-    
+
     if ((this as any)._edgeGlow) {
       (this as any)._edgeGlow.destroy();
     }
   }
 }
-

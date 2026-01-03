@@ -9,4 +9,3 @@ export { ToastManager } from './ToastManager';
 export type { ToastType } from './ToastManager';
 export { PauseMenu } from './PauseMenu';
 export { InventoryUI } from './InventoryUI';
-

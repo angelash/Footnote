@@ -122,7 +122,7 @@ export class TutorialManager {
   private _backdrop!: Phaser.GameObjects.Rectangle;
   private _tutorialBox!: Phaser.GameObjects.Container;
   private _highlightGraphics!: Phaser.GameObjects.Graphics;
-  
+
   private _currentStep: TutorialStep | null = null;
   private _completedSteps: Set<TutorialStep> = new Set();
   private _isActive: boolean = false;
@@ -170,7 +170,7 @@ export class TutorialManager {
   private _checkSkipPermission(): void {
     // NG+玩家可以跳过所有教程
     this._canSkipAll = newGamePlusManager.isNewGamePlus();
-    
+
     // 或者已完成过游戏
     if (worldState.getFlag('GAME_COMPLETED_ONCE')) {
       this._canSkipAll = true;
@@ -259,7 +259,10 @@ export class TutorialManager {
     const boxHeight = 150;
 
     // 位置
-    const pos = config.position || { x: this._scene.scale.width / 2, y: this._scene.scale.height / 2 };
+    const pos = config.position || {
+      x: this._scene.scale.width / 2,
+      y: this._scene.scale.height / 2,
+    };
     this._tutorialBox.setPosition(pos.x, pos.y);
 
     // 背景
@@ -344,7 +347,7 @@ export class TutorialManager {
 
     const targetWithBounds = target as unknown as Phaser.GameObjects.Sprite;
     const bounds = targetWithBounds.getBounds();
-    
+
     // 绘制高亮框
     this._highlightGraphics.lineStyle(3, 0x4a9eff, 1);
     this._highlightGraphics.strokeRoundedRect(
@@ -446,8 +449,7 @@ export class TutorialManager {
   public isAllCompleted(): boolean {
     return TUTORIAL_CONFIGS.every(
       (config) =>
-        this._completedSteps.has(config.step) ||
-        (config.skipCondition && config.skipCondition())
+        this._completedSteps.has(config.step) || (config.skipCondition && config.skipCondition())
     );
   }
 
@@ -473,4 +475,3 @@ export class TutorialManager {
     this._container?.destroy();
   }
 }
-

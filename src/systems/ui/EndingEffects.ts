@@ -87,10 +87,14 @@ export class EndingEffects {
     const lines: Phaser.GameObjects.Line[] = [];
     for (let i = 0; i < 20; i++) {
       const line = this._scene.add.line(
-        0, 0,
-        Phaser.Math.Between(-width / 2, width / 2), -height / 2,
-        0, 0,
-        0x4444ff, 0.5
+        0,
+        0,
+        Phaser.Math.Between(-width / 2, width / 2),
+        -height / 2,
+        0,
+        0,
+        0x4444ff,
+        0.5
       );
       line.setLineWidth(2);
       this._container.add(line);
@@ -198,7 +202,7 @@ export class EndingEffects {
     // 版本碎片
     const fragments: Phaser.GameObjects.Text[] = [];
     const fragmentTexts = ['V-A', 'V-B', 'V-C', 'V-?', '◦', '◇', '□', '△'];
-    
+
     for (let i = 0; i < 30; i++) {
       const frag = this._scene.add.text(
         Phaser.Math.Between(-width / 2, width / 2),
@@ -207,9 +211,7 @@ export class EndingEffects {
         {
           fontFamily: 'monospace',
           fontSize: `${Phaser.Math.Between(14, 32)}px`,
-          color: Phaser.Display.Color.IntegerToColor(
-            Phaser.Math.Between(0x4444ff, 0xffaa44)
-          ).rgba,
+          color: Phaser.Display.Color.IntegerToColor(Phaser.Math.Between(0x4444ff, 0xffaa44)).rgba,
         }
       );
       frag.setOrigin(0.5);
@@ -337,12 +339,17 @@ export class EndingEffects {
     subtitleText.setAlpha(0);
     this._container.add(subtitleText);
 
-    const descText = this._scene.add.text(0, 130, '你不是升维成神，你是背债。\n但你让某些人多活了一点。', {
-      fontFamily: 'serif',
-      fontSize: '18px',
-      color: '#88aa88',
-      align: 'center',
-    });
+    const descText = this._scene.add.text(
+      0,
+      130,
+      '你不是升维成神，你是背债。\n但你让某些人多活了一点。',
+      {
+        fontFamily: 'serif',
+        fontSize: '18px',
+        color: '#88aa88',
+        align: 'center',
+      }
+    );
     descText.setOrigin(0.5);
     descText.setAlpha(0);
     this._container.add(descText);
@@ -453,12 +460,3 @@ export class EndingEffects {
     this._container?.destroy();
   }
 }
-
-
-
-
-
-
-
-
-

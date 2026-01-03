@@ -62,7 +62,7 @@ export class InventoryUI {
    */
   show(): void {
     this._refreshCards();
-    
+
     this._container.setVisible(true);
     this._container.setAlpha(0);
 
@@ -114,7 +114,8 @@ export class InventoryUI {
     this._container.setVisible(false);
 
     // 半透明背景
-    const overlay = this._scene.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7)
+    const overlay = this._scene.add
+      .rectangle(width / 2, height / 2, width, height, 0x000000, 0.7)
       .setInteractive()
       .on('pointerdown', () => this.hide());
     this._container.add(overlay);
@@ -126,16 +127,30 @@ export class InventoryUI {
     // 面板背景
     const panelBg = this._scene.add.graphics();
     panelBg.fillStyle(COLORS.BG_SECONDARY, 0.98);
-    panelBg.fillRoundedRect(-CONFIG.PANEL_WIDTH / 2, -CONFIG.PANEL_HEIGHT / 2, CONFIG.PANEL_WIDTH, CONFIG.PANEL_HEIGHT, 16);
+    panelBg.fillRoundedRect(
+      -CONFIG.PANEL_WIDTH / 2,
+      -CONFIG.PANEL_HEIGHT / 2,
+      CONFIG.PANEL_WIDTH,
+      CONFIG.PANEL_HEIGHT,
+      16
+    );
     panelBg.lineStyle(2, COLORS.BORDER, 1);
-    panelBg.strokeRoundedRect(-CONFIG.PANEL_WIDTH / 2, -CONFIG.PANEL_HEIGHT / 2, CONFIG.PANEL_WIDTH, CONFIG.PANEL_HEIGHT, 16);
+    panelBg.strokeRoundedRect(
+      -CONFIG.PANEL_WIDTH / 2,
+      -CONFIG.PANEL_HEIGHT / 2,
+      CONFIG.PANEL_WIDTH,
+      CONFIG.PANEL_HEIGHT,
+      16
+    );
     panel.add(panelBg);
 
     // 标题
-    const title = this._scene.add.text(0, -CONFIG.PANEL_HEIGHT / 2 + 40, '卡片收藏', {
-      ...TEXT_STYLES.TITLE,
-      fontSize: UI_FONT_SIZE.SECTION,
-    }).setOrigin(0.5);
+    const title = this._scene.add
+      .text(0, -CONFIG.PANEL_HEIGHT / 2 + 40, '卡片收藏', {
+        ...TEXT_STYLES.TITLE,
+        fontSize: UI_FONT_SIZE.SECTION,
+      })
+      .setOrigin(0.5);
     panel.add(title);
 
     // 关闭按钮
@@ -163,14 +178,17 @@ export class InventoryUI {
     bg.lineStyle(1, COLORS.BORDER, 1);
     bg.strokeCircle(0, 0, 18);
 
-    const x = this._scene.add.text(0, 0, '×', {
-      fontSize: UI_FONT_SIZE.ICON,
-      color: '#888888',
-    }).setOrigin(0.5);
+    const x = this._scene.add
+      .text(0, 0, '×', {
+        fontSize: UI_FONT_SIZE.ICON,
+        color: '#888888',
+      })
+      .setOrigin(0.5);
 
     container.add([bg, x]);
     container.setSize(36, 36);
-    container.setInteractive({ useHandCursor: true })
+    container
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         bg.clear();
         bg.fillStyle(COLORS.BG_SECONDARY, 1);
@@ -214,28 +232,34 @@ export class InventoryUI {
     this._updateTabStyles();
   }
 
-  private _createTabButton(x: number, y: number, label: string, type: TabType): Phaser.GameObjects.Container {
+  private _createTabButton(
+    x: number,
+    y: number,
+    label: string,
+    type: TabType
+  ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
     const tabWidth = 90;
     const tabHeight = 32;
 
     const bg = this._scene.add.graphics();
     bg.setName('bg');
-    
-    const text = this._scene.add.text(0, 0, label, {
-      ...TEXT_STYLES.BODY,
-      fontSize: UI_FONT_SIZE.SMALL,
-    }).setOrigin(0.5);
+
+    const text = this._scene.add
+      .text(0, 0, label, {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+      })
+      .setOrigin(0.5);
     text.setName('text');
 
     container.add([bg, text]);
     container.setSize(tabWidth, tabHeight);
-    container.setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => {
-        this._currentTab = type;
-        this._updateTabStyles();
-        this._refreshCards();
-      });
+    container.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+      this._currentTab = type;
+      this._updateTabStyles();
+      this._refreshCards();
+    });
 
     return container;
   }
@@ -265,10 +289,12 @@ export class InventoryUI {
     const totalCards = narrativeEngine.getCardCount();
     const obtainedCount = narrativeEngine.getCardsByCategory('all').length;
 
-    const statsText = this._scene.add.text(0, y, `已收集: ${obtainedCount} / ${totalCards}`, {
-      ...TEXT_STYLES.MUTED,
-      fontSize: UI_FONT_SIZE.SMALL,
-    }).setOrigin(0.5);
+    const statsText = this._scene.add
+      .text(0, y, `已收集: ${obtainedCount} / ${totalCards}`, {
+        ...TEXT_STYLES.MUTED,
+        fontSize: UI_FONT_SIZE.SMALL,
+      })
+      .setOrigin(0.5);
     statsText.setName('statsText');
     panel.add(statsText);
   }
@@ -285,26 +311,29 @@ export class InventoryUI {
       cards = narrativeEngine.getCardsByCategory('all');
     } else {
       const categoryMap: Record<TabType, CardCategory> = {
-        'all': CardCategory.ARCHIVE,
-        'archive': CardCategory.ARCHIVE,
-        'item': CardCategory.ITEM,
-        'prayer': CardCategory.PRAYER,
-        'verdict': CardCategory.VERDICT,
+        all: CardCategory.ARCHIVE,
+        archive: CardCategory.ARCHIVE,
+        item: CardCategory.ITEM,
+        prayer: CardCategory.PRAYER,
+        verdict: CardCategory.VERDICT,
       };
       cards = narrativeEngine.getCardsByCategory(categoryMap[this._currentTab]);
     }
 
     if (cards.length === 0) {
-      const emptyText = this._scene.add.text(0, 100, '暂无卡片', {
-        ...TEXT_STYLES.MUTED,
-        fontSize: UI_FONT_SIZE.NORMAL,
-      }).setOrigin(0.5);
+      const emptyText = this._scene.add
+        .text(0, 100, '暂无卡片', {
+          ...TEXT_STYLES.MUTED,
+          fontSize: UI_FONT_SIZE.NORMAL,
+        })
+        .setOrigin(0.5);
       this._cardsContainer.add(emptyText);
       return;
     }
 
     // 渲染卡片网格
-    const startX = -((CONFIG.CARDS_PER_ROW - 1) * (CONFIG.CARD_THUMB_WIDTH + CONFIG.CARD_SPACING)) / 2;
+    const startX =
+      -((CONFIG.CARDS_PER_ROW - 1) * (CONFIG.CARD_THUMB_WIDTH + CONFIG.CARD_SPACING)) / 2;
     const startY = -CONFIG.PANEL_HEIGHT / 2 + 180;
 
     cards.forEach((card, index) => {
@@ -318,16 +347,32 @@ export class InventoryUI {
     });
   }
 
-  private _createCardThumbnail(card: INarrativeCard, x: number, y: number): Phaser.GameObjects.Container {
+  private _createCardThumbnail(
+    card: INarrativeCard,
+    x: number,
+    y: number
+  ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
 
     // 卡片背景
     const bg = this._scene.add.graphics();
     const cardColor = this._getCardColor(card.category);
     bg.fillStyle(cardColor, 0.9);
-    bg.fillRoundedRect(-CONFIG.CARD_THUMB_WIDTH / 2, -CONFIG.CARD_THUMB_HEIGHT / 2, CONFIG.CARD_THUMB_WIDTH, CONFIG.CARD_THUMB_HEIGHT, 8);
+    bg.fillRoundedRect(
+      -CONFIG.CARD_THUMB_WIDTH / 2,
+      -CONFIG.CARD_THUMB_HEIGHT / 2,
+      CONFIG.CARD_THUMB_WIDTH,
+      CONFIG.CARD_THUMB_HEIGHT,
+      8
+    );
     bg.lineStyle(1, COLORS.BORDER, 1);
-    bg.strokeRoundedRect(-CONFIG.CARD_THUMB_WIDTH / 2, -CONFIG.CARD_THUMB_HEIGHT / 2, CONFIG.CARD_THUMB_WIDTH, CONFIG.CARD_THUMB_HEIGHT, 8);
+    bg.strokeRoundedRect(
+      -CONFIG.CARD_THUMB_WIDTH / 2,
+      -CONFIG.CARD_THUMB_HEIGHT / 2,
+      CONFIG.CARD_THUMB_WIDTH,
+      CONFIG.CARD_THUMB_HEIGHT,
+      8
+    );
 
     // 类型图标
     const icon = this._scene.add.text(
@@ -338,23 +383,22 @@ export class InventoryUI {
     );
 
     // 卡片标题
-    const title = this._scene.add.text(0, 0, card.title, {
-      ...TEXT_STYLES.BODY,
-      fontSize: UI_FONT_SIZE.TINY,
-      wordWrap: { width: CONFIG.CARD_THUMB_WIDTH - 20 },
-      align: 'center',
-    }).setOrigin(0.5);
+    const title = this._scene.add
+      .text(0, 0, card.title, {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        wordWrap: { width: CONFIG.CARD_THUMB_WIDTH - 20 },
+        align: 'center',
+      })
+      .setOrigin(0.5);
 
     // 章节标记
-    const chapter = this._scene.add.text(
-      0,
-      CONFIG.CARD_THUMB_HEIGHT / 2 - 20,
-      card.chapter,
-      {
+    const chapter = this._scene.add
+      .text(0, CONFIG.CARD_THUMB_HEIGHT / 2 - 20, card.chapter, {
         ...TEXT_STYLES.MUTED,
         fontSize: UI_FONT_SIZE.TINY,
-      }
-    ).setOrigin(0.5);
+      })
+      .setOrigin(0.5);
 
     container.add([bg, icon, title, chapter]);
     container.setSize(CONFIG.CARD_THUMB_WIDTH, CONFIG.CARD_THUMB_HEIGHT);
@@ -363,29 +407,39 @@ export class InventoryUI {
     const isViewed = narrativeEngine.hasCard(card.id);
     if (!isViewed) {
       // 新卡片标记
-      const newBadge = this._scene.add.text(
-        CONFIG.CARD_THUMB_WIDTH / 2 - 10,
-        -CONFIG.CARD_THUMB_HEIGHT / 2 + 10,
-        'NEW',
-        {
+      const newBadge = this._scene.add
+        .text(CONFIG.CARD_THUMB_WIDTH / 2 - 10, -CONFIG.CARD_THUMB_HEIGHT / 2 + 10, 'NEW', {
           fontSize: UI_FONT_SIZE.TINY,
           color: '#FFD700',
           backgroundColor: '#000000',
           padding: { x: 4, y: 2 },
-        }
-      ).setOrigin(1, 0);
+        })
+        .setOrigin(1, 0);
       container.add(newBadge);
     }
 
     // 交互
-    container.setInteractive({ useHandCursor: true })
+    container
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         bg.clear();
         bg.fillStyle(cardColor, 1);
-        bg.fillRoundedRect(-CONFIG.CARD_THUMB_WIDTH / 2, -CONFIG.CARD_THUMB_HEIGHT / 2, CONFIG.CARD_THUMB_WIDTH, CONFIG.CARD_THUMB_HEIGHT, 8);
+        bg.fillRoundedRect(
+          -CONFIG.CARD_THUMB_WIDTH / 2,
+          -CONFIG.CARD_THUMB_HEIGHT / 2,
+          CONFIG.CARD_THUMB_WIDTH,
+          CONFIG.CARD_THUMB_HEIGHT,
+          8
+        );
         bg.lineStyle(2, COLORS.ACCENT, 1);
-        bg.strokeRoundedRect(-CONFIG.CARD_THUMB_WIDTH / 2, -CONFIG.CARD_THUMB_HEIGHT / 2, CONFIG.CARD_THUMB_WIDTH, CONFIG.CARD_THUMB_HEIGHT, 8);
-        
+        bg.strokeRoundedRect(
+          -CONFIG.CARD_THUMB_WIDTH / 2,
+          -CONFIG.CARD_THUMB_HEIGHT / 2,
+          CONFIG.CARD_THUMB_WIDTH,
+          CONFIG.CARD_THUMB_HEIGHT,
+          8
+        );
+
         this._scene.tweens.add({
           targets: container,
           scale: 1.05,
@@ -395,10 +449,22 @@ export class InventoryUI {
       .on('pointerout', () => {
         bg.clear();
         bg.fillStyle(cardColor, 0.9);
-        bg.fillRoundedRect(-CONFIG.CARD_THUMB_WIDTH / 2, -CONFIG.CARD_THUMB_HEIGHT / 2, CONFIG.CARD_THUMB_WIDTH, CONFIG.CARD_THUMB_HEIGHT, 8);
+        bg.fillRoundedRect(
+          -CONFIG.CARD_THUMB_WIDTH / 2,
+          -CONFIG.CARD_THUMB_HEIGHT / 2,
+          CONFIG.CARD_THUMB_WIDTH,
+          CONFIG.CARD_THUMB_HEIGHT,
+          8
+        );
         bg.lineStyle(1, COLORS.BORDER, 1);
-        bg.strokeRoundedRect(-CONFIG.CARD_THUMB_WIDTH / 2, -CONFIG.CARD_THUMB_HEIGHT / 2, CONFIG.CARD_THUMB_WIDTH, CONFIG.CARD_THUMB_HEIGHT, 8);
-        
+        bg.strokeRoundedRect(
+          -CONFIG.CARD_THUMB_WIDTH / 2,
+          -CONFIG.CARD_THUMB_HEIGHT / 2,
+          CONFIG.CARD_THUMB_WIDTH,
+          CONFIG.CARD_THUMB_HEIGHT,
+          8
+        );
+
         this._scene.tweens.add({
           targets: container,
           scale: 1,
@@ -434,7 +500,3 @@ export class InventoryUI {
     return icons[category] || '📄';
   }
 }
-
-
-
-

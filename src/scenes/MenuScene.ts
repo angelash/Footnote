@@ -24,9 +24,12 @@ export class MenuScene extends Phaser.Scene {
   private _saveListContainer!: Phaser.GameObjects.Container;
   private _settingsContainer!: Phaser.GameObjects.Container;
   private _settings!: IGameSettings;
-  
+
   // 设置控件引用
-  private _volumeSliders: Map<string, { bar: Phaser.GameObjects.Graphics; handle: Phaser.GameObjects.Rectangle }> = new Map();
+  private _volumeSliders: Map<
+    string,
+    { bar: Phaser.GameObjects.Graphics; handle: Phaser.GameObjects.Rectangle }
+  > = new Map();
 
   constructor() {
     super({ key: SCENES.MENU });
@@ -64,30 +67,37 @@ export class MenuScene extends Phaser.Scene {
 
   private _createTitle(width: number, height: number): void {
     // 主标题
-    this._title = this.add.text(width / 2, height * 0.25, '备 注', {
-      ...TEXT_STYLES.TITLE,
-      fontSize: '48px',
-    })
+    this._title = this.add
+      .text(width / 2, height * 0.25, '备 注', {
+        ...TEXT_STYLES.TITLE,
+        fontSize: '48px',
+      })
       .setOrigin(0.5)
       .setAlpha(0);
 
     // 副标题
-    this._subtitle = this.add.text(width / 2, height * 0.25 + 60, 'FOOTNOTE', {
-      ...TEXT_STYLES.MUTED,
-      fontSize: '16px',
-      letterSpacing: 8,
-    })
+    this._subtitle = this.add
+      .text(width / 2, height * 0.25 + 60, 'FOOTNOTE', {
+        ...TEXT_STYLES.MUTED,
+        fontSize: '16px',
+        letterSpacing: 8,
+      })
       .setOrigin(0.5)
       .setAlpha(0);
 
     // 标语
-    this.add.text(width / 2, height * 0.25 + 100, 
-      '你生活在一个二维世界，\n但你能短暂触碰更高维度——\n代价是：世界会记住你做过的一切。', {
-      ...TEXT_STYLES.BODY,
-      fontSize: '16px',
-      align: 'center',
-      color: '#686868',
-    })
+    this.add
+      .text(
+        width / 2,
+        height * 0.25 + 100,
+        '你生活在一个二维世界，\n但你能短暂触碰更高维度——\n代价是：世界会记住你做过的一切。',
+        {
+          ...TEXT_STYLES.BODY,
+          fontSize: '16px',
+          align: 'center',
+          color: '#686868',
+        }
+      )
       .setOrigin(0.5)
       .setAlpha(0)
       .setName('tagline');
@@ -124,36 +134,39 @@ export class MenuScene extends Phaser.Scene {
 
     // 按钮背景
     const bg = this.add.graphics();
-    bg.fillStyle(0x1E1E24, 1);
+    bg.fillStyle(0x1e1e24, 1);
     bg.fillRoundedRect(-120, -25, 240, 50, 8);
-    bg.lineStyle(1, 0x3A3A40, 1);
+    bg.lineStyle(1, 0x3a3a40, 1);
     bg.strokeRoundedRect(-120, -25, 240, 50, 8);
 
     // 按钮文字
-    const label = this.add.text(0, 0, text, {
-      ...TEXT_STYLES.BODY,
-      fontSize: '18px',
-    }).setOrigin(0.5);
+    const label = this.add
+      .text(0, 0, text, {
+        ...TEXT_STYLES.BODY,
+        fontSize: '18px',
+      })
+      .setOrigin(0.5);
 
     container.add([bg, label]);
     container.setSize(240, 50);
     container.setAlpha(0);
 
     // 交互
-    container.setInteractive({ useHandCursor: true })
+    container
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         bg.clear();
-        bg.fillStyle(0x2A2A30, 1);
+        bg.fillStyle(0x2a2a30, 1);
         bg.fillRoundedRect(-120, -25, 240, 50, 8);
-        bg.lineStyle(1, 0x00FFAA, 1);
+        bg.lineStyle(1, 0x00ffaa, 1);
         bg.strokeRoundedRect(-120, -25, 240, 50, 8);
         label.setColor('#00FFAA');
       })
       .on('pointerout', () => {
         bg.clear();
-        bg.fillStyle(0x1E1E24, 1);
+        bg.fillStyle(0x1e1e24, 1);
         bg.fillRoundedRect(-120, -25, 240, 50, 8);
-        bg.lineStyle(1, 0x3A3A40, 1);
+        bg.lineStyle(1, 0x3a3a40, 1);
         bg.strokeRoundedRect(-120, -25, 240, 50, 8);
         label.setColor('#E8E6E3');
       })
@@ -178,7 +191,8 @@ export class MenuScene extends Phaser.Scene {
     this._saveListContainer.setVisible(false);
 
     // 半透明背景
-    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.7)
+    const overlay = this.add
+      .rectangle(0, 0, width, height, 0x000000, 0.7)
       .setInteractive()
       .on('pointerdown', () => this._hideSaveList());
     this._saveListContainer.add(overlay);
@@ -192,10 +206,12 @@ export class MenuScene extends Phaser.Scene {
     this._saveListContainer.add(panelBg);
 
     // 标题
-    const title = this.add.text(0, -260, '选择存档', {
-      ...TEXT_STYLES.TITLE,
-      fontSize: '24px',
-    }).setOrigin(0.5);
+    const title = this.add
+      .text(0, -260, '选择存档', {
+        ...TEXT_STYLES.TITLE,
+        fontSize: '24px',
+      })
+      .setOrigin(0.5);
     this._saveListContainer.add(title);
 
     // 关闭按钮
@@ -205,9 +221,9 @@ export class MenuScene extends Phaser.Scene {
 
   private async _showSaveList(): Promise<void> {
     // 清除旧的存档项
-    const oldItems = this._saveListContainer.getAll().filter(
-      (child) => child.getData('isSaveItem')
-    );
+    const oldItems = this._saveListContainer
+      .getAll()
+      .filter((child) => child.getData('isSaveItem'));
     oldItems.forEach((item) => item.destroy());
 
     // 获取存档列表
@@ -215,12 +231,14 @@ export class MenuScene extends Phaser.Scene {
 
     if (saves.length === 0) {
       // 无存档提示
-      const noSaveText = this.add.text(0, 0, '没有找到存档\n\n请开始新游戏', {
-        ...TEXT_STYLES.BODY,
-        fontSize: '16px',
-        align: 'center',
-        color: '#686868',
-      }).setOrigin(0.5);
+      const noSaveText = this.add
+        .text(0, 0, '没有找到存档\n\n请开始新游戏', {
+          ...TEXT_STYLES.BODY,
+          fontSize: '16px',
+          align: 'center',
+          color: '#686868',
+        })
+        .setOrigin(0.5);
       noSaveText.setData('isSaveItem', true);
       this._saveListContainer.add(noSaveText);
     } else {
@@ -265,26 +283,31 @@ export class MenuScene extends Phaser.Scene {
     // 时间
     const date = new Date(save.timestamp);
     const dateStr = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-    const timeText = this.add.text(180, -15, dateStr, {
-      ...TEXT_STYLES.MUTED,
-      fontSize: '14px',
-    }).setOrigin(1, 0);
+    const timeText = this.add
+      .text(180, -15, dateStr, {
+        ...TEXT_STYLES.MUTED,
+        fontSize: '14px',
+      })
+      .setOrigin(1, 0);
 
     // 游玩时长
     const playTimeStr = this._formatPlayTime(save.playTime);
-    const playTimeText = this.add.text(180, 10, `游玩: ${playTimeStr}`, {
-      ...TEXT_STYLES.MUTED,
-      fontSize: '14px',
-    }).setOrigin(1, 0);
+    const playTimeText = this.add
+      .text(180, 10, `游玩: ${playTimeStr}`, {
+        ...TEXT_STYLES.MUTED,
+        fontSize: '14px',
+      })
+      .setOrigin(1, 0);
 
     container.add([bg, name, location, timeText, playTimeText]);
     container.setSize(400, 70);
 
     // 交互
-    container.setInteractive({ useHandCursor: true })
+    container
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         bg.clear();
-        bg.fillStyle(0x2A2A30, 1);
+        bg.fillStyle(0x2a2a30, 1);
         bg.fillRoundedRect(-200, -35, 400, 70, 8);
         bg.lineStyle(1, COLORS.ACCENT, 1);
         bg.strokeRoundedRect(-200, -35, 400, 70, 8);
@@ -348,7 +371,8 @@ export class MenuScene extends Phaser.Scene {
     this._settingsContainer.setVisible(false);
 
     // 半透明背景
-    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.7)
+    const overlay = this.add
+      .rectangle(0, 0, width, height, 0x000000, 0.7)
       .setInteractive()
       .on('pointerdown', () => this._hideSettings());
     this._settingsContainer.add(overlay);
@@ -362,14 +386,18 @@ export class MenuScene extends Phaser.Scene {
     this._settingsContainer.add(panelBg);
 
     // 标题
-    const title = this.add.text(0, -210, '设置', {
-      ...TEXT_STYLES.TITLE,
-      fontSize: '24px',
-    }).setOrigin(0.5);
+    const title = this.add
+      .text(0, -210, '设置', {
+        ...TEXT_STYLES.TITLE,
+        fontSize: '24px',
+      })
+      .setOrigin(0.5);
     this._settingsContainer.add(title);
 
     // 关闭按钮
-    const closeBtn = this._createCloseButton(CONFIG.SETTINGS_WIDTH / 2 - 40, -210, () => this._hideSettings());
+    const closeBtn = this._createCloseButton(CONFIG.SETTINGS_WIDTH / 2 - 40, -210, () =>
+      this._hideSettings()
+    );
     this._settingsContainer.add(closeBtn);
 
     // 音量设置
@@ -384,21 +412,28 @@ export class MenuScene extends Phaser.Scene {
     this._createToggle(-CONFIG.SETTINGS_WIDTH / 2 + 30, 130, '自动存档', 'autoSave');
   }
 
-  private _createCloseButton(x: number, y: number, callback: () => void): Phaser.GameObjects.Container {
+  private _createCloseButton(
+    x: number,
+    y: number,
+    callback: () => void
+  ): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
 
     const bg = this.add.graphics();
     bg.fillStyle(COLORS.BG_TERTIARY, 1);
     bg.fillCircle(0, 0, 18);
 
-    const closeX = this.add.text(0, 0, '×', {
-      fontSize: '24px',
-      color: '#888888',
-    }).setOrigin(0.5);
+    const closeX = this.add
+      .text(0, 0, '×', {
+        fontSize: '24px',
+        color: '#888888',
+      })
+      .setOrigin(0.5);
 
     container.add([bg, closeX]);
     container.setSize(36, 36);
-    container.setInteractive({ useHandCursor: true })
+    container
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         bg.clear();
         bg.fillStyle(COLORS.BG_SECONDARY, 1);
@@ -441,17 +476,18 @@ export class MenuScene extends Phaser.Scene {
 
     // 滑块手柄
     const handleX = trackX + value * CONFIG.SLIDER_WIDTH;
-    const handle = this.add.rectangle(handleX, y, 16, 20, COLORS.ACCENT)
+    const handle = this.add
+      .rectangle(handleX, y, 16, 20, COLORS.ACCENT)
       .setInteractive({ useHandCursor: true, draggable: true });
     this._settingsContainer.add(handle);
 
     // 值显示
-    const valueText = this.add.text(
-      CONFIG.SETTINGS_WIDTH / 2 - 10,
-      y,
-      `${Math.round(value * 100)}%`,
-      { ...TEXT_STYLES.BODY, fontSize: '14px' }
-    ).setOrigin(1, 0.5);
+    const valueText = this.add
+      .text(CONFIG.SETTINGS_WIDTH / 2 - 10, y, `${Math.round(value * 100)}%`, {
+        ...TEXT_STYLES.BODY,
+        fontSize: '14px',
+      })
+      .setOrigin(1, 0.5);
     this._settingsContainer.add(valueText);
 
     // 保存引用
@@ -469,7 +505,12 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
-  private _updateSliderFill(graphics: Phaser.GameObjects.Graphics, x: number, y: number, value: number): void {
+  private _updateSliderFill(
+    graphics: Phaser.GameObjects.Graphics,
+    x: number,
+    y: number,
+    value: number
+  ): void {
     graphics.clear();
     graphics.fillStyle(COLORS.ACCENT, 1);
     graphics.fillRoundedRect(x, y - 4, CONFIG.SLIDER_WIDTH * value, 8, 4);
@@ -504,7 +545,13 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
-  private _createSpeedButton(x: number, y: number, label: string, selected: boolean, callback: () => void): Phaser.GameObjects.Container {
+  private _createSpeedButton(
+    x: number,
+    y: number,
+    label: string,
+    selected: boolean,
+    callback: () => void
+  ): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
 
     const bg = this.add.graphics();
@@ -519,24 +566,30 @@ export class MenuScene extends Phaser.Scene {
       bg.fillRoundedRect(-22, -14, 44, 28, 4);
     }
 
-    const text = this.add.text(0, 0, label, {
-      ...TEXT_STYLES.BODY,
-      fontSize: '14px',
-      color: selected ? '#00FFAA' : '#A8A6A3',
-    }).setOrigin(0.5);
+    const text = this.add
+      .text(0, 0, label, {
+        ...TEXT_STYLES.BODY,
+        fontSize: '14px',
+        color: selected ? '#00FFAA' : '#A8A6A3',
+      })
+      .setOrigin(0.5);
     text.setName('text');
 
     container.add([bg, text]);
     container.setSize(44, 28);
-    container.setInteractive({ useHandCursor: true })
-      .on('pointerdown', callback);
+    container.setInteractive({ useHandCursor: true }).on('pointerdown', callback);
 
     return container;
   }
 
-  private _updateSpeedButtons(speeds: Array<{ value: IGameSettings['textSpeed']; label: string }>, selectedValue: string): void {
+  private _updateSpeedButtons(
+    speeds: Array<{ value: IGameSettings['textSpeed']; label: string }>,
+    selectedValue: string
+  ): void {
     speeds.forEach((speed) => {
-      const btn = this._settingsContainer.getByName(`speed_${speed.value}`) as Phaser.GameObjects.Container;
+      const btn = this._settingsContainer.getByName(
+        `speed_${speed.value}`
+      ) as Phaser.GameObjects.Container;
       if (!btn) return;
 
       const bg = btn.getByName('bg') as Phaser.GameObjects.Graphics;
@@ -574,22 +627,18 @@ export class MenuScene extends Phaser.Scene {
     toggleBg.setPosition(toggleX, y);
     this._settingsContainer.add(toggleBg);
 
-    const toggleHandle = this.add.circle(
-      toggleX + (isOn ? 20 : -20),
-      y,
-      10,
-      0xFFFFFF
-    );
+    const toggleHandle = this.add.circle(toggleX + (isOn ? 20 : -20), y, 10, 0xffffff);
     toggleHandle.setName('toggleHandle');
     this._settingsContainer.add(toggleHandle);
 
     // 交互
-    const hitArea = this.add.rectangle(toggleX, y, 50, 24, 0x000000, 0)
+    const hitArea = this.add
+      .rectangle(toggleX, y, 50, 24, 0x000000, 0)
       .setInteractive({ useHandCursor: true })
       .on('pointerdown', () => {
         this._settings.autoPlay = !this._settings.autoPlay;
         void this._saveSettings();
-        
+
         this._updateToggleBg(toggleBg, this._settings.autoPlay);
         this.tweens.add({
           targets: toggleHandle,
@@ -662,10 +711,12 @@ export class MenuScene extends Phaser.Scene {
 
   private _createVersionInfo(width: number, height: number): void {
     const version = __VERSION__ || '0.1.0';
-    this.add.text(width / 2, height - 30, `v${version}`, {
-      ...TEXT_STYLES.MUTED,
-      fontSize: '14px',
-    }).setOrigin(0.5);
+    this.add
+      .text(width / 2, height - 30, `v${version}`, {
+        ...TEXT_STYLES.MUTED,
+        fontSize: '14px',
+      })
+      .setOrigin(0.5);
   }
 
   private _playIntroAnimation(): void {
@@ -722,22 +773,26 @@ export class MenuScene extends Phaser.Scene {
     });
   }
 
-  private _showToast(message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info'): void {
+  private _showToast(
+    message: string,
+    type: 'info' | 'success' | 'warning' | 'error' = 'info'
+  ): void {
     const { width } = this.scale;
-    
+
     const colors: Record<string, number> = {
-      info: 0x1E1E24,
-      success: 0x1A4A2A,
-      warning: 0x4A3A1A,
-      error: 0x4A1A1A,
+      info: 0x1e1e24,
+      success: 0x1a4a2a,
+      warning: 0x4a3a1a,
+      error: 0x4a1a1a,
     };
 
-    const toast = this.add.text(width / 2, 80, message, {
-      ...TEXT_STYLES.BODY,
-      fontSize: '14px',
-      backgroundColor: `#${colors[type].toString(16).padStart(6, '0')}`,
-      padding: { x: 16, y: 10 },
-    })
+    const toast = this.add
+      .text(width / 2, 80, message, {
+        ...TEXT_STYLES.BODY,
+        fontSize: '14px',
+        backgroundColor: `#${colors[type].toString(16).padStart(6, '0')}`,
+        padding: { x: 16, y: 10 },
+      })
       .setOrigin(0.5)
       .setAlpha(0)
       .setDepth(200);

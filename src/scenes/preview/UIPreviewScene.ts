@@ -1,6 +1,6 @@
 /**
  * UI预览场景 (Prefab 模式)
- * 
+ *
  * 展示完整的UI界面 Prefab，而不只是单个组件：
  * - 对话界面 (DialogueUI)
  * - 卡片界面 (CardUI)
@@ -66,27 +66,33 @@ export class UIPreviewScene extends BasePreviewScene {
     // 统计
     const totalScreens = uiScreens.length;
     const totalComponents = uiComponents.length;
-    const stats = this.add.text(width / 2, currentY, 
-      `${totalScreens} 个界面 Prefab | ${totalComponents} 个组件元素`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#686868',
-    }).setOrigin(0.5);
+    const stats = this.add
+      .text(width / 2, currentY, `${totalScreens} 个界面 Prefab | ${totalComponents} 个组件元素`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#686868',
+      })
+      .setOrigin(0.5);
     this.contentContainer.add(stats);
     currentY += 45;
 
     // 操作提示
-    const hint = this.add.text(width / 2, currentY, 
-      '💡 点击界面卡片进入全屏预览模式，可交互测试', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#4A9EFF',
-    }).setOrigin(0.5);
+    const hint = this.add
+      .text(width / 2, currentY, '💡 点击界面卡片进入全屏预览模式，可交互测试', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#4A9EFF',
+      })
+      .setOrigin(0.5);
     this.contentContainer.add(hint);
     currentY += 50;
 
     // UI界面 Prefab 区域
-    const screenTitle = this.createSectionTitle(40, currentY, '📺 UI界面 Prefab（点击进入全屏预览）');
+    const screenTitle = this.createSectionTitle(
+      40,
+      currentY,
+      '📺 UI界面 Prefab（点击进入全屏预览）'
+    );
     this.contentContainer.add(screenTitle);
     currentY += 50;
 
@@ -182,43 +188,52 @@ export class UIPreviewScene extends BasePreviewScene {
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
     bg.fillRoundedRect(0, 0, width, height, 10);
-    bg.lineStyle(2, 0x2A2A30, 1);
+    bg.lineStyle(2, 0x2a2a30, 1);
     bg.strokeRoundedRect(0, 0, width, height, 10);
     container.add(bg);
 
     // 图标
-    const icon = this.add.text(width / 2, 55, screen.icon, {
-      fontSize: '56px',
-    }).setOrigin(0.5);
+    const icon = this.add
+      .text(width / 2, 55, screen.icon, {
+        fontSize: '56px',
+      })
+      .setOrigin(0.5);
     container.add(icon);
 
     // 名称
-    const name = this.add.text(width / 2, 120, screen.name, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SECTION,
-      color: '#00FFAA',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const name = this.add
+      .text(width / 2, 120, screen.name, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SECTION,
+        color: '#00FFAA',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     container.add(name);
 
     // 描述
-    const desc = this.add.text(width / 2, 160, screen.description, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#686868',
-      wordWrap: { width: width - 40 },
-      align: 'center',
-    }).setOrigin(0.5, 0);
+    const desc = this.add
+      .text(width / 2, 160, screen.description, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#686868',
+        wordWrap: { width: width - 40 },
+        align: 'center',
+      })
+      .setOrigin(0.5, 0);
     container.add(desc);
 
     // 交互
-    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, width, height),
+      Phaser.Geom.Rectangle.Contains
+    );
 
     container.on('pointerover', () => {
       bg.clear();
-      bg.fillStyle(0x1E1E24, 1);
+      bg.fillStyle(0x1e1e24, 1);
       bg.fillRoundedRect(0, 0, width, height, 10);
-      bg.lineStyle(2, 0x00FFAA, 1);
+      bg.lineStyle(2, 0x00ffaa, 1);
       bg.strokeRoundedRect(0, 0, width, height, 10);
     });
 
@@ -226,7 +241,7 @@ export class UIPreviewScene extends BasePreviewScene {
       bg.clear();
       bg.fillStyle(0x141419, 1);
       bg.fillRoundedRect(0, 0, width, height, 10);
-      bg.lineStyle(2, 0x2A2A30, 1);
+      bg.lineStyle(2, 0x2a2a30, 1);
       bg.strokeRoundedRect(0, 0, width, height, 10);
     });
 
@@ -254,7 +269,7 @@ export class UIPreviewScene extends BasePreviewScene {
     this._uiPreviewContainer.removeAll(true);
 
     // 游戏背景模拟
-    const gameBg = this.add.rectangle(0, 0, width, height, 0x0A0A0F).setOrigin(0);
+    const gameBg = this.add.rectangle(0, 0, width, height, 0x0a0a0f).setOrigin(0);
     this._uiPreviewContainer.add(gameBg);
 
     // 模拟游戏场景（白盒）
@@ -297,8 +312,8 @@ export class UIPreviewScene extends BasePreviewScene {
 
     // 网格背景
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x1A1A1F, 0.5);
-    
+    grid.lineStyle(1, 0x1a1a1f, 0.5);
+
     for (let x = 0; x < width; x += 50) {
       grid.moveTo(x, 0);
       grid.lineTo(x, height);
@@ -312,17 +327,19 @@ export class UIPreviewScene extends BasePreviewScene {
 
     // 模拟玩家位置
     const player = this.add.graphics();
-    player.fillStyle(0x00FFAA, 0.5);
+    player.fillStyle(0x00ffaa, 0.5);
     player.fillCircle(width / 2, height / 2, 20);
-    player.lineStyle(2, 0x00FFAA, 1);
+    player.lineStyle(2, 0x00ffaa, 1);
     player.strokeCircle(width / 2, height / 2, 20);
     this._uiPreviewContainer.add(player);
 
-    const playerLabel = this.add.text(width / 2, height / 2 + 35, '玩家', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '10px',
-      color: '#00FFAA',
-    }).setOrigin(0.5);
+    const playerLabel = this.add
+      .text(width / 2, height / 2 + 35, '玩家', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '10px',
+        color: '#00FFAA',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(playerLabel);
   }
 
@@ -358,12 +375,13 @@ export class UIPreviewScene extends BasePreviewScene {
     });
 
     // 添加操作提示
-    const tip = this.add.text(this.scale.width / 2, 120, 
-      '💡 点击对话框可推进对话，点击选项可选择', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
-      color: '#FFD700',
-    }).setOrigin(0.5);
+    const tip = this.add
+      .text(this.scale.width / 2, 120, '💡 点击对话框可推进对话，点击选项可选择', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '12px',
+        color: '#FFD700',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(tip);
   }
 
@@ -385,11 +403,7 @@ export class UIPreviewScene extends BasePreviewScene {
       type: 'archive',
       chapter: 'C0',
       zone: 'C0-Z1',
-      front: [
-        '维修局外勤身份凭证',
-        '持卡人：岑回',
-        '编号：EX-7749',
-      ],
+      front: ['维修局外勤身份凭证', '持卡人：岑回', '编号：EX-7749'],
       detail: [
         '通行级别：灰',
         '有效期：本周期内有效',
@@ -405,12 +419,13 @@ export class UIPreviewScene extends BasePreviewScene {
       this._cardUI?.showCardObtain(sampleCard);
     });
 
-    const tip = this.add.text(this.scale.width / 2, 120, 
-      '💡 展示卡片获得动画，点击可关闭', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
-      color: '#FFD700',
-    }).setOrigin(0.5);
+    const tip = this.add
+      .text(this.scale.width / 2, 120, '💡 展示卡片获得动画，点击可关闭', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '12px',
+        color: '#FFD700',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(tip);
   }
 
@@ -433,50 +448,55 @@ export class UIPreviewScene extends BasePreviewScene {
     const panel = this.add.graphics();
     panel.fillStyle(0x141419, 1);
     panel.fillRoundedRect(panelX, panelY, panelWidth, panelHeight, 12);
-    panel.lineStyle(2, 0x2A2A30, 1);
+    panel.lineStyle(2, 0x2a2a30, 1);
     panel.strokeRoundedRect(panelX, panelY, panelWidth, panelHeight, 12);
     this._uiPreviewContainer.add(panel);
 
     // 标题
-    const title = this.add.text(width / 2, panelY + 30, '游戏暂停', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '20px',
-      color: '#E8E6E3',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const title = this.add
+      .text(width / 2, panelY + 30, '游戏暂停', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '20px',
+        color: '#E8E6E3',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(title);
 
     // 菜单项
     const menuItems = [
-      { text: '继续游戏', color: 0x00FFAA },
-      { text: '保存游戏', color: 0x4A9EFF },
-      { text: '读取存档', color: 0x4A9EFF },
+      { text: '继续游戏', color: 0x00ffaa },
+      { text: '保存游戏', color: 0x4a9eff },
+      { text: '读取存档', color: 0x4a9eff },
       { text: '游戏设置', color: 0x686868 },
-      { text: '返回主菜单', color: 0xFF4444 },
+      { text: '返回主菜单', color: 0xff4444 },
     ];
 
     menuItems.forEach((item, index) => {
       const btnY = panelY + 80 + index * 55;
-      
+
       const btn = this.add.graphics();
-      btn.fillStyle(0x1E1E24, 1);
+      btn.fillStyle(0x1e1e24, 1);
       btn.fillRoundedRect(panelX + 30, btnY, panelWidth - 60, 45, 8);
       this._uiPreviewContainer.add(btn);
 
-      const btnText = this.add.text(width / 2, btnY + 22, item.text, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: '14px',
-        color: `#${item.color.toString(16).padStart(6, '0')}`,
-      }).setOrigin(0.5);
+      const btnText = this.add
+        .text(width / 2, btnY + 22, item.text, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: '14px',
+          color: `#${item.color.toString(16).padStart(6, '0')}`,
+        })
+        .setOrigin(0.5);
       this._uiPreviewContainer.add(btnText);
     });
 
-    const tip = this.add.text(width / 2, panelY + panelHeight + 20, 
-      '💡 这是 PauseMenu 的完整界面预览', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
-      color: '#FFD700',
-    }).setOrigin(0.5);
+    const tip = this.add
+      .text(width / 2, panelY + panelHeight + 20, '💡 这是 PauseMenu 的完整界面预览', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '12px',
+        color: '#FFD700',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(tip);
   }
 
@@ -495,17 +515,19 @@ export class UIPreviewScene extends BasePreviewScene {
     const panel = this.add.graphics();
     panel.fillStyle(0x141419, 0.95);
     panel.fillRoundedRect(panelX, panelY, panelWidth, panelHeight, 12);
-    panel.lineStyle(2, 0x2A2A30, 1);
+    panel.lineStyle(2, 0x2a2a30, 1);
     panel.strokeRoundedRect(panelX, panelY, panelWidth, panelHeight, 12);
     this._uiPreviewContainer.add(panel);
 
     // 标题
-    const title = this.add.text(width / 2, panelY + 25, '📋 已收集卡片', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '18px',
-      color: '#00FFAA',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const title = this.add
+      .text(width / 2, panelY + 25, '📋 已收集卡片', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '18px',
+        color: '#00FFAA',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(title);
 
     // 分类标签
@@ -516,18 +538,20 @@ export class UIPreviewScene extends BasePreviewScene {
 
       const tabBg = this.add.graphics();
       if (isActive) {
-        tabBg.fillStyle(0x00FFAA, 0.2);
+        tabBg.fillStyle(0x00ffaa, 0.2);
         tabBg.fillRoundedRect(tabX, panelY + 55, 80, 28, 6);
       }
-      tabBg.lineStyle(1, isActive ? 0x00FFAA : 0x2A2A30, 1);
+      tabBg.lineStyle(1, isActive ? 0x00ffaa : 0x2a2a30, 1);
       tabBg.strokeRoundedRect(tabX, panelY + 55, 80, 28, 6);
       this._uiPreviewContainer.add(tabBg);
 
-      const tabText = this.add.text(tabX + 40, panelY + 69, tab, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
-        color: isActive ? '#00FFAA' : '#686868',
-      }).setOrigin(0.5);
+      const tabText = this.add
+        .text(tabX + 40, panelY + 69, tab, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: '12px',
+          color: isActive ? '#00FFAA' : '#686868',
+        })
+        .setOrigin(0.5);
       this._uiPreviewContainer.add(tabText);
     });
 
@@ -543,41 +567,48 @@ export class UIPreviewScene extends BasePreviewScene {
       const cardY = panelY + 100 + row * (cardHeight + 15);
 
       const cardBg = this.add.graphics();
-      cardBg.fillStyle(0x1E1E24, 1);
+      cardBg.fillStyle(0x1e1e24, 1);
       cardBg.fillRoundedRect(cardX, cardY, cardWidth, cardHeight, 8);
-      cardBg.lineStyle(1, i < 3 ? 0x00FFAA : 0x2A2A30, 0.5);
+      cardBg.lineStyle(1, i < 3 ? 0x00ffaa : 0x2a2a30, 0.5);
       cardBg.strokeRoundedRect(cardX, cardY, cardWidth, cardHeight, 8);
       this._uiPreviewContainer.add(cardBg);
 
       if (i < 3) {
         // 已收集的卡片
-        const cardIcon = this.add.text(cardX + cardWidth / 2, cardY + 50, '📄', {
-          fontSize: '32px',
-        }).setOrigin(0.5);
+        const cardIcon = this.add
+          .text(cardX + cardWidth / 2, cardY + 50, '📄', {
+            fontSize: '32px',
+          })
+          .setOrigin(0.5);
         this._uiPreviewContainer.add(cardIcon);
 
-        const cardName = this.add.text(cardX + cardWidth / 2, cardY + 100, `卡片 ${i + 1}`, {
-          fontFamily: 'Noto Sans SC',
-          fontSize: '11px',
-          color: '#A8A6A3',
-        }).setOrigin(0.5);
+        const cardName = this.add
+          .text(cardX + cardWidth / 2, cardY + 100, `卡片 ${i + 1}`, {
+            fontFamily: 'Noto Sans SC',
+            fontSize: '11px',
+            color: '#A8A6A3',
+          })
+          .setOrigin(0.5);
         this._uiPreviewContainer.add(cardName);
       } else {
         // 未收集的卡片
-        const lockIcon = this.add.text(cardX + cardWidth / 2, cardY + cardHeight / 2, '🔒', {
-          fontSize: '24px',
-        }).setOrigin(0.5);
+        const lockIcon = this.add
+          .text(cardX + cardWidth / 2, cardY + cardHeight / 2, '🔒', {
+            fontSize: '24px',
+          })
+          .setOrigin(0.5);
         lockIcon.setAlpha(0.3);
         this._uiPreviewContainer.add(lockIcon);
       }
     }
 
-    const tip = this.add.text(width / 2, height - 50, 
-      '💡 这是 InventoryUI 的完整界面预览', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
-      color: '#FFD700',
-    }).setOrigin(0.5);
+    const tip = this.add
+      .text(width / 2, height - 50, '💡 这是 InventoryUI 的完整界面预览', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '12px',
+        color: '#FFD700',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(tip);
   }
 
@@ -610,28 +641,32 @@ export class UIPreviewScene extends BasePreviewScene {
       });
       this._uiPreviewContainer.add(label);
 
-      const value = this.add.text(width - 130, y, 
-        counter.label === 'W' ? `${counter.value}%` : `${counter.value}`, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: '14px',
-        color: counter.color,
-      });
+      const value = this.add.text(
+        width - 130,
+        y,
+        counter.label === 'W' ? `${counter.value}%` : `${counter.value}`,
+        {
+          fontFamily: 'Noto Sans SC',
+          fontSize: '14px',
+          color: counter.color,
+        }
+      );
       this._uiPreviewContainer.add(value);
     });
 
     // 能力栏
     const abilityBarY = this.scale.height - 150;
     const abilities = [
-      { name: '深度感知', key: '1', color: 0x00FFAA, unlocked: true },
-      { name: '深度介入', key: '2', color: 0xFF00FF, unlocked: true },
-      { name: '时间干预', key: '3', color: 0xFFD700, unlocked: false },
+      { name: '深度感知', key: '1', color: 0x00ffaa, unlocked: true },
+      { name: '深度介入', key: '2', color: 0xff00ff, unlocked: true },
+      { name: '时间干预', key: '3', color: 0xffd700, unlocked: false },
     ];
 
     abilities.forEach((ability, index) => {
       const x = width / 2 + (index - 1) * 90;
 
       const abilityBg = this.add.graphics();
-      abilityBg.fillStyle(0x1E1E24, 0.9);
+      abilityBg.fillStyle(0x1e1e24, 0.9);
       abilityBg.fillRoundedRect(x - 35, abilityBarY, 70, 60, 8);
       abilityBg.lineStyle(2, ability.color, ability.unlocked ? 0.8 : 0.2);
       abilityBg.strokeRoundedRect(x - 35, abilityBarY, 70, 60, 8);
@@ -645,28 +680,33 @@ export class UIPreviewScene extends BasePreviewScene {
         this._uiPreviewContainer.add(lock);
       }
 
-      const keyHint = this.add.text(x, abilityBarY + 15, ability.key, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: '11px',
-        color: '#4A4A4A',
-      }).setOrigin(0.5);
+      const keyHint = this.add
+        .text(x, abilityBarY + 15, ability.key, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: '11px',
+          color: '#4A4A4A',
+        })
+        .setOrigin(0.5);
       this._uiPreviewContainer.add(keyHint);
 
-      const abilityName = this.add.text(x, abilityBarY + 38, ability.name.slice(0, 2), {
-        fontFamily: 'Noto Sans SC',
-        fontSize: '14px',
-        color: `#${ability.color.toString(16).padStart(6, '0')}`,
-      }).setOrigin(0.5);
+      const abilityName = this.add
+        .text(x, abilityBarY + 38, ability.name.slice(0, 2), {
+          fontFamily: 'Noto Sans SC',
+          fontSize: '14px',
+          color: `#${ability.color.toString(16).padStart(6, '0')}`,
+        })
+        .setOrigin(0.5);
       if (!ability.unlocked) abilityName.setAlpha(0.3);
       this._uiPreviewContainer.add(abilityName);
     });
 
-    const tip = this.add.text(width / 2, 250, 
-      '💡 HUD元素：R/P/W计数器 + 能力栏', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
-      color: '#FFD700',
-    }).setOrigin(0.5);
+    const tip = this.add
+      .text(width / 2, 250, '💡 HUD元素：R/P/W计数器 + 能力栏', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '12px',
+        color: '#FFD700',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(tip);
   }
 
@@ -679,20 +719,21 @@ export class UIPreviewScene extends BasePreviewScene {
     const { width } = this.scale;
 
     // 说明
-    const instructions = this.add.text(width / 2, 150, 
-      '点击下方按钮触发不同类型的 Toast 提示', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
-      color: '#A8A6A3',
-    }).setOrigin(0.5);
+    const instructions = this.add
+      .text(width / 2, 150, '点击下方按钮触发不同类型的 Toast 提示', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '14px',
+        color: '#A8A6A3',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(instructions);
 
     // Toast类型按钮
     const toastTypes = [
-      { name: '成功', method: 'showSuccess', color: 0x00CC66 },
-      { name: '错误', method: 'showError', color: 0xFF4444 },
-      { name: '警告', method: 'showWarning', color: 0xFFD700 },
-      { name: '信息', method: 'showInfo', color: 0x4A9EFF },
+      { name: '成功', method: 'showSuccess', color: 0x00cc66 },
+      { name: '错误', method: 'showError', color: 0xff4444 },
+      { name: '警告', method: 'showWarning', color: 0xffd700 },
+      { name: '信息', method: 'showInfo', color: 0x4a9eff },
     ];
 
     toastTypes.forEach((toast, index) => {
@@ -706,17 +747,20 @@ export class UIPreviewScene extends BasePreviewScene {
       btn.strokeRoundedRect(x - 45, y - 20, 90, 40, 8);
       this._uiPreviewContainer.add(btn);
 
-      const btnText = this.add.text(x, y, toast.name, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: '14px',
-        color: `#${toast.color.toString(16).padStart(6, '0')}`,
-      }).setOrigin(0.5);
+      const btnText = this.add
+        .text(x, y, toast.name, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: '14px',
+          color: `#${toast.color.toString(16).padStart(6, '0')}`,
+        })
+        .setOrigin(0.5);
       this._uiPreviewContainer.add(btnText);
 
       // 交互
-      const hitArea = this.add.rectangle(x, y, 90, 40, 0x000000, 0)
+      const hitArea = this.add
+        .rectangle(x, y, 90, 40, 0x000000, 0)
         .setInteractive({ useHandCursor: true });
-      
+
       hitArea.on('pointerdown', () => {
         const messages: Record<string, string> = {
           showSuccess: '操作成功完成！',
@@ -731,20 +775,23 @@ export class UIPreviewScene extends BasePreviewScene {
 
     // 成就提示按钮
     const achievementBtn = this.add.graphics();
-    achievementBtn.fillStyle(0xFF00FF, 0.2);
+    achievementBtn.fillStyle(0xff00ff, 0.2);
     achievementBtn.fillRoundedRect(width / 2 - 80, 300, 160, 40, 8);
-    achievementBtn.lineStyle(2, 0xFF00FF, 1);
+    achievementBtn.lineStyle(2, 0xff00ff, 1);
     achievementBtn.strokeRoundedRect(width / 2 - 80, 300, 160, 40, 8);
     this._uiPreviewContainer.add(achievementBtn);
 
-    const achievementText = this.add.text(width / 2, 320, '🏆 成就提示', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
-      color: '#FF00FF',
-    }).setOrigin(0.5);
+    const achievementText = this.add
+      .text(width / 2, 320, '🏆 成就提示', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '14px',
+        color: '#FF00FF',
+      })
+      .setOrigin(0.5);
     this._uiPreviewContainer.add(achievementText);
 
-    const achievementHit = this.add.rectangle(width / 2, 320, 160, 40, 0x000000, 0)
+    const achievementHit = this.add
+      .rectangle(width / 2, 320, 160, 40, 0x000000, 0)
       .setInteractive({ useHandCursor: true });
     achievementHit.on('pointerdown', () => {
       this._toastManager?.showAchievement('成就解锁', '完成首次预览测试');
@@ -758,7 +805,7 @@ export class UIPreviewScene extends BasePreviewScene {
   private _createPreviewHeader(screenId: string): void {
     const { width } = this.scale;
     const screens = this._getUIScreens();
-    const screen = screens.find(s => s.id === screenId);
+    const screen = screens.find((s) => s.id === screenId);
 
     // 头部背景
     const headerBg = this.add.graphics();
@@ -767,11 +814,13 @@ export class UIPreviewScene extends BasePreviewScene {
     this._uiPreviewContainer.add(headerBg);
 
     // 返回按钮
-    const backBtn = this.add.text(20, 30, '← 返回列表', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#4A9EFF',
-    }).setInteractive({ useHandCursor: true });
+    const backBtn = this.add
+      .text(20, 30, '← 返回列表', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#4A9EFF',
+      })
+      .setInteractive({ useHandCursor: true });
 
     backBtn.on('pointerover', () => backBtn.setColor('#00FFAA'));
     backBtn.on('pointerout', () => backBtn.setColor('#4A9EFF'));
@@ -779,21 +828,24 @@ export class UIPreviewScene extends BasePreviewScene {
     this._uiPreviewContainer.add(backBtn);
 
     // 标题
-    const title = this.add.text(width / 2, 18, 
-      `${screen?.icon || '🎨'} ${screen?.name || screenId}`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SECTION,
-      color: '#00FFAA',
-      fontStyle: 'bold',
-    }).setOrigin(0.5, 0);
+    const title = this.add
+      .text(width / 2, 18, `${screen?.icon || '🎨'} ${screen?.name || screenId}`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SECTION,
+        color: '#00FFAA',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5, 0);
     this._uiPreviewContainer.add(title);
 
     // 描述
-    const desc = this.add.text(width / 2, 60, screen?.description || '', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#686868',
-    }).setOrigin(0.5, 0);
+    const desc = this.add
+      .text(width / 2, 60, screen?.description || '', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#686868',
+      })
+      .setOrigin(0.5, 0);
     this._uiPreviewContainer.add(desc);
   }
 
@@ -804,10 +856,10 @@ export class UIPreviewScene extends BasePreviewScene {
     // 清理UI实例
     this._dialogueUI?.destroy();
     this._dialogueUI = null;
-    
+
     this._cardUI?.destroy();
     this._cardUI = null;
-    
+
     this._toastManager?.destroy();
     this._toastManager = null;
 
@@ -844,7 +896,11 @@ export class UIPreviewScene extends BasePreviewScene {
     return currentY;
   }
 
-  private _createComponentSection(title: string, y: number, width: number): Phaser.GameObjects.Container {
+  private _createComponentSection(
+    title: string,
+    y: number,
+    width: number
+  ): Phaser.GameObjects.Container {
     const container = this.add.container(30, y);
 
     const sectionTitle = this.add.text(0, 0, title, {
@@ -859,10 +915,10 @@ export class UIPreviewScene extends BasePreviewScene {
 
   private _addButtonPreviews(container: Phaser.GameObjects.Container, width: number): void {
     const buttons = [
-      { name: '主按钮', fill: true, color: 0x00FFAA },
-      { name: '次按钮', fill: false, color: 0x00FFAA },
-      { name: '危险按钮', fill: true, color: 0xFF4444 },
-      { name: '禁用按钮', fill: true, color: 0x2A2A30, textColor: '#4A4A4A' },
+      { name: '主按钮', fill: true, color: 0x00ffaa },
+      { name: '次按钮', fill: false, color: 0x00ffaa },
+      { name: '危险按钮', fill: true, color: 0xff4444 },
+      { name: '禁用按钮', fill: true, color: 0x2a2a30, textColor: '#4A4A4A' },
     ];
 
     buttons.forEach((btn, index) => {
@@ -879,22 +935,25 @@ export class UIPreviewScene extends BasePreviewScene {
       }
       container.add(graphic);
 
-      const text = this.add.text(x + 80, y + 25, btn.name, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: this.FONT_SIZE.NORMAL,
-        color: btn.textColor || (btn.fill ? '#0A0A0F' : `#${btn.color.toString(16).padStart(6, '0')}`),
-      }).setOrigin(0.5);
+      const text = this.add
+        .text(x + 80, y + 25, btn.name, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.NORMAL,
+          color:
+            btn.textColor || (btn.fill ? '#0A0A0F' : `#${btn.color.toString(16).padStart(6, '0')}`),
+        })
+        .setOrigin(0.5);
       container.add(text);
     });
   }
 
   private _addColorPreviews(container: Phaser.GameObjects.Container, width: number): void {
     const colors = [
-      { name: 'Accent', color: 0x00FFAA },
-      { name: 'Error', color: 0xFF4444 },
-      { name: 'Warning', color: 0xFFD700 },
-      { name: 'Info', color: 0x4A9EFF },
-      { name: 'Text', color: 0xE8E6E3 },
+      { name: 'Accent', color: 0x00ffaa },
+      { name: 'Error', color: 0xff4444 },
+      { name: 'Warning', color: 0xffd700 },
+      { name: 'Info', color: 0x4a9eff },
+      { name: 'Text', color: 0xe8e6e3 },
       { name: 'Muted', color: 0x686868 },
       { name: 'BG', color: 0x141419 },
     ];
@@ -908,11 +967,13 @@ export class UIPreviewScene extends BasePreviewScene {
       swatch.fillRoundedRect(x, y, 80, 40, 6);
       container.add(swatch);
 
-      const label = this.add.text(x + 40, y + 52, c.name, {
-        fontFamily: 'Noto Sans SC',
-        fontSize: this.FONT_SIZE.SMALL,
-        color: '#4A4A4A',
-      }).setOrigin(0.5, 0);
+      const label = this.add
+        .text(x + 40, y + 52, c.name, {
+          fontFamily: 'Noto Sans SC',
+          fontSize: this.FONT_SIZE.SMALL,
+          color: '#4A4A4A',
+        })
+        .setOrigin(0.5, 0);
       container.add(label);
     });
   }

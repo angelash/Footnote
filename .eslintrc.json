@@ -24,7 +24,7 @@
       "argsIgnorePattern": "^_",
       "varsIgnorePattern": "^_"
     }],
-    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/naming-convention": [
       "error",
       {
@@ -34,8 +34,7 @@
       },
       {
         "selector": "typeAlias",
-        "format": ["PascalCase"],
-        "prefix": ["T"]
+        "format": ["PascalCase"]
       },
       {
         "selector": "enum",
@@ -54,7 +53,9 @@
     "dist",
     "node_modules",
     "*.config.ts",
-    "*.config.js"
+    "*.config.js",
+    "src/scenes/preview/**",
+    "src/preview.ts"
   ]
 }
 

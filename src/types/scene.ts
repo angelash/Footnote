@@ -71,5 +71,3 @@ export interface IAssembledScene {
   /** 由组装器创建的所有对象，用于切换Zone时统一销毁 */
   objects: Phaser.GameObjects.GameObject[];
 }
-
-

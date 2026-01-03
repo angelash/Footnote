@@ -38,7 +38,7 @@ export interface IAchievement {
   id: string;
   name: string;
   description: string;
-  hiddenDescription?: string;  // 解锁前显示的描述
+  hiddenDescription?: string; // 解锁前显示的描述
   category: AchievementCategory;
   rarity: AchievementRarity;
   icon: string;
@@ -793,7 +793,3 @@ export class AchievementManager {
     this._notificationContainer?.destroy();
   }
 }
-
-
-
-

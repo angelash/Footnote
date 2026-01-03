@@ -53,7 +53,7 @@ export enum GameEvent {
   LOAD_ERROR = 'load:error',
   SAVE_DELETE = 'save:delete',
   AUTOSAVE_TRIGGER = 'autosave:trigger',
-  
+
   // ==================== 云存档事件 ====================
   CLOUD_SAVE_UPLOAD = 'cloud:save:upload',
   CLOUD_SAVE_DOWNLOAD = 'cloud:save:download',
@@ -144,7 +144,11 @@ export interface IEventPayloads {
   [GameEvent.COUNTER_P_CHANGE]: { oldValue: number; newValue: number; delta: number };
   [GameEvent.COUNTER_W_CHANGE]: { oldValue: number; newValue: number };
   [GameEvent.SCAR_CREATE]: { scarId: string; zoneId: string; objectId: string };
-  [GameEvent.CONTAMINATION_CREATE]: { contaminationId: string; sourceZoneId: string; affectedZones: string[] };
+  [GameEvent.CONTAMINATION_CREATE]: {
+    contaminationId: string;
+    sourceZoneId: string;
+    affectedZones: string[];
+  };
   [GameEvent.FLAG_SET]: { flagName: string; value: boolean };
 
   [GameEvent.SAVE_START]: { slot: number };
@@ -163,7 +167,11 @@ export interface IEventPayloads {
   [GameEvent.CLOUD_SYNC_START]: Record<string, never>;
   [GameEvent.CLOUD_SYNC_COMPLETE]: { uploaded: number; downloaded: number; conflicts: number };
 
-  [GameEvent.UI_TOAST]: { message: string; type?: 'info' | 'success' | 'warning' | 'error'; duration?: number };
+  [GameEvent.UI_TOAST]: {
+    message: string;
+    type?: 'info' | 'success' | 'warning' | 'error';
+    duration?: number;
+  };
   [GameEvent.UI_PANEL_OPEN]: { panelType: string };
   [GameEvent.UI_PANEL_CLOSE]: { panelType: string };
   [GameEvent.UI_MODAL_OPEN]: { modalId: string; data?: unknown };
@@ -347,4 +355,3 @@ class EventBus extends TypedEventEmitter {
 
 // 导出单例
 export const eventBus = EventBus.getInstance();
-

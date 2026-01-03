@@ -485,7 +485,7 @@ class WorldState {
    * 获取Zone的伤痕
    */
   getScarsByZone(zoneId: string): IScar[] {
-    return this._scars.filter(s => s.zoneId === zoneId);
+    return this._scars.filter((s) => s.zoneId === zoneId);
   }
 
   // ==================== 污染操作 ====================
@@ -529,7 +529,7 @@ class WorldState {
    */
   isZoneContaminated(zoneId: string): boolean {
     return this._contaminations.some(
-      c => c.sourceZoneId === zoneId || c.affectedZoneIds.includes(zoneId)
+      (c) => c.sourceZoneId === zoneId || c.affectedZoneIds.includes(zoneId)
     );
   }
 
@@ -692,7 +692,7 @@ class WorldState {
   private _initializeDefaultZones(): void {
     // 序章Zone默认解锁
     const defaultUnlockedZones = ['C0-Z1', 'C0-Z2', 'C0-Z3', 'C0-Z4'];
-    defaultUnlockedZones.forEach(zoneId => {
+    defaultUnlockedZones.forEach((zoneId) => {
       this._zoneStates.set(zoneId, {
         ...this._createDefaultZoneState(),
         unlocked: true,
@@ -713,4 +713,3 @@ class WorldState {
 
 // 导出单例
 export const worldState = WorldState.getInstance();
-

@@ -9,11 +9,24 @@ import { getSceneConfig } from '@/data/scenes';
 import { SceneAssembler } from '@/systems/scene/SceneAssembler';
 import { worldState } from '@/systems/world';
 import { eventBus, GameEvent } from '@/systems/EventBus';
-import { 
-  DialogueUI, CardUI, ToastManager, AbilitySystem, PauseMenu, InventoryUI, 
-  saveManager, assetManager, debugCommands,
-  RedundantFieldBar, DepthEffects, ForeshadowManager, EndingEffects, EndingType,
-  TouchControls, TutorialManager, AchievementManager
+import {
+  DialogueUI,
+  CardUI,
+  ToastManager,
+  AbilitySystem,
+  PauseMenu,
+  InventoryUI,
+  saveManager,
+  assetManager,
+  debugCommands,
+  RedundantFieldBar,
+  DepthEffects,
+  ForeshadowManager,
+  EndingEffects,
+  EndingType,
+  TouchControls,
+  TutorialManager,
+  AchievementManager,
 } from '@/systems';
 import { AudioManager } from '@/systems/audio/AudioManager';
 import { narrativeEngine } from '@/systems/narrative';
@@ -41,7 +54,12 @@ export class GameScene extends Phaser.Scene {
 
   // 输入
   private _cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
-  private _moveKeys!: { W: Phaser.Input.Keyboard.Key; A: Phaser.Input.Keyboard.Key; S: Phaser.Input.Keyboard.Key; D: Phaser.Input.Keyboard.Key };
+  private _moveKeys!: {
+    W: Phaser.Input.Keyboard.Key;
+    A: Phaser.Input.Keyboard.Key;
+    S: Phaser.Input.Keyboard.Key;
+    D: Phaser.Input.Keyboard.Key;
+  };
   private _moveSpeed: number = 200;
 
   // 玩家状态
@@ -76,7 +94,11 @@ export class GameScene extends Phaser.Scene {
   private _zoneTitle!: Phaser.GameObjects.Text;
   private _dialogueBox!: Phaser.GameObjects.Container;
   private _hudContainer!: Phaser.GameObjects.Container;
-  private _counterTexts!: { r: Phaser.GameObjects.Text; p: Phaser.GameObjects.Text; w: Phaser.GameObjects.Text };
+  private _counterTexts!: {
+    r: Phaser.GameObjects.Text;
+    p: Phaser.GameObjects.Text;
+    w: Phaser.GameObjects.Text;
+  };
   private _abilityBar!: Phaser.GameObjects.Container;
 
   constructor() {
@@ -155,10 +177,10 @@ export class GameScene extends Phaser.Scene {
 
     // P值自然衰减
     worldState.decayP(delta);
-    
+
     // 更新游戏时间
     worldState.updatePlayTime(delta / 1000);
-    
+
     // 更新能力系统
     this._abilitySystem?.update(delta);
 
@@ -168,7 +190,7 @@ export class GameScene extends Phaser.Scene {
   shutdown(): void {
     // 清理事件监听
     this._cleanupEventListeners();
-    
+
     // 清理UI系统
     this._dialogueUI?.destroy();
     this._cardUI?.destroy();
@@ -176,20 +198,20 @@ export class GameScene extends Phaser.Scene {
     this._abilitySystem?.destroy();
     this._pauseMenu?.destroy();
     this._inventoryUI?.destroy();
-    
+
     // 清理新增UI组件
     this._redundantFieldBar?.destroy();
     this._depthEffects?.destroy();
     this._foreshadowManager?.destroy();
     this._endingEffects?.destroy();
-    
+
     // 清理触控系统
     this._touchControls?.destroy();
-    
+
     // 清理教程和成就系统
     this._tutorialManager?.destroy();
     this._achievementManager?.destroy();
-    
+
     // 清理音频系统
     this._audioManager?.destroy();
   }
@@ -208,7 +230,8 @@ export class GameScene extends Phaser.Scene {
 
     for (const interactable of this._interactables) {
       const dist = Phaser.Math.Distance.Between(playerX, playerY, interactable.x, interactable.y);
-      if (dist < closestDist && dist < 100) { // 100px 交互范围
+      if (dist < closestDist && dist < 100) {
+        // 100px 交互范围
         closestDist = dist;
         closest = interactable;
       }
@@ -219,7 +242,7 @@ export class GameScene extends Phaser.Scene {
       const objectId = closest.name;
       console.log(`[GameScene] 触发交互: ${objectId}`);
       eventBus.emit(GameEvent.INTERACT_START, { objectId, actionType: 'touch' });
-      
+
       // 使用getData获取存储的action（如果有的话）
       const action = closest.getData('action') as ISceneAction | undefined;
       if (action) {
@@ -332,13 +355,13 @@ export class GameScene extends Phaser.Scene {
 
     // 冗余字段条（CF章节显示）
     this._redundantFieldBar = new RedundantFieldBar({ scene: this });
-    
+
     // 深度能力视觉效果
     this._depthEffects = new DepthEffects({ scene: this });
-    
+
     // 伏笔管理器
     this._foreshadowManager = new ForeshadowManager({ scene: this });
-    
+
     // 结局演出效果
     this._endingEffects = new EndingEffects({ scene: this });
   }
@@ -348,14 +371,10 @@ export class GameScene extends Phaser.Scene {
    */
   private _initAudioSystem(): void {
     this._audioManager = new AudioManager(this);
-    
+
     // 加载音频配置
-    this._audioManager.loadConfigs(
-      AUDIO_CONFIG.bgm,
-      AUDIO_CONFIG.sfx,
-      AUDIO_CONFIG.ambience
-    );
-    
+    this._audioManager.loadConfigs(AUDIO_CONFIG.bgm, AUDIO_CONFIG.sfx, AUDIO_CONFIG.ambience);
+
     console.log('[GameScene] 音频系统初始化完成');
   }
 
@@ -385,7 +404,7 @@ export class GameScene extends Phaser.Scene {
       } else {
         console.log(`[GameScene] BGM未加载: ${audioConfig.bgm}`);
       }
-      
+
       // 播放环境音
       if (this.cache.audio.exists(audioConfig.ambience)) {
         this._audioManager.playAmbience(audioConfig.ambience);
@@ -424,7 +443,7 @@ export class GameScene extends Phaser.Scene {
   private _createBackground(width: number, height: number): void {
     // 获取Zone背景配置
     const zoneBgKey = getZoneBackgroundKey(this._currentZoneId);
-    
+
     // 优先使用Zone配置的WebP背景，否则使用占位符
     let bgKey = 'placeholder_bg';
     if (this.textures.exists(zoneBgKey)) {
@@ -436,8 +455,9 @@ export class GameScene extends Phaser.Scene {
     } else {
       console.log(`[GameScene] 使用默认占位符背景`);
     }
-    
-    this.add.image(0, 0, bgKey)
+
+    this.add
+      .image(0, 0, bgKey)
       .setOrigin(0)
       .setDisplaySize(width, height)
       .setName('zone_background');
@@ -466,10 +486,11 @@ export class GameScene extends Phaser.Scene {
 
   private _createUI(width: number, height: number): void {
     // Zone标题
-    this._zoneTitle = this.add.text(width / 2, 60, '', {
-      ...TEXT_STYLES.BODY,
-      fontSize: '16px',
-    })
+    this._zoneTitle = this.add
+      .text(width / 2, 60, '', {
+        ...TEXT_STYLES.BODY,
+        fontSize: '16px',
+      })
       .setOrigin(0.5)
       .setAlpha(0);
 
@@ -492,7 +513,7 @@ export class GameScene extends Phaser.Scene {
 
     // 计数器背景
     const counterBg = this.add.graphics();
-    counterBg.fillStyle(0x0A0A0F, 0.8);
+    counterBg.fillStyle(0x0a0a0f, 0.8);
     counterBg.fillRoundedRect(width - 180, 20, 160, 80, 8);
     this._hudContainer.add(counterBg);
 
@@ -504,32 +525,44 @@ export class GameScene extends Phaser.Scene {
     // R值（红色）
     const rIcon = this.textures.exists('px_counter_r')
       ? this.add.image(width - 160, counterY, 'px_counter_r').setScale(0.3)
-      : this.add.text(width - 160, counterY, 'R', { fontSize: '14px', color: '#FF4444' }).setOrigin(0.5);
-    const rText = this.add.text(width - 130, counterY, `${counters.R}`, {
-      ...TEXT_STYLES.BODY,
-      fontSize: '14px',
-      color: '#FF4444',
-    }).setOrigin(0, 0.5);
+      : this.add
+          .text(width - 160, counterY, 'R', { fontSize: '14px', color: '#FF4444' })
+          .setOrigin(0.5);
+    const rText = this.add
+      .text(width - 130, counterY, `${counters.R}`, {
+        ...TEXT_STYLES.BODY,
+        fontSize: '14px',
+        color: '#FF4444',
+      })
+      .setOrigin(0, 0.5);
 
     // P值（蓝色）
     const pIcon = this.textures.exists('px_counter_p')
       ? this.add.image(width - 160, counterY + spacing, 'px_counter_p').setScale(0.3)
-      : this.add.text(width - 160, counterY + spacing, 'P', { fontSize: '14px', color: '#4A9EFF' }).setOrigin(0.5);
-    const pText = this.add.text(width - 130, counterY + spacing, `${counters.P}`, {
-      ...TEXT_STYLES.BODY,
-      fontSize: '14px',
-      color: '#4A9EFF',
-    }).setOrigin(0, 0.5);
+      : this.add
+          .text(width - 160, counterY + spacing, 'P', { fontSize: '14px', color: '#4A9EFF' })
+          .setOrigin(0.5);
+    const pText = this.add
+      .text(width - 130, counterY + spacing, `${counters.P}`, {
+        ...TEXT_STYLES.BODY,
+        fontSize: '14px',
+        color: '#4A9EFF',
+      })
+      .setOrigin(0, 0.5);
 
     // W值（金色）
     const wIcon = this.textures.exists('px_counter_w')
       ? this.add.image(width - 160, counterY + spacing * 2, 'px_counter_w').setScale(0.3)
-      : this.add.text(width - 160, counterY + spacing * 2, 'W', { fontSize: '14px', color: '#FFD700' }).setOrigin(0.5);
-    const wText = this.add.text(width - 130, counterY + spacing * 2, `${counters.W}`, {
-      ...TEXT_STYLES.BODY,
-      fontSize: '14px',
-      color: '#FFD700',
-    }).setOrigin(0, 0.5);
+      : this.add
+          .text(width - 160, counterY + spacing * 2, 'W', { fontSize: '14px', color: '#FFD700' })
+          .setOrigin(0.5);
+    const wText = this.add
+      .text(width - 130, counterY + spacing * 2, `${counters.W}`, {
+        ...TEXT_STYLES.BODY,
+        fontSize: '14px',
+        color: '#FFD700',
+      })
+      .setOrigin(0, 0.5);
 
     this._hudContainer.add([rIcon, rText, pIcon, pText, wIcon, wText]);
 
@@ -545,32 +578,36 @@ export class GameScene extends Phaser.Scene {
     this._abilityBar.setDepth(1000);
 
     const abilities = [
-      { key: '1', name: '深度感知', type: 'DEPTH_PERCEPTION', color: 0x00FFAA },
-      { key: '2', name: '深度介入', type: 'DEPTH_INTERVENTION', color: 0xFF00FF },
-      { key: '3', name: '时间干预', type: 'TIME_INTERVENTION', color: 0xFFD700 },
+      { key: '1', name: '深度感知', type: 'DEPTH_PERCEPTION', color: 0x00ffaa },
+      { key: '2', name: '深度介入', type: 'DEPTH_INTERVENTION', color: 0xff00ff },
+      { key: '3', name: '时间干预', type: 'TIME_INTERVENTION', color: 0xffd700 },
     ];
 
     abilities.forEach((ability, index) => {
       const x = (index - 1) * 80;
-      
+
       // 背景
       const bg = this.add.graphics();
-      bg.fillStyle(0x1E1E24, 0.9);
+      bg.fillStyle(0x1e1e24, 0.9);
       bg.fillRoundedRect(x - 30, -25, 60, 50, 8);
       bg.lineStyle(2, ability.color, 0.5);
       bg.strokeRoundedRect(x - 30, -25, 60, 50, 8);
-      
+
       // 快捷键提示
-      const keyHint = this.add.text(x, -15, ability.key, {
-        fontSize: '14px',
-        color: '#686868',
-      }).setOrigin(0.5);
+      const keyHint = this.add
+        .text(x, -15, ability.key, {
+          fontSize: '14px',
+          color: '#686868',
+        })
+        .setOrigin(0.5);
 
       // 图标/名称
-      const icon = this.add.text(x, 5, ability.name.slice(0, 2), {
-        fontSize: '14px',
-        color: `#${ability.color.toString(16).padStart(6, '0')}`,
-      }).setOrigin(0.5);
+      const icon = this.add
+        .text(x, 5, ability.name.slice(0, 2), {
+          fontSize: '14px',
+          color: `#${ability.color.toString(16).padStart(6, '0')}`,
+        })
+        .setOrigin(0.5);
 
       // 锁定遮罩（未解锁时显示）
       const lockMask = this.add.graphics();
@@ -586,7 +623,8 @@ export class GameScene extends Phaser.Scene {
       this._abilityBar.add([bg, keyHint, icon, lockMask]);
 
       // 点击激活能力
-      const hitArea = this.add.rectangle(x, 0, 60, 50, 0x000000, 0)
+      const hitArea = this.add
+        .rectangle(x, 0, 60, 50, 0x000000, 0)
         .setInteractive({ useHandCursor: true })
         .on('pointerdown', () => {
           if (worldState.hasAbility(ability.type as any)) {
@@ -746,9 +784,11 @@ export class GameScene extends Phaser.Scene {
    */
   private _onAbilityUnlocked(payload: { abilityType: string }): void {
     this._toastManager?.showAchievement('能力解锁', `解锁了新能力: ${payload.abilityType}`);
-    
+
     // 更新能力栏锁定状态
-    const lockMask = this._abilityBar?.getByName(`lock_${payload.abilityType}`) as Phaser.GameObjects.Graphics;
+    const lockMask = this._abilityBar?.getByName(
+      `lock_${payload.abilityType}`
+    ) as Phaser.GameObjects.Graphics;
     if (lockMask) {
       this.tweens.add({
         targets: lockMask,
@@ -780,12 +820,13 @@ export class GameScene extends Phaser.Scene {
     } else {
       // 回退到简单提示
       const { width } = this.scale;
-      const toast = this.add.text(width / 2, 120, message, {
-        ...TEXT_STYLES.BODY,
-        fontSize: '14px',
-        backgroundColor: '#1E1E24',
-        padding: { x: 12, y: 8 },
-      })
+      const toast = this.add
+        .text(width / 2, 120, message, {
+          ...TEXT_STYLES.BODY,
+          fontSize: '14px',
+          backgroundColor: '#1E1E24',
+          padding: { x: 12, y: 8 },
+        })
         .setOrigin(0.5)
         .setAlpha(0)
         .setDepth(1001);
@@ -807,26 +848,31 @@ export class GameScene extends Phaser.Scene {
 
     // 背景
     const bg = this.add.graphics();
-    bg.fillStyle(0x0A0A0F, 0.9);
+    bg.fillStyle(0x0a0a0f, 0.9);
     bg.fillRoundedRect(-340, -80, 680, 160, 12);
-    bg.lineStyle(1, 0x3A3A40, 1);
+    bg.lineStyle(1, 0x3a3a40, 1);
     bg.strokeRoundedRect(-340, -80, 680, 160, 12);
 
     // 说话者名称
-    const speakerName = this.add.text(-320, -60, '', {
-      ...TEXT_STYLES.SPEAKER,
-    }).setName('speakerName');
+    const speakerName = this.add
+      .text(-320, -60, '', {
+        ...TEXT_STYLES.SPEAKER,
+      })
+      .setName('speakerName');
 
     // 对话文字
-    const dialogueText = this.add.text(-320, -30, '', {
-      ...TEXT_STYLES.DIALOGUE,
-      wordWrap: { width: 620 },
-    }).setName('dialogueText');
+    const dialogueText = this.add
+      .text(-320, -30, '', {
+        ...TEXT_STYLES.DIALOGUE,
+        wordWrap: { width: 620 },
+      })
+      .setName('dialogueText');
 
     // 继续提示
-    const continueHint = this.add.text(300, 50, '点击继续 ▼', {
-      ...TEXT_STYLES.MUTED,
-    })
+    const continueHint = this.add
+      .text(300, 50, '点击继续 ▼', {
+        ...TEXT_STYLES.MUTED,
+      })
       .setOrigin(1, 0.5)
       .setName('continueHint');
 
@@ -836,10 +882,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   private _createMenuButton(): void {
-    const menuBtn = this.add.text(30, 30, '☰', {
-      fontSize: '28px',
-      color: '#686868',
-    })
+    const menuBtn = this.add
+      .text(30, 30, '☰', {
+        fontSize: '28px',
+        color: '#686868',
+      })
       .setInteractive({ useHandCursor: true })
       .on('pointerover', () => menuBtn.setColor('#E8E6E3'))
       .on('pointerout', () => menuBtn.setColor('#686868'))
@@ -847,9 +894,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private _createInventoryButton(width: number): void {
-    const invBtn = this.add.text(width - 30, 30, '📋', {
-      fontSize: '24px',
-    })
+    const invBtn = this.add
+      .text(width - 30, 30, '📋', {
+        fontSize: '24px',
+      })
       .setOrigin(1, 0)
       .setInteractive({ useHandCursor: true })
       .on('pointerdown', () => this._openInventory());
@@ -1029,23 +1077,24 @@ export class GameScene extends Phaser.Scene {
 
     // 交互指示器
     const indicator = this.add.graphics();
-    indicator.fillStyle(0x00FFAA, 0.3);
+    indicator.fillStyle(0x00ffaa, 0.3);
     indicator.fillCircle(0, 0, 30);
-    indicator.lineStyle(2, 0x00FFAA, 0.8);
+    indicator.lineStyle(2, 0x00ffaa, 0.8);
     indicator.strokeCircle(0, 0, 30);
 
     // 标签
-    const text = this.add.text(0, 45, label, {
-      ...TEXT_STYLES.MUTED,
-      fontSize: '14px',
-    }).setOrigin(0.5);
+    const text = this.add
+      .text(0, 45, label, {
+        ...TEXT_STYLES.MUTED,
+        fontSize: '14px',
+      })
+      .setOrigin(0.5);
 
     container.add([indicator, text]);
     container.setSize(60, 60);
 
     // 交互
-    container.setInteractive({ useHandCursor: true })
-      .on('pointerdown', callback);
+    container.setInteractive({ useHandCursor: true }).on('pointerdown', callback);
 
     // 呼吸动画
     this.tweens.add({
@@ -1111,7 +1160,11 @@ export class GameScene extends Phaser.Scene {
       },
       onAbility: (index) => {
         // 0=深度感知, 1=深度介入, 2=时间干预
-        const abilityTypes = ['DEPTH_PERCEPTION', 'DEPTH_INTERVENTION', 'TIME_INTERVENTION'] as const;
+        const abilityTypes = [
+          'DEPTH_PERCEPTION',
+          'DEPTH_INTERVENTION',
+          'TIME_INTERVENTION',
+        ] as const;
         if (index < abilityTypes.length && this._abilitySystem) {
           // 使用现有的 activateAbility/deactivateAbility 方法
           const abilityType = abilityTypes[index];
@@ -1132,7 +1185,11 @@ export class GameScene extends Phaser.Scene {
 
   private _updatePlayerMovement(): void {
     // 如果对话框、暂停菜单或物品栏打开，不允许移动
-    if (this._dialogueBox.visible || this._pauseMenu?.isVisible() || this._inventoryUI?.isVisible()) {
+    if (
+      this._dialogueBox.visible ||
+      this._pauseMenu?.isVisible() ||
+      this._inventoryUI?.isVisible()
+    ) {
       this._player.setVelocity(0, 0);
       return;
     }
@@ -1141,7 +1198,10 @@ export class GameScene extends Phaser.Scene {
     let vy = 0;
 
     // 优先使用触控输入
-    if (this._touchControls?.isMobile() && (this._touchMoveDirection.x !== 0 || this._touchMoveDirection.y !== 0)) {
+    if (
+      this._touchControls?.isMobile() &&
+      (this._touchMoveDirection.x !== 0 || this._touchMoveDirection.y !== 0)
+    ) {
       vx = this._touchMoveDirection.x;
       vy = this._touchMoveDirection.y;
     } else if (this._cursors && this._moveKeys) {
@@ -1249,7 +1309,7 @@ export class GameScene extends Phaser.Scene {
         console.log(`[GameScene] 对话结束`);
       },
     });
-    
+
     await narrativeEngine.startDialogue(dialogueId);
   }
 
@@ -1278,14 +1338,14 @@ export class GameScene extends Phaser.Scene {
    */
   private _showCard(cardId: string): void {
     console.log(`[GameScene] 显示卡片: ${cardId}`);
-    
+
     // 尝试从narrativeEngine获取卡片数据
     const narrativeCard = narrativeEngine.getCard(cardId);
-    
+
     if (narrativeCard && this._cardUI) {
       // 转换NarrativeEngine的ICard到CardUI需要的格式
       const card = this._convertNarrativeCard(narrativeCard);
-      
+
       // 检查是否已拥有
       if (narrativeEngine.hasCard(cardId)) {
         // 查看已有卡片
@@ -1307,7 +1367,7 @@ export class GameScene extends Phaser.Scene {
         front: ['维修局外勤身份凭证', '持卡人：岑回', '编号：EX-7749'],
         detail: ['通行级别：灰', '有效期：本周期内有效', '背面有一道细小的划痕'],
       };
-      
+
       if (this._cardUI) {
         this._cardUI.showCardObtain(tempCard);
       } else {
@@ -1319,7 +1379,7 @@ export class GameScene extends Phaser.Scene {
       }
     }
   }
-  
+
   /**
    * 转换NarrativeEngine的卡片格式到UI需要的格式
    */
@@ -1361,4 +1421,3 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
-

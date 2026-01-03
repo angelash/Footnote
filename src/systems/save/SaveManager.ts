@@ -165,9 +165,9 @@ class SaveManager {
 
       await this._writeSave(saveData);
 
-      eventBus.emit(GameEvent.SAVE_COMPLETE, { 
-        slot, 
-        timestamp: saveData.timestamp 
+      eventBus.emit(GameEvent.SAVE_COMPLETE, {
+        slot,
+        timestamp: saveData.timestamp,
       });
 
       console.log(`[SaveManager] 存档成功: 槽位${slot}`);
@@ -456,10 +456,10 @@ class SaveManager {
     // 版本迁移逻辑
     if (saveData.version < CONFIG.SAVE_VERSION) {
       console.log(`[SaveManager] 迁移存档: v${saveData.version} -> v${CONFIG.SAVE_VERSION}`);
-      
+
       // 根据版本差异进行迁移
       // if (saveData.version < 2) { ... }
-      
+
       saveData.version = CONFIG.SAVE_VERSION;
     }
 
@@ -479,4 +479,3 @@ class SaveManager {
 
 // 导出单例
 export const saveManager = SaveManager.getInstance();
-

@@ -157,5 +157,3 @@ export function getSceneConfig(zoneId: string): ISceneConfig | null {
 export function getAllZoneIds(): string[] {
   return Object.keys(SCENE_YAML_BY_ZONE_ID);
 }
-
-

@@ -1,6 +1,6 @@
 /**
  * 角色预览场景 (Prefab 模式)
- * 
+ *
  * 预览8个角色的完整表现：
  * - 所有表情立绘
  * - 在对话框中的展示效果
@@ -9,7 +9,12 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import { CHARACTERS, CharacterId, getPortraitKey, ICharacterInfo } from '@/config/characters.config';
+import {
+  CHARACTERS,
+  CharacterId,
+  getPortraitKey,
+  ICharacterInfo,
+} from '@/config/characters.config';
 import { CHARACTER_PORTRAITS } from '@/data/webpAssets';
 import { DialogueUI } from '@/systems/ui/DialogueUI';
 import type { IDialogue } from '@/types';
@@ -21,7 +26,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
   private previewContainer!: Phaser.GameObjects.Container;
   private isFullPreview = false;
   private currentCharacter: ICharacterInfo | null = null;
-  
+
   // 对话预览
   private _dialoguePreviewContainer!: Phaser.GameObjects.Container;
   private _dialogueUI: DialogueUI | null = null;
@@ -35,11 +40,13 @@ export class CharacterPreviewScene extends BasePreviewScene {
 
     // 统计
     const totalPortraits = Object.keys(CHARACTER_PORTRAITS).length;
-    const stats = this.add.text(width / 2, currentY, `8个角色，共 ${totalPortraits} 张头像`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#686868',
-    }).setOrigin(0.5);
+    const stats = this.add
+      .text(width / 2, currentY, `8个角色，共 ${totalPortraits} 张头像`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#686868',
+      })
+      .setOrigin(0.5);
     this.contentContainer.add(stats);
     currentY += 50;
 
@@ -82,7 +89,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
     bg.fillRoundedRect(0, 0, width, height, 12);
-    bg.lineStyle(1, 0x2A2A30, 1);
+    bg.lineStyle(1, 0x2a2a30, 1);
     bg.strokeRoundedRect(0, 0, width, height, 12);
     container.add(bg);
 
@@ -97,13 +104,15 @@ export class CharacterPreviewScene extends BasePreviewScene {
     } else {
       // 占位
       const placeholder = this.add.graphics();
-      placeholder.fillStyle(0x1E1E24, 1);
+      placeholder.fillStyle(0x1e1e24, 1);
       placeholder.fillCircle(70, height / 2, 45);
       container.add(placeholder);
 
-      const placeholderText = this.add.text(70, height / 2, '👤', {
-        fontSize: '36px',
-      }).setOrigin(0.5);
+      const placeholderText = this.add
+        .text(70, height / 2, '👤', {
+          fontSize: '36px',
+        })
+        .setOrigin(0.5);
       container.add(placeholderText);
     }
 
@@ -133,29 +142,40 @@ export class CharacterPreviewScene extends BasePreviewScene {
     container.add(expressionCount);
 
     // 表情列表预览（小图标）
-    const expressionPreview = this.add.text(160, 150, character.expressions.slice(0, 5).join(' · ') + (character.expressions.length > 5 ? ' ...' : ''), {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#4A4A4A',
-    });
+    const expressionPreview = this.add.text(
+      160,
+      150,
+      character.expressions.slice(0, 5).join(' · ') +
+        (character.expressions.length > 5 ? ' ...' : ''),
+      {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#4A4A4A',
+      }
+    );
     container.add(expressionPreview);
 
     // 查看按钮
-    const viewBtn = this.add.text(width - 100, height / 2, '查看 →', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#4A9EFF',
-    }).setOrigin(0.5);
+    const viewBtn = this.add
+      .text(width - 100, height / 2, '查看 →', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#4A9EFF',
+      })
+      .setOrigin(0.5);
     container.add(viewBtn);
 
     // 交互
-    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, width, height),
+      Phaser.Geom.Rectangle.Contains
+    );
 
     container.on('pointerover', () => {
       bg.clear();
-      bg.fillStyle(0x1E1E24, 1);
+      bg.fillStyle(0x1e1e24, 1);
       bg.fillRoundedRect(0, 0, width, height, 12);
-      bg.lineStyle(2, 0x00FFAA, 1);
+      bg.lineStyle(2, 0x00ffaa, 1);
       bg.strokeRoundedRect(0, 0, width, height, 12);
       viewBtn.setColor('#00FFAA');
     });
@@ -164,7 +184,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
       bg.clear();
       bg.fillStyle(0x141419, 1);
       bg.fillRoundedRect(0, 0, width, height, 12);
-      bg.lineStyle(1, 0x2A2A30, 1);
+      bg.lineStyle(1, 0x2a2a30, 1);
       bg.strokeRoundedRect(0, 0, width, height, 12);
       viewBtn.setColor('#4A9EFF');
     });
@@ -214,10 +234,12 @@ export class CharacterPreviewScene extends BasePreviewScene {
     this.previewContainer.add(titleText);
 
     // 关闭按钮
-    const closeBtn = this.add.text(width - 40, 45, '✕', {
-      fontSize: '36px',
-      color: '#A8A6A3',
-    }).setOrigin(0.5);
+    const closeBtn = this.add
+      .text(width - 40, 45, '✕', {
+        fontSize: '36px',
+        color: '#A8A6A3',
+      })
+      .setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
     closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
     closeBtn.on('pointerout', () => closeBtn.setColor('#A8A6A3'));
@@ -244,20 +266,23 @@ export class CharacterPreviewScene extends BasePreviewScene {
 
     // 对话预览按钮
     const dialoguePreviewBtn = this.add.graphics();
-    dialoguePreviewBtn.fillStyle(0x4A9EFF, 0.2);
+    dialoguePreviewBtn.fillStyle(0x4a9eff, 0.2);
     dialoguePreviewBtn.fillRoundedRect(width / 2 - 140, height - 100, 280, 55, 10);
-    dialoguePreviewBtn.lineStyle(2, 0x4A9EFF, 1);
+    dialoguePreviewBtn.lineStyle(2, 0x4a9eff, 1);
     dialoguePreviewBtn.strokeRoundedRect(width / 2 - 140, height - 100, 280, 55, 10);
     this.previewContainer.add(dialoguePreviewBtn);
 
-    const dialogueBtnText = this.add.text(width / 2, height - 72, '💬 预览对话框效果', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#4A9EFF',
-    }).setOrigin(0.5);
+    const dialogueBtnText = this.add
+      .text(width / 2, height - 72, '💬 预览对话框效果', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#4A9EFF',
+      })
+      .setOrigin(0.5);
     this.previewContainer.add(dialogueBtnText);
 
-    const dialogueHitArea = this.add.rectangle(width / 2, height - 72, 280, 55, 0x000000, 0)
+    const dialogueHitArea = this.add
+      .rectangle(width / 2, height - 72, 280, 55, 0x000000, 0)
       .setInteractive({ useHandCursor: true });
     dialogueHitArea.on('pointerover', () => dialogueBtnText.setColor('#00FFAA'));
     dialogueHitArea.on('pointerout', () => dialogueBtnText.setColor('#4A9EFF'));
@@ -265,11 +290,13 @@ export class CharacterPreviewScene extends BasePreviewScene {
     this.previewContainer.add(dialogueHitArea);
 
     // 底部提示
-    const tipText = this.add.text(width / 2, height - 30, '点击表情查看 | 按 ESC 关闭', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#4A4A4A',
-    }).setOrigin(0.5);
+    const tipText = this.add
+      .text(width / 2, height - 30, '点击表情查看 | 按 ESC 关闭', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#4A4A4A',
+      })
+      .setOrigin(0.5);
     this.previewContainer.add(tipText);
 
     this.previewContainer.setVisible(true);
@@ -293,9 +320,9 @@ export class CharacterPreviewScene extends BasePreviewScene {
 
     // 背景
     const bg = this.add.graphics();
-    bg.fillStyle(0x1E1E24, 1);
+    bg.fillStyle(0x1e1e24, 1);
     bg.fillRoundedRect(0, 0, width, height, 8);
-    bg.lineStyle(1, 0x2A2A30, 1);
+    bg.lineStyle(1, 0x2a2a30, 1);
     bg.strokeRoundedRect(0, 0, width, height, 8);
     container.add(bg);
 
@@ -321,44 +348,53 @@ export class CharacterPreviewScene extends BasePreviewScene {
         this.load.start();
 
         // 加载中
-        const loading = this.add.text(width / 2, (height - 30) / 2, '⏳', {
-          fontSize: '24px',
-        }).setOrigin(0.5);
+        const loading = this.add
+          .text(width / 2, (height - 30) / 2, '⏳', {
+            fontSize: '24px',
+          })
+          .setOrigin(0.5);
         container.add(loading);
       }
     } else {
       // 无图片
-      const noImage = this.add.text(width / 2, (height - 30) / 2, '❌', {
-        fontSize: '24px',
-      }).setOrigin(0.5);
+      const noImage = this.add
+        .text(width / 2, (height - 30) / 2, '❌', {
+          fontSize: '24px',
+        })
+        .setOrigin(0.5);
       container.add(noImage);
     }
 
     // 表情名
-    const expressionText = this.add.text(width / 2, height - 25, expression, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#A8A6A3',
-    }).setOrigin(0.5);
+    const expressionText = this.add
+      .text(width / 2, height - 25, expression, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#A8A6A3',
+      })
+      .setOrigin(0.5);
     container.add(expressionText);
 
     // 交互
-    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, width, height),
+      Phaser.Geom.Rectangle.Contains
+    );
 
     container.on('pointerover', () => {
       bg.clear();
-      bg.fillStyle(0x2A2A30, 1);
+      bg.fillStyle(0x2a2a30, 1);
       bg.fillRoundedRect(0, 0, width, height, 8);
-      bg.lineStyle(2, 0x00FFAA, 1);
+      bg.lineStyle(2, 0x00ffaa, 1);
       bg.strokeRoundedRect(0, 0, width, height, 8);
       expressionText.setColor('#00FFAA');
     });
 
     container.on('pointerout', () => {
       bg.clear();
-      bg.fillStyle(0x1E1E24, 1);
+      bg.fillStyle(0x1e1e24, 1);
       bg.fillRoundedRect(0, 0, width, height, 8);
-      bg.lineStyle(1, 0x2A2A30, 1);
+      bg.lineStyle(1, 0x2a2a30, 1);
       bg.strokeRoundedRect(0, 0, width, height, 8);
       expressionText.setColor('#A8A6A3');
     });
@@ -398,19 +434,21 @@ export class CharacterPreviewScene extends BasePreviewScene {
 
     // 模拟游戏场景背景
     const sceneBg = this.add.graphics();
-    sceneBg.fillStyle(0x1A1A1F, 1);
+    sceneBg.fillStyle(0x1a1a1f, 1);
     sceneBg.fillRect(50, 100, width - 100, height - 300);
-    sceneBg.lineStyle(1, 0x2A2A30, 1);
+    sceneBg.lineStyle(1, 0x2a2a30, 1);
     sceneBg.strokeRect(50, 100, width - 100, height - 300);
     this._dialoguePreviewContainer.add(sceneBg);
 
     // 标题
-    const title = this.add.text(width / 2, 60, `💬 ${character.name} 对话框预览`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '18px',
-      color: '#00FFAA',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const title = this.add
+      .text(width / 2, 60, `💬 ${character.name} 对话框预览`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '18px',
+        color: '#00FFAA',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     this._dialoguePreviewContainer.add(title);
 
     // 创建对话UI
@@ -423,21 +461,23 @@ export class CharacterPreviewScene extends BasePreviewScene {
 
     // 示例对话数据
     const sampleDialogues: Record<string, string> = {
-      'cenhui': '先按流程走。',
-      'gulin': '收敛是必要的。不然世界会记住太多。',
-      'songlan': '版本库里还有另一个说法……',
-      'xuchen': '我只能告诉你，这不是病。',
-      'atang': '我不存在。但我还是会漂。',
-      'muping': '平面神话从不沉没。',
-      'qilan': '我做的事没有收益。但我想做。',
-      'chenjiang': '我修的东西已经不存在了。但我还是修。',
+      cenhui: '先按流程走。',
+      gulin: '收敛是必要的。不然世界会记住太多。',
+      songlan: '版本库里还有另一个说法……',
+      xuchen: '我只能告诉你，这不是病。',
+      atang: '我不存在。但我还是会漂。',
+      muping: '平面神话从不沉没。',
+      qilan: '我做的事没有收益。但我想做。',
+      chenjiang: '我修的东西已经不存在了。但我还是修。',
     };
 
     // 显示对话
     const dialogue: IDialogue = {
       id: `preview_${character.id}`,
       speaker: character.name,
-      text: sampleDialogues[character.id] || `这是${character.name}的示例对话文本，用于展示角色在对话框中的表现效果。`,
+      text:
+        sampleDialogues[character.id] ||
+        `这是${character.name}的示例对话文本，用于展示角色在对话框中的表现效果。`,
       expression: character.defaultExpression,
     };
 
@@ -446,23 +486,27 @@ export class CharacterPreviewScene extends BasePreviewScene {
     });
 
     // 关闭按钮
-    const closeBtn = this.add.text(width - 60, 60, '✕ 关闭', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '14px',
-      color: '#686868',
-    }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
+    const closeBtn = this.add
+      .text(width - 60, 60, '✕ 关闭', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '14px',
+        color: '#686868',
+      })
+      .setOrigin(1, 0.5)
+      .setInteractive({ useHandCursor: true });
     closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
     closeBtn.on('pointerout', () => closeBtn.setColor('#686868'));
     closeBtn.on('pointerdown', () => this._hideDialoguePreview());
     this._dialoguePreviewContainer.add(closeBtn);
 
     // 切换表情提示
-    const expressionTip = this.add.text(width / 2, height - 30, 
-      '💡 这是使用 DialogueUI 组件渲染的真实对话框', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
-      color: '#4A4A4A',
-    }).setOrigin(0.5);
+    const expressionTip = this.add
+      .text(width / 2, height - 30, '💡 这是使用 DialogueUI 组件渲染的真实对话框', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '11px',
+        color: '#4A4A4A',
+      })
+      .setOrigin(0.5);
     this._dialoguePreviewContainer.add(expressionTip);
 
     this._dialoguePreviewContainer.setVisible(true);
@@ -497,4 +541,3 @@ export class CharacterPreviewScene extends BasePreviewScene {
     super.shutdown();
   }
 }
-

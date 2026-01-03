@@ -5,8 +5,11 @@
  */
 
 export { BillboardFactory } from './BillboardFactory';
-export type { IBillboardConfig, ICharacterBillboardConfig, IZoneBillboardConfig } from './BillboardFactory';
+export type {
+  IBillboardConfig,
+  ICharacterBillboardConfig,
+  IZoneBillboardConfig,
+} from './BillboardFactory';
 
 export { assetResolver } from './AssetResolver';
 export type { IResolvedAsset } from './AssetResolver';
-

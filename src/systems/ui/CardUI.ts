@@ -174,7 +174,7 @@ export class CardUI {
       onComplete: () => {
         this._isShowingFront = !this._isShowingFront;
         this._updateCardDisplay();
-        
+
         this._scene.tweens.add({
           targets: this._cardContainer,
           scaleX: 1,
@@ -209,14 +209,7 @@ export class CardUI {
     this._container.setVisible(false);
 
     // 半透明遮罩
-    this._overlay = this._scene.add.rectangle(
-      width / 2,
-      height / 2,
-      width,
-      height,
-      0x000000,
-      0
-    );
+    this._overlay = this._scene.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0);
     this._container.add(this._overlay);
 
     // 卡片容器
@@ -237,46 +230,37 @@ export class CardUI {
     this._cardContainer.add(this._cardTypeIcon);
 
     // 卡片标题
-    this._cardTitle = this._scene.add.text(
-      0,
-      -CONFIG.CARD_HEIGHT / 2 + 70,
-      '',
-      {
+    this._cardTitle = this._scene.add
+      .text(0, -CONFIG.CARD_HEIGHT / 2 + 70, '', {
         ...TEXT_STYLES.TITLE,
         fontSize: UI_FONT_SIZE.SECTION,
         wordWrap: { width: CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2 },
-      }
-    ).setOrigin(0.5);
+      })
+      .setOrigin(0.5);
     this._cardContainer.add(this._cardTitle);
 
     // 卡片内容
-    this._cardContent = this._scene.add.text(
-      0,
-      -CONFIG.CARD_HEIGHT / 2 + 130,
-      '',
-      {
+    this._cardContent = this._scene.add
+      .text(0, -CONFIG.CARD_HEIGHT / 2 + 130, '', {
         ...TEXT_STYLES.BODY,
         fontSize: UI_FONT_SIZE.SMALL,
         wordWrap: { width: CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2, useAdvancedWrap: true },
         lineSpacing: UI.LINE_SPACING.LOOSE,
         align: 'center',
-      }
-    ).setOrigin(0.5, 0);
+      })
+      .setOrigin(0.5, 0);
     this._cardContainer.add(this._cardContent);
 
     // 创建内容遮罩，防止超出卡片边界
     this._createContentMask();
 
     // 翻转提示
-    this._flipHint = this._scene.add.text(
-      0,
-      CONFIG.CARD_HEIGHT / 2 - 40,
-      '点击翻转',
-      {
+    this._flipHint = this._scene.add
+      .text(0, CONFIG.CARD_HEIGHT / 2 - 40, '点击翻转', {
         ...TEXT_STYLES.MUTED,
         fontSize: UI_FONT_SIZE.SMALL,
-      }
-    ).setOrigin(0.5);
+      })
+      .setOrigin(0.5);
     this._cardContainer.add(this._flipHint);
 
     // 关闭按钮
@@ -291,23 +275,23 @@ export class CardUI {
     const { width, height } = this._scene.scale;
     const maskGraphics = this._scene.add.graphics();
     maskGraphics.fillStyle(0xffffff);
-    
+
     // 遮罩区域（基于卡片容器在场景中的实际位置）
     // 卡片容器在场景中心 (width/2, height/2)
     const cardCenterX = width / 2;
     const cardCenterY = height / 2;
-    
+
     // 内容区域的遮罩范围
     const maskX = cardCenterX - CONFIG.CARD_WIDTH / 2 + CONFIG.CONTENT_PADDING;
     const maskY = cardCenterY - CONFIG.CARD_HEIGHT / 2 + 120; // 标题下方开始
     const maskWidth = CONFIG.CARD_WIDTH - CONFIG.CONTENT_PADDING * 2;
     const maskHeight = CONFIG.CARD_HEIGHT - 200; // 留出标题和底部提示的空间
-    
+
     maskGraphics.fillRect(maskX, maskY, maskWidth, maskHeight);
-    
+
     const mask = maskGraphics.createGeometryMask();
     this._cardContent.setMask(mask);
-    
+
     // 将遮罩图形添加到容器以便管理
     this._container.add(maskGraphics);
     maskGraphics.setVisible(false); // 遮罩图形本身不需要显示
@@ -325,19 +309,22 @@ export class CardUI {
     closeCircle.lineStyle(1, 0x666666, 1);
     closeCircle.strokeCircle(0, 0, 16);
 
-    const closeX = this._scene.add.text(0, 0, '×', {
-      fontSize: UI_FONT_SIZE.NORMAL,
-      color: '#999999',
-    }).setOrigin(0.5);
+    const closeX = this._scene.add
+      .text(0, 0, '×', {
+        fontSize: UI_FONT_SIZE.NORMAL,
+        color: '#999999',
+      })
+      .setOrigin(0.5);
 
     this._closeButton.add([closeCircle, closeX]);
     this._closeButton.setSize(32, 32);
-    this._closeButton.setInteractive({ useHandCursor: true })
+    this._closeButton
+      .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
         closeCircle.clear();
         closeCircle.fillStyle(0x444444, 1);
         closeCircle.fillCircle(0, 0, 16);
-        closeCircle.lineStyle(1, 0x00FFAA, 1);
+        closeCircle.lineStyle(1, 0x00ffaa, 1);
         closeCircle.strokeCircle(0, 0, 16);
         closeX.setColor('#FFFFFF');
       })
@@ -385,13 +372,14 @@ export class CardUI {
 
     // 根据卡片类型选择颜色
     const typeColors = {
-      'archive': 0x1a3a4a,
-      'item': 0x3a1a4a,
-      'prayer': 0x4a3a1a,
-      'verdict': 0x4a1a1a,
+      archive: 0x1a3a4a,
+      item: 0x3a1a4a,
+      prayer: 0x4a3a1a,
+      verdict: 0x4a1a1a,
     };
 
-    const bgColor = typeColors[this._currentCard?.type as keyof typeof typeColors] || COLORS.BG_SECONDARY;
+    const bgColor =
+      typeColors[this._currentCard?.type as keyof typeof typeColors] || COLORS.BG_SECONDARY;
 
     // 卡片背景
     this._cardBackground.fillStyle(bgColor, 0.95);
@@ -426,10 +414,10 @@ export class CardUI {
 
   private _getTypeIcon(): string {
     const icons = {
-      'archive': '📋',
-      'item': '🔧',
-      'prayer': '🙏',
-      'verdict': '⚖️',
+      archive: '📋',
+      item: '🔧',
+      prayer: '🙏',
+      verdict: '⚖️',
     };
     return icons[this._currentCard?.type as keyof typeof icons] || '📄';
   }
@@ -474,11 +462,8 @@ export class CardUI {
       // 如果点击的是关闭按钮区域，不翻转
       const localX = pointer.x - this._cardContainer.x;
       const localY = pointer.y - this._cardContainer.y;
-      
-      if (
-        localX > CONFIG.CARD_WIDTH / 2 - 30 &&
-        localY < -CONFIG.CARD_HEIGHT / 2 + 30
-      ) {
+
+      if (localX > CONFIG.CARD_WIDTH / 2 - 30 && localY < -CONFIG.CARD_HEIGHT / 2 + 30) {
         return;
       }
 
@@ -499,7 +484,3 @@ export class CardUI {
     });
   }
 }
-
-
-
-

@@ -4,12 +4,3 @@
  */
 
 export { AbilitySystem } from './AbilitySystem';
-
-
-
-
-
-
-
-
-

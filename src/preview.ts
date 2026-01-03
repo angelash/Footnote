@@ -1,6 +1,6 @@
 /**
  * 《备注 / Footnote》开发预览入口
- * 
+ *
  * 独立的资源预览系统入口
  * 启动方式: npm run preview
  */
@@ -39,19 +39,19 @@ const config: Phaser.Types.Core.GameConfig = {
   ...GAME_CONFIG,
   scene: previewScenes,
   parent: 'game-container',
-  
+
   // 渲染配置
   render: {
     antialias: true,
     pixelArt: false,
     roundPixels: true,
   },
-  
+
   // 缩放配置（预览工具使用更大尺寸以便查看）
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 1080,  // 预览工具使用更大的宽度
+    width: 1080, // 预览工具使用更大的宽度
     height: 1920, // 预览工具使用更大的高度
     min: {
       width: 640,
@@ -62,17 +62,17 @@ const config: Phaser.Types.Core.GameConfig = {
       height: 2560,
     },
   },
-  
+
   // 音频配置
   audio: {
     disableWebAudio: false,
   },
-  
+
   // DOM元素支持
   dom: {
     createContainer: true,
   },
-  
+
   // 输入配置
   input: {
     activePointers: 3,
@@ -81,7 +81,7 @@ const config: Phaser.Types.Core.GameConfig = {
       capture: true,
     },
   },
-  
+
   // 回调
   callbacks: {
     preBoot: () => {
@@ -100,7 +100,7 @@ const config: Phaser.Types.Core.GameConfig = {
       console.log('  - card: 卡片预览');
       console.log('  - dialogue: 对话预览');
       console.log('[Footnote Preview] URL参数快速跳转: ?preview=scene');
-      
+
       // 开发模式下暴露游戏实例
       if (import.meta.env.DEV) {
         (window as any).__PREVIEW_GAME__ = game;
@@ -115,13 +115,13 @@ const game = new Phaser.Game(config);
 // 处理页面可见性变化
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    game.scene.scenes.forEach(scene => {
+    game.scene.scenes.forEach((scene) => {
       if (scene.scene.isActive()) {
         scene.scene.pause();
       }
     });
   } else {
-    game.scene.scenes.forEach(scene => {
+    game.scene.scenes.forEach((scene) => {
       if (scene.scene.isPaused()) {
         scene.scene.resume();
       }
@@ -139,11 +139,14 @@ window.addEventListener('focus', () => {
 });
 
 // 防止iOS橡皮筋效果
-document.body.addEventListener('touchmove', (e) => {
-  if (e.target === document.body) {
-    e.preventDefault();
-  }
-}, { passive: false });
+document.body.addEventListener(
+  'touchmove',
+  (e) => {
+    if (e.target === document.body) {
+      e.preventDefault();
+    }
+  },
+  { passive: false }
+);
 
 export { game };
-

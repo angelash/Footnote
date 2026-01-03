@@ -262,7 +262,7 @@ export class PreloadScene extends Phaser.Scene {
 
     // 加载条背景
     this._loadingBar = this.add.graphics();
-    this._loadingBar.fillStyle(0x1E1E24, 1);
+    this._loadingBar.fillStyle(0x1e1e24, 1);
     this._loadingBar.fillRect(centerX - 150, centerY, 300, 4);
 
     // 加载条进度
@@ -281,7 +281,7 @@ export class PreloadScene extends Phaser.Scene {
       const centerY = height / 2;
 
       this._progressBar.clear();
-      this._progressBar.fillStyle(0x00FFAA, 1);
+      this._progressBar.fillStyle(0x00ffaa, 1);
       this._progressBar.fillRect(centerX - 150, centerY, 300 * value, 4);
 
       // 更新HTML加载条
@@ -368,17 +368,17 @@ export class PreloadScene extends Phaser.Scene {
     console.log(`[PreloadScene] 开始加载 ${totalAudio} 个音频资产...`);
 
     // 加载BGM
-    BGM_CONFIGS.forEach(config => {
+    BGM_CONFIGS.forEach((config) => {
       this.load.audio(config.id, config.file);
     });
 
     // 加载音效
-    SFX_CONFIGS.forEach(config => {
+    SFX_CONFIGS.forEach((config) => {
       this.load.audio(config.id, config.file);
     });
 
     // 加载环境音
-    AMBIENCE_CONFIGS.forEach(config => {
+    AMBIENCE_CONFIGS.forEach((config) => {
       this.load.audio(config.id, config.file);
     });
   }
@@ -477,25 +477,24 @@ export class PreloadScene extends Phaser.Scene {
     const graphics = this.make.graphics({ x: 0, y: 0 });
 
     // 占位背景
-    graphics.fillStyle(0x0A0A0F, 1);
+    graphics.fillStyle(0x0a0a0f, 1);
     graphics.fillRect(0, 0, 750, 1334);
     graphics.generateTexture('placeholder_bg', 750, 1334);
 
     // 占位角色
     graphics.clear();
-    graphics.fillStyle(0x4A9EFF, 1);
+    graphics.fillStyle(0x4a9eff, 1);
     graphics.fillCircle(32, 32, 32);
     graphics.generateTexture('placeholder_char', 64, 64);
 
     // 占位UI按钮
     graphics.clear();
-    graphics.fillStyle(0x1E1E24, 1);
+    graphics.fillStyle(0x1e1e24, 1);
     graphics.fillRoundedRect(0, 0, 200, 60, 8);
-    graphics.lineStyle(2, 0x00FFAA, 1);
+    graphics.lineStyle(2, 0x00ffaa, 1);
     graphics.strokeRoundedRect(0, 0, 200, 60, 8);
     graphics.generateTexture('placeholder_button', 200, 60);
 
     graphics.destroy();
   }
 }
-

@@ -2,141 +2,164 @@
  * WorldState 单元测试
  */
 
-import { describe, it, expect } from 'vitest';
-
-// TODO: 实现WorldState后取消注释
-// import { WorldState } from '@/systems/world/WorldState';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { CONSTANTS } from '@/config/game.config';
+import { worldState } from '@/systems/world/WorldState';
 
 describe('WorldState', () => {
-  describe('初始化', () => {
-    it('应该创建默认的初始状态', () => {
-      // const state = new WorldState();
-      // expect(state.counters.r).toBe(0);
-      // expect(state.counters.p).toBe(0);
-      // expect(state.counters.w).toBe(100);
-      // expect(state.chapter).toBe('C0');
-      expect(true).toBe(true); // 占位
-    });
+  beforeEach(() => {
+    worldState.reset();
   });
 
-  describe('R值计算', () => {
-    it('完成无收益行为应增加R', () => {
-      // const state = new WorldState();
-      // state.recordAction({ type: 'no_reward', id: 'signpost_fix', rValue: 2 });
-      // expect(state.counters.r).toBe(2);
-      expect(true).toBe(true); // 占位
-    });
+  it('初始化：默认计数器与默认解锁 Zone', () => {
+    const counters = worldState.getCounters();
+    expect(counters.R).toBe(0);
+    expect(counters.P).toBe(0);
+    expect(counters.W).toBe(100);
 
-    it('R≥3时应触发系统停顿标记', () => {
-      // const state = new WorldState();
-      // state.counters.r = 3;
-      // expect(state.shouldShowSystemPause()).toBe(true);
-      expect(true).toBe(true); // 占位
-    });
-
-    it('R≥6时应触发F21弱版', () => {
-      // const state = new WorldState();
-      // state.counters.r = 6;
-      // expect(state.shouldTriggerF21Weak()).toBe(true);
-      expect(true).toBe(true); // 占位
-    });
-
-    it('R≥10时应开启模型改写路径', () => {
-      // const state = new WorldState();
-      // state.counters.r = 10;
-      // expect(state.canRewriteModel()).toBe(true);
-      expect(true).toBe(true); // 占位
-    });
+    expect(worldState.isZoneUnlocked('C0-Z1')).toBe(true);
+    expect(worldState.isZoneUnlocked('C0-Z4')).toBe(true);
   });
 
-  describe('P值计算', () => {
-    it('深度感知不应增加P值', () => {
-      // const state = new WorldState();
-      // state.useAbility('DEPTH_PERCEPTION');
-      // expect(state.counters.p).toBe(0);
-      expect(true).toBe(true); // 占位
-    });
-
-    it('深度介入应增加2点P值', () => {
-      // const state = new WorldState();
-      // state.useAbility('DEPTH_INTERVENTION');
-      // expect(state.counters.p).toBe(2);
-      expect(true).toBe(true); // 占位
-    });
-
-    it('时间干预应增加3点P值', () => {
-      // const state = new WorldState();
-      // state.useAbility('TIME_INTERVENTION');
-      // expect(state.counters.p).toBe(3);
-      expect(true).toBe(true); // 占位
-    });
+  it('recordAction：reward=0 应增加 R', () => {
+    worldState.recordAction({ type: 'no_reward', reward: 0 });
+    expect(worldState.getCounters().R).toBe(1);
   });
 
-  describe('W值计算', () => {
-    it('R和P增加应降低W值', () => {
-      // const state = new WorldState();
-      // state.counters.r = 6;  // R每3点降低5 -> -10
-      // state.counters.p = 10; // P每5点降低10 -> -20
-      // expect(state.calculateW()).toBe(70); // 100 - 10 - 20
-      expect(true).toBe(true); // 占位
-    });
+  it('能力：unlockAbility/hasAbility/useAbility 与 P 消耗', () => {
+    expect(worldState.useAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION)).toBe(false);
 
-    it('W值最低为0', () => {
-      // const state = new WorldState();
-      // state.counters.r = 100;
-      // state.counters.p = 100;
-      // expect(state.calculateW()).toBe(0);
-      expect(true).toBe(true); // 占位
-    });
+    worldState.unlockAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION);
+    expect(worldState.hasAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION)).toBe(true);
+
+    expect(worldState.useAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION)).toBe(true);
+    expect(worldState.getCounters().P).toBe(1);
+
+    worldState.unlockAbility(CONSTANTS.ABILITY.DEPTH_INTERVENTION);
+    expect(worldState.useAbility(CONSTANTS.ABILITY.DEPTH_INTERVENTION)).toBe(true);
+    expect(worldState.getCounters().P).toBe(4);
   });
 
-  describe('结局判定', () => {
-    it('低干预应得到结局A', () => {
-      // const state = new WorldState();
-      // state.counters = { r: 2, p: 5, w: 80 };
-      // expect(state.determineEnding()).toBe('A_STABLE_PLANE');
-      expect(true).toBe(true); // 占位
-    });
-
-    it('高压力低可读性应得到结局B', () => {
-      // const state = new WorldState();
-      // state.counters = { r: 5, p: 25, w: 20 };
-      // expect(state.determineEnding()).toBe('B_RELEASE_TRUTH');
-      expect(true).toBe(true); // 占位
-    });
-
-    it('特定条件应触发隐藏结局C', () => {
-      // const state = new WorldState();
-      // state.counters = { r: 12, p: 18, w: 35 };
-      // expect(state.determineEnding()).toBe('C_BECOME_SYSTEM');
-      expect(true).toBe(true); // 占位
-    });
+  it('P 衰减：decayP 应降低 P 且不低于 0', () => {
+    worldState.addP(10);
+    worldState.decayP(1000);
+    expect(worldState.getCounters().P).toBeLessThan(10);
+    worldState.decayP(99999999);
+    expect(worldState.getCounters().P).toBeGreaterThanOrEqual(0);
   });
 
-  describe('能力解锁', () => {
-    it('应在C2解锁深度感知', () => {
-      // const state = new WorldState();
-      // state.chapter = 'C2';
-      // state.unlockChapterAbilities();
-      // expect(state.abilities.depthPerception).toBe(true);
-      expect(true).toBe(true); // 占位
+  it('W：伤痕/污染应降低 W，且下限为 0', () => {
+    worldState.addScar({
+      zoneId: 'C0-Z1',
+      objectId: 'obj_1',
+      type: 'minor',
+      description: 'test scar',
     });
+    expect(worldState.getCounters().W).toBe(95);
 
-    it('应在C3解锁深度介入', () => {
-      // const state = new WorldState();
-      // state.chapter = 'C3';
-      // state.unlockChapterAbilities();
-      // expect(state.abilities.depthIntervention).toBe(true);
-      expect(true).toBe(true); // 占位
+    worldState.addContamination({
+      sourceZoneId: 'C0-Z1',
+      affectedZoneIds: ['C0-Z2'],
+      type: 'timeline_fracture',
     });
+    expect(worldState.getCounters().W).toBe(85);
 
-    it('应在C4解锁时间干预', () => {
-      // const state = new WorldState();
-      // state.chapter = 'C4';
-      // state.unlockChapterAbilities();
-      // expect(state.abilities.timeIntervention).toBe(true);
-      expect(true).toBe(true); // 占位
-    });
+    for (let i = 0; i < 20; i++) {
+      worldState.addContamination({
+        sourceZoneId: 'C0-Z1',
+        affectedZoneIds: ['C0-Z2'],
+        type: 'timeline_fracture',
+      });
+    }
+    expect(worldState.getCounters().W).toBe(0);
+  });
+
+  it('Zone：visit/complete + checkCondition', () => {
+    expect(worldState.isZoneVisited('C0-Z2')).toBe(false);
+    worldState.visitZone('C0-Z2');
+    expect(worldState.isZoneVisited('C0-Z2')).toBe(true);
+    expect(worldState.getCurrentZone()).toBe('C0-Z2');
+
+    worldState.completeZone('C0-Z2');
+    expect(worldState.getZoneState('C0-Z2')?.completed).toBe(true);
+
+    worldState.setFlag('FLAG_X', true);
+    worldState.unlockAbility(CONSTANTS.ABILITY.DEPTH_INTERVENTION);
+    worldState.addR(2);
+
+    expect(
+      worldState.checkCondition({
+        flagTrue: 'FLAG_X',
+        hasAbility: CONSTANTS.ABILITY.DEPTH_INTERVENTION,
+        rMin: 2,
+        zoneVisited: 'C0-Z2',
+        zoneCompleted: 'C0-Z2',
+      })
+    ).toBe(true);
+    expect(worldState.checkCondition({ flagFalse: 'FLAG_X' })).toBe(false);
+  });
+
+  it('checkCondition：缺少能力/标记/访问/完成应返回 false', () => {
+    // 缺少能力
+    expect(
+      worldState.checkCondition({
+        hasAbility: CONSTANTS.ABILITY.DEPTH_PERCEPTION,
+      })
+    ).toBe(false);
+
+    // flagTrue 但未设置
+    expect(
+      worldState.checkCondition({
+        flagTrue: 'FLAG_MISSING',
+      })
+    ).toBe(false);
+
+    // zoneVisited 但未访问
+    worldState.unlockZone('C0-Z9');
+    expect(
+      worldState.checkCondition({
+        zoneVisited: 'C0-Z9',
+      })
+    ).toBe(false);
+
+    // zoneCompleted 但未完成
+    worldState.visitZone('C0-Z9');
+    expect(
+      worldState.checkCondition({
+        zoneCompleted: 'C0-Z9',
+      })
+    ).toBe(false);
+  });
+
+  it('useAbility：P 过高时应拒绝使用', () => {
+    worldState.unlockAbility(CONSTANTS.ABILITY.TIME_INTERVENTION);
+    worldState.addP(91); // 91 + 5 > 90 (P_MAX*0.9)
+    expect(worldState.useAbility(CONSTANTS.ABILITY.TIME_INTERVENTION)).toBe(false);
+  });
+
+  it('serialize/restore：核心字段应可往返', () => {
+    worldState.addR(5);
+    worldState.addP(7);
+    worldState.unlockAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION);
+    worldState.setFlag('F', true);
+    worldState.visitZone('C0-Z3');
+
+    const data = worldState.serialize();
+    worldState.reset();
+    worldState.restore(data);
+
+    expect(worldState.getCounters().R).toBe(5);
+    expect(worldState.getCounters().P).toBe(7);
+    expect(worldState.hasAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION)).toBe(true);
+    expect(worldState.getFlag('F')).toBe(true);
+    expect(worldState.getCurrentZone()).toBe('C0-Z3');
+  });
+
+  it('getState：应等价于 serialize()', () => {
+    worldState.addR(1);
+    const a = worldState.serialize();
+    const b = worldState.getState();
+    expect(b).toEqual(a);
   });
 });
 

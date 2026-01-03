@@ -57,7 +57,11 @@ export { newGamePlusManager } from './game/NewGamePlus';
 export type { INewGamePlusState, INewGamePlusRewards } from './game/NewGamePlus';
 
 // 成就系统
-export { AchievementManager, AchievementCategory, AchievementRarity } from './game/AchievementSystem';
+export {
+  AchievementManager,
+  AchievementCategory,
+  AchievementRarity,
+} from './game/AchievementSystem';
 export type { IAchievement, IAchievementState } from './game/AchievementSystem';
 
 // 教程管理器
@@ -109,4 +113,9 @@ export { assetManager, AssetGroup } from './assets';
 
 // 白盒开发系统
 export { BillboardFactory, assetResolver } from './whitebox';
-export type { IBillboardConfig, ICharacterBillboardConfig, IZoneBillboardConfig, IResolvedAsset } from './whitebox';
+export type {
+  IBillboardConfig,
+  ICharacterBillboardConfig,
+  IZoneBillboardConfig,
+  IResolvedAsset,
+} from './whitebox';

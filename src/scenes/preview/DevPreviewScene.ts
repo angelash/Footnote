@@ -1,6 +1,6 @@
 /**
  * 开发预览入口场景
- * 
+ *
  * 提供资源预览的统一入口，支持：
  * - 场景预览（Zone背景+物件布局）
  * - 角色预览（8角色×多种表情）
@@ -16,16 +16,16 @@ import Phaser from 'phaser';
 import { COLORS, TEXT_STYLES, CONSTANTS } from '@/config/game.config';
 
 // 预览类型
-export type PreviewType = 
-  | 'scene'       // 场景预览
-  | 'object'      // 物件预览
-  | 'character'   // 角色预览
-  | 'animation'   // 动画预览
-  | 'ui'          // UI预览
-  | 'effect'      // 特效预览
-  | 'audio'       // 音频预览
-  | 'card'        // 卡片预览
-  | 'dialogue';   // 对话预览
+export type PreviewType =
+  | 'scene' // 场景预览
+  | 'object' // 物件预览
+  | 'character' // 角色预览
+  | 'animation' // 动画预览
+  | 'ui' // UI预览
+  | 'effect' // 特效预览
+  | 'audio' // 音频预览
+  | 'card' // 卡片预览
+  | 'dialogue'; // 对话预览
 
 // 预览菜单项
 interface IPreviewMenuItem {
@@ -118,26 +118,32 @@ export class DevPreviewScene extends Phaser.Scene {
     this.createBackground(width, height);
 
     // 标题
-    this.titleText = this.add.text(width / 2, 100, '🛠️ 开发预览工具', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '56px',
-      color: '#00FFAA',
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    this.titleText = this.add
+      .text(width / 2, 100, '🛠️ 开发预览工具', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '56px',
+        color: '#00FFAA',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
 
     // 副标题
-    this.add.text(width / 2, 175, '《备注 / Footnote》资源预览系统', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '28px',
-      color: '#686868',
-    }).setOrigin(0.5);
+    this.add
+      .text(width / 2, 175, '《备注 / Footnote》资源预览系统', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '28px',
+        color: '#686868',
+      })
+      .setOrigin(0.5);
 
     // 版本信息
-    this.versionText = this.add.text(width / 2, height - 50, 'DEV v0.1.0 | 按 ESC 返回此菜单', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '22px',
-      color: '#4A4A4A',
-    }).setOrigin(0.5);
+    this.versionText = this.add
+      .text(width / 2, height - 50, 'DEV v0.1.0 | 按 ESC 返回此菜单', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '22px',
+        color: '#4A4A4A',
+      })
+      .setOrigin(0.5);
 
     // 创建菜单
     this.createMenu(width, height);
@@ -156,13 +162,12 @@ export class DevPreviewScene extends Phaser.Scene {
 
   private createBackground(width: number, height: number): void {
     // 深色背景
-    this.add.rectangle(0, 0, width, height, 0x0A0A0F)
-      .setOrigin(0);
+    this.add.rectangle(0, 0, width, height, 0x0a0a0f).setOrigin(0);
 
     // 网格背景
     const graphics = this.add.graphics();
-    graphics.lineStyle(1, 0x1A1A20, 0.3);
-    
+    graphics.lineStyle(1, 0x1a1a20, 0.3);
+
     const gridSize = 50;
     for (let x = 0; x < width; x += gridSize) {
       graphics.moveTo(x, 0);
@@ -176,13 +181,13 @@ export class DevPreviewScene extends Phaser.Scene {
 
     // 顶部装饰线
     const topLine = this.add.graphics();
-    topLine.fillStyle(0x00FFAA, 0.3);
+    topLine.fillStyle(0x00ffaa, 0.3);
     topLine.fillRect(0, 0, width, 3);
   }
 
   private createMenu(width: number, height: number): void {
     this.menuContainer = this.add.container(0, 0);
-    
+
     const startY = 260;
     const itemHeight = 150;
     const itemPadding = 22;
@@ -208,7 +213,7 @@ export class DevPreviewScene extends Phaser.Scene {
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
     bg.fillRoundedRect(-width / 2, -height / 2, width, height, 12);
-    bg.lineStyle(1, 0x2A2A30, 1);
+    bg.lineStyle(1, 0x2a2a30, 1);
     bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 12);
     container.add(bg);
 
@@ -236,10 +241,12 @@ export class DevPreviewScene extends Phaser.Scene {
     container.add(desc);
 
     // 箭头
-    const arrow = this.add.text(width / 2 - 50, 0, '→', {
-      fontSize: '44px',
-      color: '#3A3A40',
-    }).setOrigin(0.5);
+    const arrow = this.add
+      .text(width / 2 - 50, 0, '→', {
+        fontSize: '44px',
+        color: '#3A3A40',
+      })
+      .setOrigin(0.5);
     container.add(arrow);
 
     // 交互
@@ -248,9 +255,9 @@ export class DevPreviewScene extends Phaser.Scene {
 
     container.on('pointerover', () => {
       bg.clear();
-      bg.fillStyle(0x1E1E24, 1);
+      bg.fillStyle(0x1e1e24, 1);
       bg.fillRoundedRect(-width / 2, -height / 2, width, height, 12);
-      bg.lineStyle(2, 0x00FFAA, 1);
+      bg.lineStyle(2, 0x00ffaa, 1);
       bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 12);
       label.setColor('#00FFAA');
       arrow.setColor('#00FFAA');
@@ -266,7 +273,7 @@ export class DevPreviewScene extends Phaser.Scene {
       bg.clear();
       bg.fillStyle(0x141419, 1);
       bg.fillRoundedRect(-width / 2, -height / 2, width, height, 12);
-      bg.lineStyle(1, 0x2A2A30, 1);
+      bg.lineStyle(1, 0x2a2a30, 1);
       bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 12);
       label.setColor('#E8E6E3');
       arrow.setColor('#3A3A40');
@@ -296,9 +303,9 @@ export class DevPreviewScene extends Phaser.Scene {
   private checkUrlParams(): void {
     const params = new URLSearchParams(window.location.search);
     const previewType = params.get('preview') as PreviewType | null;
-    
+
     if (previewType) {
-      const item = this.menuItems.find(m => m.type === previewType);
+      const item = this.menuItems.find((m) => m.type === previewType);
       if (item) {
         // 延迟跳转，让场景先完成加载
         this.time.delayedCall(100, () => {
@@ -324,7 +331,7 @@ export class DevPreviewScene extends Phaser.Scene {
       const gameObject = item as Phaser.GameObjects.Container;
       gameObject.setAlpha(0);
       gameObject.x += 50;
-      
+
       this.tweens.add({
         targets: gameObject,
         alpha: 1,
@@ -336,4 +343,3 @@ export class DevPreviewScene extends Phaser.Scene {
     });
   }
 }
-

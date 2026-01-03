@@ -136,7 +136,7 @@ class CloudSaveManager {
       const tx = db.transaction('saves', 'readonly');
       const store = tx.objectStore('saves');
       const request = store.get(slot);
-      
+
       return new Promise((resolve, reject) => {
         request.onsuccess = () => resolve(request.result || null);
         request.onerror = () => reject(request.error);
@@ -166,10 +166,10 @@ class CloudSaveManager {
       const db = await this._openDB();
       const tx = db.transaction('saves', 'readwrite');
       const store = tx.objectStore('saves');
-      
+
       saveData.slot = slot;
       store.put(saveData);
-      
+
       await new Promise<void>((resolve, reject) => {
         tx.oncomplete = () => resolve();
         tx.onerror = () => reject(tx.error);
@@ -200,7 +200,9 @@ class CloudSaveManager {
       const stored = localStorage.getItem('cloud_pending_uploads');
       if (stored) {
         const pending = JSON.parse(stored);
-        this._pendingUploads = new Map(Object.entries(pending).map(([k, v]) => [Number(k), v as ISaveData]));
+        this._pendingUploads = new Map(
+          Object.entries(pending).map(([k, v]) => [Number(k), v as ISaveData])
+        );
       }
     } catch (error) {
       console.warn('[CloudSave] 加载待上传队列失败:', error);
@@ -259,7 +261,7 @@ class CloudSaveManager {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this._config.accessToken}`,
+          Authorization: `Bearer ${this._config.accessToken}`,
         },
         body: JSON.stringify({
           userId: this._config.userId,
@@ -298,14 +300,11 @@ class CloudSaveManager {
     if (!this._config.enabled || !this._config.endpoint) return null;
 
     try {
-      const response = await fetch(
-        `${this._config.endpoint}/save/${this._config.userId}/${slot}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${this._config.accessToken}`,
-          },
-        }
-      );
+      const response = await fetch(`${this._config.endpoint}/save/${this._config.userId}/${slot}`, {
+        headers: {
+          Authorization: `Bearer ${this._config.accessToken}`,
+        },
+      });
 
       const result: ICloudSaveResponse = await response.json();
 
@@ -330,14 +329,11 @@ class CloudSaveManager {
     if (!this._config.enabled || !this._config.endpoint) return [];
 
     try {
-      const response = await fetch(
-        `${this._config.endpoint}/saves/${this._config.userId}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${this._config.accessToken}`,
-          },
-        }
-      );
+      const response = await fetch(`${this._config.endpoint}/saves/${this._config.userId}`, {
+        headers: {
+          Authorization: `Bearer ${this._config.accessToken}`,
+        },
+      });
 
       const result = await response.json();
 
@@ -372,7 +368,7 @@ class CloudSaveManager {
     try {
       // 获取云端存档列表
       const cloudSaves = await this.listCloudSaves();
-      
+
       // 获取本地存档列表
       const localSaveList = await saveManager.getSaveList();
       const localSlots = localSaveList.map((s: ISaveMetadata) => s.slot);
@@ -416,7 +412,6 @@ class CloudSaveManager {
 
       this._lastSyncTime = Date.now();
       console.log('[CloudSave] 同步完成:', result);
-
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       result.errors.push(errorMsg);
@@ -499,7 +494,7 @@ class CloudSaveManager {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return hash.toString(16);
@@ -565,4 +560,3 @@ class CloudSaveManager {
 
 // 单例导出
 export const cloudSaveManager = new CloudSaveManager();
-

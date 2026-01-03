@@ -9,34 +9,34 @@ import { ChapterID, AbilityType, ZoneType, CardType } from '@/config/game.config
 export interface IWorldState {
   /** 隐藏计数器 */
   counters: ICounters;
-  
+
   /** 当前章节 */
   chapter: ChapterID;
-  
+
   /** 能力解锁状态 */
   abilities: IAbilityState;
-  
+
   /** Zone状态 */
   zones: Record<string, ZoneState>;
-  
+
   /** 已完成的对话 */
   dialoguesCompleted: Set<string>;
-  
+
   /** 选择记录 */
   choices: IChoiceRecord[];
-  
+
   /** 收集的卡片 */
   collectedCards: Set<string>;
-  
+
   /** 深度伤痕 */
   depthScars: IDepthScar[];
-  
+
   /** 时间节点 */
   timeNodes: ITimeNode[];
-  
+
   /** 时间污染度 */
   timeContamination: number;
-  
+
   /** 游戏时间（秒） */
   playTime: number;
 }
@@ -93,7 +93,38 @@ export interface IDialogue {
   speaker: string;
   text: string;
   /** 角色表情，影响立绘显示 */
-  expression?: 'neutral' | 'smiling' | 'sad' | 'angry' | 'surprised' | 'thinking' | 'stressed' | 'confused' | 'curious' | 'dreamy' | 'excited' | 'scared' | 'focused' | 'hopeful' | 'kind' | 'tired' | 'displeased' | 'stern' | 'worried' | 'mysterious' | 'serene' | 'wise' | 'comforting' | 'concerned' | 'determined' | 'professional' | 'understanding' | 'melancholy' | 'resigned' | 'serious' | 'warm';
+  expression?:
+    | 'neutral'
+    | 'smiling'
+    | 'sad'
+    | 'angry'
+    | 'surprised'
+    | 'thinking'
+    | 'stressed'
+    | 'confused'
+    | 'curious'
+    | 'dreamy'
+    | 'excited'
+    | 'scared'
+    | 'focused'
+    | 'hopeful'
+    | 'kind'
+    | 'tired'
+    | 'displeased'
+    | 'stern'
+    | 'worried'
+    | 'mysterious'
+    | 'serene'
+    | 'wise'
+    | 'comforting'
+    | 'concerned'
+    | 'determined'
+    | 'professional'
+    | 'understanding'
+    | 'melancholy'
+    | 'resigned'
+    | 'serious'
+    | 'warm';
   next?: string | null;
   choices?: IDialogueChoice[];
   trigger?: IDialogueTrigger;
@@ -273,10 +304,10 @@ export interface IGameSettings {
 
 // ==================== 结局系统 ====================
 
-export type EndingType = 
-  | 'A_STABLE_PLANE'    // 平面稳定
-  | 'B_RELEASE_TRUTH'   // 真实释放
-  | 'C_BECOME_SYSTEM';  // 成为系统
+export type EndingType =
+  | 'A_STABLE_PLANE' // 平面稳定
+  | 'B_RELEASE_TRUTH' // 真实释放
+  | 'C_BECOME_SYSTEM'; // 成为系统
 
 export interface IEndingResult {
   type: EndingType;
@@ -312,4 +343,3 @@ export type GameEventType =
   | 'depth:perceive'
   | 'depth:intervene'
   | 'ending:reach';
-

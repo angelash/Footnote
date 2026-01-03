@@ -47,7 +47,10 @@ export class ForeshadowManager {
   private _notificationContainer!: Phaser.GameObjects.Container;
 
   // 核心伏笔定义
-  private static readonly FORESHADOW_DEFINITIONS: Omit<IForeshadow, 'currentStage' | 'isCollected'>[] = [
+  private static readonly FORESHADOW_DEFINITIONS: Omit<
+    IForeshadow,
+    'currentStage' | 'isCollected'
+  >[] = [
     {
       id: 'F01',
       name: '岑回的例外性质',
@@ -186,7 +189,7 @@ export class ForeshadowManager {
    */
   private _createNotificationUI(): void {
     const { width } = this._scene.scale;
-    
+
     this._notificationContainer = this._scene.add.container(width / 2, 150);
     this._notificationContainer.setDepth(900);
     this._notificationContainer.setAlpha(0);
@@ -205,7 +208,7 @@ export class ForeshadowManager {
   private _onForeshadowTriggered(data: { foreshadowId: string; stage: string }): void {
     const { foreshadowId, stage } = data;
     const foreshadow = this._foreshadows.get(foreshadowId);
-    
+
     if (!foreshadow) {
       console.warn(`[ForeshadowManager] 未知伏笔: ${foreshadowId}`);
       return;
@@ -213,13 +216,18 @@ export class ForeshadowManager {
 
     // 更新阶段
     const newStage = stage as ForeshadowStage;
-    const stageOrder = [ForeshadowStage.PLANT, ForeshadowStage.DEEPEN, ForeshadowStage.MISREAD, ForeshadowStage.COLLECT];
+    const stageOrder = [
+      ForeshadowStage.PLANT,
+      ForeshadowStage.DEEPEN,
+      ForeshadowStage.MISREAD,
+      ForeshadowStage.COLLECT,
+    ];
     const currentIndex = stageOrder.indexOf(foreshadow.currentStage);
     const newIndex = stageOrder.indexOf(newStage);
 
     if (newIndex > currentIndex) {
       foreshadow.currentStage = newStage;
-      
+
       if (newStage === ForeshadowStage.COLLECT) {
         foreshadow.isCollected = true;
         this._showCollectNotification(foreshadow);
@@ -388,7 +396,3 @@ export class ForeshadowManager {
     this._notificationContainer?.destroy();
   }
 }
-
-
-
-

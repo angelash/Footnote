@@ -28,7 +28,7 @@ export class VersionSwitchEffect {
   private _versionALabel!: Phaser.GameObjects.Text;
   private _versionBLabel!: Phaser.GameObjects.Text;
   private _confirmPanel!: Phaser.GameObjects.Container;
-  
+
   private _isActive: boolean = false;
   private _currentVersions: { a: IVersionInfo; b: IVersionInfo } | null = null;
   private _selectedVersion: string | null = null;
@@ -142,7 +142,7 @@ export class VersionSwitchEffect {
    */
   public showVersionConflict(versionA: IVersionInfo, versionB: IVersionInfo): void {
     if (this._isActive) return;
-    
+
     this._isActive = true;
     this._currentVersions = { a: versionA, b: versionB };
     this._selectedVersion = null;
@@ -172,7 +172,7 @@ export class VersionSwitchEffect {
     // 标签滑入
     this._versionALabel.x = -100;
     this._versionBLabel.x = this._scene.scale.width + 100;
-    
+
     this._scene.tweens.add({
       targets: this._versionALabel,
       x: this._scene.scale.width * 0.25,
@@ -247,8 +247,14 @@ export class VersionSwitchEffect {
     });
 
     // 全屏闪烁确认
-    const flash = this._scene.add.rectangle(width / 2, height / 2, width, height, 
-      version === 'A' ? 0x4488ff : 0xff8844, 0);
+    const flash = this._scene.add.rectangle(
+      width / 2,
+      height / 2,
+      width,
+      height,
+      version === 'A' ? 0x4488ff : 0xff8844,
+      0
+    );
     flash.setDepth(700);
 
     this._scene.tweens.add({
@@ -271,9 +277,7 @@ export class VersionSwitchEffect {
    * 完成选择
    */
   private _completeSelection(version: 'A' | 'B'): void {
-    const selectedVersion = version === 'A' 
-      ? this._currentVersions?.a 
-      : this._currentVersions?.b;
+    const selectedVersion = version === 'A' ? this._currentVersions?.a : this._currentVersions?.b;
 
     // 淡出整体
     this._scene.tweens.add({
@@ -283,13 +287,11 @@ export class VersionSwitchEffect {
       onComplete: () => {
         this._isActive = false;
         this._resetComponents();
-        
+
         // 发送事件
-        eventBus.emit('version:selected', { 
+        eventBus.emit('version:selected', {
           selectedVersion,
-          discardedVersion: version === 'A' 
-            ? this._currentVersions?.b 
-            : this._currentVersions?.a,
+          discardedVersion: version === 'A' ? this._currentVersions?.b : this._currentVersions?.a,
         });
       },
     });
@@ -300,18 +302,18 @@ export class VersionSwitchEffect {
    */
   private _resetComponents(): void {
     const { width, height } = this._scene.scale;
-    
+
     this._versionALabel.setPosition(width * 0.25, 150);
     this._versionALabel.setScale(1);
     this._versionALabel.setAlpha(1);
-    
+
     this._versionBLabel.setPosition(width * 0.75, 150);
     this._versionBLabel.setScale(1);
     this._versionBLabel.setAlpha(1);
-    
+
     this._splitLine.setAlpha(1);
     this._splitLine.setSize(4, 0);
-    
+
     this._confirmPanel.setPosition(width / 2, height - 150);
     this._confirmPanel.setAlpha(0);
   }
@@ -319,7 +321,11 @@ export class VersionSwitchEffect {
   /**
    * 快速切换效果（无选择）
    */
-  public quickSwitch(_fromVersion: IVersionInfo, toVersion: IVersionInfo, callback?: () => void): void {
+  public quickSwitch(
+    _fromVersion: IVersionInfo,
+    toVersion: IVersionInfo,
+    callback?: () => void
+  ): void {
     const { width, height } = this._scene.scale;
 
     // 创建过渡效果
@@ -387,4 +393,3 @@ export class VersionSwitchEffect {
     this._container?.destroy();
   }
 }
-

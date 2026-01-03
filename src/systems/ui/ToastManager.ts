@@ -99,7 +99,7 @@ export class ToastManager {
    * 手动关闭指定Toast
    */
   dismiss(toastId: number): void {
-    const toast = this._toasts.find(t => t.id === toastId);
+    const toast = this._toasts.find((t) => t.id === toastId);
     if (toast) {
       this._dismissToast(toast);
     }
@@ -109,7 +109,7 @@ export class ToastManager {
    * 关闭所有Toast
    */
   dismissAll(): void {
-    [...this._toasts].forEach(toast => this._dismissToast(toast));
+    [...this._toasts].forEach((toast) => this._dismissToast(toast));
   }
 
   /**
@@ -124,7 +124,7 @@ export class ToastManager {
 
   private _createMainContainer(): void {
     const { width } = this._scene.scale;
-    
+
     this._mainContainer = this._scene.add.container(width / 2, CONFIG.MARGIN_TOP);
     this._mainContainer.setDepth(1200);
   }
@@ -137,7 +137,7 @@ export class ToastManager {
 
     const id = ++this._toastIdCounter;
     const container = this._createToastContainer(message, type);
-    
+
     // 计算位置
     const yOffset = this._toasts.length * (CONFIG.HEIGHT + CONFIG.SPACING);
     container.y = yOffset;
@@ -158,7 +158,7 @@ export class ToastManager {
 
     // 自动消失定时器
     const timer = this._scene.time.delayedCall(duration, () => {
-      const toast = this._toasts.find(t => t.id === id);
+      const toast = this._toasts.find((t) => t.id === id);
       if (toast) {
         this._dismissToast(toast);
       }
@@ -178,7 +178,7 @@ export class ToastManager {
 
     const id = ++this._toastIdCounter;
     const container = this._createAchievementContainer(title, description);
-    
+
     const yOffset = this._toasts.length * (CONFIG.HEIGHT + 20 + CONFIG.SPACING);
     container.y = yOffset;
 
@@ -200,7 +200,7 @@ export class ToastManager {
 
     // 延长显示时间
     const timer = this._scene.time.delayedCall(5000, () => {
-      const toast = this._toasts.find(t => t.id === id);
+      const toast = this._toasts.find((t) => t.id === id);
       if (toast) {
         this._dismissToast(toast);
       }
@@ -218,38 +218,35 @@ export class ToastManager {
     // 背景
     const bg = this._scene.add.graphics();
     const colors = this._getTypeColors(type);
-    
+
     bg.fillStyle(colors.bg, 0.95);
     bg.fillRoundedRect(-CONFIG.WIDTH / 2, -CONFIG.HEIGHT / 2, CONFIG.WIDTH, CONFIG.HEIGHT, 8);
     bg.lineStyle(2, colors.border, 1);
     bg.strokeRoundedRect(-CONFIG.WIDTH / 2, -CONFIG.HEIGHT / 2, CONFIG.WIDTH, CONFIG.HEIGHT, 8);
 
     // 图标
-    const icon = this._scene.add.text(
-      -CONFIG.WIDTH / 2 + 20,
-      0,
-      this._getTypeIcon(type),
-      { fontSize: UI_FONT_SIZE.ICON }
-    ).setOrigin(0, 0.5);
+    const icon = this._scene.add
+      .text(-CONFIG.WIDTH / 2 + 20, 0, this._getTypeIcon(type), { fontSize: UI_FONT_SIZE.ICON })
+      .setOrigin(0, 0.5);
 
     // 消息文字
-    const text = this._scene.add.text(
-      -CONFIG.WIDTH / 2 + 55,
-      0,
-      message,
-      {
+    const text = this._scene.add
+      .text(-CONFIG.WIDTH / 2 + 55, 0, message, {
         ...TEXT_STYLES.BODY,
         fontSize: UI_FONT_SIZE.SMALL,
         wordWrap: { width: CONFIG.WIDTH - 80 },
-      }
-    ).setOrigin(0, 0.5);
+      })
+      .setOrigin(0, 0.5);
 
     container.add([bg, icon, text]);
 
     return container;
   }
 
-  private _createAchievementContainer(title: string, description: string): Phaser.GameObjects.Container {
+  private _createAchievementContainer(
+    title: string,
+    description: string
+  ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(0, 0);
     const achHeight = CONFIG.HEIGHT + 20;
 
@@ -257,39 +254,30 @@ export class ToastManager {
     const bg = this._scene.add.graphics();
     bg.fillStyle(0x2a2a1a, 0.95);
     bg.fillRoundedRect(-CONFIG.WIDTH / 2, -achHeight / 2, CONFIG.WIDTH, achHeight, 10);
-    bg.lineStyle(2, 0xFFD700, 1);
+    bg.lineStyle(2, 0xffd700, 1);
     bg.strokeRoundedRect(-CONFIG.WIDTH / 2, -achHeight / 2, CONFIG.WIDTH, achHeight, 10);
 
     // 奖杯图标
-    const icon = this._scene.add.text(
-      -CONFIG.WIDTH / 2 + 20,
-      0,
-      '🏆',
-      { fontSize: UI_FONT_SIZE.ICON_LARGE }
-    ).setOrigin(0, 0.5);
+    const icon = this._scene.add
+      .text(-CONFIG.WIDTH / 2 + 20, 0, '🏆', { fontSize: UI_FONT_SIZE.ICON_LARGE })
+      .setOrigin(0, 0.5);
 
     // 标题
-    const titleText = this._scene.add.text(
-      -CONFIG.WIDTH / 2 + 65,
-      -10,
-      title,
-      {
+    const titleText = this._scene.add
+      .text(-CONFIG.WIDTH / 2 + 65, -10, title, {
         ...TEXT_STYLES.TITLE,
         fontSize: UI_FONT_SIZE.SMALL,
         color: '#FFD700',
-      }
-    ).setOrigin(0, 0.5);
+      })
+      .setOrigin(0, 0.5);
 
     // 描述
-    const descText = this._scene.add.text(
-      -CONFIG.WIDTH / 2 + 65,
-      14,
-      description,
-      {
+    const descText = this._scene.add
+      .text(-CONFIG.WIDTH / 2 + 65, 14, description, {
         ...TEXT_STYLES.MUTED,
         fontSize: UI_FONT_SIZE.TINY,
-      }
-    ).setOrigin(0, 0.5);
+      })
+      .setOrigin(0, 0.5);
 
     container.add([bg, icon, titleText, descText]);
 
@@ -301,10 +289,10 @@ export class ToastManager {
   private _getTypeColors(type: ToastType): { bg: number; border: number } {
     const colorMap = {
       info: { bg: COLORS.BG_SECONDARY, border: COLORS.BORDER },
-      success: { bg: 0x1a3a2a, border: 0x00FF88 },
-      warning: { bg: 0x3a3a1a, border: 0xFFAA00 },
-      error: { bg: 0x3a1a1a, border: 0xFF4444 },
-      achievement: { bg: 0x2a2a1a, border: 0xFFD700 },
+      success: { bg: 0x1a3a2a, border: 0x00ff88 },
+      warning: { bg: 0x3a3a1a, border: 0xffaa00 },
+      error: { bg: 0x3a1a1a, border: 0xff4444 },
+      achievement: { bg: 0x2a2a1a, border: 0xffd700 },
     };
     return colorMap[type];
   }
@@ -335,7 +323,7 @@ export class ToastManager {
       ease: 'Power2.easeIn',
       onComplete: () => {
         toast.container.destroy();
-        
+
         // 从列表中移除
         const index = this._toasts.indexOf(toast);
         if (index > -1) {
@@ -351,7 +339,7 @@ export class ToastManager {
   private _repositionToasts(): void {
     this._toasts.forEach((toast, index) => {
       const targetY = index * (CONFIG.HEIGHT + CONFIG.SPACING);
-      
+
       this._scene.tweens.add({
         targets: toast.container,
         y: targetY,
@@ -361,7 +349,3 @@ export class ToastManager {
     });
   }
 }
-
-
-
-

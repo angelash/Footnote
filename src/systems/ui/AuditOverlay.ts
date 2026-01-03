@@ -32,7 +32,7 @@ export class AuditOverlay {
   private _overlayGraphics!: Phaser.GameObjects.Graphics;
   private _warningText!: Phaser.GameObjects.Text;
   private _scanLine!: Phaser.GameObjects.Rectangle;
-  
+
   private _isActive: boolean = false;
   private _intensity: AuditIntensity = AuditIntensity.LIGHT;
   private _coveragePercent: number = 0;
@@ -115,7 +115,7 @@ export class AuditOverlay {
    */
   private _showSystemReaction(rValue: number): void {
     let message = '';
-    
+
     if (rValue >= 10) {
       message = '[ 模型改写路径开启 ]';
     } else if (rValue >= 6) {
@@ -125,7 +125,7 @@ export class AuditOverlay {
     if (message) {
       this._warningText.setText(message);
       this._warningText.setAlpha(0);
-      
+
       this._scene.tweens.add({
         targets: this._warningText,
         alpha: { from: 0, to: 1 },
@@ -195,12 +195,12 @@ export class AuditOverlay {
    */
   private _drawOverlay(): void {
     const { width, height } = this._scene.scale;
-    
+
     this._overlayGraphics.clear();
 
     // 边缘渐变覆盖
     const edgeWidth = width * this._coveragePercent * 0.5;
-    
+
     // 左边缘
     for (let i = 0; i < edgeWidth; i += 5) {
       const alpha = (1 - i / edgeWidth) * 0.3;
@@ -245,7 +245,7 @@ export class AuditOverlay {
    */
   private _startScanAnimation(): void {
     const { height } = this._scene.scale;
-    
+
     this._scanLine.setAlpha(0.5);
     this._scanLine.y = 0;
 
@@ -271,7 +271,7 @@ export class AuditOverlay {
    */
   public flashWarning(message: string): void {
     this._warningText.setText(message);
-    
+
     this._scene.tweens.add({
       targets: this._warningText,
       alpha: { from: 0, to: 1 },
@@ -307,4 +307,3 @@ export class AuditOverlay {
     this._container?.destroy();
   }
 }
-

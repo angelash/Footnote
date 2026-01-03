@@ -1,6 +1,6 @@
 /**
  * 特效预览场景
- * 
+ *
  * 预览能力/系统/环境特效
  * - 静态特效图片预览
  * - 动画特效播放
@@ -10,7 +10,12 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import { EFFECTS_ABILITIES, EFFECTS_SYSTEM, EFFECTS_ENVIRONMENTAL, ALL_EFFECTS } from '@/data/webpAssets';
+import {
+  EFFECTS_ABILITIES,
+  EFFECTS_SYSTEM,
+  EFFECTS_ENVIRONMENTAL,
+  ALL_EFFECTS,
+} from '@/data/webpAssets';
 
 interface IEffectCategory {
   name: string;
@@ -56,9 +61,21 @@ export class EffectPreviewScene extends BasePreviewScene {
   private _initAnimationConfigs(): void {
     // 能力特效动画配置
     this._animationConfigs.set('fx_depth_perception', { frameCount: 8, frameRate: 12, repeat: -1 });
-    this._animationConfigs.set('fx_depth_intervention', { frameCount: 12, frameRate: 15, repeat: -1 });
-    this._animationConfigs.set('fx_time_intervention', { frameCount: 16, frameRate: 18, repeat: -1 });
-    this._animationConfigs.set('fx_drift_afterimage', { frameCount: 10, frameRate: 12, repeat: -1 });
+    this._animationConfigs.set('fx_depth_intervention', {
+      frameCount: 12,
+      frameRate: 15,
+      repeat: -1,
+    });
+    this._animationConfigs.set('fx_time_intervention', {
+      frameCount: 16,
+      frameRate: 18,
+      repeat: -1,
+    });
+    this._animationConfigs.set('fx_drift_afterimage', {
+      frameCount: 10,
+      frameRate: 12,
+      repeat: -1,
+    });
 
     // 系统特效动画配置
     this._animationConfigs.set('fx_system_verdict', { frameCount: 6, frameRate: 10, repeat: 0 });
@@ -78,11 +95,13 @@ export class EffectPreviewScene extends BasePreviewScene {
 
     // 统计
     const totalEffects = Object.keys(ALL_EFFECTS).length;
-    const stats = this.add.text(width / 2, currentY, `共 ${totalEffects} 个特效`, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#686868',
-    }).setOrigin(0.5);
+    const stats = this.add
+      .text(width / 2, currentY, `共 ${totalEffects} 个特效`, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#686868',
+      })
+      .setOrigin(0.5);
     this.contentContainer.add(stats);
     currentY += 60;
 
@@ -91,7 +110,11 @@ export class EffectPreviewScene extends BasePreviewScene {
       if (category.effects.length === 0) return;
 
       // 分类标题
-      const sectionTitle = this.createSectionTitle(30, currentY, `${category.name} (${category.effects.length})`);
+      const sectionTitle = this.createSectionTitle(
+        30,
+        currentY,
+        `${category.name} (${category.effects.length})`
+      );
       sectionTitle.setColor(category.color);
       this.contentContainer.add(sectionTitle);
       currentY += 55;
@@ -132,57 +155,57 @@ export class EffectPreviewScene extends BasePreviewScene {
   private getEffectCategories(): IEffectCategory[] {
     const effectMeta: Record<string, { name: string; desc: string; animated?: boolean }> = {
       // 能力特效
-      'fx_depth_perception': { 
-        name: '深度感知', 
+      fx_depth_perception: {
+        name: '深度感知',
         desc: '岑回的第一能力，感知隐藏信息',
-        animated: true 
+        animated: true,
       },
-      'fx_depth_intervention': { 
-        name: '深度介入', 
+      fx_depth_intervention: {
+        name: '深度介入',
         desc: '可改变结构，会留下维度伤痕',
-        animated: true 
+        animated: true,
       },
-      'fx_time_intervention': { 
-        name: '时间干预', 
+      fx_time_intervention: {
+        name: '时间干预',
         desc: '回溯节点，产生时间污染',
-        animated: true 
+        animated: true,
       },
-      'fx_drift_afterimage': { 
-        name: '漂移残影', 
+      fx_drift_afterimage: {
+        name: '漂移残影',
         desc: '对账失败者的视觉残留',
-        animated: true 
+        animated: true,
       },
       // 系统特效
-      'fx_system_verdict': { 
-        name: '系统判定', 
+      fx_system_verdict: {
+        name: '系统判定',
         desc: '当R值达到阈值时触发',
-        animated: true 
+        animated: true,
       },
-      'fx_data_ripple': { 
-        name: '数据涟漪', 
+      fx_data_ripple: {
+        name: '数据涟漪',
         desc: '信息流动的可视化表现',
-        animated: true 
+        animated: true,
       },
-      'fx_verdict': { 
-        name: '判决效果', 
+      fx_verdict: {
+        name: '判决效果',
         desc: '最终判定的闪现效果',
-        animated: true 
+        animated: true,
       },
       // 环境特效
-      'fx_dimensional_scar': { 
-        name: '维度伤痕', 
+      fx_dimensional_scar: {
+        name: '维度伤痕',
         desc: '深度介入留下的永久痕迹',
-        animated: true 
+        animated: true,
       },
-      'fx_scar': { 
-        name: '伤痕效果', 
+      fx_scar: {
+        name: '伤痕效果',
         desc: '世界被改变后的裂痕',
-        animated: true 
+        animated: true,
       },
-      'fx_drift': { 
-        name: '漂移效果', 
+      fx_drift: {
+        name: '漂移效果',
         desc: '存在不稳定时的视觉抖动',
-        animated: true 
+        animated: true,
       },
     };
 
@@ -237,13 +260,13 @@ export class EffectPreviewScene extends BasePreviewScene {
     const bg = this.add.graphics();
     bg.fillStyle(0x141419, 1);
     bg.fillRoundedRect(0, 0, width, height, 8);
-    bg.lineStyle(1, 0x2A2A30, 1);
+    bg.lineStyle(1, 0x2a2a30, 1);
     bg.strokeRoundedRect(0, 0, width, height, 8);
     container.add(bg);
 
     // 预览区域背景
     const previewBg = this.add.graphics();
-    previewBg.fillStyle(0x0A0A0F, 1);
+    previewBg.fillStyle(0x0a0a0f, 1);
     previewBg.fillRoundedRect(15, 15, width - 30, height - 90, 8);
     container.add(previewBg);
 
@@ -256,9 +279,11 @@ export class EffectPreviewScene extends BasePreviewScene {
     } else {
       // 加载
       this.load.image(effect.key, effect.url);
-      const loading = this.add.text(width / 2, (height - 80) / 2 + 10, '⏳', {
-        fontSize: '48px',
-      }).setOrigin(0.5);
+      const loading = this.add
+        .text(width / 2, (height - 80) / 2 + 10, '⏳', {
+          fontSize: '48px',
+        })
+        .setOrigin(0.5);
       container.add(loading);
 
       this.load.once('complete', () => {
@@ -274,28 +299,35 @@ export class EffectPreviewScene extends BasePreviewScene {
     }
 
     // 特效名称
-    const nameText = this.add.text(width / 2, height - 55, effect.name, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: accentColor,
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+    const nameText = this.add
+      .text(width / 2, height - 55, effect.name, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: accentColor,
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     container.add(nameText);
 
     // 特效键名
-    const keyText = this.add.text(width / 2, height - 25, effect.key, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#4A4A4A',
-    }).setOrigin(0.5);
+    const keyText = this.add
+      .text(width / 2, height - 25, effect.key, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#4A4A4A',
+      })
+      .setOrigin(0.5);
     container.add(keyText);
 
     // 交互
-    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, width, height), Phaser.Geom.Rectangle.Contains);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, width, height),
+      Phaser.Geom.Rectangle.Contains
+    );
 
     container.on('pointerover', () => {
       bg.clear();
-      bg.fillStyle(0x1E1E24, 1);
+      bg.fillStyle(0x1e1e24, 1);
       bg.fillRoundedRect(0, 0, width, height, 8);
       const color = Phaser.Display.Color.HexStringToColor(accentColor).color;
       bg.lineStyle(2, color, 1);
@@ -306,7 +338,7 @@ export class EffectPreviewScene extends BasePreviewScene {
       bg.clear();
       bg.fillStyle(0x141419, 1);
       bg.fillRoundedRect(0, 0, width, height, 8);
-      bg.lineStyle(1, 0x2A2A30, 1);
+      bg.lineStyle(1, 0x2a2a30, 1);
       bg.strokeRoundedRect(0, 0, width, height, 8);
     });
 
@@ -325,13 +357,13 @@ export class EffectPreviewScene extends BasePreviewScene {
     this._stopCurrentAnimation();
 
     // 背景 - 模拟游戏场景
-    const overlay = this.add.rectangle(0, 0, width, height, 0x0A0A0F, 1).setOrigin(0);
+    const overlay = this.add.rectangle(0, 0, width, height, 0x0a0a0f, 1).setOrigin(0);
     overlay.setInteractive();
     this.previewContainer.add(overlay);
 
     // 场景网格背景（增加深度感）
     const grid = this.add.graphics();
-    grid.lineStyle(1, 0x1A1A20, 0.5);
+    grid.lineStyle(1, 0x1a1a20, 0.5);
     for (let i = 0; i < width; i += 50) {
       grid.lineBetween(i, 0, i, height);
     }
@@ -379,28 +411,36 @@ export class EffectPreviewScene extends BasePreviewScene {
 
     // 动画状态标签
     const animConfig = this._animationConfigs.get(effect.key);
-    const animLabel = this.add.text(45, 125, 
-      animConfig 
+    const animLabel = this.add.text(
+      45,
+      125,
+      animConfig
         ? `🎬 动画: ${animConfig.frameCount}帧 @ ${animConfig.frameRate}fps | ${animConfig.repeat === -1 ? '循环' : `播放${animConfig.repeat + 1}次`}`
-        : '📷 静态图片', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#686868',
-    });
+        : '📷 静态图片',
+      {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#686868',
+      }
+    );
     this.previewContainer.add(animLabel);
 
-    const keyText = this.add.text(width - 50, 125, effect.key, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#4A4A4A',
-    }).setOrigin(1, 0);
+    const keyText = this.add
+      .text(width - 50, 125, effect.key, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#4A4A4A',
+      })
+      .setOrigin(1, 0);
     this.previewContainer.add(keyText);
 
     // 关闭按钮
-    const closeBtn = this.add.text(width - 55, 55, '✕', {
-      fontSize: '36px',
-      color: '#A8A6A3',
-    }).setOrigin(0.5);
+    const closeBtn = this.add
+      .text(width - 55, 55, '✕', {
+        fontSize: '36px',
+        color: '#A8A6A3',
+      })
+      .setOrigin(0.5);
     closeBtn.setInteractive({ useHandCursor: true });
     closeBtn.on('pointerover', () => closeBtn.setColor('#FF4444'));
     closeBtn.on('pointerout', () => closeBtn.setColor('#A8A6A3'));
@@ -411,11 +451,13 @@ export class EffectPreviewScene extends BasePreviewScene {
     this._createControlPanel(effect, accentColor, width, height);
 
     // 底部提示
-    const tipText = this.add.text(width / 2, height - 30, '按 ESC 关闭 | 点击「重播」重新播放动画', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: '#4A4A4A',
-    }).setOrigin(0.5);
+    const tipText = this.add
+      .text(width / 2, height - 30, '按 ESC 关闭 | 点击「重播」重新播放动画', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: '#4A4A4A',
+      })
+      .setOrigin(0.5);
     this.previewContainer.add(tipText);
 
     this.previewContainer.setVisible(true);
@@ -430,7 +472,12 @@ export class EffectPreviewScene extends BasePreviewScene {
   /**
    * 显示特效动画
    */
-  private _showEffectAnimation(effect: IEffectItem, accentColor: string, width: number, height: number): void {
+  private _showEffectAnimation(
+    effect: IEffectItem,
+    accentColor: string,
+    width: number,
+    height: number
+  ): void {
     const centerX = width / 2;
     const centerY = height / 2;
 
@@ -445,7 +492,10 @@ export class EffectPreviewScene extends BasePreviewScene {
       } else {
         // 静态图片 + 呼吸效果
         const effectImg = this.add.image(centerX, centerY, effect.key);
-        const maxScale = Math.min((width - 100) / effectImg.width, (height - 300) / effectImg.height);
+        const maxScale = Math.min(
+          (width - 100) / effectImg.width,
+          (height - 300) / effectImg.height
+        );
         effectImg.setScale(Math.min(maxScale, 1.5));
         this.previewContainer.add(effectImg);
 
@@ -471,10 +521,10 @@ export class EffectPreviewScene extends BasePreviewScene {
    * 创建程序化动画（用于演示）
    */
   private _createProceduralAnimation(
-    effectKey: string, 
-    x: number, 
-    y: number, 
-    color: string, 
+    effectKey: string,
+    x: number,
+    y: number,
+    color: string,
     config: IAnimationConfig
   ): void {
     const colorInt = Phaser.Display.Color.HexStringToColor(color).color;
@@ -571,7 +621,7 @@ export class EffectPreviewScene extends BasePreviewScene {
       delay: 50,
       callback: () => {
         rays.forEach((ray, i) => {
-          const angle = (i / rayCount) * Math.PI * 2 + (this.time.now / 1000);
+          const angle = (i / rayCount) * Math.PI * 2 + this.time.now / 1000;
           ray.clear();
           ray.lineStyle(2, color, 0.7);
           const len = 80 + Math.sin(this.time.now / 200 + i) * 30;
@@ -596,14 +646,16 @@ export class EffectPreviewScene extends BasePreviewScene {
     const clockGraphics = this.add.graphics();
     clockGraphics.lineStyle(2, color, 0.5);
     clockGraphics.strokeCircle(x, y, 80);
-    
+
     for (let i = 0; i < 12; i++) {
       const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
       const inner = 65;
       const outer = 75;
       clockGraphics.lineBetween(
-        x + Math.cos(angle) * inner, y + Math.sin(angle) * inner,
-        x + Math.cos(angle) * outer, y + Math.sin(angle) * outer
+        x + Math.cos(angle) * inner,
+        y + Math.sin(angle) * inner,
+        x + Math.cos(angle) * outer,
+        y + Math.sin(angle) * outer
       );
     }
     this.previewContainer.add(clockGraphics);
@@ -685,13 +737,20 @@ export class EffectPreviewScene extends BasePreviewScene {
   /**
    * 判决闪烁效果
    */
-  private _createVerdictFlash(x: number, y: number, color: number, _config: IAnimationConfig): void {
-    const verdictText = this.add.text(x, y, '「判定」', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: '48px',
-      color: `#${color.toString(16).padStart(6, '0')}`,
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
+  private _createVerdictFlash(
+    x: number,
+    y: number,
+    color: number,
+    _config: IAnimationConfig
+  ): void {
+    const verdictText = this.add
+      .text(x, y, '「判定」', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: '48px',
+        color: `#${color.toString(16).padStart(6, '0')}`,
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5);
     this.previewContainer.add(verdictText);
 
     // 闪烁效果
@@ -727,7 +786,7 @@ export class EffectPreviewScene extends BasePreviewScene {
   private _createScarEffect(x: number, y: number, color: number, _config: IAnimationConfig): void {
     const scar = this.add.graphics();
     scar.lineStyle(4, color, 0.8);
-    
+
     // 不规则裂缝
     const points = [
       { x: x - 80, y: y - 50 },
@@ -739,7 +798,7 @@ export class EffectPreviewScene extends BasePreviewScene {
 
     scar.beginPath();
     scar.moveTo(points[0].x, points[0].y);
-    points.slice(1).forEach(p => scar.lineTo(p.x, p.y));
+    points.slice(1).forEach((p) => scar.lineTo(p.x, p.y));
     scar.strokePath();
     this.previewContainer.add(scar);
 
@@ -754,7 +813,7 @@ export class EffectPreviewScene extends BasePreviewScene {
     });
 
     // 闪电分支
-    points.forEach(p => {
+    points.forEach((p) => {
       if (Math.random() > 0.5) {
         const branch = this.add.graphics();
         branch.lineStyle(2, color, 0.5);
@@ -784,8 +843,8 @@ export class EffectPreviewScene extends BasePreviewScene {
     for (let row = -2; row <= 2; row++) {
       for (let col = -2; col <= 2; col++) {
         const offsetX = col * hexSize * 1.5;
-        const offsetY = row * hexSize * Math.sqrt(3) + (col % 2) * hexSize * Math.sqrt(3) / 2;
-        
+        const offsetY = row * hexSize * Math.sqrt(3) + ((col % 2) * hexSize * Math.sqrt(3)) / 2;
+
         const hex = this.add.graphics();
         hex.lineStyle(1, color, 0.3);
         this._drawHexagon(hex, x + offsetX, y + offsetY, hexSize / 2);
@@ -811,7 +870,12 @@ export class EffectPreviewScene extends BasePreviewScene {
     });
   }
 
-  private _drawHexagon(graphics: Phaser.GameObjects.Graphics, x: number, y: number, size: number): void {
+  private _drawHexagon(
+    graphics: Phaser.GameObjects.Graphics,
+    x: number,
+    y: number,
+    size: number
+  ): void {
     const points: { x: number; y: number }[] = [];
     for (let i = 0; i < 6; i++) {
       const angle = (i / 6) * Math.PI * 2 - Math.PI / 6;
@@ -822,7 +886,7 @@ export class EffectPreviewScene extends BasePreviewScene {
     }
     graphics.beginPath();
     graphics.moveTo(points[0].x, points[0].y);
-    points.slice(1).forEach(p => graphics.lineTo(p.x, p.y));
+    points.slice(1).forEach((p) => graphics.lineTo(p.x, p.y));
     graphics.closePath();
     graphics.strokePath();
   }
@@ -830,7 +894,12 @@ export class EffectPreviewScene extends BasePreviewScene {
   /**
    * 默认粒子效果
    */
-  private _createDefaultParticles(x: number, y: number, color: number, _config: IAnimationConfig): void {
+  private _createDefaultParticles(
+    x: number,
+    y: number,
+    color: number,
+    _config: IAnimationConfig
+  ): void {
     // 创建简单的粒子效果
     const particles: Phaser.GameObjects.Graphics[] = [];
 
@@ -839,7 +908,11 @@ export class EffectPreviewScene extends BasePreviewScene {
       callback: () => {
         const particle = this.add.graphics();
         particle.fillStyle(color, 0.8);
-        particle.fillCircle(x + (Math.random() - 0.5) * 100, y + (Math.random() - 0.5) * 100, 3 + Math.random() * 5);
+        particle.fillCircle(
+          x + (Math.random() - 0.5) * 100,
+          y + (Math.random() - 0.5) * 100,
+          3 + Math.random() * 5
+        );
         this.previewContainer.add(particle);
         particles.push(particle);
 
@@ -866,28 +939,34 @@ export class EffectPreviewScene extends BasePreviewScene {
     const placeholder = this.add.graphics();
     placeholder.lineStyle(3, Phaser.Display.Color.HexStringToColor(color).color, 0.5);
     placeholder.strokeRoundedRect(x - 120, y - 120, 240, 240, 16);
-    placeholder.lineStyle(1, 0x2A2A30, 0.5);
+    placeholder.lineStyle(1, 0x2a2a30, 0.5);
     placeholder.lineBetween(x - 120, y - 120, x + 120, y + 120);
     placeholder.lineBetween(x + 120, y - 120, x - 120, y + 120);
     this.previewContainer.add(placeholder);
 
-    const icon = this.add.text(x, y - 30, '✨', {
-      fontSize: '64px',
-    }).setOrigin(0.5);
+    const icon = this.add
+      .text(x, y - 30, '✨', {
+        fontSize: '64px',
+      })
+      .setOrigin(0.5);
     this.previewContainer.add(icon);
 
-    const text = this.add.text(x, y + 45, '资源待制作', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#686868',
-    }).setOrigin(0.5);
+    const text = this.add
+      .text(x, y + 45, '资源待制作', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#686868',
+      })
+      .setOrigin(0.5);
     this.previewContainer.add(text);
 
-    const nameText = this.add.text(x, y + 80, name, {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.SMALL,
-      color: color,
-    }).setOrigin(0.5);
+    const nameText = this.add
+      .text(x, y + 80, name, {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.SMALL,
+        color: color,
+      })
+      .setOrigin(0.5);
     this.previewContainer.add(nameText);
 
     // 呼吸效果
@@ -903,7 +982,12 @@ export class EffectPreviewScene extends BasePreviewScene {
   /**
    * 创建控制面板
    */
-  private _createControlPanel(effect: IEffectItem, accentColor: string, width: number, height: number): void {
+  private _createControlPanel(
+    effect: IEffectItem,
+    accentColor: string,
+    width: number,
+    height: number
+  ): void {
     const panelY = height - 100;
     const panelWidth = 450;
     const panelX = (width - panelWidth) / 2;
@@ -912,16 +996,19 @@ export class EffectPreviewScene extends BasePreviewScene {
     const panel = this.add.graphics();
     panel.fillStyle(0x141419, 0.9);
     panel.fillRoundedRect(panelX, panelY, panelWidth, 65, 10);
-    panel.lineStyle(1, 0x2A2A30, 1);
+    panel.lineStyle(1, 0x2a2a30, 1);
     panel.strokeRoundedRect(panelX, panelY, panelWidth, 65, 10);
     this.previewContainer.add(panel);
 
     // 重播按钮
-    const replayBtn = this.add.text(panelX + 75, panelY + 32, '🔄 重播', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#A8A6A3',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    const replayBtn = this.add
+      .text(panelX + 75, panelY + 32, '🔄 重播', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#A8A6A3',
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
     replayBtn.on('pointerover', () => replayBtn.setColor(accentColor));
     replayBtn.on('pointerout', () => replayBtn.setColor('#A8A6A3'));
     replayBtn.on('pointerdown', () => {
@@ -933,11 +1020,14 @@ export class EffectPreviewScene extends BasePreviewScene {
 
     // 暂停/播放按钮
     let isPaused = false;
-    const pauseBtn = this.add.text(panelX + 225, panelY + 32, '⏸️ 暂停', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#A8A6A3',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    const pauseBtn = this.add
+      .text(panelX + 225, panelY + 32, '⏸️ 暂停', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#A8A6A3',
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
     pauseBtn.on('pointerover', () => pauseBtn.setColor(accentColor));
     pauseBtn.on('pointerout', () => pauseBtn.setColor('#A8A6A3'));
     pauseBtn.on('pointerdown', () => {
@@ -955,11 +1045,14 @@ export class EffectPreviewScene extends BasePreviewScene {
     this.previewContainer.add(pauseBtn);
 
     // 信息按钮
-    const infoBtn = this.add.text(panelX + 375, panelY + 32, 'ℹ️ 信息', {
-      fontFamily: 'Noto Sans SC',
-      fontSize: this.FONT_SIZE.NORMAL,
-      color: '#A8A6A3',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    const infoBtn = this.add
+      .text(panelX + 375, panelY + 32, 'ℹ️ 信息', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#A8A6A3',
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
     infoBtn.on('pointerover', () => infoBtn.setColor(accentColor));
     infoBtn.on('pointerout', () => infoBtn.setColor('#A8A6A3'));
     infoBtn.on('pointerdown', () => {
@@ -1024,4 +1117,3 @@ export class EffectPreviewScene extends BasePreviewScene {
     super.shutdown();
   }
 }
-

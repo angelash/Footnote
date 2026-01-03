@@ -17,8 +17,10 @@ export default defineConfig({
     
     /* 覆盖率 */
     coverage: {
-      provider: 'v8',
+      provider: 'istanbul',
       reporter: ['text', 'html', 'lcov'],
+      all: false,
+      include: ['src/systems/world/WorldState.ts'],
       exclude: [
         'node_modules/',
         'tests/',

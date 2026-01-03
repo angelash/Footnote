@@ -29,7 +29,7 @@ interface IJoystickState {
 export class TouchControls {
   private _scene: Phaser.Scene;
   private _container!: Phaser.GameObjects.Container;
-  
+
   // 虚拟摇杆
   private _joystickBase!: Phaser.GameObjects.Arc;
   private _joystickThumb!: Phaser.GameObjects.Arc;
@@ -41,21 +41,21 @@ export class TouchControls {
     currentY: 0,
     pointerId: -1,
   };
-  
+
   // 动作按钮
   private _interactButton!: Phaser.GameObjects.Container;
   private _abilityButtons: Phaser.GameObjects.Container[] = [];
-  
+
   // 配置
   private _joystickRadius: number = 60;
   private _thumbRadius: number = 25;
   private _deadzone: number = 10;
-  
+
   // 回调
   private _onMove?: (direction: { x: number; y: number }) => void;
   private _onInteract?: () => void;
   private _onAbility?: (index: number) => void;
-  
+
   // 状态
   private _isEnabled: boolean = true;
   private _isMobile: boolean = false;
@@ -65,9 +65,9 @@ export class TouchControls {
     this._onMove = config.onMove;
     this._onInteract = config.onInteract;
     this._onAbility = config.onAbility;
-    
+
     this._checkMobile();
-    
+
     if (this._isMobile) {
       this._createControls();
       this._setupTouchListeners();
@@ -78,9 +78,9 @@ export class TouchControls {
    * 检测是否为移动设备
    */
   private _checkMobile(): void {
-    this._isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    ) || ('ontouchstart' in window);
+    this._isMobile =
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      'ontouchstart' in window;
   }
 
   /**
@@ -88,16 +88,16 @@ export class TouchControls {
    */
   private _createControls(): void {
     const { width, height } = this._scene.scale;
-    
+
     this._container = this._scene.add.container(0, 0);
     this._container.setDepth(1800);
-    
+
     // 创建虚拟摇杆
     this._createJoystick(120, height - 150);
-    
+
     // 创建交互按钮
     this._createInteractButton(width - 100, height - 150);
-    
+
     // 创建能力按钮
     this._createAbilityButtons(width - 100, height - 280);
   }
@@ -107,14 +107,32 @@ export class TouchControls {
    */
   private _createJoystick(x: number, y: number): void {
     // 底座
-    this._joystickBase = this._scene.add.arc(x, y, this._joystickRadius, 0, 360, false, 0x333344, 0.5);
+    this._joystickBase = this._scene.add.arc(
+      x,
+      y,
+      this._joystickRadius,
+      0,
+      360,
+      false,
+      0x333344,
+      0.5
+    );
     this._joystickBase.setStrokeStyle(3, 0x4a9eff, 0.8);
     this._container.add(this._joystickBase);
-    
+
     // 摇杆
-    this._joystickThumb = this._scene.add.arc(x, y, this._thumbRadius, 0, 360, false, 0x4a9eff, 0.8);
+    this._joystickThumb = this._scene.add.arc(
+      x,
+      y,
+      this._thumbRadius,
+      0,
+      360,
+      false,
+      0x4a9eff,
+      0.8
+    );
     this._container.add(this._joystickThumb);
-    
+
     // 设置交互区域
     this._joystickBase.setInteractive(
       new Phaser.Geom.Circle(0, 0, this._joystickRadius * 1.5),
@@ -127,20 +145,20 @@ export class TouchControls {
    */
   private _createInteractButton(x: number, y: number): void {
     this._interactButton = this._scene.add.container(x, y);
-    
+
     // 按钮背景
     const bg = this._scene.add.arc(0, 0, 40, 0, 360, false, 0x2a4a6a, 0.8);
     bg.setStrokeStyle(3, 0x4a9eff);
     bg.setInteractive(new Phaser.Geom.Circle(0, 0, 40), Phaser.Geom.Circle.Contains);
     this._interactButton.add(bg);
-    
+
     // 按钮图标
     const icon = this._scene.add.text(0, 0, '👆', {
       fontSize: '28px',
     });
     icon.setOrigin(0.5);
     this._interactButton.add(icon);
-    
+
     // 标签
     const label = this._scene.add.text(0, 50, '交互', {
       fontFamily: 'monospace',
@@ -149,21 +167,21 @@ export class TouchControls {
     });
     label.setOrigin(0.5);
     this._interactButton.add(label);
-    
+
     // 点击事件
     bg.on('pointerdown', () => {
       this._onInteractPress();
       bg.setFillStyle(0x4a6a8a, 0.9);
     });
-    
+
     bg.on('pointerup', () => {
       bg.setFillStyle(0x2a4a6a, 0.8);
     });
-    
+
     bg.on('pointerout', () => {
       bg.setFillStyle(0x2a4a6a, 0.8);
     });
-    
+
     this._container.add(this._interactButton);
   }
 
@@ -176,23 +194,23 @@ export class TouchControls {
       { icon: '✋', name: '介入', color: 0xff00ff },
       { icon: '⏪', name: '回溯', color: 0xffd700 },
     ];
-    
+
     abilities.forEach((ability, index) => {
       const btn = this._scene.add.container(x, y - index * 70);
-      
+
       // 按钮背景
       const bg = this._scene.add.arc(0, 0, 30, 0, 360, false, 0x1a1a2e, 0.8);
       bg.setStrokeStyle(2, ability.color, 0.8);
       bg.setInteractive(new Phaser.Geom.Circle(0, 0, 30), Phaser.Geom.Circle.Contains);
       btn.add(bg);
-      
+
       // 图标
       const icon = this._scene.add.text(0, 0, ability.icon, {
         fontSize: '20px',
       });
       icon.setOrigin(0.5);
       btn.add(icon);
-      
+
       // 快捷键提示
       const hint = this._scene.add.text(0, -35, `${index + 1}`, {
         fontFamily: 'monospace',
@@ -201,22 +219,22 @@ export class TouchControls {
       });
       hint.setOrigin(0.5);
       btn.add(hint);
-      
+
       // 锁定遮罩（默认显示）
       const lock = this._scene.add.arc(0, 0, 30, 0, 360, false, 0x000000, 0.7);
       lock.setName(`lock_${index}`);
       btn.add(lock);
-      
+
       // 点击事件
       bg.on('pointerdown', () => {
         this._onAbilityPress(index);
         bg.setFillStyle(0x2a2a3e, 0.9);
       });
-      
+
       bg.on('pointerup', () => {
         bg.setFillStyle(0x1a1a2e, 0.8);
       });
-      
+
       this._container.add(btn);
       this._abilityButtons.push(btn);
     });
@@ -236,12 +254,12 @@ export class TouchControls {
    */
   private _onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (!this._isEnabled) return;
-    
+
     // 检查是否在摇杆区域
     const dx = pointer.x - this._joystickBase.x;
     const dy = pointer.y - this._joystickBase.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    
+
     if (dist <= this._joystickRadius * 1.5) {
       this._joystickState = {
         active: true,
@@ -260,7 +278,7 @@ export class TouchControls {
    */
   private _onPointerMove(pointer: Phaser.Input.Pointer): void {
     if (!this._isEnabled) return;
-    
+
     if (this._joystickState.active && pointer.id === this._joystickState.pointerId) {
       this._joystickState.currentX = pointer.x;
       this._joystickState.currentY = pointer.y;
@@ -275,7 +293,7 @@ export class TouchControls {
     if (this._joystickState.active && pointer.id === this._joystickState.pointerId) {
       this._joystickState.active = false;
       this._resetJoystick();
-      
+
       // 发送停止移动
       this._onMove?.({ x: 0, y: 0 });
     }
@@ -288,23 +306,23 @@ export class TouchControls {
     const dx = x - this._joystickState.startX;
     const dy = y - this._joystickState.startY;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    
+
     // 限制在最大半径内
     let thumbX = dx;
     let thumbY = dy;
-    
+
     if (dist > this._joystickRadius) {
       const angle = Math.atan2(dy, dx);
       thumbX = Math.cos(angle) * this._joystickRadius;
       thumbY = Math.sin(angle) * this._joystickRadius;
     }
-    
+
     // 更新摇杆位置
     this._joystickThumb.setPosition(
       this._joystickState.startX + thumbX,
       this._joystickState.startY + thumbY
     );
-    
+
     // 计算方向（归一化）
     if (dist > this._deadzone) {
       const normalizedX = thumbX / this._joystickRadius;
@@ -351,7 +369,7 @@ export class TouchControls {
    */
   public unlockAbility(index: number): void {
     if (index < 0 || index >= this._abilityButtons.length) return;
-    
+
     const btn = this._abilityButtons[index];
     const lock = btn.getByName(`lock_${index}`);
     if (lock) {
@@ -406,7 +424,3 @@ export class TouchControls {
     this._container?.destroy();
   }
 }
-
-
-
-

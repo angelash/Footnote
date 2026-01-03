@@ -7,6 +7,14 @@ import { vi } from 'vitest';
 // Mock Phaser
 vi.mock('phaser', () => ({
   default: {
+    Events: {
+      EventEmitter: class MockEventEmitter {
+        emit = vi.fn();
+        on = vi.fn();
+        off = vi.fn();
+        once = vi.fn();
+      },
+    },
     Scene: class MockScene {
       add = {
         image: vi.fn().mockReturnThis(),

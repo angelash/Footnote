@@ -155,8 +155,8 @@ export class AbilitySystem {
    * 销毁
    */
   destroy(): void {
-    this._activeTimers.forEach(timer => timer.destroy());
-    this._cooldownTimers.forEach(timer => timer.destroy());
+    this._activeTimers.forEach((timer) => timer.destroy());
+    this._cooldownTimers.forEach((timer) => timer.destroy());
     this._cleanupVisualEffects();
   }
 
@@ -171,17 +171,17 @@ export class AbilitySystem {
     // 创建视觉滤镜效果
     this._depthPerceptionOverlay = this._scene.add.graphics();
     this._depthPerceptionOverlay.setDepth(900);
-    
+
     // 蓝色调滤镜
-    this._depthPerceptionOverlay.fillStyle(0x0066AA, 0.15);
+    this._depthPerceptionOverlay.fillStyle(0x0066aa, 0.15);
     this._depthPerceptionOverlay.fillRect(0, 0, width, height);
 
     // 边缘发光效果
-    this._depthPerceptionOverlay.lineStyle(4, 0x00FFFF, 0.8);
+    this._depthPerceptionOverlay.lineStyle(4, 0x00ffff, 0.8);
     this._depthPerceptionOverlay.strokeRect(10, 10, width - 20, height - 20);
 
     // 扫描线动画
-    const scanLine = this._scene.add.rectangle(width / 2, 0, width, 3, 0x00FFFF, 0.5);
+    const scanLine = this._scene.add.rectangle(width / 2, 0, width, 3, 0x00ffff, 0.5);
     scanLine.setDepth(901);
 
     this._scene.tweens.add({
@@ -240,18 +240,20 @@ export class AbilitySystem {
 
     // 紫色调滤镜
     const overlay = this._scene.add.graphics();
-    overlay.fillStyle(0x6600AA, 0.2);
+    overlay.fillStyle(0x6600aa, 0.2);
     overlay.fillRect(0, 0, width, height);
     this._depthInterventionHighlights.add(overlay);
 
     // 提示文字
-    const hint = this._scene.add.text(width / 2, 100, '深度介入模式\n点击可修改的对象', {
-      fontSize: '20px',
-      color: '#FF00FF',
-      align: 'center',
-      backgroundColor: '#000000',
-      padding: { x: 20, y: 10 },
-    }).setOrigin(0.5);
+    const hint = this._scene.add
+      .text(width / 2, 100, '深度介入模式\n点击可修改的对象', {
+        fontSize: '20px',
+        color: '#FF00FF',
+        align: 'center',
+        backgroundColor: '#000000',
+        padding: { x: 20, y: 10 },
+      })
+      .setOrigin(0.5);
     this._depthInterventionHighlights.add(hint);
 
     // 闪烁动画
@@ -324,39 +326,46 @@ export class AbilitySystem {
     this._timeInterventionUI.add(overlay);
 
     // 标题
-    const title = this._scene.add.text(width / 2, 100, '时间干预', {
-      fontSize: '32px',
-      color: '#FFD700',
-    }).setOrigin(0.5);
+    const title = this._scene.add
+      .text(width / 2, 100, '时间干预', {
+        fontSize: '32px',
+        color: '#FFD700',
+      })
+      .setOrigin(0.5);
     this._timeInterventionUI.add(title);
 
     // 警告文字
-    const warning = this._scene.add.text(width / 2, 150, '回溯会产生时间污染', {
-      fontSize: '14px',
-      color: '#FF4444',
-    }).setOrigin(0.5);
+    const warning = this._scene.add
+      .text(width / 2, 150, '回溯会产生时间污染', {
+        fontSize: '14px',
+        color: '#FF4444',
+      })
+      .setOrigin(0.5);
     this._timeInterventionUI.add(warning);
 
     // TODO: 显示可回溯的时间节点列表
-    const noNodeText = this._scene.add.text(width / 2, height / 2, '暂无可回溯节点', {
-      fontSize: '18px',
-      color: '#888888',
-    }).setOrigin(0.5);
+    const noNodeText = this._scene.add
+      .text(width / 2, height / 2, '暂无可回溯节点', {
+        fontSize: '18px',
+        color: '#888888',
+      })
+      .setOrigin(0.5);
     this._timeInterventionUI.add(noNodeText);
 
     // 取消按钮
-    const cancelBtn = this._scene.add.text(width / 2, height - 100, '取消', {
-      fontSize: '20px',
-      color: '#888888',
-      backgroundColor: '#333333',
-      padding: { x: 40, y: 15 },
-    })
+    const cancelBtn = this._scene.add
+      .text(width / 2, height - 100, '取消', {
+        fontSize: '20px',
+        color: '#888888',
+        backgroundColor: '#333333',
+        padding: { x: 40, y: 15 },
+      })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true })
       .on('pointerover', () => cancelBtn.setColor('#FFFFFF'))
       .on('pointerout', () => cancelBtn.setColor('#888888'))
       .on('pointerdown', () => this.deactivateAbility('TIME_INTERVENTION' as AbilityType));
-    
+
     this._timeInterventionUI.add(cancelBtn);
 
     // 进入动画
@@ -414,9 +423,13 @@ export class AbilitySystem {
   // ==================== 私有方法 ====================
 
   private _initializeStates(): void {
-    const abilityTypes: AbilityType[] = ['DEPTH_PERCEPTION', 'DEPTH_INTERVENTION', 'TIME_INTERVENTION'];
-    
-    abilityTypes.forEach(type => {
+    const abilityTypes: AbilityType[] = [
+      'DEPTH_PERCEPTION',
+      'DEPTH_INTERVENTION',
+      'TIME_INTERVENTION',
+    ];
+
+    abilityTypes.forEach((type) => {
       this._states.set(type, {
         isActive: false,
         cooldownRemaining: 0,
@@ -488,4 +501,3 @@ export class AbilitySystem {
     this._timeInterventionUI?.destroy();
   }
 }
-

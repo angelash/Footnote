@@ -8,6 +8,7 @@
 
 - **主从 + Cursor CLI 执行架构**：`docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
 - **落地推进计划（含角色/执行策略）**：`docs/02_specs/pipelines/n8n_cursor_cli_rollout_plan.md`
+- **对外介绍总览（含流程图/架构图/表格）**：`docs/02_specs/pipelines/n8n_cursor_cli_overview.md`
 - **内容生产管线（对白/事件/卡片等）**：`docs/02_specs/pipelines/content_pipeline_spec.md`
 - **美术资产管线（命名/尺寸/校验/AI生图）**：`docs/02_specs/pipelines/asset_pipeline_spec.md`
 - **AI-Native 流程改造总文档（含角色列表）**：`docs/AI-Native流程改造落地计划.md`

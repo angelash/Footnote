@@ -6,16 +6,15 @@
 
 ### 1. 启动 n8n
 
-**当前工程支持两种形态**：
-- **单实例（最简）**：只跑一个 n8n（常见是 5678）
-- **主从（推荐）**：Windows 主实例 `5678` + WSL 从实例 `5680`（执行都落到 WSL）
+**当前默认形态（已选择 C）**：
+- **单入口（推荐）**：只使用 **WSL 实例 `5680`** 作为所有 AI-Native 任务入口（执行都在 WSL）
+- **Windows 5678（可选）**：后续如需“主从分发 / browser-test”等再启用
 
 ```bash
 n8n start
 ```
 
-默认访问（主实例）：http://localhost:5678  
-从实例（WSL）：http://localhost:5680
+默认入口（WSL）：http://localhost:5680
 
 **配置为常驻服务**: 参见 [SERVICE-SETUP.md](./SERVICE-SETUP.md)  
 **主从集群架构**: 参见 [CLUSTER-SETUP.md](./CLUSTER-SETUP.md)
@@ -104,7 +103,7 @@ Check Validation (检查结果)
 
 #### Windows 浏览器测试工作流（Webhook）
 
-主实例导入并启用：
+（可选）Windows 侧导入并启用：
 - `tools/n8n/windows-mcp-runner-browser-test-workflow.json`
   - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
   - body 示例：
@@ -130,16 +129,14 @@ Check Validation (检查结果)
 
 ### 主→从分发（Webhook）
 
-为实现“主实例统一入口 → 从实例执行”，主实例导入并启用：
-- `tools/n8n/dispatch-to-secondary-workflow.json`
-  - Webhook：`POST http://localhost:5678/webhook/dispatch-task`
+（当前选择 C：暂不使用 5678 分发）
 
-从实例导入并启用：
-- `tools/n8n/cursor-cli-task-workflow.json`
-  - Webhook：`POST http://localhost:5680/webhook/execute-task`
+入口（5680）：
+- `POST http://localhost:5680/webhook/compose-taskpack`
+- `POST http://localhost:5680/webhook/execute-task`
 
-冒烟脚本：
-- `tools/n8n/smoke-dispatch.ps1`
+冒烟脚本（5680）：
+- `tools/n8n/smoke-secondary.ps1`
 
 **重要**: 
 - 项目必须在 WSL 文件系统中（`/home/...`），不能在 Windows 挂载点（`/mnt/...`）
@@ -175,9 +172,9 @@ set N8N_GITHUB_TOKEN=ghp_xxx
 2. 使用脚本批量调用：
 
 ```bash
-curl -X POST http://localhost:5678/webhook/xxx \
+curl -X POST http://localhost:5680/webhook/execute-task \
   -H "Content-Type: application/json" \
-  -d '{"task_pack_path": "docs/03_taskpacks/T-0001.md", "role": "L3_writer"}'
+  -d '{"task_pack_path": "docs/03_taskpacks/T-0001_c0_z1_dialogue.md", "role": "L3_writer", "task_type":"doc", "complexity":"normal", "model_override":"auto"}'
 ```
 
 ---

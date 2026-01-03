@@ -8,6 +8,14 @@
 
 ## 1. 工厂的核心概念
 
+### 1.0 当前运行形态（已选 C）
+
+- **入口**：仅使用 `WSL n8n-secondary (5680)` 作为工厂流水线的统一入口
+- **对外 Webhook**：
+  - `POST http://localhost:5680/webhook/compose-taskpack`
+  - `POST http://localhost:5680/webhook/execute-task`
+- **Windows 5678**：暂不作为分发入口（后续如需浏览器/MCP 任务再引入）
+
 ### 1.1 四类工件（Artifacts）
 
 1. **Intake Request（需求单）**

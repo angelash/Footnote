@@ -63,7 +63,7 @@
       {
         "parameters": {
           "method": "POST",
-          "url": "http://127.0.0.1:3211/agent",
+          "url": "http://127.0.0.1:3980/agent",
           "sendBody": true,
           "specifyBody": "json",
           "jsonBody": "={{ { mcp_url: $json.mcp_url, prompt: $json.prompt, task_type: $json.task_type, complexity: $json.complexity, model_override: $json.model_override } }}"
@@ -110,7 +110,7 @@
     "meta": null,
     "pinData": {},
     "versionId": "b8b91339-a7b4-46b3-80e1-1169c10b98d0",
-    "activeVersionId": "b8b91339-a7b4-46b3-80e1-1169c10b98d0",
+    "activeVersionId": null,
     "versionCounter": 1,
     "triggerCount": 0,
     "tags": [],

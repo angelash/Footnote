@@ -85,14 +85,22 @@ echo "[run-cursor-task] task_pack=$TASK_PACK task_type=$TASK_TYPE complexity=$CO
 
 # Extract Deliverables allowlist from Task Pack (simple parser).
 # Matches lines starting with "- " within section "## 3. Deliverables" until next "## ".
-mapfile -t DELIVERABLES < <(
-  awk '
-    BEGIN{in=0}
-    /^##[[:space:]]*3\.[[:space:]]*Deliverables/{in=1; next}
-    /^##[[:space:]]*/{if(in==1) exit}
-    {if(in==1 && $0 ~ /^- /) {sub(/^- /,"",$0); print $0}}
-  ' "$TASK_PACK" | sed 's/\r$//'
-)
+    # Deliverables in Task Packs often use annotated bullets like:
+    # - [`file`] `path/to/file` (notes)
+    # Normalize these into raw repo-relative paths for guardrails.
+    mapfile -t DELIVERABLES < <(
+      awk '
+        BEGIN{inSection=0}
+        /^##[[:space:]]*3\.[[:space:]]*Deliverables/{inSection=1; next}
+        /^##[[:space:]]*/{if(inSection==1) exit}
+        {if(inSection==1 && $0 ~ /^- /) {sub(/^- /,"",$0); print $0}}
+      ' "$TASK_PACK" \
+        | sed 's/\r$//' \
+        | sed -E 's/^\\[[^]]+\\][[:space:]]*//' \
+        | sed -E 's/^`([^`]+)`.*/\\1/' \
+        | sed -E 's/^[[:space:]]*//' \
+        | sed -E 's/[[:space:]].*$//'
+    )
 
 if [[ ${#DELIVERABLES[@]} -eq 0 ]]; then
   echo "[run-cursor-task] WARN: No deliverables parsed from task pack. Guardrail will only allow .cursor/* changes." >&2

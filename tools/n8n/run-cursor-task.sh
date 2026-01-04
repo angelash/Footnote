@@ -97,7 +97,7 @@ echo "[run-cursor-task] task_pack=$TASK_PACK task_type=$TASK_TYPE complexity=$CO
       ' "$TASK_PACK" \
         | sed 's/\r$//' \
         | sed -E 's/^\\[[^]]+\\][[:space:]]*//' \
-        | sed -E 's/^`([^`]+)`.*/\\1/' \
+        | sed -E 's/^`([^`]+)`.*/\1/' \
         | sed -E 's/^[[:space:]]*//' \
         | sed -E 's/[[:space:]].*$//'
     )

@@ -9,7 +9,8 @@
  * - GET  /health
  * - POST /execute-task      { task_pack_path, role, task_type, complexity, model_override, project_root? }
  * - POST /compose-taskpack  { ... taskpack fields ... }
- * - POST /fixed-flow        { task_id, title?, task_pack_path?, role?, task_type?, complexity?, model_override?, auto?, resume_from_stage?, run_id?, project_root? }
+ * - POST /fixed-flow        { task_id, title?, task_pack_path?, role?, task_type?, complexity?, model_override?, auto?, resume_from_stage?, run_id?, project_root?, async? }
+ * - GET  /fixed-flow/status?run_id=...&project_root=...
  *
  * Env:
  * - HOST (default 127.0.0.1)
@@ -403,6 +404,7 @@ async function handleFixedFlow(body) {
   const auto = body.auto !== false;
   const resumeFromStage = Number(body.resume_from_stage ?? body.resumeFromStage ?? 0);
   const runId = body.run_id || body.runId || makeRunId();
+  const asyncMode = body.async !== false;
 
   if (!taskId) throw new Error("task_id is required");
 
@@ -448,7 +450,8 @@ async function handleFixedFlow(body) {
     repo: { root: projectRoot, branch: "", head: "" },
   };
 
-  const out = await withRepoLock(projectRoot, runId, async () => {
+  const runFlow = async () =>
+    await withRepoLock(projectRoot, runId, async () => {
     // Stage 01: preflight
     if (resumeFromStage <= 1) {
       await writeJson(statusAbs, { ...statusBase, stage: 1, updated_at: nowIso() });
@@ -456,6 +459,17 @@ async function handleFixedFlow(body) {
       await writeJson(preflightAbs, pf);
       if (!pf.ok) {
         await writeJson(statusAbs, { ...statusBase, stage: 1, ok: false, error: pf.reason || "preflight_failed", updated_at: nowIso() });
+        const notifyOut = await sendNotify({
+          ok: false,
+          taskId,
+          title,
+          runId,
+          stage: 1,
+          projectRoot,
+          logRelDir: runRelDir,
+          head: statusBase.repo.head,
+        });
+        await writeJson(notifyAbs, notifyOut);
         return { ok: false, run_id: runId, stage: 1, error: pf.reason || "preflight_failed" };
       }
       statusBase.repo.branch = pf.branch || "";
@@ -514,6 +528,17 @@ async function handleFixedFlow(body) {
       await writeJson(executeAbs, execOut);
       if (!execOut.ok) {
         await writeJson(statusAbs, { ...statusBase, stage: 4, ok: false, error: "execute_failed", updated_at: nowIso() });
+        const notifyOut = await sendNotify({
+          ok: false,
+          taskId,
+          title,
+          runId,
+          stage: 4,
+          projectRoot,
+          logRelDir: runRelDir,
+          head: statusBase.repo.head,
+        });
+        await writeJson(notifyAbs, notifyOut);
         return { ok: false, run_id: runId, stage: 4, error: "execute_failed", execute: execOut };
       }
     }
@@ -527,6 +552,17 @@ async function handleFixedFlow(body) {
       await writeJson(validateAbs, validateOut);
       if (!validateOut.ok) {
         await writeJson(statusAbs, { ...statusBase, stage: 5, ok: false, error: "validate_failed", updated_at: nowIso() });
+        const notifyOut = await sendNotify({
+          ok: false,
+          taskId,
+          title,
+          runId,
+          stage: 5,
+          projectRoot,
+          logRelDir: runRelDir,
+          head: statusBase.repo.head,
+        });
+        await writeJson(notifyAbs, notifyOut);
         return { ok: false, run_id: runId, stage: 5, error: "validate_failed", validate: validateOut };
       }
     }
@@ -539,6 +575,17 @@ async function handleFixedFlow(body) {
       await writeJson(gitAbs, gitOut);
       if (!gitOut.ok) {
         await writeJson(statusAbs, { ...statusBase, stage: 6, ok: false, error: "git_failed", updated_at: nowIso() });
+        const notifyOut = await sendNotify({
+          ok: false,
+          taskId,
+          title,
+          runId,
+          stage: 6,
+          projectRoot,
+          logRelDir: runRelDir,
+          head: statusBase.repo.head,
+        });
+        await writeJson(notifyAbs, notifyOut);
         return { ok: false, run_id: runId, stage: 6, error: "git_failed", git: gitOut };
       }
       statusBase.repo.head = gitOut.head || statusBase.repo.head;
@@ -573,11 +620,51 @@ async function handleFixedFlow(body) {
     };
   });
 
-  if (!auto) {
-    // v1: currently still runs full chain; auto is reserved for future pause/resume semantics.
+  if (!asyncMode) {
+    return await runFlow();
   }
 
-  return out;
+  // Async: start background run and return immediately.
+  // Background errors are recorded into status.json and notify.json.
+  void (async () => {
+    try {
+      await runFlow();
+    } catch (e) {
+      const err = String(e?.message || e);
+      await writeJson(statusAbs, {
+        ...statusBase,
+        stage: Math.max(0, resumeFromStage || 0),
+        ok: false,
+        error: err,
+        updated_at: nowIso(),
+      });
+      const notifyOut = await sendNotify({
+        ok: false,
+        taskId,
+        title,
+        runId,
+        stage: Math.max(0, resumeFromStage || 0),
+        projectRoot,
+        logRelDir: runRelDir,
+        head: statusBase.repo.head,
+      });
+      await writeJson(notifyAbs, notifyOut);
+    }
+  })();
+
+  await writeJson(statusAbs, { ...statusBase, stage: 0, ok: false, updated_at: nowIso(), note: "started_async" });
+  return { ok: true, run_id: runId, task_id: taskId, stage: 0, logs_dir: runRelDir, started_async: true };
+}
+
+function getQueryParams(url) {
+  try {
+    const u = new URL(url, "http://localhost");
+    const params = {};
+    for (const [k, v] of u.searchParams.entries()) params[k] = v;
+    return params;
+  } catch {
+    return {};
+  }
 }
 
 const server = http.createServer(async (req, res) => {
@@ -602,6 +689,23 @@ const server = http.createServer(async (req, res) => {
       const body = await readJsonBody(req);
       const out = await handleFixedFlow(body);
       return json(res, 200, out);
+    }
+
+    if (req.method === "GET" && req.url?.startsWith("/fixed-flow/status")) {
+      const q = getQueryParams(req.url);
+      const projectRoot = q.project_root || q.projectRoot || DEFAULT_PROJECT_ROOT;
+      const runId = q.run_id || q.runId;
+      if (!runId) return json(res, 400, { ok: false, error: "run_id is required" });
+
+      const runRelDir = path.posix.join(AUTOMATION_RUNS_DIR, runId);
+      const runAbsDir = safeResolveUnderProject(projectRoot, runRelDir);
+      const statusAbs = path.posix.join(runAbsDir, "status.json");
+      try {
+        const text = await fs.readFile(statusAbs, "utf8");
+        return json(res, 200, { ok: true, run_id: runId, status: JSON.parse(text) });
+      } catch (e) {
+        return json(res, 404, { ok: false, error: "status_not_found", run_id: runId });
+      }
     }
 
     return json(res, 404, { ok: false, error: "not_found" });

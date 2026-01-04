@@ -15,6 +15,14 @@
 
 `docs/05_logs/automation_runs/<run_id>/...`
 
+### 异步启动（推荐）
+
+默认以异步方式启动：接口会立刻返回 `run_id`，后台继续跑完整流程。
+
+查询状态：
+
+`GET /fixed-flow/status?run_id=<run_id>`
+
 ### 必要前提（否则会在 git 阶段失败）
 
 WSL 环境必须配置 git identity（用于自动 commit）：

@@ -98,6 +98,15 @@ docs/05_logs/automation_runs/<run_id>/
 建议策略（v1 简化）：
 - **重跑产生新 run_id**（更简单、审计更清晰）；旧 run 保留。
 
+### 5.3 异步执行（推荐：避免 webhook 超时）
+
+固定流程 v1 建议采用“异步启动 + 外部观察”的方式：
+- `POST /fixed-flow` **立即返回** `{ run_id, logs_dir }`（started_async）
+- 后台继续跑完整 stage
+- 观察方式：
+  - 直接查看 `docs/05_logs/automation_runs/<run_id>/status.json`
+  - 或调用 `GET /fixed-flow/status?run_id=<run_id>` 读取 status.json
+
 ---
 
 ## 6. Preflight 标准（强制项）

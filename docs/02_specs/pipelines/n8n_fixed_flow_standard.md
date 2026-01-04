@@ -136,12 +136,19 @@ docs/05_logs/automation_runs/_lock/
 
 ## 8. Git 阶段标准（v1：直接 main）
 
-### 8.1 git 阶段动作
+### 8.1 git 阶段动作（v1.1：仅在 stage=99 之后提交）
 
-1. `git add -A`
-2. `git diff --cached --name-only` 写入 `06_git.json`
-3. `git commit -m "<task_id>: <title> [run:<run_id>]"`  
-4. `git push origin main`
+> 新约束（你已确认）：**只有真正完成（`stage=99`）才允许 commit/push**。  
+> 目的：避免“runner 还没 done，但 main 已出现 commit”的观感混乱。
+
+顺序（推荐实现）：
+
+1. `07_notify.json`（通知先落盘）
+2. 写入 `status.json`：`stage=99, ok=true`（标记为真正完成）
+3. `git add -A`
+4. `git diff --cached --name-only` 写入 `06_git.json`（注意：为避免 post-commit 再写脏 repo，`06_git.json` 应在 commit 前写入）
+5. `git commit -m "<task_id>: <title> [run:<run_id>]"`  
+6. `git push origin main`
 
 ### 8.2 防重复 push（幂等）
 

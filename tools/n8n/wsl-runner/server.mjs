@@ -205,6 +205,53 @@ async function gitCommitPush({ projectRoot, taskId, title, runId }) {
   };
 }
 
+async function gitCommitPushAfterStage99({ projectRoot, taskId, title, runId, gitAbs }) {
+  const startedAt = Date.now();
+
+  // Stage everything that exists up to (and including) status stage=99 and notify logs.
+  const add = await run("bash", ["-lc", "git add -A"], { cwd: projectRoot, env: process.env });
+  const diffNames = await run("bash", ["-lc", "git diff --cached --name-only"], { cwd: projectRoot, env: process.env });
+
+  const changed = diffNames.stdout
+    .split("\n")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const safeTitle = String(title || "task").replace(/\s+/g, " ").trim().slice(0, 80);
+  const msg = `${taskId}: ${safeTitle} [run:${runId}]`;
+
+  // IMPORTANT: user requested "only commit after stage=99".
+  // We therefore write status=99 first, then perform git commit/push without writing any tracked files afterwards.
+  // To keep an auditable record without dirtying the repo post-commit, we write 06_git.json BEFORE committing.
+  await writeJson(gitAbs, {
+    ok: true,
+    mode: "post_stage_99",
+    note: "06_git.json is written before commit to avoid post-commit repo dirtiness; commit msg embeds run_id",
+    elapsed_ms: Date.now() - startedAt,
+    staged: add.code === 0,
+    changed_files: changed,
+    commit_message: msg,
+  });
+
+  // Re-stage to include the 06_git.json we just wrote.
+  const add2 = await run("bash", ["-lc", "git add -A"], { cwd: projectRoot, env: process.env });
+  const commit = await run("bash", ["-lc", `git commit -m ${JSON.stringify(msg)}`], {
+    cwd: projectRoot,
+    env: process.env,
+  });
+  const head = await run("bash", ["-lc", "git rev-parse --short HEAD"], { cwd: projectRoot, env: process.env });
+  const push = await run("bash", ["-lc", "git push origin main"], { cwd: projectRoot, env: process.env });
+
+  return {
+    ok: add.code === 0 && add2.code === 0 && commit.code === 0 && push.code === 0,
+    elapsed_ms: Date.now() - startedAt,
+    staged_files: changed,
+    commit,
+    head: head.stdout.trim(),
+    push,
+  };
+}
+
 async function sendNotify({ ok, taskId, title, runId, stage, projectRoot, logRelDir, head }) {
   const payload = {
     receiver: "gz0149",
@@ -581,31 +628,9 @@ async function handleFixedFlow(body) {
       }
     }
 
-    // Stage 06: git
-    let gitOut = null;
-    if (resumeFromStage <= 6) {
-      await writeJson(statusAbs, { ...statusBase, stage: 6, updated_at: nowIso() });
-      gitOut = await gitCommitPush({ projectRoot, taskId, title, runId });
-      await writeJson(gitAbs, gitOut);
-      if (!gitOut.ok) {
-        await writeJson(statusAbs, { ...statusBase, stage: 6, ok: false, error: "git_failed", updated_at: nowIso() });
-        const notifyOut = await sendNotify({
-          ok: false,
-          taskId,
-          title,
-          runId,
-          stage: 6,
-          projectRoot,
-          logRelDir: runRelDir,
-          head: statusBase.repo.head,
-        });
-        await writeJson(notifyAbs, notifyOut);
-        return { ok: false, run_id: runId, stage: 6, error: "git_failed", git: gitOut };
-      }
-      statusBase.repo.head = gitOut.head || statusBase.repo.head;
-    }
-
-    // Stage 07: notify
+    // Stage 07: notify (pre-commit)
+    // NOTE: We intentionally notify BEFORE git commit to keep "only commit after stage=99".
+    // The notify log will be committed together with status stage=99.
     let notifyOut = null;
     if (resumeFromStage <= 7) {
       await writeJson(statusAbs, { ...statusBase, stage: 7, updated_at: nowIso() });
@@ -622,7 +647,17 @@ async function handleFixedFlow(body) {
       await writeJson(notifyAbs, notifyOut);
     }
 
+    // Stage 99: finalize (this must happen BEFORE git commit, per user requirement)
     await writeJson(statusAbs, { ...statusBase, stage: 99, ok: true, updated_at: nowIso() });
+
+    // Post stage=99: git commit/push (no further tracked writes afterwards)
+    // If git fails, we do NOT mutate status.json (to avoid "committed then dirty" confusion).
+    const gitOut = await gitCommitPushAfterStage99({ projectRoot, taskId, title, runId, gitAbs });
+    if (!gitOut.ok) {
+      return { ok: false, run_id: runId, stage: 99, error: "git_failed_post_stage_99", git: gitOut };
+    }
+    statusBase.repo.head = gitOut.head || statusBase.repo.head;
+
     return {
       ok: true,
       run_id: runId,

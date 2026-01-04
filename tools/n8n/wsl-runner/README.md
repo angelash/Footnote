@@ -23,6 +23,16 @@
 
 `GET /fixed-flow/status?run_id=<run_id>`
 
+### 提交时机（重要）
+
+> 新约束：**只有真正完成（`stage=99`）才允许 commit/push**。
+
+因此该 runner 会先写入：
+- `07_notify.json`（通知结果）
+- `status.json`（`stage=99`）
+
+再执行 `git add/commit/push`，避免“流程还没 done 但 main 已出现 commit”的观感混乱。
+
 ### 必要前提（否则会在 git 阶段失败）
 
 WSL 环境必须配置 git identity（用于自动 commit）：

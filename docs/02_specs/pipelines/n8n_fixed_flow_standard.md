@@ -61,9 +61,11 @@ docs/05_logs/automation_runs/<run_id>/
 | 03 | taskpack | `03_taskpack.md` | 直接 FAIL |
 | 04 | execute | `04_execute.json` | FAIL，可重试（attempt++） |
 | 05 | validate | `05_validate.json` | FAIL，可重试（一般回到 stage04） |
-| 06 | git | `06_git.json` | FAIL：不 push；可重试/人工介入 |
 | 07 | notify | `07_notify.json` | FAIL：可重试，不影响代码结果 |
 | 99 | done | `status.json` | - |
+
+> 注（v1.1）：`git commit/push` 属于 **post-stage=99 动作**，用于满足“只有真正完成（stage=99）才提交”的约束。  
+> 因此 **status.stage 不会回退到 06**，但仍会产出并提交 `06_git.json`（在 commit 前写入，记录 staged 文件与 commit message）。
 
 ---
 

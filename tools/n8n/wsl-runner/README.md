@@ -33,6 +33,8 @@
 
 再执行 `git add/commit/push`，避免“流程还没 done 但 main 已出现 commit”的观感混乱。
 
+> 注：为了满足“stage=99 后才提交”，Runner 在 commit/push 时不会再更新 `status.json`（否则会造成“已提交但工作区又被写脏”的问题）。
+
 ### 必要前提（否则会在 git 阶段失败）
 
 WSL 环境必须配置 git identity（用于自动 commit）：

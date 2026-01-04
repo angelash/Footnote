@@ -135,7 +135,17 @@ async function withRepoLock(projectRoot, runId, fn) {
 
 async function gitPreflight(projectRoot) {
   const startedAt = Date.now();
-  const status = await run("bash", ["-lc", "git status --porcelain"], { cwd: projectRoot, env: process.env });
+  // IMPORTANT: fixed-flow stage logs are written under docs/05_logs/automation_runs.
+  // Preflight must treat the repo as "clean" even if those logs exist, otherwise a failed run
+  // would permanently block subsequent runs.
+  const status = await run(
+    "bash",
+    [
+      "-lc",
+      "git status --porcelain -- . ':(exclude)docs/05_logs/automation_runs' ':(exclude)docs/05_logs/automation_runs/**'",
+    ],
+    { cwd: projectRoot, env: process.env }
+  );
   if (status.code !== 0) {
     return { ok: false, reason: "git_status_failed", ...status, elapsed_ms: Date.now() - startedAt };
   }

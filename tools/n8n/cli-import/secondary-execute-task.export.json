@@ -25,7 +25,7 @@
       {
         "parameters": {
           "method": "POST",
-          "url": "http://127.0.0.1:3210/execute-task",
+          "url": "http://localhost:3210/execute-task",
           "sendBody": true,
           "specifyBody": "json",
           "jsonBody": "={{ $json.body || {} }}",

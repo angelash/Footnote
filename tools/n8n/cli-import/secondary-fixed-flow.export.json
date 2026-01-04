@@ -22,7 +22,7 @@
       {
         "parameters": {
           "method": "POST",
-          "url": "http://127.0.0.1:3210/fixed-flow",
+          "url": "http://localhost:3210/fixed-flow",
           "sendBody": true,
           "specifyBody": "json",
           "jsonBody": "={{ $json.body || {} }}",

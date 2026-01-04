@@ -1,0 +1,74 @@
+{
+  "name": "Status Query (WSL Native)",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "status",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [100, 300],
+      "webhookId": "status-query-webhook"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Parse query parameters\nconst query = $input.first().json.query || {};\nconst runId = query.run_id || '';\nconst projectRoot = query.project_root || '/home/shash/work/Footnote';\n\nif (!runId) {\n  return { json: { ok: false, error: 'run_id is required' } };\n}\n\nreturn {\n  json: {\n    run_id: runId,\n    project_root: projectRoot,\n    status_path: `${projectRoot}/docs/05_logs/automation_runs/${runId}/status.json`\n  }\n};"
+      },
+      "id": "parse-query",
+      "name": "Parse Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [320, 300]
+    },
+    {
+      "parameters": {
+        "command": "={{ 'cat \"' + $json.status_path + '\" 2>/dev/null || echo \"{\\\"error\\\": \\\"not_found\\\"}\"' }}"
+      },
+      "id": "read-status",
+      "name": "Read Status",
+      "type": "n8n-nodes-base.exec",
+      "typeVersion": 1,
+      "position": [540, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Parse status and return\nconst params = $('Parse Query').first().json;\nconst result = $input.first().json;\nconst stdout = result.stdout || '';\n\ntry {\n  const status = JSON.parse(stdout);\n  if (status.error === 'not_found') {\n    return { json: { ok: false, error: 'status_not_found', run_id: params.run_id } };\n  }\n  return { json: { ok: true, run_id: params.run_id, status } };\n} catch (e) {\n  return { json: { ok: false, error: 'parse_error', run_id: params.run_id, detail: stdout.slice(0, 200) } };\n}"
+      },
+      "id": "format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{ "node": "Parse Query", "type": "main", "index": 0 }]]
+    },
+    "Parse Query": {
+      "main": [[{ "node": "Read Status", "type": "main", "index": 0 }]]
+    },
+    "Read Status": {
+      "main": [[{ "node": "Format Response", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "AI-Native" },
+    { "name": "Status" },
+    { "name": "WSL" }
+  ],
+  "versionId": "statusquery-v1-001"
+}
+

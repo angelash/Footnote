@@ -22,11 +22,32 @@
 
 ### 2.1 WSL 执行器（通用：代码/文档/多模态）
 
-- **从实例执行（WSL 5680）**：`tools/n8n/cursor-cli-task-workflow.json`
-  - Webhook：`POST http://localhost:5680/webhook/execute-task`
-- **固定流程 v1（推荐：自动流转/落盘/可续跑）**：`tools/n8n/cli-import/secondary-fixed-flow.export.json`
+- **🆕 Fixed Flow Pipeline（推荐：完全 n8n 原生）**：`tools/n8n/fixed-flow-pipeline.json`
   - Webhook：`POST http://localhost:5680/webhook/fixed-flow`
-  - 说明：该工作流仅做“入口代理”，具体 stage/落盘/锁/git/通知由 `wsl-cursor-runner` 的 `/fixed-flow` 负责
+  - 特点：
+    - ✅ 异步执行（立即返回 run_id）
+    - ✅ 7 阶段完整链路（preflight → plan → taskpack → execute → validate → git → notify）
+    - ✅ 任何阶段失败都发通知
+    - ✅ 支持从某个阶段续跑（resume_from_stage）
+    - ✅ 每阶段落盘日志到 `docs/05_logs/automation_runs/{run_id}/`
+  - 参数：
+    ```json
+    {
+      "task_id": "T-0001",
+      "task_pack_path": "docs/03_taskpacks/T-0001.md",
+      "role": "L3_engineer",
+      "task_type": "code",
+      "complexity": "normal",
+      "model_override": "auto",
+      "resume_from_stage": 0
+    }
+    ```
+- **🆕 Status Query（查询任务进度）**：`tools/n8n/status-query-workflow.json`
+  - Webhook：`GET http://localhost:5680/webhook/status?run_id=RUN-xxx`
+  - 返回：`{ ok: true, run_id: "...", status: { stage: 99, ok: true, ... } }`
+- **从实例执行（简单版）**：`tools/n8n/cursor-cli-task-workflow.json`
+  - Webhook：`POST http://localhost:5680/webhook/execute-task`
+  - 说明：依赖 wsl-runner 服务，已被 Fixed Flow Pipeline 替代
 - **Windows 主实例直连 WSL 的版本（可选）**：`tools/n8n/cursor-cli-task-workflow-windows.json`
 
 ### 2.2 主从分发（通用入口 → 从实例执行）

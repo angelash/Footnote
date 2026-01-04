@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Native 任务看板</title>
+  <style>
+    :root {
+      --bg-dark: #0d1117;
+      --bg-card: #161b22;
+      --border: #30363d;
+      --text-primary: #c9d1d9;
+      --text-secondary: #8b949e;
+      --accent-green: #3fb950;
+      --accent-red: #f85149;
+      --accent-yellow: #d29922;
+      --accent-blue: #58a6ff;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    h1::before {
+      content: '📊';
+    }
+    
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    input[type="text"] {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      width: 300px;
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+    
+    button {
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .config-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .config-section h3 {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    
+    .config-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    
+    .config-row label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      min-width: 80px;
+    }
+    
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 16px;
+    }
+    
+    .task-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      transition: border-color 0.2s;
+    }
+    
+    .task-card:hover {
+      border-color: var(--accent-blue);
+    }
+    
+    .task-card.success {
+      border-left: 3px solid var(--accent-green);
+    }
+    
+    .task-card.failed {
+      border-left: 3px solid var(--accent-red);
+    }
+    
+    .task-card.running {
+      border-left: 3px solid var(--accent-yellow);
+    }
+    
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    
+    .task-id {
+      font-weight: 600;
+      font-size: 15px;
+    }
+    
+    .task-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .task-status.success {
+      background: rgba(63, 185, 80, 0.2);
+      color: var(--accent-green);
+    }
+    
+    .task-status.failed {
+      background: rgba(248, 81, 73, 0.2);
+      color: var(--accent-red);
+    }
+    
+    .task-status.running {
+      background: rgba(210, 153, 34, 0.2);
+      color: var(--accent-yellow);
+    }
+    
+    .task-meta {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    
+    .task-meta span {
+      margin-right: 16px;
+    }
+    
+    .stage-progress {
+      display: flex;
+      gap: 4px;
+      margin-top: 12px;
+    }
+    
+    .stage-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--border);
+      color: var(--text-secondary);
+    }
+    
+    .stage-dot.completed {
+      background: var(--accent-green);
+      color: white;
+    }
+    
+    .stage-dot.failed {
+      background: var(--accent-red);
+      color: white;
+    }
+    
+    .stage-dot.current {
+      background: var(--accent-yellow);
+      color: white;
+      animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    .stage-labels {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+    
+    .stage-label {
+      width: 24px;
+      font-size: 9px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state h2 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    
+    .error-message {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid var(--accent-red);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+      color: var(--accent-red);
+      font-size: 14px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-secondary);
+    }
+    
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>AI-Native 任务看板</h1>
+    <div class="controls">
+      <input type="text" id="runIdInput" placeholder="输入 run_id 查询（如 RUN-20260104-1234）">
+      <button id="queryBtn" onclick="queryStatus()">查询</button>
+      <button id="refreshBtn" onclick="refreshAll()">刷新全部</button>
+    </div>
+  </div>
+  
+  <div class="config-section">
+    <h3>⚙️ 配置</h3>
+    <div class="config-row">
+      <label>n8n 地址:</label>
+      <input type="text" id="n8nUrl" value="http://localhost:5680" style="width: 250px;">
+      <label>项目路径:</label>
+      <input type="text" id="projectRoot" value="/home/shash/work/Footnote" style="width: 300px;">
+    </div>
+  </div>
+  
+  <div id="errorContainer"></div>
+  
+  <div id="taskContainer">
+    <div class="empty-state">
+      <h2>暂无任务</h2>
+      <p>输入 run_id 查询任务状态，或点击"刷新全部"加载最近任务</p>
+    </div>
+  </div>
+  
+  <script>
+    const STAGES = [
+      { id: 0, name: '准备' },
+      { id: 1, name: '预检' },
+      { id: 2, name: '计划' },
+      { id: 3, name: '工单' },
+      { id: 4, name: '执行' },
+      { id: 5, name: '校验' },
+      { id: 6, name: 'Git' },
+      { id: 7, name: '通知' },
+    ];
+    
+    const tasks = new Map();
+    
+    function getN8nUrl() {
+      return document.getElementById('n8nUrl').value.replace(/\/$/, '');
+    }
+    
+    function getProjectRoot() {
+      return document.getElementById('projectRoot').value;
+    }
+    
+    function showError(message) {
+      const container = document.getElementById('errorContainer');
+      container.innerHTML = `<div class="error-message">${message}</div>`;
+      setTimeout(() => container.innerHTML = '', 5000);
+    }
+    
+    async function queryStatus() {
+      const runId = document.getElementById('runIdInput').value.trim();
+      if (!runId) {
+        showError('请输入 run_id');
+        return;
+      }
+      
+      const btn = document.getElementById('queryBtn');
+      btn.disabled = true;
+      btn.textContent = '查询中...';
+      
+      try {
+        const url = `${getN8nUrl()}/webhook/status?run_id=${encodeURIComponent(runId)}&project_root=${encodeURIComponent(getProjectRoot())}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.ok && data.status) {
+          tasks.set(runId, data.status);
+          renderTasks();
+        } else {
+          showError(data.error || '查询失败');
+        }
+      } catch (e) {
+        showError(`请求失败: ${e.message}`);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '查询';
+      }
+    }
+    
+    async function refreshAll() {
+      const btn = document.getElementById('refreshBtn');
+      btn.disabled = true;
+      btn.textContent = '刷新中...';
+      
+      // Refresh all known tasks
+      const promises = Array.from(tasks.keys()).map(async (runId) => {
+        try {
+          const url = `${getN8nUrl()}/webhook/status?run_id=${encodeURIComponent(runId)}&project_root=${encodeURIComponent(getProjectRoot())}`;
+          const response = await fetch(url);
+          const data = await response.json();
+          if (data.ok && data.status) {
+            tasks.set(runId, data.status);
+          }
+        } catch (e) {
+          console.error(`Failed to refresh ${runId}:`, e);
+        }
+      });
+      
+      await Promise.all(promises);
+      renderTasks();
+      
+      btn.disabled = false;
+      btn.textContent = '刷新全部';
+    }
+    
+    function renderTasks() {
+      const container = document.getElementById('taskContainer');
+      
+      if (tasks.size === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h2>暂无任务</h2>
+            <p>输入 run_id 查询任务状态</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const sortedTasks = Array.from(tasks.entries())
+        .sort((a, b) => (b[1].started_at || '').localeCompare(a[1].started_at || ''));
+      
+      container.innerHTML = `
+        <div class="task-grid">
+          ${sortedTasks.map(([runId, status]) => renderTaskCard(runId, status)).join('')}
+        </div>
+      `;
+    }
+    
+    function renderTaskCard(runId, status) {
+      const stage = status.stage || 0;
+      const ok = status.ok;
+      const isDone = stage === 99;
+      const isFailed = !ok && stage > 0;
+      
+      let statusClass = 'running';
+      let statusText = `阶段 ${stage}`;
+      
+      if (isDone) {
+        statusClass = 'success';
+        statusText = '完成';
+      } else if (isFailed) {
+        statusClass = 'failed';
+        statusText = `失败 (阶段 ${stage})`;
+      }
+      
+      return `
+        <div class="task-card ${statusClass}">
+          <div class="task-header">
+            <div class="task-id">${status.task_id || runId}</div>
+            <span class="task-status ${statusClass}">${statusText}</span>
+          </div>
+          <div class="task-meta">
+            <span>🏷️ ${runId}</span>
+            ${status.updated_at ? `<span>🕐 ${new Date(status.updated_at).toLocaleString()}</span>` : ''}
+          </div>
+          ${status.error ? `<div style="color: var(--accent-red); font-size: 13px; margin-bottom: 8px;">❌ ${status.error}</div>` : ''}
+          <div class="stage-progress">
+            ${STAGES.map(s => {
+              let dotClass = '';
+              if (isDone || s.id < stage) dotClass = 'completed';
+              else if (isFailed && s.id === stage) dotClass = 'failed';
+              else if (s.id === stage) dotClass = 'current';
+              return `<div class="stage-dot ${dotClass}">${s.id}</div>`;
+            }).join('')}
+          </div>
+          <div class="stage-labels">
+            ${STAGES.map(s => `<div class="stage-label">${s.name}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Enter key to query
+    document.getElementById('runIdInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') queryStatus();
+    });
+  </script>
+</body>
+</html>
+

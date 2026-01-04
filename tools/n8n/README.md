@@ -47,7 +47,99 @@ n8n start
 
 ## 工作流说明
 
-### Cursor CLI 版本（推荐）
+### 🆕 Fixed Flow Pipeline（推荐）
+
+完全在 n8n 中编排的完整执行链路，不依赖外部 runner 服务。
+
+**特点**：
+- ✅ 异步执行（立即返回 run_id，后台执行）
+- ✅ 7 阶段完整链路
+- ✅ 任何阶段失败都发通知
+- ✅ 支持从某个阶段续跑
+- ✅ 每阶段落盘日志
+
+**流程图**：
+
+```
+Webhook /fixed-flow
+    ↓
+Parse Params + Generate run_id
+    ↓
+Respond Async (立即返回)
+    ↓
+Stage 1: Git Preflight (检查 repo 是否干净)
+    ↓ (失败 → 通知)
+Stage 2: Plan (记录执行计划)
+    ↓
+Stage 3: TaskPack (读取或生成)
+    ↓
+Stage 4: Execute (调用 cursor-agent)
+    ↓ (失败 → 通知)
+Stage 5: Validate (npm run validate)
+    ↓ (失败 → 通知)
+Stage 6: Git Commit/Push
+    ↓ (失败 → 通知)
+Stage 7: Notify (发送完成通知)
+    ↓
+Write Final Status
+```
+
+**调用示例**：
+
+```bash
+curl -X POST http://localhost:5680/webhook/fixed-flow \
+  -H "Content-Type: application/json" \
+  -d '{
+    "task_id": "T-0001",
+    "task_pack_path": "docs/03_taskpacks/T-0001_example.md",
+    "role": "L3_engineer",
+    "task_type": "code",
+    "complexity": "normal"
+  }'
+```
+
+**响应**：
+
+```json
+{
+  "ok": true,
+  "run_id": "RUN-20260104-123456-abc1",
+  "task_id": "T-0001",
+  "started_async": true,
+  "logs_dir": "docs/05_logs/automation_runs/RUN-20260104-123456-abc1"
+}
+```
+
+### 状态查询
+
+```bash
+curl "http://localhost:5680/webhook/status?run_id=RUN-20260104-123456-abc1"
+```
+
+**响应**：
+
+```json
+{
+  "ok": true,
+  "run_id": "RUN-20260104-123456-abc1",
+  "status": {
+    "run_id": "RUN-20260104-123456-abc1",
+    "task_id": "T-0001",
+    "stage": 99,
+    "stage_name": "done",
+    "ok": true,
+    "completed_at": "2026-01-04T12:00:00.000Z"
+  }
+}
+```
+
+### 任务看板
+
+打开 `tools/n8n/dashboard/index.html` 可视化查看任务进度。
+
+---
+
+### 旧版：Cursor CLI 版本
 
 ```
 Manual Trigger

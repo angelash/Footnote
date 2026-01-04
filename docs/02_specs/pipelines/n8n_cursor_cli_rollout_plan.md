@@ -17,7 +17,7 @@
 
 ## 1. 新标准（必须先落地的“固定流程驱动”约定）
 
-> 你已确认：需要 **自动流转（无需人工确认）**、**每一步落盘**、且可以 **从任意阶段续跑**。
+> 你已确认：需要 **自动流转（无需人工确认）**、**每一步落盘**、并保留“可续跑”的扩展能力。
 
 本项目采用的固定流程标准（v1）已落盘：
 - `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
@@ -25,7 +25,7 @@
 ### 1.1 关键要求（摘要）
 - **全自动**：默认 `auto=true`，工作流从 intake 跑到 notify，不等待人工确认
 - **全程落盘**：每个 stage 产出到 `docs/05_logs/automation_runs/<run_id>/...`
-- **可续跑**：支持 `resume_from_stage`（或直接新 run_id 重跑）
+- **可续跑（对齐最新实现）**：保留 `resume_from_stage` 参数，但 `fixedflow-v1-001` 目前仅实现“跳过 preflight”（`resume_from_stage > 1`）；更细粒度的分段续跑属于后续增强项
 - **单任务串行**：v1 只允许一次跑一个任务（避免 repo 并发写）
 - **Git 固定策略（v1）**：允许直接 push `main`（你已确认）；后续再演进到分支+PR
 
@@ -99,7 +99,7 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 
 ### M0：跑通一次“固定流程 v1”端到端冒烟（目标：今天）
 - [ ] 5680 可访问
-- [ ] 触发一次 Webhook 执行（auto=true）
+- [ ] 触发一次 Webhook 执行（`POST /webhook/fixed-flow`）
 - [ ] 每个 stage 均有落盘（`docs/05_logs/automation_runs/<run_id>/`）
 - [ ] cursor-agent 产出 Deliverables（按 Task Pack/固定流程）
 - [ ] 校验器 PASS/FAIL 可阻断
@@ -125,15 +125,20 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 - **目标**：5680 的 n8n 进程由 PM2 管理（`n8n-secondary` online），并具备健康检查与日志可读性
 
 ### P0-2 导入/部署固定流程工作流（v1）
-- **从实例（5680）**：导入固定流程工作流（intake → preflight → execute → validate → git → notify）
+- **从实例（5680）**：导入并启用
+  - `tools/n8n/fixed-flow-pipeline.json`（`POST /webhook/fixed-flow`）
+  - `tools/n8n/status-query-workflow.json`（`GET /webhook/status?run_id=...`）
+  - （可选）`tools/n8n/dashboard/index.html` 用于可视化查看进度
 
 ### P0-3 阶段落盘与可续跑
-- **目标**：每个 stage 都写 `docs/05_logs/automation_runs/<run_id>/...`，并支持 `resume_from_stage`
+- **目标**：每次执行落盘到 `docs/05_logs/automation_runs/<run_id>/...`
+  - 关键文件（对齐 `fixedflow-v1-001`）：`00_intake.json`、`01_preflight.json`、`_prompt.md`、`04_execute.json`、`05_validate.json`、`06_git.json`、`07_notify.json`、`status.json`
+  - `resume_from_stage` 当前仅用于“跳过 preflight”，完整分段续跑需后续补齐工作流路由
 
 ### P0-4 cursor-agent 执行安全护栏（强烈建议）
 > 实测：`cursor-agent --print` 具备执行命令/写文件能力，若缺少护栏，可能出现“跑偏/越权/改错文件”的风险。
 
-- **建议封装**：新增一个 WSL 脚本（示例）`tools/n8n/run-cursor-task.sh`
+- **已落盘**：WSL 护栏脚本 `tools/n8n/run-cursor-task.sh`
   - 输入：task_pack_path、role、model
   - 动作：生成 prompt → 执行 cursor-agent → 运行校验器 → `git diff --name-only` 校验只改 Deliverables → 输出回执
 - **验收**：若出现非 Deliverables 的改动，脚本直接 fail 并阻断进入“完成”

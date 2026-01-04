@@ -10,11 +10,13 @@
 
 ### 1.0 当前运行形态（已选 C）
 
-- **入口**：仅使用 `WSL n8n-secondary (5680)` 作为工厂流水线的统一入口
-- **对外 Webhook**：
-  - `POST http://localhost:5680/webhook/compose-taskpack`
-  - `POST http://localhost:5680/webhook/execute-task`
-- **Windows 5678**：暂不作为分发入口（后续如需浏览器/MCP 任务再引入）
+- **执行入口（推荐）**：使用 `WSL n8n-secondary (5680)` 承载固定流程（Fixed Flow）
+  - `POST http://localhost:5680/webhook/fixed-flow`（主入口：落盘审计 → execute → validate → git → notify）
+  - `GET  http://localhost:5680/webhook/status?run_id=RUN-...`（状态查询：读取 `status.json`）
+- **兼容入口（旧链路）**：仍保留（部分工厂入口仍在使用，后续迁移）
+  - `POST http://localhost:5680/webhook/compose-taskpack`（Runner 版本）
+  - `POST http://localhost:5680/webhook/execute-task`（Runner 版本）
+- **Windows 5678（可选）**：用于“入口路由/浏览器任务”（例如 `/webhook/intake`、`/webhook/run-role`、`/webhook/browser-test`）
 
 ### 1.1 四类工件（Artifacts）
 
@@ -60,6 +62,8 @@
   - 传 `role/task_type/complexity`，把任务直接路由给对应执行器
 
 > 你仍然可以保留“便捷入口”：如 `/webhook/run-writer`、`/webhook/run-engineer`，本质是预填 role 的 Launcher。
+>
+> 对齐最新落地：上述“工厂入口”通常导入在 **Windows 5678**，并转发到 WSL 5680 的执行入口。
 
 ---
 
@@ -76,7 +80,9 @@
 ### 3.2 对应工作流
 
 - 主→从分发（通用）：`tools/n8n/dispatch-to-secondary-workflow.json`
-- 从实例执行器（通用）：`tools/n8n/cursor-cli-task-workflow.json`
+- 固定流程执行器（推荐）：`tools/n8n/fixed-flow-pipeline.json`
+- 状态查询（配套）：`tools/n8n/status-query-workflow.json`
+- 从实例执行器（旧：Runner）：`tools/n8n/cursor-cli-task-workflow.json`
 - Windows 浏览器测试：`tools/n8n/windows-mcp-runner-browser-test-workflow.json`
 
 ---
@@ -94,8 +100,14 @@
 
 - 规格文档：本文件
 - n8n 可导入工作流：
+  - `tools/n8n/fixed-flow-pipeline.json`（WSL 5680：/fixed-flow，推荐）
+  - `tools/n8n/status-query-workflow.json`（WSL 5680：/status，配套）
   - `tools/n8n/factory-intake-workflow.json`（主实例 /intake）
   - `tools/n8n/factory-run-role-workflow.json`（主实例 /run-role）
-  - `tools/n8n/taskpack-factory-workflow.json`（从实例 /compose-taskpack）
+  - `tools/n8n/taskpack-factory-workflow.json`（从实例 /compose-taskpack，旧：Runner 版本）
+  - `tools/n8n/launcher-l3-writer-to-wsl.json`（可选：/run-writer）
+  - `tools/n8n/launcher-l3-engineer-to-wsl.json`（可选：/run-engineer）
+
+- 可视化看板（可选）：`tools/n8n/dashboard/index.html`（查询 `/webhook/status` 展示进度）
 
 

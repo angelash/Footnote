@@ -37,6 +37,8 @@
 
 当前工程在多处文档中已选择 **形态 C（单入口）**：
 - **统一入口**：WSL `n8n-secondary`（端口 `5680`）作为“工厂入口”
+- **执行主链路（推荐）**：`POST /webhook/fixed-flow`（`tools/n8n/fixed-flow-pipeline.json`）
+- **状态查询（配套）**：`GET /webhook/status?run_id=...`（`tools/n8n/status-query-workflow.json`）
 - **Windows 5678**：暂不作为分发入口（后续需要浏览器/MCP 任务再启用）
 
 ### 3.1 新标准：固定流程驱动 + 自动流转 + 可续跑
@@ -44,7 +46,7 @@
 你已确认工作方式偏好：
 - **不需要每步人工确认**：默认全自动流转（auto=true）
 - **每一步都必须落盘**：任何阶段都可回看与定位
-- **随时从某个阶段重新开始**：支持从 intake/preflight/execute/validate/git/notify 续跑
+- **可续跑**：保留 `resume_from_stage` 参数（但当前落地版本仅支持“跳过 preflight”，完整分段续跑待补齐）
 - **单任务串行**：一次只跑一个任务，避免 repo 并发写
 
 对应标准文档：
@@ -133,7 +135,7 @@ sequenceDiagram
   participant V as Validators
 
   Client->>N8NP: POST /webhook/dispatch-task {task_pack_path,...}
-  N8NP->>N8NS: POST /webhook/execute-task {task_pack_path,...}
+  N8NP->>N8NS: POST /webhook/fixed-flow {task_id/task_pack_path,...}（推荐）
   N8NS->>Repo: 读取 Task Pack + Allowed Inputs
   N8NS->>CA: 执行 cursor-agent（受限提示）
   CA->>Repo: 写 Deliverables
@@ -142,6 +144,8 @@ sequenceDiagram
   N8NS-->>N8NP: 回执/结果（可选回传）
   N8NP-->>Client: 返回执行结果（或异步通知）
 ```
+
+> 兼容说明：仓库中仍保留旧链路 `/webhook/execute-task` 与 `/webhook/compose-taskpack`（Runner 版本），部分“工厂入口”工作流仍在使用；迁移到 fixed-flow 后可逐步下线。
 
 ---
 
@@ -154,7 +158,8 @@ stateDiagram-v2
   [*] --> Draft
   Draft --> Ready: 填写完整 Allowed Inputs/Deliverables/Acceptance
   Ready --> InProgress: 触发执行
-  InProgress --> Review: 校验通过<br/>等待人工确认
+  InProgress --> Done: fixed-flow 全自动完成<br/>commit/push + notify
+  InProgress --> Review: （可选）需要人工把关时开启
   Review --> Done: 验收通过
   InProgress --> Rollback: 越权/改冻结目录/超粒度
   Review --> Rollback: 发现风险需回滚
@@ -176,8 +181,10 @@ stateDiagram-v2
 
 | Webhook | 位置 | 用途 |
 |---|---|---|
-| `POST /webhook/execute-task` | WSL 5680 | 执行指定 Task Pack（主链路） |
-| `POST /webhook/compose-taskpack` | WSL 5680 | 生成 Task Pack（工厂模式） |
+| `POST /webhook/fixed-flow` | WSL 5680 | **固定流程主入口（推荐）**：异步启动 run_id，落盘审计并自动完成 |
+| `GET /webhook/status` | WSL 5680 | **状态查询（配套）**：读取 `docs/05_logs/automation_runs/<run_id>/status.json` |
+| `POST /webhook/execute-task` | WSL 5680 | 旧链路：执行指定 Task Pack（Runner 版本，兼容保留） |
+| `POST /webhook/compose-taskpack` | WSL 5680 | 旧链路：生成 Task Pack（Runner 版本，兼容保留） |
 | `POST /webhook/dispatch-task` | Windows 5678 | 主→从分发（可选） |
 | `POST /webhook/browser-test` | Windows 5678 | Windows MCP Runner 浏览器任务（可选） |
 
@@ -185,12 +192,16 @@ stateDiagram-v2
 
 | 工作流 | 文件 | 建议导入到 |
 |---|---|---|
-| Cursor CLI 执行器 | `tools/n8n/cursor-cli-task-workflow.json` | WSL 5680 |
+| **Fixed Flow Pipeline（推荐）** | `tools/n8n/fixed-flow-pipeline.json` | WSL 5680 |
+| **Status Query（配套）** | `tools/n8n/status-query-workflow.json` | WSL 5680 |
+| Cursor CLI 执行器（旧） | `tools/n8n/cursor-cli-task-workflow.json` | WSL 5680（兼容保留；依赖 `wsl-runner:3210`） |
 | Windows 桥接 WSL 执行器 | `tools/n8n/cursor-cli-task-workflow-windows.json` | Windows 5678（可选） |
 | 主→从分发 | `tools/n8n/dispatch-to-secondary-workflow.json` | Windows 5678（可选） |
 | 工厂入口 /intake | `tools/n8n/factory-intake-workflow.json` | Windows 5678（可选） |
 | 工厂入口 /run-role | `tools/n8n/factory-run-role-workflow.json` | Windows 5678（可选） |
-| 生成 Task Pack（/compose-taskpack） | `tools/n8n/taskpack-factory-workflow.json` | WSL 5680 |
+| 生成 Task Pack（旧 /compose-taskpack） | `tools/n8n/taskpack-factory-workflow.json` | WSL 5680（兼容保留；依赖 `wsl-runner:3210`） |
+| 岗位 Launcher：writer | `tools/n8n/launcher-l3-writer-to-wsl.json` | Windows 5678（可选） |
+| 岗位 Launcher：engineer | `tools/n8n/launcher-l3-engineer-to-wsl.json` | Windows 5678（可选） |
 | Windows Browser Test | `tools/n8n/windows-mcp-runner-browser-test-workflow.json` | Windows 5678（可选） |
 
 完整目录：`tools/n8n/WORKFLOW-CATALOG.md`

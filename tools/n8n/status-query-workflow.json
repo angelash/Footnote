@@ -29,18 +29,19 @@
     },
     {
       "parameters": {
-        "command": "={{ 'cat \"' + $json.status_path + '\" 2>/dev/null || echo \"{\\\"error\\\": \\\"not_found\\\"}\"' }}"
+        "fileSelector": "={{ $json.status_path }}"
       },
       "id": "read-status",
       "name": "Read Status",
-      "type": "n8n-nodes-base.exec",
+      "type": "n8n-nodes-base.readBinaryFile",
       "typeVersion": 1,
-      "position": [540, 300]
+      "position": [540, 300],
+      "continueOnFail": true
     },
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// Parse status and return\nconst params = $('Parse Query').first().json;\nconst result = $input.first().json;\nconst stdout = result.stdout || '';\n\ntry {\n  const status = JSON.parse(stdout);\n  if (status.error === 'not_found') {\n    return { json: { ok: false, error: 'status_not_found', run_id: params.run_id } };\n  }\n  return { json: { ok: true, run_id: params.run_id, status } };\n} catch (e) {\n  return { json: { ok: false, error: 'parse_error', run_id: params.run_id, detail: stdout.slice(0, 200) } };\n}"
+        "jsCode": "// Parse status and return\nconst params = $('Parse Query').first().json;\nconst item = $input.first();\n\n// Check if file read failed (file not found)\nif (item.error || !item.binary || !item.binary.data) {\n  return { json: { ok: false, error: 'status_not_found', run_id: params.run_id } };\n}\n\ntry {\n  // Convert base64 to string and parse JSON\n  const jsonString = Buffer.from(item.binary.data.data, 'base64').toString('utf8');\n  const status = JSON.parse(jsonString);\n  return { json: { ok: true, run_id: params.run_id, status } };\n} catch (e) {\n  return { json: { ok: false, error: 'parse_error', run_id: params.run_id, detail: e.message } };\n}"
       },
       "id": "format-response",
       "name": "Format Response",

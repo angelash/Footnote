@@ -108,6 +108,11 @@ comics/processed/
 .turbo/
 
 # ===========================
+# n8n local data (do NOT commit)
+# ===========================
+local/
+
+# ===========================
 # Package manager locks
 # Keep one, comment out the rest
 # ===========================

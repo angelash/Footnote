@@ -16,6 +16,9 @@ module.exports = {
         N8N_PORT: 5678,
         N8N_HOST: '0.0.0.0',
         N8N_PROTOCOL: 'http',
+        // 固定数据目录，避免“换运行用户/换启动方式”导致 .n8n 位置变化（账号/工作流看似丢失）
+        // 如需自定义：通过外部环境变量覆盖 N8N_USER_FOLDER
+        N8N_USER_FOLDER: process.env.N8N_USER_FOLDER || 'F:\\workspace\\github\\Footnote\\local\\n8n-primary',
         N8N_BASIC_AUTH_ACTIVE: 'true',
         N8N_BASIC_AUTH_USER: 'admin@footnote.local',
         N8N_BASIC_AUTH_PASSWORD: 'Footnote2025!',

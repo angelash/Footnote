@@ -50,13 +50,13 @@
 
 ```mermaid
 flowchart LR
-  U[你 / 团队\n(需求/验收)] -->|编写/选择| TP[Task Pack\n docs/03_taskpacks/*.md]
+  U[你 / 团队<br/>需求 / 验收] -->|编写/选择| TP[Task Pack<br/>docs/03_taskpacks/*.md]
 
   subgraph WSL[WSL 执行域（推荐）]
-    N8N[n8n-secondary\n:5680]
-    REPO[Repo 工作副本\n/home/.../Footnote]
-    CA[cursor-agent\n(写代码/写文档)]
-    V[Validators\nnpm run validate/typecheck/test]
+    N8N[n8n-secondary<br/>5680]
+    REPO[Repo 工作副本<br/>/home/.../Footnote]
+    CA[cursor-agent<br/>写代码 / 写文档]
+    V[Validators<br/>npm run validate / typecheck / test]
   end
 
   TP -->|Webhook/Manual| N8N
@@ -66,13 +66,13 @@ flowchart LR
   N8N -->|run| V
   V -->|PASS/FAIL| N8N
 
-  N8N --> R[Execution Receipt\n(回执/日志)]
+  N8N --> R[Execution Receipt<br/>回执 / 日志]
   N8N -->|可选| NOTI[完成通知接口]
 
   subgraph Windows[Windows 扩展域（可选）]
-    N8NP[n8n-primary\n:5678 (可选)]
-    MR[mcp-runner\n(无 cursor-agent\n驱动 Browser MCP)]
-    MCP[Browser/Chrome MCP\n:3000/mcp]
+    N8NP[n8n-primary<br/>5678 可选]
+    MR[mcp-runner<br/>无 cursor-agent<br/>驱动 Browser MCP]
+    MCP[Browser / Chrome MCP<br/>3000/mcp]
   end
 
   N8NP -.->|可选分发| N8N
@@ -92,15 +92,15 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A[触发执行\nManual/Webhook/Schedule] --> B[读取 Task Pack\n(task_pack_path)]
-  B --> C[构建最小上下文\n(只读 Allowed Inputs\n只写 Deliverables)]
-  C --> D[调用 cursor-agent\n(选模型/角色)]
-  D --> E[生成变更\n写入 Deliverables]
-  E --> F[运行校验器\nvalidate/typecheck/test]
+  A[触发执行<br/>Manual / Webhook / Schedule] --> B[读取 Task Pack<br/>task_pack_path]
+  B --> C[构建最小上下文<br/>只读 Allowed Inputs<br/>只写 Deliverables]
+  C --> D[调用 cursor-agent<br/>选模型 / 角色]
+  D --> E[生成变更<br/>写入 Deliverables]
+  E --> F[运行校验器<br/>validate / typecheck / test]
   F --> G{校验通过?}
-  G -- 否 --> H[FAIL\n输出错误摘要/回执\n标记返工]
-  G -- 是 --> I[PASS\n输出回执\n进入人工 Review(可选)]
-  I --> J[通知/记录\n(可选)]
+  G -- 否 --> H[FAIL<br/>输出错误摘要 / 回执<br/>标记返工]
+  G -- 是 --> I[PASS<br/>输出回执<br/>进入人工 Review 可选]
+  I --> J[通知 / 记录<br/>可选]
   H --> J
 ```
 
@@ -138,7 +138,7 @@ stateDiagram-v2
   [*] --> Draft
   Draft --> Ready: 填写完整 Allowed Inputs/Deliverables/Acceptance
   Ready --> InProgress: 触发执行
-  InProgress --> Review: 校验通过\n等待人工确认
+  InProgress --> Review: 校验通过<br/>等待人工确认
   Review --> Done: 验收通过
   InProgress --> Rollback: 越权/改冻结目录/超粒度
   Review --> Rollback: 发现风险需回滚

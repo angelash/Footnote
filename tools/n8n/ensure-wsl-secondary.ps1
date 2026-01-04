@@ -8,14 +8,14 @@
 # - Windows 可执行 wsl
 # - WSL 中已安装 pm2，且 n8n-secondary 已配置为 pm2 app
 
-$ErrorActionPreference = "Stop"
-
 param(
     [int]$Port = 5680,
     [string]$ProjectRoot = "/home/shash/work/Footnote",
     [string]$ProcessName = "n8n-secondary",
     [string]$StartCommand = "pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
 )
+
+$ErrorActionPreference = "Stop"
 
 function Write-Info([string]$msg) { Write-Host "[ensure-wsl-secondary] $msg" -ForegroundColor Cyan }
 function Write-Ok([string]$msg) { Write-Host "[ensure-wsl-secondary] $msg" -ForegroundColor Green }
@@ -35,8 +35,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Info "Checking port $Port..."
-$port = netstat -ano | findstr ":$Port" 2>$null
-if ($port) {
+$portLine = netstat -ano | findstr ":$Port" 2>$null
+if ($portLine) {
     Write-Ok "Port $Port is listening"
 } else {
     Write-Warn "Port $Port not listening, starting process..."

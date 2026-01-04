@@ -50,6 +50,11 @@
 对应标准文档：
 - `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
 
+### 3.2 两条线边界（Env/Process vs Production）
+
+为避免“改流程/改部署”污染“做产品/出产物”，两条线的工作环境与提交策略必须区分：
+- `docs/02_specs/pipelines/workstreams_boundary.md`
+
 相关说明：
 - 工厂流水线规格：`docs/02_specs/pipelines/factory_pipeline_spec.md`
 - n8n 使用说明：`tools/n8n/README.md`

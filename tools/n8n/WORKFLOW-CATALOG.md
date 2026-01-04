@@ -24,6 +24,9 @@
 
 - **从实例执行（WSL 5680）**：`tools/n8n/cursor-cli-task-workflow.json`
   - Webhook：`POST http://localhost:5680/webhook/execute-task`
+- **固定流程 v1（推荐：自动流转/落盘/可续跑）**：`tools/n8n/cli-import/secondary-fixed-flow.export.json`
+  - Webhook：`POST http://localhost:5680/webhook/fixed-flow`
+  - 说明：该工作流仅做“入口代理”，具体 stage/落盘/锁/git/通知由 `wsl-cursor-runner` 的 `/fixed-flow` 负责
 - **Windows 主实例直连 WSL 的版本（可选）**：`tools/n8n/cursor-cli-task-workflow-windows.json`
 
 ### 2.2 主从分发（通用入口 → 从实例执行）

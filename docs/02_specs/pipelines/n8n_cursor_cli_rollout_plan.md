@@ -1,21 +1,37 @@
-# n8n 主从 + Cursor CLI（cursor-agent）落地推进计划（Rollout Plan）
+# n8n + Cursor CLI（cursor-agent）落地推进计划（Rollout Plan）
 
-> 本计划用于把“主从 n8n + Task Pack + Cursor CLI 执行”从**可用**推进到**可持续规模化提需求**。
+> 本计划用于把“n8n 固定流程 + Task Pack/结构化输入 + Cursor CLI 执行”从**可用**推进到**可持续规模化提需求**。
 >
 > 架构规格：`docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
 
 ---
 
-## 0. 现状快照（2025-12-31）
+## 0. 现状快照（2026-01-04）
 
-- **主实例（Windows 5678）**：端口已监听，UI 可访问；但当前是 `n8n start` 直接启动，`pm2 status` 中 `n8n-primary` 可能为 stopped（状态漂移风险）。
-- **从实例（WSL 5680）**：`pm2 status` 显示 `n8n-secondary` online；WSL 工具链可用（Node/n8n/PM2）。
+- **单入口（WSL 5680）**：`pm2 status` 显示 `n8n-secondary` online；作为执行入口与看板。
+- **Windows 5678**：未来如需要浏览器/MCP 扩展再启用；当前不作为必选链路。
 - **Task Pack**：仓库已有 `docs/03_taskpacks/_template.md` 与示例 `T-0001_c0_z1_dialogue.md`。
 - **工作流导入文件**：`tools/n8n/*.json` 已准备；默认 Task Pack 路径已修正为存在的示例文件。
 
 ---
 
-## 1. 需要先确认的决策（P0-Decision）
+## 1. 新标准（必须先落地的“固定流程驱动”约定）
+
+> 你已确认：需要 **自动流转（无需人工确认）**、**每一步落盘**、且可以 **从任意阶段续跑**。
+
+本项目采用的固定流程标准（v1）已落盘：
+- `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
+
+### 1.1 关键要求（摘要）
+- **全自动**：默认 `auto=true`，工作流从 intake 跑到 notify，不等待人工确认
+- **全程落盘**：每个 stage 产出到 `docs/05_logs/automation_runs/<run_id>/...`
+- **可续跑**：支持 `resume_from_stage`（或直接新 run_id 重跑）
+- **单任务串行**：v1 只允许一次跑一个任务（避免 repo 并发写）
+- **Git 固定策略（v1）**：允许直接 push `main`（你已确认）；后续再演进到分支+PR
+
+---
+
+## 2. 模型选择策略（落地约定）
 
 ### D1：执行副本策略（必须二选一）
 - **A（推荐）只跑 WSL 副本**：自动化执行只在 `/home/shash/work/Footnote` 上发生；Windows 主实例仅做分发/看板
@@ -29,7 +45,7 @@
 
 ---
 
-## 1.1 模型选择策略（落地约定）
+## 2.1 模型选择策略（落地约定）
 
 > 重要澄清：**Cursor CLI（cursor-agent）使用 Cursor 自己的模型体系**；你提供的 `CUSTOM_API_*` 是另一条独立能力（Windows MCP Runner），两者不要混用。
 
@@ -60,7 +76,7 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 
 ---
 
-## 1.2 MCP/ChromeMCP 策略（落地约定）
+## 2.2 MCP/ChromeMCP 策略（落地约定）
 
 ### 原则
 - **代码/文档任务**：默认只跑 **WSL 执行器**（执行副本 A）。
@@ -79,47 +95,40 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 
 ---
 
-## 2. 里程碑（Milestones）
+## 3. 里程碑（Milestones）
 
-### M0：跑通一次端到端（E2E）冒烟（目标：今天）
-- [ ] 主/从实例可访问
-- [ ] 从实例导入 `cursor-cli-task-workflow.json`
-- [ ] 指定 `task_pack_path=docs/03_taskpacks/T-0001_c0_z1_dialogue.md` 执行一次
-- [ ] cursor-agent 产出 Deliverables（按 Task Pack）
-- [ ] 跑校验器并产生 PASS/FAIL
-- [ ] 输出回执 + 可追踪日志
+### M0：跑通一次“固定流程 v1”端到端冒烟（目标：今天）
+- [ ] 5680 可访问
+- [ ] 触发一次 Webhook 执行（auto=true）
+- [ ] 每个 stage 均有落盘（`docs/05_logs/automation_runs/<run_id>/`）
+- [ ] cursor-agent 产出 Deliverables（按 Task Pack/固定流程）
+- [ ] 校验器 PASS/FAIL 可阻断
+- [ ] git commit/push（v1 可直接 main）
+- [ ] 输出回执 + 通知闭环
 
 ### M1：可持续提需求（目标：1~2 天）
-- [ ] 主实例提供统一入口（Webhook/手动表单）→ 分发到从实例执行
-- [ ] 参数与回执格式标准化
-- [ ] “失败可重跑/可定位”闭环跑通
+- [ ] 统一入口（Webhook/表单）可用
+- [ ] 参数/回执/落盘目录结构标准化
+- [ ] “失败可重跑/可定位/可续跑”闭环跑通
 
 ### M2：工程化规模化（目标：3~7 天）
 - [ ] 校验器标准化（validate/typecheck/lint/test）
-- [ ] 工作流同步自动化（或明确手动流程+审计）
+- [ ] 工作流/runner 部署自动化（或明确手动流程+审计）
 - [ ] 密钥与安全边界固化（N8N_ENCRYPTION_KEY、API Key 轮换）
 - [ ] 产物审计与通知闭环（成功/失败都通知）
 
 ---
 
-## 3. P0 阻塞项任务清单（必须做）
+## 4. P0 阻塞项任务清单（必须做）
 
-### P0-1 统一主实例托管（消除漂移）
-- **目标**：5678 的 n8n 进程由 PM2 管理（`n8n-primary` online）
-- **交付**：
-  - `pm2 status` 显示 `n8n-primary` online
-  - `netstat :5678` 的 PID 对应 PM2 托管进程
-- **建议动作**：
-  - 停掉当前手动 `n8n start` 进程
-  - 用 `pm2 start n8n --name n8n-primary -- start` 启动（端口用环境变量）
+### P0-1 单入口（5680）托管与可观测性
+- **目标**：5680 的 n8n 进程由 PM2 管理（`n8n-secondary` online），并具备健康检查与日志可读性
 
-### P0-2 导入工作流（主/从）
-- **从实例**：导入 `tools/n8n/cursor-cli-task-workflow.json`
-- **主实例**：导入 `tools/n8n/cursor-cli-task-workflow-windows.json`（如果主实例要直接桥接 WSL）
+### P0-2 导入/部署固定流程工作流（v1）
+- **从实例（5680）**：导入固定流程工作流（intake → preflight → execute → validate → git → notify）
 
-### P0-3 增加“主→从分发”工作流（建议）
-- **主实例**：提供一个 Webhook（或表单）接收 `{task_pack_path, role, model?}` → 转发到从实例 Webhook
-- **从实例**：提供一个 Webhook 版本执行工作流（替代 Manual Trigger）
+### P0-3 阶段落盘与可续跑
+- **目标**：每个 stage 都写 `docs/05_logs/automation_runs/<run_id>/...`，并支持 `resume_from_stage`
 
 ### P0-4 cursor-agent 执行安全护栏（强烈建议）
 > 实测：`cursor-agent --print` 具备执行命令/写文件能力，若缺少护栏，可能出现“跑偏/越权/改错文件”的风险。
@@ -133,7 +142,7 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 - 选用：`docs/03_taskpacks/T-0001_c0_z1_dialogue.md`
 - 目标：一次跑通 M0
 
-### P0-6 Windows 浏览器/MCP 测试链路（ChromeMCP / Browser MCP）
+### P0-6 Windows 浏览器/MCP 测试链路（ChromeMCP / Browser MCP）（可选）
 
 - **目标**：当 Windows 侧没有 `cursor-agent` 时，仍能通过 n8n 触发浏览器自动化测试
 - **执行器**：`tools/mcp-runner/mcp-runner.mjs` + `tools/mcp-runner/run-agent.ps1`

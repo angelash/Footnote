@@ -83,6 +83,16 @@ Task Pack 必须包含：
 7. **Check Validation / Human Review**：校验通过进入待审；失败进入返工
 8. **Notify（可选）**：向通知接口/Issue 系统推送结果
 
+### 4.1.1 固定流程驱动（v1：全自动 + 可续跑）
+
+> 本项目已确认“无需每步人工确认”，并要求“每一步落盘且可从任意阶段续跑”。  
+> 固定流程标准见：`docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
+
+固定流程在架构层面的新增要求：
+- **强制落盘审计目录**：`docs/05_logs/automation_runs/<run_id>/...`
+- **单任务串行**：避免同一 repo 并发写导致状态污染
+- **git 阶段纳入固定流程**：`commit/push` 作为明确 stage（v1 允许直接 push main）
+
 ### 4.2 主从联动（推荐形态）
 **推荐策略**：主实例只做“分发”，执行全部落在从实例。
 - 主实例 workflow：接收需求（Webhook/手动）→ 校验参数 → 调用从实例 Webhook

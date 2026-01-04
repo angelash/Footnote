@@ -39,6 +39,17 @@
 - **统一入口**：WSL `n8n-secondary`（端口 `5680`）作为“工厂入口”
 - **Windows 5678**：暂不作为分发入口（后续需要浏览器/MCP 任务再启用）
 
+### 3.1 新标准：固定流程驱动 + 自动流转 + 可续跑
+
+你已确认工作方式偏好：
+- **不需要每步人工确认**：默认全自动流转（auto=true）
+- **每一步都必须落盘**：任何阶段都可回看与定位
+- **随时从某个阶段重新开始**：支持从 intake/preflight/execute/validate/git/notify 续跑
+- **单任务串行**：一次只跑一个任务，避免 repo 并发写
+
+对应标准文档：
+- `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
+
 相关说明：
 - 工厂流水线规格：`docs/02_specs/pipelines/factory_pipeline_spec.md`
 - n8n 使用说明：`tools/n8n/README.md`
@@ -92,15 +103,15 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A[触发执行<br/>Manual / Webhook / Schedule] --> B[读取 Task Pack<br/>task_pack_path]
+  A[触发执行<br/>Webhook / Schedule] --> B[落盘 run_id + intake<br/>docs/05_logs/automation_runs]
   B --> C[构建最小上下文<br/>只读 Allowed Inputs<br/>只写 Deliverables]
   C --> D[调用 cursor-agent<br/>选模型 / 角色]
   D --> E[生成变更<br/>写入 Deliverables]
   E --> F[运行校验器<br/>validate / typecheck / test]
   F --> G{校验通过?}
   G -- 否 --> H[FAIL<br/>输出错误摘要 / 回执<br/>标记返工]
-  G -- 是 --> I[PASS<br/>输出回执<br/>进入人工 Review 可选]
-  I --> J[通知 / 记录<br/>可选]
+  G -- 是 --> I[PASS<br/>进入 git 阶段<br/>commit/push]
+  I --> J[通知 / 记录（强制）]
   H --> J
 ```
 

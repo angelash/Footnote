@@ -83,7 +83,7 @@ NODE_ENV=production
 #### PM2 配置
 
 ```json
-// ecosystem.config.js
+// ecosystem.config.cjs
 module.exports = {
   apps: [
     {
@@ -118,7 +118,7 @@ module.exports = {
 npm install -g pm2
 
 # 启动主实例
-pm2 start ecosystem.config.js --only n8n-primary
+pm2 start ecosystem.config.cjs --only n8n-primary
 
 # 保存配置
 pm2 save
@@ -155,7 +155,7 @@ NODE_ENV=production
 #### PM2 配置
 
 ```json
-// ecosystem.config.js (WSL)
+// ecosystem.config.wsl.cjs (WSL)
 module.exports = {
   apps: [
     {
@@ -188,7 +188,7 @@ module.exports = {
 ```bash
 # 在 WSL 中
 cd /home/shash/work/Footnote
-pm2 start ecosystem.config.js --only n8n-secondary
+pm2 start ecosystem.config.wsl.cjs --only n8n-secondary
 pm2 save
 pm2 startup
 ```

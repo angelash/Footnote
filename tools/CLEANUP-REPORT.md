@@ -33,7 +33,6 @@
 
 ### 文档（参考价值）
 - ✅ `tools/n8n/WSL-SETUP.md` - WSL 设置指南
-- ✅ `tools/n8n/WSL-TEST-REPORT.md` - 最新测试报告（2025-12-30）
 
 ### 规则文件（正常文件）
 - ✅ `.cursor/rules/04-testing.mdc` - 测试规范

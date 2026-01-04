@@ -63,7 +63,7 @@
       {
         "parameters": {
           "method": "POST",
-          "url": "http://127.0.0.1:3980/agent",
+          "url": "http://127.0.0.1:3211/agent",
           "sendBody": true,
           "specifyBody": "json",
           "jsonBody": "={{ { mcp_url: $json.mcp_url, prompt: $json.prompt, task_type: $json.task_type, complexity: $json.complexity, model_override: $json.model_override } }}"

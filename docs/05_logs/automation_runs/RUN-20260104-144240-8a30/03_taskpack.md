@@ -1,8 +1,3 @@
-# Task Execution Instructions
-
-## Current Role: L3_engineer
-
-## Task Pack:
 ---
 task_id: T-REVIEW-20260103_project_quality
 title: "项目审查：完成度与质量评估 + 后续开发计划"
@@ -78,24 +73,3 @@ requires_mcp: false
 ```
 
 
-
-
-## Execution Rules:
-1. Only read files listed in Allowed Inputs
-2. Only write to paths listed in Deliverables
-3. Follow all constraints strictly
-4. Output a receipt in this format:
-
-```
-【完成内容】
-- ...
-
-【输出文件】
-- ...
-
-【自检】
-- [ ] ...
-
-【风险与未完成】
-- (如有)
-```

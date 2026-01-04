@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "elapsed_ms": 132801,
+  "task_pack_path": "docs/03_taskpacks/T-REVIEW-20260103_project_quality.md",
+  "role": "L3_engineer",
+  "task_type": "doc",
+  "complexity": "normal",
+  "model_override": "auto",
+  "agent": {
+    "code": 0,
+    "stdout": "门禁跑起来了，但目前 **typecheck/lint/unit/coverage/e2e 全部直接失败**，原因一致：`tsc/eslint/vitest/playwright` 都 “not found”。这通常意味着 **devDependencies 没有被安装**（比如环境里 `NODE_ENV=production` 导致 `npm ci` 默认省略 dev 依赖）。我先确认环境变量，然后用包含 dev 依赖的方式重新安装，再重跑门禁，把最终结果写进质检文档。\n",
+    "stderr": "[run-cursor-task] task_pack=docs/03_taskpacks/T-REVIEW-20260103_project_quality.md task_type=doc complexity=normal model=gpt-5.2\n[run-cursor-task] OK\n"
+  },
+  "validate": {
+    "code": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+}

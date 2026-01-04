@@ -142,7 +142,8 @@ async function gitPreflight(projectRoot) {
     "bash",
     [
       "-lc",
-      "git status --porcelain -- . ':(exclude)docs/05_logs/automation_runs' ':(exclude)docs/05_logs/automation_runs/**'",
+      // Also ignore the generated prompt file (tracked in this repo) to avoid self-blocking.
+      "git status --porcelain -- . ':(exclude).cursor/current_task_prompt.md' ':(exclude)docs/05_logs/automation_runs' ':(exclude)docs/05_logs/automation_runs/**'",
     ],
     { cwd: projectRoot, env: process.env }
   );

@@ -106,6 +106,7 @@ docs/05_logs/automation_runs/<run_id>/
 - **repo 状态**：`git status --porcelain` 必须为空（否则 FAIL，提示先 reset/clean 或新 workspace）
 - **分支策略（v1）**：允许直接 `main`（你已确认），但必须 `git pull --ff-only` 成功
 - **远端**：必须是 `origin`，且有 push 权限可用
+- **git identity**：必须配置 `user.name` / `user.email`（否则 git commit 会失败）
 - **串行锁**：获取锁成功（见第 7 节）
 
 ---

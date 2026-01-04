@@ -1,0 +1,14 @@
+{
+  "run_id": "RUN-20260104-163302-12f8",
+  "task_id": "T-SMOKE-STAGE99-GIT-20260104",
+  "stage": 99,
+  "attempt": 1,
+  "ok": true,
+  "started_at": "2026-01-04T08:33:02.583Z",
+  "updated_at": "2026-01-04T08:39:28.737Z",
+  "repo": {
+    "root": "/home/shash/work/Footnote",
+    "branch": "main",
+    "head": "9cd7797"
+  }
+}

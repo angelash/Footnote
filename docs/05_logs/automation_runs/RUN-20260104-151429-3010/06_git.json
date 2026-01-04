@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "elapsed_ms": 3110,
+  "changed_files": [
+    "docs/05_logs/automation_runs/RUN-20260104-145104-77b0/06_git.json",
+    "docs/05_logs/automation_runs/RUN-20260104-145104-77b0/07_notify.json",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/00_intake.json",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/01_preflight.json",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/02_plan.json",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/03_taskpack.md",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/04_execute.json",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/05_validate.json",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/_prompt.md",
+    "docs/05_logs/automation_runs/RUN-20260104-151429-3010/status.json"
+  ],
+  "commit": {
+    "code": 0,
+    "stdout": "[main 3d784a9] T-SMOKE-FIXEDFLOW-PROMPT-20260104: smoke fixed-flow prompt path (no .cursor commit) [run:RUN-20260104-151429-3010]\n 10 files changed, 297 insertions(+)\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-145104-77b0/06_git.json\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-145104-77b0/07_notify.json\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/00_intake.json\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/01_preflight.json\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/02_plan.json\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/03_taskpack.md\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/04_execute.json\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/05_validate.json\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/_prompt.md\n create mode 100644 docs/05_logs/automation_runs/RUN-20260104-151429-3010/status.json\n",
+    "stderr": ""
+  },
+  "head": "3d784a9",
+  "push": {
+    "code": 0,
+    "stdout": "",
+    "stderr": "To github.com:angelash/Footnote.git\n   9f90324..3d784a9  main -> main\n"
+  }
+}

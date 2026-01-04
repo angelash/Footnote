@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "planned_at": "2026-01-04T07:14:33.169Z",
+  "role": "L3_engineer",
+  "task_type": "doc",
+  "complexity": "normal",
+  "model_override": "auto",
+  "runner": "wsl-runner"
+}

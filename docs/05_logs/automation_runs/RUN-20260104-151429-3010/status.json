@@ -1,0 +1,14 @@
+{
+  "run_id": "RUN-20260104-151429-3010",
+  "task_id": "T-SMOKE-FIXEDFLOW-PROMPT-20260104",
+  "stage": 6,
+  "attempt": 1,
+  "ok": false,
+  "started_at": "2026-01-04T07:14:29.945Z",
+  "updated_at": "2026-01-04T07:16:34.375Z",
+  "repo": {
+    "root": "/home/shash/work/Footnote",
+    "branch": "main",
+    "head": "9f90324"
+  }
+}

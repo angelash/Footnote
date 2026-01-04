@@ -15,7 +15,7 @@
 - **平台**：H5 竖版手机游戏
 - **核心体验**：维度不是空间，而是资源与代价
 
-📖 详细游戏设计文档请查看 [`design/README.md`](./design/README.md)
+📖 详细游戏设计文档请查看 [`design/game/README.md`](./design/game/README.md)
 
 ---
 
@@ -34,6 +34,9 @@
 git clone https://github.com/YourOrg/Footnote.git
 cd Footnote
 
+# 进入游戏目录
+cd game
+
 # 安装 Node.js 依赖
 npm install
 
@@ -44,6 +47,7 @@ npx playwright install
 ### 启动开发服务器
 
 ```bash
+# 在 game/ 目录下
 npm run dev
 ```
 
@@ -81,40 +85,33 @@ npm run generate:pixel-assets:128
 
 ```
 Footnote/
-├── src/                    # 源代码
-│   ├── scenes/            # Phaser 场景
-│   ├── systems/           # 核心系统
-│   │   ├── narrative/     # 叙事引擎
-│   │   ├── world/         # 世界状态
-│   │   ├── ability/       # 能力系统
-│   │   ├── save/          # 存档系统
-│   │   ├── ui/            # UI 组件
-│   │   └── audio/         # 音频管理
-│   ├── data/              # 游戏数据 (YAML)
-│   │   ├── dialogues/     # 对白数据
-│   │   ├── cards/         # 卡片数据
-│   │   └── scenes/        # 场景配置
-│   ├── config/            # 配置文件
-│   └── types/             # TypeScript 类型定义
-├── assets/                 # 游戏资源
-│   ├── audio/             # 音频文件
-│   ├── images/            # 图片资源
-│   └── fonts/             # 字体文件
-├── design/                 # 策划设计文档
-│   ├── 00-overview/       # 项目总览
-│   ├── 01-narrative/      # 叙事设计
-│   ├── 02-system/         # 系统设计
-│   ├── 03-art/            # 美术设计
-│   ├── 04-audio/          # 音频设计
-│   ├── 05-tech/           # 技术设计
-│   └── 06-operation/      # 运营设计
-├── docs/                   # 技术开发文档
-│   └── art/               # 美术工作流文档
-├── tests/                  # 测试代码
-│   ├── unit/              # 单元测试
-│   └── e2e/               # E2E 测试
-├── scripts/                # 构建脚本
-└── public/                 # 静态资源
+├── game/                    # 🎮 产品相关产出
+│   ├── src/                # TypeScript源代码
+│   ├── assets/             # 美术资产
+│   ├── tests/              # 测试代码
+│   ├── scripts/            # 构建和资源生成脚本
+│   ├── dist/               # 构建输出
+│   ├── public/             # 静态资源
+│   └── [配置文件]          # package.json, tsconfig.json等
+├── workflows/              # 🔧 工作流相关
+│   ├── reusable/          # 可复用工作流（通用工具）
+│   │   ├── mcp-runner/    # MCP服务器运行器
+│   │   ├── text2pic/      # 文本转图片工具
+│   │   └── n8n-common/    # n8n通用工作流配置
+│   └── project/           # 项目特定工作流
+│       ├── promptx/       # PromptX角色定义
+│       ├── n8n/          # n8n项目特定工作流
+│       ├── logs/         # 自动化运行日志
+│       └── pipelines/    # 流水线规格文档
+├── design/                 # 📖 策划设计相关
+│   ├── game/              # 游戏设计文档
+│   ├── ai-native/         # AI-Native工作流设计文档
+│   └── production/        # 生产相关设计文档
+├── content/                # 📚 小说漫画等其他文娱产出
+│   ├── story/             # 小说文本
+│   └── comics/            # 漫画生成
+└── .cursor/                # Cursor AI规则
+    └── rules/             # 项目规则
 ```
 
 ---
@@ -154,9 +151,9 @@ Footnote/
 
 ## 📖 文档索引
 
-- **游戏设计** → [`design/README.md`](./design/README.md)
-- **技术设计** → [`design/05-tech/`](./design/05-tech/)
-- **美术规范** → [`docs/art/`](./docs/art/)
+- **游戏设计** → [`design/game/README.md`](./design/game/README.md)
+- **技术设计** → [`design/game/05-tech/`](./design/game/05-tech/)
+- **美术规范** → [`design/production/art/`](./design/production/art/)
 - **贡献指南** → [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - **更新日志** → [`CHANGELOG.md`](./CHANGELOG.md)
 

@@ -136,6 +136,8 @@ is_allowed_change() {
   local f="$1"
   # Always allow internal prompt files
   if [[ "$f" == ".cursor/"* ]]; then return 0; fi
+  # Allow fixed-flow audit logs (user requested to keep committing them for now)
+  if [[ "$f" == "docs/05_logs/automation_runs/"* ]]; then return 0; fi
   for d in "${DELIVERABLES[@]}"; do
     [[ -n "$d" ]] || continue
     if [[ "$f" == "$d" ]]; then return 0; fi

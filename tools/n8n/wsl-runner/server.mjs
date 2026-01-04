@@ -281,6 +281,7 @@ async function handleExecuteTask(body) {
   const taskType = body.task_type || body.taskType || "code";
   const complexity = body.complexity || "normal";
   const modelOverride = body.model_override || body.modelOverride || "auto";
+  const runId = body.run_id || body.runId || "";
 
   if (!taskPackPath) throw new Error("task_pack_path is required");
 
@@ -288,7 +289,19 @@ async function handleExecuteTask(body) {
   const taskPackText = await fs.readFile(taskPackAbs, "utf8");
 
   const prompt = buildCursorPrompt({ role, taskPackText });
-  const promptAbs = safeResolveUnderProject(projectRoot, ".cursor/current_task_prompt.md");
+
+  // IMPORTANT:
+  // Do NOT write prompt into tracked `.cursor/current_task_prompt.md`, otherwise fixed-flow git stage would commit it.
+  // - If run_id is provided (fixed-flow), write the prompt under the run logs directory for auditability.
+  // - Otherwise (plain /execute-task), write to /tmp to avoid touching the repo at all.
+  let promptAbs = "";
+  if (runId) {
+    const rel = path.posix.join(AUTOMATION_RUNS_DIR, runId, "_prompt.md");
+    promptAbs = safeResolveUnderProject(projectRoot, rel);
+  } else {
+    const nonce = `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+    promptAbs = path.posix.join("/tmp", `cursor_prompt_${nonce}.md`);
+  }
   await fs.mkdir(path.posix.dirname(promptAbs), { recursive: true });
   await fs.writeFile(promptAbs, prompt, "utf8");
 
@@ -300,7 +313,7 @@ async function handleExecuteTask(body) {
       "--task-pack",
       taskPackPath,
       "--prompt-file",
-      ".cursor/current_task_prompt.md",
+      promptAbs,
       "--task-type",
       taskType,
       "--complexity",
@@ -520,6 +533,7 @@ async function handleFixedFlow(body) {
       execOut = await handleExecuteTask({
         project_root: projectRoot,
         task_pack_path: taskPackPath,
+        run_id: runId,
         role,
         task_type: taskType,
         complexity,

@@ -5,15 +5,15 @@ purpose: "定义Art Bible，规范视觉风格与资产生产标准"
 
 authority:
   can_read:
-    - "/docs/**"
+    - "/design/**"
     - "/design/03-art/**"
-    - "/assets/**"
+    - "/game/assets/**"
   can_write:
-    - "/docs/01_bibles/art_bible.md"
-    - "/docs/02_specs/pipelines/asset_pipeline_spec.md"
+    - "/design/01_bibles/art_bible.md"
+    - "/design/02_specs/pipelines/asset_pipeline_spec.md"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_code_decision: true

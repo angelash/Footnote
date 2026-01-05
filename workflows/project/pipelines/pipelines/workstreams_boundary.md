@@ -35,13 +35,13 @@
 **目标**：让流水线“可用、可续跑、可观测、可控”。
 
 - **允许修改（典型）**
-  - `tools/n8n/**`（runner、脚本、pm2 配置、工作流导入文件）
-  - `tools/mcp-runner/**`（Windows MCP runner）
-  - `docs/02_specs/pipelines/**`（流程规格/标准）
-  - `docs/05_logs/**`（建议仅新增**日志样例/说明**；避免提交“本机临时跑出来的杂项”）
+  - `workflows/project/n8n/**`（runner、脚本、pm2 配置、工作流导入文件）
+  - `workflows/reusable/mcp-runner/**`（Windows MCP runner）
+  - `workflows/project/pipelines/**`（流程规格/标准）
+  - `workflows/project/logs/**`（建议仅新增**日志样例/说明**；避免提交"本机临时跑出来的杂项"）
 - **禁止修改（强制冻结）**
-  - `docs/00_charter/**`
-  - `docs/01_bibles/**`
+  - `design/ai-native/00_charter/**`
+  - `design/ai-native/01_bibles/**`
 
 **提交策略（v1）**
 - 由 Windows 工作区人工提交到 `main`（你确认先不做多分支）。
@@ -52,28 +52,28 @@
 **目标**：产出产品交付物（代码/内容/资源/测试），并进入岗位 Review。
 
 - **允许修改（典型）**
-  - `src/**`, `tests/**`, `assets/**`, `design/**`, `docs/03_taskpacks/**`, `docs/04_acceptance/**`, `docs/05_logs/**(本次run工件)`
+  - `game/src/**`, `game/tests/**`, `game/assets/**`, `design/**`, `design/ai-native/03_taskpacks/**`, `design/ai-native/04_acceptance/**`, `workflows/project/logs/**(本次run工件)`
 - **禁止修改（强制冻结）**
-  - `docs/00_charter/**`
-  - `docs/01_bibles/**`
+  - `design/ai-native/00_charter/**`
+  - `design/ai-native/01_bibles/**`
 
 **提交策略（v1）**
 - 由 n8n 固定流程在 WSL 执行完成后 **自动 commit/push main**（你确认允许）。
 - 当出现冲突/脏工作区：流程必须 **Fail 并落盘**，不允许“带病 push”；人工介入修复后可重跑（建议新 `run_id`）。
 - 串行锁：Runner 版本可通过 `_lock/` 做“锁忙即失败”；n8n 原生 fixed-flow 目前尚未加入锁节点（需人工避免并发触发）。
 
-> 重要对齐（当前落地行为）：`fixedflow-v1-001` 在 git 阶段使用 `git add -A`，因此 `docs/05_logs/automation_runs/<run_id>/` 的审计文件会随提交入库。若你希望“审计落盘但不入库”，需要后续调整 `.gitignore` 或改工作流 git add 白名单策略。
+> 重要对齐（当前落地行为）：`fixedflow-v1-001` 在 git 阶段使用 `git add -A`，因此 `workflows/project/logs/automation_runs/<run_id>/` 的审计文件会随提交入库。若你希望"审计落盘但不入库"，需要后续调整 `.gitignore` 或改工作流 git add 白名单策略。
 
 ---
 
 ## 3. 固定流程标准（Production 线强制遵守）
 
 Production 线必须遵守：
-- `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
+- `workflows/project/pipelines/n8n_fixed_flow_standard.md`
 
 核心约束（摘要）：
 - **自动流转**：默认 `auto=true`
-- **全程落盘**：`docs/05_logs/automation_runs/<run_id>/...`
+- **全程落盘**：`workflows/project/logs/automation_runs/<run_id>/...`
 - **可续跑（现状）**：保留 `resume_from_stage` 参数，但 fixed-flow 目前仅实现“跳过 preflight”；需要重跑建议新 `run_id`
 - **单任务串行（现状）**：Runner 版本有 `_lock/`；n8n 原生 fixed-flow 暂无锁
 
@@ -86,12 +86,12 @@ Production 线必须遵守：
   - `run_id / task_id / stage / ok`
   - commit hash（如有）
   - 产物路径（Deliverables）
-  - 日志目录：`docs/05_logs/automation_runs/<run_id>/`
+  - 日志目录：`workflows/project/logs/automation_runs/<run_id>/`
 
 ### 4.2 Env/Process（建议）
 - 每次改动建议同步更新：
-  - `docs/02_specs/pipelines/*`（规格/约束）
-  - `tools/n8n/*`（部署/运维说明）
+  - `workflows/project/pipelines/*`（规格/约束）
+  - `workflows/project/n8n/*`（部署/运维说明）
 
 ---
 

@@ -5,16 +5,16 @@ purpose: "把Art Bible转为UI Spec，管理界面流程与组件规范"
 
 authority:
   can_read:
-    - "/docs/**"
-    - "/src/systems/ui/**"
-    - "/assets/ui/**"
+    - "/design/**"
+    - "/game/src/systems/ui/**"
+    - "/game/assets/ui/**"
   can_write:
-    - "/docs/02_specs/ui/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/ai-native/02_specs/ui/**"
+    - "/design/ai-native/03_taskpacks/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"
+    - "/design/ai-native/00_charter/**"
+    - "/design/ai-native/01_bibles/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_art_style_change: true

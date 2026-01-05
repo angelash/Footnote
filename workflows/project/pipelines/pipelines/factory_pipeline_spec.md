@@ -24,7 +24,7 @@
    - 输入：你用自然语言描述“要做什么”
    - 输出：要么直接指向某个 Task Pack，要么生成一组 Task Pack
 2. **Task Pack（工单契约）**
-   - 位置：`docs/03_taskpacks/*.md`
+   - 位置：`design/ai-native/03_taskpacks/*.md`
    - 内容：Allowed Inputs / Deliverables / Constraints / Acceptance / 回执格式
 3. **Execution Receipt（执行回执）**
    - 输出：执行者必须按模板回执（完成内容、输出文件、自检、风险）
@@ -79,11 +79,11 @@
 
 ### 3.2 对应工作流
 
-- 主→从分发（通用）：`tools/n8n/dispatch-to-secondary-workflow.json`
-- 固定流程执行器（推荐）：`tools/n8n/fixed-flow-pipeline.json`
-- 状态查询（配套）：`tools/n8n/status-query-workflow.json`
-- 从实例执行器（旧：Runner）：`tools/n8n/cursor-cli-task-workflow.json`
-- Windows 浏览器测试：`tools/n8n/windows-mcp-runner-browser-test-workflow.json`
+- 主→从分发（通用）：`workflows/project/n8n/dispatch-to-secondary-workflow.json`
+- 固定流程执行器（推荐）：`workflows/project/n8n/fixed-flow-pipeline.json`
+- 状态查询（配套）：`workflows/project/n8n/status-query-workflow.json`
+- 从实例执行器（旧：Runner）：`workflows/project/n8n/cursor-cli-task-workflow.json`
+- Windows 浏览器测试：`workflows/project/n8n/windows-mcp-runner-browser-test-workflow.json`
 
 ---
 
@@ -92,7 +92,7 @@
 最小闭环要求：
 - 每次执行都能定位到 `task_pack_path`
 - 回执必须列出输出文件路径
-- 禁止修改冻结目录：`docs/00_charter/**`、`docs/01_bibles/**`
+- 禁止修改冻结目录：`design/ai-native/00_charter/**`、`design/ai-native/01_bibles/**`
 
 ---
 
@@ -100,14 +100,14 @@
 
 - 规格文档：本文件
 - n8n 可导入工作流：
-  - `tools/n8n/fixed-flow-pipeline.json`（WSL 5680：/fixed-flow，推荐）
-  - `tools/n8n/status-query-workflow.json`（WSL 5680：/status，配套）
-  - `tools/n8n/factory-intake-workflow.json`（主实例 /intake）
-  - `tools/n8n/factory-run-role-workflow.json`（主实例 /run-role）
-  - `tools/n8n/taskpack-factory-workflow.json`（从实例 /compose-taskpack，旧：Runner 版本）
-  - `tools/n8n/launcher-l3-writer-to-wsl.json`（可选：/run-writer）
-  - `tools/n8n/launcher-l3-engineer-to-wsl.json`（可选：/run-engineer）
+  - `workflows/project/n8n/fixed-flow-pipeline.json`（WSL 5680：/fixed-flow，推荐）
+  - `workflows/project/n8n/status-query-workflow.json`（WSL 5680：/status，配套）
+  - `workflows/project/n8n/factory-intake-workflow.json`（主实例 /intake）
+  - `workflows/project/n8n/factory-run-role-workflow.json`（主实例 /run-role）
+  - `workflows/project/n8n/taskpack-factory-workflow.json`（从实例 /compose-taskpack，旧：Runner 版本）
+  - `workflows/project/n8n/launcher-l3-writer-to-wsl.json`（可选：/run-writer）
+  - `workflows/project/n8n/launcher-l3-engineer-to-wsl.json`（可选：/run-engineer）
 
-- 可视化看板（可选）：`tools/n8n/dashboard/index.html`（查询 `/webhook/status` 展示进度）
+- 可视化看板（可选）：`workflows/project/n8n/dashboard/index.html`（查询 `/webhook/status` 展示进度）
 
 

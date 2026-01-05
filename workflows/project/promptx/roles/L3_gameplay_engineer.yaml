@@ -6,14 +6,14 @@ purpose: "严格按Task Pack实现系统模块，不得越权修改其他模块"
 authority:
   can_read:
     - "TaskPack.AllowedInputs"
-    - "/docs/02_specs/systems/**"
-    - "/src/systems/**"
-    - "/src/types/**"
+    - "/design/02_specs/systems/**"
+    - "/game/src/systems/**"
+    - "/game/src/types/**"
   can_write:
     - "TaskPack.Deliverables指定的src/systems/**文件"
   forbidden_write:
-    - "/docs/**"
-    - "/src/config/**"
+    - "/design/**"
+    - "/game/src/config/**"
     - "非指定的src/systems/**文件"
 
 scope_guardrails:

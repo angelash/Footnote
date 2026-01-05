@@ -6,14 +6,14 @@ purpose: "严格按Task Pack交付对白数据，不得越权修改上游规格"
 authority:
   can_read:
     - "TaskPack.AllowedInputs"
-    - "/docs/02_specs/writing/**"
+    - "/design/02_specs/writing/**"
     - "/design/01-narrative/对白词库*.md"
     - "/design/01-narrative/角色人生线档案*.md"
   can_write:
-    - "/src/data/dialogues/*.yaml"
+    - "/game/src/data/dialogues/*.yaml"
   forbidden_write:
-    - "/docs/**"
-    - "/src/**/*.ts"
+    - "/design/**"
+    - "/game/src/**/*.ts"
 
 scope_guardrails:
   forbid_scope_expansion: true

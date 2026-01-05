@@ -3,7 +3,7 @@
 > 目标：把“AI 执行任务”变成**可自动流转、全程可追溯、可从任意阶段续跑**的工厂流水线；团队不需要在每步人工确认，只需要在任意时刻查看落盘结果并在需要时介入 review/合并。
 
 **适用范围**：WSL 单入口 `n8n-secondary:5680`（当前形态）。  
-**实现基线**：以可导入工作流 `tools/n8n/fixed-flow-pipeline.json`（`versionId: fixedflow-v1-001`）与 `tools/n8n/status-query-workflow.json` 为准。  
+**实现基线**：以可导入工作流 `workflows/project/n8n/fixed-flow-pipeline.json`（`versionId: fixedflow-v1-001`）与 `workflows/project/n8n/status-query-workflow.json` 为准。  
 **非目标**：多人并发、多仓/多分支矩阵、多机队列（后续 v2）。
 
 ---
@@ -15,7 +15,7 @@
 - **可续跑**：允许从任意 Stage 重新开始（指定 `resume_from_stage`），前面阶段工件不丢失。
 - **幂等优先**：重复触发同一阶段不会产生不可控副作用（例如重复 push）；必要时通过 `run_id` 与 stage status 防重。
 - **单任务串行**：当前只跑一个任务，避免 repo 并发写导致的冲突与状态污染。
-- **强边界**：冻结目录 `docs/00_charter/**` 与 `docs/01_bibles/**` 禁止修改（任何阶段发现即 fail 并落盘原因）。
+- **强边界**：冻结目录 `design/ai-native/00_charter/**` 与 `design/ai-native/01_bibles/**` 禁止修改（任何阶段发现即 fail 并落盘原因）。
 
 ---
 
@@ -33,7 +33,7 @@
 所有执行工件统一落到：
 
 ```
-docs/05_logs/automation_runs/<run_id>/
+workflows/project/logs/automation_runs/<run_id>/
   status.json                    # 当前 run 的总状态（stage、时间、结果）
   00_intake.json                 # 入口参数快照（webhook body + 推导字段）
   01_preflight.json              # 环境检查结果（git status + git pull --ff-only）
@@ -59,7 +59,7 @@ docs/05_logs/automation_runs/<run_id>/
 |---:|---|---|---|
 | 0 | intake | `00_intake.json`, `status.json(stage=0)` | webhook 入参快照、生成 `run_id` |
 | 1 | preflight | `01_preflight.json`, `status.json(stage=1)` | git clean 检查 + `git pull --ff-only` |
-| 4 | execute | `04_execute.json`, `status.json(stage=4)` | 调用 `tools/n8n/run-cursor-task.sh` 执行 `cursor-agent` |
+| 4 | execute | `04_execute.json`, `status.json(stage=4)` | 调用 `workflows/project/n8n/run-cursor-task.sh` 执行 `cursor-agent` |
 | 5 | validate | `05_validate.json`, `status.json(stage=5)` | 当前实现：`npm run validate --if-present` |
 | 6 | git | `06_git.json`, `status.json(stage=6)` | `git add -A` →（有变更则）commit/push main |
 | 99 | done | `07_notify.json`, `status.json(stage=99)` | 成功通知后写最终状态；失败时 `status.stage=失败阶段` |
@@ -104,8 +104,8 @@ docs/05_logs/automation_runs/<run_id>/
 - `POST /webhook/fixed-flow` **立即返回** `{ run_id, logs_dir, started_async:true }`
 - 后台继续跑完整链路（preflight → execute → validate → git → notify → done）
 - 观察方式：
-  - 直接查看 `docs/05_logs/automation_runs/<run_id>/status.json`
-  - 或调用 `GET /webhook/status?run_id=<run_id>`（由 `tools/n8n/status-query-workflow.json` 提供）
+  - 直接查看 `workflows/project/logs/automation_runs/<run_id>/status.json`
+  - 或调用 `GET /webhook/status?run_id=<run_id>`（由 `workflows/project/n8n/status-query-workflow.json` 提供）
 
 ---
 
@@ -113,7 +113,7 @@ docs/05_logs/automation_runs/<run_id>/
 
 `01_preflight.json` 必须包含：
 - **repo 状态**：`git status --porcelain` 必须为空（否则 FAIL，提示先 reset/clean 或新 workspace）
-  - 当前实现会**排除**：`.cursor/current_task_prompt.md` 与 `docs/05_logs/automation_runs/**`，避免“审计落盘/提示文件”导致永远 dirty
+  - 当前实现会**排除**：`.cursor/current_task_prompt.md` 与 `workflows/project/logs/automation_runs/**`，避免“审计落盘/提示文件”导致永远 dirty
 - **分支策略（v1）**：允许直接 `main`（你已确认），但必须 `git pull --ff-only` 成功
 - **远端**：必须是 `origin`，且有 push 权限可用
 - **git identity**：必须配置 `user.name` / `user.email`（否则 git commit 会失败）
@@ -126,7 +126,7 @@ docs/05_logs/automation_runs/<run_id>/
 v1 推荐使用“文件锁目录”：
 
 ```
-docs/05_logs/automation_runs/_lock/
+workflows/project/logs/automation_runs/_lock/
 ```
 
 规则：
@@ -134,7 +134,7 @@ docs/05_logs/automation_runs/_lock/
 - 流程结束（成功/失败）必须释放锁（删除目录）
 
 现状（对齐最新落地）：
-- **WSL Runner 服务**（`tools/n8n/wsl-runner/server.mjs`，端口默认 `3210`）已实现上述锁逻辑。
+- **WSL Runner 服务**（`workflows/project/n8n/wsl-runner/server.mjs`，端口默认 `3210`）已实现上述锁逻辑。
 - **n8n 原生** `fixed-flow-pipeline.json (fixedflow-v1-001)` **尚未加入锁节点**：请人工避免并发触发；后续可在工作流头部补齐“创建锁/释放锁”两步。
 
 ---
@@ -166,7 +166,7 @@ docs/05_logs/automation_runs/_lock/
 - `task_id / run_id / stage / ok`
 - `commit hash`（若有）
 - `产物路径列表`（Deliverables）
-- `关键日志路径`：`docs/05_logs/automation_runs/<run_id>/`
+- `关键日志路径`：`workflows/project/logs/automation_runs/<run_id>/`
 
 ---
 
@@ -175,7 +175,7 @@ docs/05_logs/automation_runs/_lock/
 入口（Webhook）body（JSON）：
 - `run_id`（可选，不传则自动生成：`RUN-YYYYMMDD-HHMMSS-xxxx`）
 - `task_id`（与 `task_pack_path` 二选一）
-- `task_pack_path`（与 `task_id` 二选一；相对仓库根目录，如 `docs/03_taskpacks/T-0001_c0_z1_dialogue.md`）
+- `task_pack_path`（与 `task_id` 二选一；相对仓库根目录，如 `design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md`）
 - `title`（可选，用于 commit message）
 - `role`（默认 `L3_engineer`）
 - `task_type`（`doc|code|multimodal`，默认 `code`）

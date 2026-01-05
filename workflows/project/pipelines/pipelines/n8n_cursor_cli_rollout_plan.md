@@ -2,7 +2,7 @@
 
 > 本计划用于把“n8n 固定流程 + Task Pack/结构化输入 + Cursor CLI 执行”从**可用**推进到**可持续规模化提需求**。
 >
-> 架构规格：`docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
+> 架构规格：`workflows/project/pipelines/n8n_cursor_cli_pipeline_spec.md`
 
 ---
 
@@ -10,8 +10,8 @@
 
 - **单入口（WSL 5680）**：`pm2 status` 显示 `n8n-secondary` online；作为执行入口与看板。
 - **Windows 5678**：未来如需要浏览器/MCP 扩展再启用；当前不作为必选链路。
-- **Task Pack**：仓库已有 `docs/03_taskpacks/_template.md` 与示例 `T-0001_c0_z1_dialogue.md`。
-- **工作流导入文件**：`tools/n8n/*.json` 已准备；默认 Task Pack 路径已修正为存在的示例文件。
+- **Task Pack**：仓库已有 `design/ai-native/03_taskpacks/_template.md` 与示例 `T-0001_c0_z1_dialogue.md`。
+- **工作流导入文件**：`workflows/project/n8n/*.json` 已准备；默认 Task Pack 路径已修正为存在的示例文件。
 
 ---
 
@@ -20,11 +20,11 @@
 > 你已确认：需要 **自动流转（无需人工确认）**、**每一步落盘**、并保留“可续跑”的扩展能力。
 
 本项目采用的固定流程标准（v1）已落盘：
-- `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
+- `workflows/project/pipelines/n8n_fixed_flow_standard.md`
 
 ### 1.1 关键要求（摘要）
 - **全自动**：默认 `auto=true`，工作流从 intake 跑到 notify，不等待人工确认
-- **全程落盘**：每个 stage 产出到 `docs/05_logs/automation_runs/<run_id>/...`
+- **全程落盘**：每个 stage 产出到 `workflows/project/logs/automation_runs/<run_id>/...`
 - **可续跑（对齐最新实现）**：保留 `resume_from_stage` 参数，但 `fixedflow-v1-001` 目前仅实现“跳过 preflight”（`resume_from_stage > 1`）；更细粒度的分段续跑属于后续增强项
 - **单任务串行**：v1 只允许一次跑一个任务（避免 repo 并发写）
 - **Git 固定策略（v1）**：允许直接 push `main`（你已确认）；后续再演进到分支+PR
@@ -100,7 +100,7 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 ### M0：跑通一次“固定流程 v1”端到端冒烟（目标：今天）
 - [ ] 5680 可访问
 - [ ] 触发一次 Webhook 执行（`POST /webhook/fixed-flow`）
-- [ ] 每个 stage 均有落盘（`docs/05_logs/automation_runs/<run_id>/`）
+- [ ] 每个 stage 均有落盘（`workflows/project/logs/automation_runs/<run_id>/`）
 - [ ] cursor-agent 产出 Deliverables（按 Task Pack/固定流程）
 - [ ] 校验器 PASS/FAIL 可阻断
 - [ ] git commit/push（v1 可直接 main）
@@ -126,32 +126,32 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 
 ### P0-2 导入/部署固定流程工作流（v1）
 - **从实例（5680）**：导入并启用
-  - `tools/n8n/fixed-flow-pipeline.json`（`POST /webhook/fixed-flow`）
-  - `tools/n8n/status-query-workflow.json`（`GET /webhook/status?run_id=...`）
-  - （可选）`tools/n8n/dashboard/index.html` 用于可视化查看进度
+  - `workflows/project/n8n/fixed-flow-pipeline.json`（`POST /webhook/fixed-flow`）
+  - `workflows/project/n8n/status-query-workflow.json`（`GET /webhook/status?run_id=...`）
+  - （可选）`workflows/project/n8n/dashboard/index.html` 用于可视化查看进度
 
 ### P0-3 阶段落盘与可续跑
-- **目标**：每次执行落盘到 `docs/05_logs/automation_runs/<run_id>/...`
+- **目标**：每次执行落盘到 `workflows/project/logs/automation_runs/<run_id>/...`
   - 关键文件（对齐 `fixedflow-v1-001`）：`00_intake.json`、`01_preflight.json`、`_prompt.md`、`04_execute.json`、`05_validate.json`、`06_git.json`、`07_notify.json`、`status.json`
   - `resume_from_stage` 当前仅用于“跳过 preflight”，完整分段续跑需后续补齐工作流路由
 
 ### P0-4 cursor-agent 执行安全护栏（强烈建议）
 > 实测：`cursor-agent --print` 具备执行命令/写文件能力，若缺少护栏，可能出现“跑偏/越权/改错文件”的风险。
 
-- **已落盘**：WSL 护栏脚本 `tools/n8n/run-cursor-task.sh`
+- **已落盘**：WSL 护栏脚本 `workflows/project/n8n/run-cursor-task.sh`
   - 输入：task_pack_path、role、model
   - 动作：生成 prompt → 执行 cursor-agent → 运行校验器 → `git diff --name-only` 校验只改 Deliverables → 输出回执
 - **验收**：若出现非 Deliverables 的改动，脚本直接 fail 并阻断进入“完成”
 
 ### P0-5 冒烟任务包（保证“开箱即跑”）
-- 选用：`docs/03_taskpacks/T-0001_c0_z1_dialogue.md`
+- 选用：`design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md`
 - 目标：一次跑通 M0
 
 ### P0-6 Windows 浏览器/MCP 测试链路（ChromeMCP / Browser MCP）（可选）
 
 - **目标**：当 Windows 侧没有 `cursor-agent` 时，仍能通过 n8n 触发浏览器自动化测试
 - **执行器**：`tools/mcp-runner/mcp-runner.mjs` + `tools/mcp-runner/run-agent.ps1`
-- **工作流（主实例导入）**：`tools/n8n/windows-mcp-runner-browser-test-workflow.json`
+- **工作流（主实例导入）**：`workflows/project/n8n/windows-mcp-runner-browser-test-workflow.json`
   - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
   - body：`{ mcp_url, prompt, task_type:'browser-test', complexity, model_override }`
 
@@ -173,7 +173,7 @@ Windows 侧如果**没有 cursor-agent**，浏览器/ChromeMCP 任务用独立�
 - API Key 轮换策略（到期提醒）
 
 ### P1-4 审计与通知
-- 每次执行将回执/关键信息写入审计目录（如 `docs/05_logs/` 或 Issue）
+- 每次执行将回执/关键信息写入审计目录（如 `workflows/project/logs/` 或 Issue）
 - 成功/失败都调用通知接口
 
 ---

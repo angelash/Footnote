@@ -26,7 +26,7 @@
 - **端口**: 5680
 - **PM2 名称**: n8n-secondary
 - **访问地址**: http://localhost:5680
-- **启动方式**: `pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary`
+- **启动方式**: `pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary`
 - **状态**: ✅ 运行中
 
 ### WSL 执行器 (Runner)
@@ -73,7 +73,7 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 stop wsl-cursor-runner"
    - 登录: admin@footnote.local / Footnote2025!
 
 2. **端到端冒烟**:
-   - Windows：运行 `tools/n8n/smoke-secondary.ps1`
+   - Windows：运行 `workflows/project/n8n/smoke-secondary.ps1`
 
 4. **配置工作流同步**: 参见 `CLUSTER-SETUP.md`
 

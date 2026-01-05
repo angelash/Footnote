@@ -150,7 +150,7 @@ function Configure-PM2 {
     Write-Host "  配置 WSL 从实例..." -ForegroundColor Cyan
     $wslDelete = "cd /home/shash/work/Footnote; pm2 delete n8n-secondary 2>&1"
     wsl bash -c $wslDelete | Out-Null
-    $wslStart = "cd /home/shash/work/Footnote; pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
+    $wslStart = "cd /home/shash/work/Footnote; pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
     wsl bash -c $wslStart
     Write-Host "  ✓ WSL 从实例已启动" -ForegroundColor Green
     

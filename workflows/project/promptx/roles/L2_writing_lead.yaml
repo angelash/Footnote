@@ -5,16 +5,16 @@ purpose: "管理对白标准与文本标签体系，把叙事大纲转为文案�
 
 authority:
   can_read:
-    - "/docs/**"
+    - "/design/**"
     - "/design/01-narrative/**"
-    - "/src/data/dialogues/**"
+    - "/game/src/data/dialogues/**"
   can_write:
-    - "/docs/02_specs/writing/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/02_specs/writing/**"
+    - "/design/03_taskpacks/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_narrative_structure_change: true

@@ -5,16 +5,16 @@ purpose: "把Design Bible拆解为章节大纲，管理叙事结构与伏笔"
 
 authority:
   can_read:
-    - "/docs/01_bibles/**"
+    - "/design/01_bibles/**"
     - "/design/01-narrative/**"
-    - "/src/data/dialogues/**"
+    - "/game/src/data/dialogues/**"
   can_write:
-    - "/docs/02_specs/narrative/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/02_specs/narrative/**"
+    - "/design/03_taskpacks/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_bible_modification: true

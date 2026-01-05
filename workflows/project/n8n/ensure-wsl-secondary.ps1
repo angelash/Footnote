@@ -17,7 +17,7 @@ param(
     [int]$Port = 5680,
     [string]$ProjectRoot = "/home/shash/work/Footnote",
     [string]$ProcessName = "n8n-secondary",
-    [string]$StartCommand = "pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary",
+    [string]$StartCommand = "pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary",
     [string]$Distro = "",
     [string]$WslUser = ""
 )

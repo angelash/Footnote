@@ -5,8 +5,8 @@
 > - 你把整套方案讲给其他人（架构图、流程图、表格齐全）
 >
 > 深入规格与落地计划请看：
-> - 架构规格：`docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
-> - 推进计划：`docs/02_specs/pipelines/n8n_cursor_cli_rollout_plan.md`
+> - 架构规格：`workflows/project/pipelines/n8n_cursor_cli_pipeline_spec.md`
+> - 推进计划：`workflows/project/pipelines/n8n_cursor_cli_rollout_plan.md`
 
 ---
 
@@ -25,11 +25,11 @@
 
 | 工件 | 作用 | 位置/格式 |
 |---|---|---|
-| **Task Pack（工单契约）** | 定义“允许读什么/必须写什么/怎么验收” | `docs/03_taskpacks/*.md`（模板：`docs/03_taskpacks/_template.md`） |
+| **Task Pack（工单契约）** | 定义“允许读什么/必须写什么/怎么验收” | `design/ai-native/03_taskpacks/*.md`（模板：`design/ai-native/03_taskpacks/_template.md`） |
 | **Execution Receipt（执行回执）** | 执行者按固定格式总结：完成内容/输出文件/自检/风险 | 由执行器生成（也可写入审计目录或 Issue） |
-| **Audit Log（审计记录）** | 记录每次执行：时间、参数、结果、产物 | 推荐落到 `docs/05_logs/`（由工作流/脚本实现） |
+| **Audit Log（审计记录）** | 记录每次执行：时间、参数、结果、产物 | 推荐落到 `workflows/project/logs/`（由工作流/脚本实现） |
 
-> 强制约束：冻结目录不可修改 `docs/00_charter/**`、`docs/01_bibles/**`（见 `.cursor/rules/09-ai-native-workflow.mdc`）。
+> 强制约束：冻结目录不可修改 `design/ai-native/00_charter/**`、`design/ai-native/01_bibles/**`（见 `.cursor/rules/09-ai-native-workflow.mdc`）。
 
 ---
 
@@ -37,8 +37,8 @@
 
 当前工程在多处文档中已选择 **形态 C（单入口）**：
 - **统一入口**：WSL `n8n-secondary`（端口 `5680`）作为“工厂入口”
-- **执行主链路（推荐）**：`POST /webhook/fixed-flow`（`tools/n8n/fixed-flow-pipeline.json`）
-- **状态查询（配套）**：`GET /webhook/status?run_id=...`（`tools/n8n/status-query-workflow.json`）
+- **执行主链路（推荐）**：`POST /webhook/fixed-flow`（`workflows/project/n8n/fixed-flow-pipeline.json`）
+- **状态查询（配套）**：`GET /webhook/status?run_id=...`（`workflows/project/n8n/status-query-workflow.json`）
 - **Windows 5678**：暂不作为分发入口（后续需要浏览器/MCP 任务再启用）
 
 ### 3.1 新标准：固定流程驱动 + 自动流转 + 可续跑
@@ -50,17 +50,17 @@
 - **单任务串行**：一次只跑一个任务，避免 repo 并发写
 
 对应标准文档：
-- `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
+- `workflows/project/pipelines/n8n_fixed_flow_standard.md`
 
 ### 3.2 两条线边界（Env/Process vs Production）
 
 为避免“改流程/改部署”污染“做产品/出产物”，两条线的工作环境与提交策略必须区分：
-- `docs/02_specs/pipelines/workstreams_boundary.md`
+- `workflows/project/pipelines/workstreams_boundary.md`
 
 相关说明：
-- 工厂流水线规格：`docs/02_specs/pipelines/factory_pipeline_spec.md`
-- n8n 使用说明：`tools/n8n/README.md`
-- 部署指南：`tools/n8n/DEPLOYMENT-GUIDE.md`
+- 工厂流水线规格：`workflows/project/pipelines/factory_pipeline_spec.md`
+- n8n 使用说明：`workflows/project/n8n/README.md`
+- 部署指南：`workflows/project/n8n/DEPLOYMENT-GUIDE.md`
 
 ---
 
@@ -68,7 +68,7 @@
 
 ```mermaid
 flowchart LR
-  U[你 / 团队<br/>需求 / 验收] -->|编写/选择| TP[Task Pack<br/>docs/03_taskpacks/*.md]
+  U[你 / 团队<br/>需求 / 验收] -->|编写/选择| TP[Task Pack<br/>design/ai-native/03_taskpacks/*.md]
 
   subgraph WSL[WSL 执行域（推荐）]
     N8N[n8n-secondary<br/>5680]
@@ -110,7 +110,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A[触发执行<br/>Webhook / Schedule] --> B[落盘 run_id + intake<br/>docs/05_logs/automation_runs]
+  A[触发执行<br/>Webhook / Schedule] --> B[落盘 run_id + intake<br/>workflows/project/logs/automation_runs]
   B --> C[构建最小上下文<br/>只读 Allowed Inputs<br/>只写 Deliverables]
   C --> D[调用 cursor-agent<br/>选模型 / 角色]
   D --> E[生成变更<br/>写入 Deliverables]
@@ -151,7 +151,7 @@ sequenceDiagram
 
 ## 6. 状态机（任务从 Draft 到 Done）
 
-> 以 Task Pack 模板字段为准（`docs/03_taskpacks/_template.md`）。
+> 以 Task Pack 模板字段为准（`design/ai-native/03_taskpacks/_template.md`）。
 
 ```mermaid
 stateDiagram-v2
@@ -182,7 +182,7 @@ stateDiagram-v2
 | Webhook | 位置 | 用途 |
 |---|---|---|
 | `POST /webhook/fixed-flow` | WSL 5680 | **固定流程主入口（推荐）**：异步启动 run_id，落盘审计并自动完成 |
-| `GET /webhook/status` | WSL 5680 | **状态查询（配套）**：读取 `docs/05_logs/automation_runs/<run_id>/status.json` |
+| `GET /webhook/status` | WSL 5680 | **状态查询（配套）**：读取 `workflows/project/logs/automation_runs/<run_id>/status.json` |
 | `POST /webhook/execute-task` | WSL 5680 | 旧链路：执行指定 Task Pack（Runner 版本，兼容保留） |
 | `POST /webhook/compose-taskpack` | WSL 5680 | 旧链路：生成 Task Pack（Runner 版本，兼容保留） |
 | `POST /webhook/dispatch-task` | Windows 5678 | 主→从分发（可选） |
@@ -192,19 +192,19 @@ stateDiagram-v2
 
 | 工作流 | 文件 | 建议导入到 |
 |---|---|---|
-| **Fixed Flow Pipeline（推荐）** | `tools/n8n/fixed-flow-pipeline.json` | WSL 5680 |
-| **Status Query（配套）** | `tools/n8n/status-query-workflow.json` | WSL 5680 |
-| Cursor CLI 执行器（旧） | `tools/n8n/cursor-cli-task-workflow.json` | WSL 5680（兼容保留；依赖 `wsl-runner:3210`） |
-| Windows 桥接 WSL 执行器 | `tools/n8n/cursor-cli-task-workflow-windows.json` | Windows 5678（可选） |
-| 主→从分发 | `tools/n8n/dispatch-to-secondary-workflow.json` | Windows 5678（可选） |
-| 工厂入口 /intake | `tools/n8n/factory-intake-workflow.json` | Windows 5678（可选） |
-| 工厂入口 /run-role | `tools/n8n/factory-run-role-workflow.json` | Windows 5678（可选） |
-| 生成 Task Pack（旧 /compose-taskpack） | `tools/n8n/taskpack-factory-workflow.json` | WSL 5680（兼容保留；依赖 `wsl-runner:3210`） |
-| 岗位 Launcher：writer | `tools/n8n/launcher-l3-writer-to-wsl.json` | Windows 5678（可选） |
-| 岗位 Launcher：engineer | `tools/n8n/launcher-l3-engineer-to-wsl.json` | Windows 5678（可选） |
-| Windows Browser Test | `tools/n8n/windows-mcp-runner-browser-test-workflow.json` | Windows 5678（可选） |
+| **Fixed Flow Pipeline（推荐）** | `workflows/project/n8n/fixed-flow-pipeline.json` | WSL 5680 |
+| **Status Query（配套）** | `workflows/project/n8n/status-query-workflow.json` | WSL 5680 |
+| Cursor CLI 执行器（旧） | `workflows/project/n8n/cursor-cli-task-workflow.json` | WSL 5680（兼容保留；依赖 `wsl-runner:3210`） |
+| Windows 桥接 WSL 执行器 | `workflows/project/n8n/cursor-cli-task-workflow-windows.json` | Windows 5678（可选） |
+| 主→从分发 | `workflows/project/n8n/dispatch-to-secondary-workflow.json` | Windows 5678（可选） |
+| 工厂入口 /intake | `workflows/project/n8n/factory-intake-workflow.json` | Windows 5678（可选） |
+| 工厂入口 /run-role | `workflows/project/n8n/factory-run-role-workflow.json` | Windows 5678（可选） |
+| 生成 Task Pack（旧 /compose-taskpack） | `workflows/project/n8n/taskpack-factory-workflow.json` | WSL 5680（兼容保留；依赖 `wsl-runner:3210`） |
+| 岗位 Launcher：writer | `workflows/project/n8n/launcher-l3-writer-to-wsl.json` | Windows 5678（可选） |
+| 岗位 Launcher：engineer | `workflows/project/n8n/launcher-l3-engineer-to-wsl.json` | Windows 5678（可选） |
+| Windows Browser Test | `workflows/project/n8n/windows-mcp-runner-browser-test-workflow.json` | Windows 5678（可选） |
 
-完整目录：`tools/n8n/WORKFLOW-CATALOG.md`
+完整目录：`workflows/project/n8n/WORKFLOW-CATALOG.md`
 
 ---
 
@@ -213,14 +213,14 @@ stateDiagram-v2
 ### 8.1 约束来自哪里？
 - **Task Pack 契约**：Allowed Inputs / Deliverables / Constraints / Acceptance
 - **规则层（alwaysApply）**：`.cursor/rules/09-ai-native-workflow.mdc`
-- **执行器护栏（建议封装）**：`tools/n8n/run-cursor-task.sh`（在规格中被强烈建议）
+- **执行器护栏（建议封装）**：`workflows/project/n8n/run-cursor-task.sh`（在规格中被强烈建议）
 
 ### 8.2 最关键的护栏（建议必须具备）
 
 | 风险 | 典型表现 | 护栏/阻断点 |
 |---|---|---|
 | 越权修改文件 | 改到了非 Deliverables 路径 | 执行后 `git diff --name-only` 白名单校验 |
-| 修改冻结目录 | 改动 `docs/00_charter` 或 `docs/01_bibles` | 执行后检测改动路径，直接 fail |
+| 修改冻结目录 | 改动 `design/ai-native/00_charter` 或 `design/ai-native/01_bibles` | 执行后检测改动路径，直接 fail |
 | 产物不可验收 | 没有回执/回执不含输出路径 | 强制回执模板；工作流最后一步生成回执 |
 | 校验未阻断 | 测试/类型错误仍被标记完成 | 校验结果必须决定 PASS/FAIL 分支 |
 | 路径/运行域错配 | 在 `/mnt/*` 跑导致慢/权限坑 | 强制 WSL repo 在 `/home/...` |
@@ -238,10 +238,10 @@ stateDiagram-v2
 ## 10. 深入阅读索引（从“看懂”到“落地”）
 
 - **总规则/边界**：`.cursor/rules/09-ai-native-workflow.mdc`
-- **架构规格（细节）**：`docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
-- **推进与 DoD（怎么把它跑稳）**：`docs/02_specs/pipelines/n8n_cursor_cli_rollout_plan.md`
-- **工厂化封装**：`docs/02_specs/pipelines/factory_pipeline_spec.md`
-- **部署/导入/参数**：`tools/n8n/README.md`、`tools/n8n/DEPLOYMENT-GUIDE.md`
+- **架构规格（细节）**：`workflows/project/pipelines/n8n_cursor_cli_pipeline_spec.md`
+- **推进与 DoD（怎么把它跑稳）**：`workflows/project/pipelines/n8n_cursor_cli_rollout_plan.md`
+- **工厂化封装**：`workflows/project/pipelines/factory_pipeline_spec.md`
+- **部署/导入/参数**：`workflows/project/n8n/README.md`、`workflows/project/n8n/DEPLOYMENT-GUIDE.md`
 - **Windows 浏览器任务（无 cursor-agent）**：`tools/mcp-runner/README.md`
 
 

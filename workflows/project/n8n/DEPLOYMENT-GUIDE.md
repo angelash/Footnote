@@ -47,7 +47,7 @@ wsl bash -c "node --version && npm --version && n8n --version && pm2 --version"
 
 # 2) PM2 托管从实例（推荐）
 wsl bash -c "cd /home/shash/work/Footnote && pm2 delete n8n-secondary 2>/dev/null"
-wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
+wsl bash -c "cd /home/shash/work/Footnote && pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
 wsl bash -c "cd /home/shash/work/Footnote && pm2 save"
 ```
 
@@ -62,8 +62,8 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 save"
 1. 打开 n8n UI → Workflows
 2. Import from file
 3. 选择导入：
-   - 从实例（WSL）：`tools/n8n/cursor-cli-task-workflow.json`
-   - 主实例（Windows）：`tools/n8n/cursor-cli-task-workflow-windows.json`
+   - 从实例（WSL）：`workflows/project/n8n/cursor-cli-task-workflow.json`
+   - 主实例（Windows）：`workflows/project/n8n/cursor-cli-task-workflow-windows.json`
 
 ---
 

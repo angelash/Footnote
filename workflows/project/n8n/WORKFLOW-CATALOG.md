@@ -22,19 +22,19 @@
 
 ### 2.1 WSL 执行器（通用：代码/文档/多模态）
 
-- **🆕 Fixed Flow Pipeline（推荐：完全 n8n 原生）**：`tools/n8n/fixed-flow-pipeline.json`
+- **🆕 Fixed Flow Pipeline（推荐：完全 n8n 原生）**：`workflows/project/n8n/fixed-flow-pipeline.json`
   - Webhook：`POST http://localhost:5680/webhook/fixed-flow`
   - 特点：
     - ✅ 异步执行（立即返回 run_id）
     - ✅ 7 阶段完整链路（preflight → plan → taskpack → execute → validate → git → notify）
     - ✅ 任何阶段失败都发通知
     - ✅ 支持从某个阶段续跑（resume_from_stage）
-    - ✅ 每阶段落盘日志到 `docs/05_logs/automation_runs/{run_id}/`
+    - ✅ 每阶段落盘日志到 `workflows/project/logs/automation_runs/{run_id}/`
   - 参数：
     ```json
     {
       "task_id": "T-0001",
-      "task_pack_path": "docs/03_taskpacks/T-0001.md",
+      "task_pack_path": "design/ai-native/03_taskpacks/T-0001.md",
       "role": "L3_engineer",
       "task_type": "code",
       "complexity": "normal",
@@ -42,33 +42,33 @@
       "resume_from_stage": 0
     }
     ```
-- **🆕 Status Query（查询任务进度）**：`tools/n8n/status-query-workflow.json`
+- **🆕 Status Query（查询任务进度）**：`workflows/project/n8n/status-query-workflow.json`
   - Webhook：`GET http://localhost:5680/webhook/status?run_id=RUN-xxx`
   - 返回：`{ ok: true, run_id: "...", status: { stage: 99, ok: true, ... } }`
-- **从实例执行（简单版）**：`tools/n8n/cursor-cli-task-workflow.json`
+- **从实例执行（简单版）**：`workflows/project/n8n/cursor-cli-task-workflow.json`
   - Webhook：`POST http://localhost:5680/webhook/execute-task`
   - 说明：依赖 wsl-runner 服务，已被 Fixed Flow Pipeline 替代
-- **Windows 主实例直连 WSL 的版本（可选）**：`tools/n8n/cursor-cli-task-workflow-windows.json`
+- **Windows 主实例直连 WSL 的版本（可选）**：`workflows/project/n8n/cursor-cli-task-workflow-windows.json`
 
 ### 2.2 主从分发（通用入口 → 从实例执行）
 
-- **主实例分发到从实例（5678 → 5680）**：`tools/n8n/dispatch-to-secondary-workflow.json`
+- **主实例分发到从实例（5678 → 5680）**：`workflows/project/n8n/dispatch-to-secondary-workflow.json`
   - Webhook：`POST http://localhost:5678/webhook/dispatch-task`
 
 ### 2.3 Windows 浏览器/MCP（ChromeMCP/Browser MCP）
 
-- **Windows MCP Runner（浏览器测试）**：`tools/n8n/windows-mcp-runner-browser-test-workflow.json`
+- **Windows MCP Runner（浏览器测试）**：`workflows/project/n8n/windows-mcp-runner-browser-test-workflow.json`
   - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
 
 ### 2.4 工厂入口（覆盖所有岗位/工种）
 
-- **制作人入口（统一入口）**：`tools/n8n/factory-intake-workflow.json`
+- **制作人入口（统一入口）**：`workflows/project/n8n/factory-intake-workflow.json`
   - Webhook：`POST http://127.0.0.1:5678/webhook/intake`
   - 规则：有 `task_pack_path` → 直接执行；无 `task_pack_path` → 先生成 Task Pack 再执行
-- **岗位入口（通用）**：`tools/n8n/factory-run-role-workflow.json`
+- **岗位入口（通用）**：`workflows/project/n8n/factory-run-role-workflow.json`
   - Webhook：`POST http://127.0.0.1:5678/webhook/run-role`
   - 规则：按 `execution_runtime/requires_mcp/task_type` 分流到 WSL 执行或 Windows 浏览器测试
-- **从实例：生成 Task Pack**：`tools/n8n/taskpack-factory-workflow.json`
+- **从实例：生成 Task Pack**：`workflows/project/n8n/taskpack-factory-workflow.json`
   - Webhook：`POST http://localhost:5680/webhook/compose-taskpack`
 
 ---
@@ -88,8 +88,8 @@
 
 > 这些 Launcher 不是新执行器，只是把 role 固定下来，减少手填错误。
 
-- `tools/n8n/launcher-l3-writer-to-wsl.json`
-- `tools/n8n/launcher-l3-engineer-to-wsl.json`
+- `workflows/project/n8n/launcher-l3-writer-to-wsl.json`
+- `workflows/project/n8n/launcher-l3-engineer-to-wsl.json`
 
 ---
 

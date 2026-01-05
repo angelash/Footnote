@@ -2,14 +2,14 @@
 
 > 面向《备注 / Footnote》研发的**本地自动化执行架构**：用 n8n 管理任务流转，用 Task Pack 约束输入输出，用 Cursor CLI（`cursor-agent`）在仓库内完成改动，并用校验器与人工审批保证质量。
 
-> 推进计划：`docs/02_specs/pipelines/n8n_cursor_cli_rollout_plan.md`
+> 推进计划：`workflows/project/pipelines/n8n_cursor_cli_rollout_plan.md`
 
 ---
 
 ## 1. 目标与范围
 
 ### 1.1 目标（What）
-- **结构化提需求**：把“需求”落到 `docs/03_taskpacks/*.md` 的 Task Pack（约束输入/输出/验收）。
+- **结构化提需求**：把“需求”落到 `design/ai-native/03_taskpacks/*.md` 的 Task Pack（约束输入/输出/验收）。
 - **可自动执行**：n8n 读取 Task Pack → 生成最小上下文 → 调用 `cursor-agent` 执行 → 跑校验器 → 输出回执。
 - **可审计可回滚**：每次执行都有日志、回执、产物路径可追踪；失败能定位、可重跑。
 - **执行落到 WSL**：当前采用 **C：5680 单入口**，所有 Cursor 执行/校验都在 WSL 完成；Windows 5678（如保留）仅作为可选 UI/浏览器任务入口。
@@ -45,7 +45,7 @@
 
 ### 2.2 关键前提（强约束）
 - **执行副本在 WSL 文件系统**：从实例与 `cursor-agent` 默认以 `/home/shash/work/Footnote` 作为执行根目录（避免 `/mnt/*` 的性能与权限问题）。
-- **Task Pack 是“契约”**：执行者只读 Allowed Inputs、只写 Deliverables；冻结目录（`docs/00_charter/`、`docs/01_bibles/`）不可修改。
+- **Task Pack 是“契约”**：执行者只读 Allowed Inputs、只写 Deliverables；冻结目录（`design/ai-native/00_charter/`、`design/ai-native/01_bibles/`）不可修改。
 - **主从不是“自动共享状态”**：除非显式配置共享 DB / 同步机制，否则主从实例的工作流与凭据互相独立。
 
 ---
@@ -53,9 +53,9 @@
 ## 3. 数据模型与工件（Artifacts）
 
 ### 3.1 Task Pack（输入契约）
-- **位置**：`docs/03_taskpacks/*.md`
-- **模板**：`docs/03_taskpacks/_template.md`
-- **示例**：`docs/03_taskpacks/T-0001_c0_z1_dialogue.md`
+- **位置**：`design/ai-native/03_taskpacks/*.md`
+- **模板**：`design/ai-native/03_taskpacks/_template.md`
+- **示例**：`design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md`
 
 Task Pack 必须包含：
 - **Allowed Inputs**：允许读取的文件列表
@@ -63,12 +63,12 @@ Task Pack 必须包含：
 - **Constraints / Acceptance Checklist / 回执格式**
 
 ### 3.2 n8n 工作流定义（可导入）
-- **WSL 固定流程（推荐）**：`tools/n8n/fixed-flow-pipeline.json`（`POST /webhook/fixed-flow`，纯 n8n 原生编排）
-- **WSL 状态查询（配套）**：`tools/n8n/status-query-workflow.json`（`GET /webhook/status?run_id=...`）
-- **WSL 从实例（旧：Runner 版本）**：`tools/n8n/cursor-cli-task-workflow.json`（`POST /webhook/execute-task`，内部转发到 `wsl-runner:3210`）
-- **WSL 生成 Task Pack（旧：Runner 版本）**：`tools/n8n/taskpack-factory-workflow.json`（`POST /webhook/compose-taskpack`，内部转发到 `wsl-runner:3210`）
-- **Windows 主实例（桥接 WSL）**：`tools/n8n/cursor-cli-task-workflow-windows.json`（可选/备用）
-- **OpenAI API 版本（可选）**：`tools/n8n/ai-native-task-workflow.json`
+- **WSL 固定流程（推荐）**：`workflows/project/n8n/fixed-flow-pipeline.json`（`POST /webhook/fixed-flow`，纯 n8n 原生编排）
+- **WSL 状态查询（配套）**：`workflows/project/n8n/status-query-workflow.json`（`GET /webhook/status?run_id=...`）
+- **WSL 从实例（旧：Runner 版本）**：`workflows/project/n8n/cursor-cli-task-workflow.json`（`POST /webhook/execute-task`，内部转发到 `wsl-runner:3210`）
+- **WSL 生成 Task Pack（旧：Runner 版本）**：`workflows/project/n8n/taskpack-factory-workflow.json`（`POST /webhook/compose-taskpack`，内部转发到 `wsl-runner:3210`）
+- **Windows 主实例（桥接 WSL）**：`workflows/project/n8n/cursor-cli-task-workflow-windows.json`（可选/备用）
+- **OpenAI API 版本（可选）**：`workflows/project/n8n/ai-native-task-workflow.json`
 
 > 注意：这些 JSON 是“导入文件格式”，并不等价于 n8n Public API 的 create/update payload（字段更严格）。
 
@@ -91,10 +91,10 @@ Task Pack 必须包含：
 ### 4.1.1 固定流程驱动（v1：全自动 + 可续跑）
 
 > 本项目已确认“无需每步人工确认”，并要求“每一步落盘且可从任意阶段续跑”。  
-> 固定流程标准见：`docs/02_specs/pipelines/n8n_fixed_flow_standard.md`
+> 固定流程标准见：`workflows/project/pipelines/n8n_fixed_flow_standard.md`
 
 固定流程在架构层面的新增要求：
-- **强制落盘审计目录**：`docs/05_logs/automation_runs/<run_id>/...`
+- **强制落盘审计目录**：`workflows/project/logs/automation_runs/<run_id>/...`
 - **单任务串行**：避免同一 repo 并发写导致状态污染
 - **git 阶段纳入固定流程**：`commit/push` 作为明确 stage（v1 允许直接 push main）
 
@@ -129,18 +129,18 @@ Task Pack 必须包含：
 
 > 澄清：**WSL 执行器仍然使用 cursor-agent（Cursor 自有模型体系）**。这里的“Windows 无 cursor-agent”仅指：当 Windows 侧需要跑 ChromeMCP/Browser MCP，但本机没有 Cursor CLI 时，才需要独立 Runner；这与 cursor-agent 是两条不同的执行路径，不互相替换。
 
-- **WSL Runner（默认）**：用于代码/文档任务，执行器为 WSL 的 `cursor-agent` + 护栏脚本（`tools/n8n/run-cursor-task.sh`）。
+- **WSL Runner（默认）**：用于代码/文档任务，执行器为 WSL 的 `cursor-agent` + 护栏脚本（`workflows/project/n8n/run-cursor-task.sh`）。
 - **Windows Runner（浏览器/MCP任务）**：用于 UI/E2E/多模态识别/需要 ChromeMCP 的任务
   - Task Pack 标记：`execution_runtime: windows` 或 `requires_mcp: browser`
-  - 执行器：`tools/mcp-runner/mcp-runner.mjs`（独立 MCP Runner，使用 **CUSTOM_API_URL/CUSTOM_API_KEY** 驱动 MCP 工具；与 cursor-agent 模型无关）
+  - 执行器：`workflows/reusable/mcp-runner/mcp-runner.mjs`（独立 MCP Runner，使用 **CUSTOM_API_URL/CUSTOM_API_KEY** 驱动 MCP 工具；与 cursor-agent 模型无关）
   - Browser MCP 配置示例：`docs/智绘AI生图自动化演示文案.md`（`~/.cursor/mcp.json` 指向 `http://localhost:3000/mcp`）
 
 #### 5.5.1 n8n 接入：Windows Browser Test Webhook
 
 提供可导入工作流：
-- `tools/n8n/windows-mcp-runner-browser-test-workflow.json`
+- `workflows/project/n8n/windows-mcp-runner-browser-test-workflow.json`
   - Webhook：`POST http://127.0.0.1:5678/webhook/browser-test`
-  - 内部执行：`powershell ... tools/mcp-runner/run-agent.ps1` → `node tools/mcp-runner/mcp-runner.mjs agent ...`
+  - 内部执行：`powershell ... tools/mcp-runner/run-agent.ps1` → `node workflows/reusable/mcp-runner/mcp-runner.mjs agent ...`
 
 请求体字段（JSON）：
 - `mcp_url`：MCP server endpoint（默认读取 `$env.MCP_URL`；建议 `http://localhost:3000/mcp`）
@@ -167,35 +167,35 @@ Task Pack 必须包含：
 - **WSL 工具链**：Node `v22.21.0` / npm `10.9.4` / n8n `2.1.4` / pm2 `6.0.14`。
 
 ### 6.2 仓库工件一致性问题（已发现）
-- 少数文档/示例仍引用 `docs/03_taskpacks/T-0001_example.md`，但仓库内可直接使用示例：`docs/03_taskpacks/T-0001_c0_z1_dialogue.md`。
+- 少数文档/示例仍引用 `design/ai-native/03_taskpacks/T-0001_example.md`，但仓库内可直接使用示例：`design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md`。
 - 多份部署文档对“WSL 是否已安装 Node/n8n/PM2”“启动命令是否使用 `--port` 参数”等描述不一致（需要统一）。
 
 ### 6.3 新增落地项（fixed-flow v1-001）
-- 已提供纯 n8n 原生固定流程：`tools/n8n/fixed-flow-pipeline.json`
-- 已提供状态查询工作流：`tools/n8n/status-query-workflow.json`
-- 已提供可视化看板页面：`tools/n8n/dashboard/index.html`（调用 `/webhook/status` 读取进度）
+- 已提供纯 n8n 原生固定流程：`workflows/project/n8n/fixed-flow-pipeline.json`
+- 已提供状态查询工作流：`workflows/project/n8n/status-query-workflow.json`
+- 已提供可视化看板页面：`workflows/project/n8n/dashboard/index.html`（调用 `/webhook/status` 读取进度）
 
 ### 6.4 实现对齐速查（导入清单 / 关键参数 / 排查入口）
 
 #### 6.4.1 导入到 WSL 5680（推荐最小集）
-- `tools/n8n/fixed-flow-pipeline.json`（`POST /webhook/fixed-flow`）
-- `tools/n8n/status-query-workflow.json`（`GET /webhook/status?run_id=...`）
+- `workflows/project/n8n/fixed-flow-pipeline.json`（`POST /webhook/fixed-flow`）
+- `workflows/project/n8n/status-query-workflow.json`（`GET /webhook/status?run_id=...`）
 
 （可选：兼容旧链路）
-- `tools/n8n/cursor-cli-task-workflow.json`（`POST /webhook/execute-task`，依赖 `tools/n8n/wsl-runner/server.mjs:3210`）
-- `tools/n8n/taskpack-factory-workflow.json`（`POST /webhook/compose-taskpack`，依赖 `tools/n8n/wsl-runner/server.mjs:3210`）
+- `workflows/project/n8n/cursor-cli-task-workflow.json`（`POST /webhook/execute-task`，依赖 `workflows/project/n8n/wsl-runner/server.mjs:3210`）
+- `workflows/project/n8n/taskpack-factory-workflow.json`（`POST /webhook/compose-taskpack`，依赖 `workflows/project/n8n/wsl-runner/server.mjs:3210`）
 
 #### 6.4.2 导入到 Windows 5678（可选入口/扩展）
-- `tools/n8n/dispatch-to-secondary-workflow.json`（`POST /webhook/dispatch-task`）
-- `tools/n8n/factory-intake-workflow.json`（`POST /webhook/intake`）
-- `tools/n8n/factory-run-role-workflow.json`（`POST /webhook/run-role`）
-- `tools/n8n/launcher-l3-writer-to-wsl.json`（`POST /webhook/run-writer`）
-- `tools/n8n/launcher-l3-engineer-to-wsl.json`（`POST /webhook/run-engineer`）
-- `tools/n8n/windows-mcp-runner-browser-test-workflow.json`（`POST /webhook/browser-test`）
+- `workflows/project/n8n/dispatch-to-secondary-workflow.json`（`POST /webhook/dispatch-task`）
+- `workflows/project/n8n/factory-intake-workflow.json`（`POST /webhook/intake`）
+- `workflows/project/n8n/factory-run-role-workflow.json`（`POST /webhook/run-role`）
+- `workflows/project/n8n/launcher-l3-writer-to-wsl.json`（`POST /webhook/run-writer`）
+- `workflows/project/n8n/launcher-l3-engineer-to-wsl.json`（`POST /webhook/run-engineer`）
+- `workflows/project/n8n/windows-mcp-runner-browser-test-workflow.json`（`POST /webhook/browser-test`）
 
 #### 6.4.3 最常见问题（落地级）
 - fixed-flow / status-query 都依赖 **n8n 在 WSL 内运行**（Exec 节点直接访问 WSL 文件系统）；`project_root` 必须是 WSL 路径（默认 `/home/shash/work/Footnote`）。
-- `GET /webhook/status` 返回 `status_not_found`：通常是 `run_id` 不存在或 `project_root` 不对（找不到 `docs/05_logs/automation_runs/<run_id>/status.json`）。
+- `GET /webhook/status` 返回 `status_not_found`：通常是 `run_id` 不存在或 `project_root` 不对（找不到 `workflows/project/logs/automation_runs/<run_id>/status.json`）。
 - Windows 主实例若做脚本/REST 自动化：需要 `N8N_SECURE_COOKIE=false`（否则 http 下 Secure Cookie 不会保存，容易出现 Unauthorized）。
 
 ---
@@ -221,7 +221,7 @@ Task Pack 必须包含：
    - 手动导入（最低可用）
    - 或用 n8n API Key + “sanitize workflow JSON”脚本实现一键同步（推荐）
 3. **安全与密钥管理**：`N8N_ENCRYPTION_KEY` 固化、API Key 过期/轮换策略、禁止把 token 写入仓库。
-4. **产物与审计**：输出统一落到 `docs/05_logs/` 或 PR/Issue 维度日志。
+4. **产物与审计**：输出统一落到 `workflows/project/logs/` 或 PR/Issue 维度日志。
 5. **通知闭环**：把“完成通知接口”做成工作流最后一步（成功/失败都通知）。
 
 ### P2（扩展/性能/治理）

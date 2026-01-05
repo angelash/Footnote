@@ -6,16 +6,16 @@ purpose: "严格按Task Pack执行测试，提交规范的缺陷单"
 authority:
   can_read:
     - "TaskPack.AllowedInputs"
-    - "/docs/04_acceptance/**"
-    - "/src/**"
-    - "/tests/**"
+    - "/design/ai-native/04_acceptance/**"
+    - "/game/src/**"
+    - "/game/tests/**"
   can_write:
-    - "/tests/**"
-    - "/docs/05_logs/**"
+    - "/game/tests/**"
+    - "/workflows/project/logs/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"
+    - "/design/ai-native/00_charter/**"
+    - "/design/ai-native/01_bibles/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_code_change: true

@@ -27,7 +27,7 @@ const PORT = Number(process.env.PORT || "3210");
 
 const DEFAULT_PROJECT_ROOT = "/home/shash/work/Footnote";
 
-const AUTOMATION_RUNS_DIR = "docs/05_logs/automation_runs";
+const AUTOMATION_RUNS_DIR = "workflows/project/logs/automation_runs";
 const LOCK_DIR = path.posix.join(AUTOMATION_RUNS_DIR, "_lock");
 
 const nowIso = () => new Date().toISOString();
@@ -136,7 +136,7 @@ async function withRepoLock(projectRoot, runId, fn) {
 
 async function gitPreflight(projectRoot) {
   const startedAt = Date.now();
-  // IMPORTANT: fixed-flow stage logs are written under docs/05_logs/automation_runs.
+  // IMPORTANT: fixed-flow stage logs are written under workflows/project/logs/automation_runs.
   // Preflight must treat the repo as "clean" even if those logs exist, otherwise a failed run
   // would permanently block subsequent runs.
   const status = await run(
@@ -144,7 +144,7 @@ async function gitPreflight(projectRoot) {
     [
       "-lc",
       // Also ignore the generated prompt file (tracked in this repo) to avoid self-blocking.
-      "git status --porcelain -- . ':(exclude).cursor/current_task_prompt.md' ':(exclude)docs/05_logs/automation_runs' ':(exclude)docs/05_logs/automation_runs/**'",
+      "git status --porcelain -- . ':(exclude).cursor/current_task_prompt.md' ':(exclude)workflows/project/logs/automation_runs' ':(exclude)workflows/project/logs/automation_runs/**'",
     ],
     { cwd: projectRoot, env: process.env }
   );
@@ -356,7 +356,7 @@ async function handleExecuteTask(body) {
   const agentRes = await run(
     "bash",
     [
-      "tools/n8n/run-cursor-task.sh",
+      "workflows/project/n8n/run-cursor-task.sh",
       "--task-pack",
       taskPackPath,
       "--prompt-file",
@@ -413,7 +413,7 @@ async function handleComposeTaskpack(body) {
   const outcome = body.outcome || body.description || "";
 
   const fileName = `${taskId}_${slugify(title)}.md`.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const relPath = path.posix.join("docs/03_taskpacks", fileName);
+  const relPath = path.posix.join("design/ai-native/03_taskpacks", fileName);
   const absPath = safeResolveUnderProject(projectRoot, relPath);
 
   const content = [
@@ -436,7 +436,7 @@ async function handleComposeTaskpack(body) {
     "- [`dir`] `./`",
     "",
     "## 3. Deliverables（必须交付物）",
-    "- [`file`] `docs/03_taskpacks/...` (as needed)",
+    "- [`file`] `design/ai-native/03_taskpacks/...` (as needed)",
     "",
     "## 4. Constraints（硬约束 / 禁止事项）",
     "- 不得修改冻结目录：`docs/00_charter/**`、`docs/01_bibles/**`",

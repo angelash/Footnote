@@ -13,7 +13,7 @@
 
 `POST /fixed-flow`：按固定 stage 自动流转并落盘到：
 
-`docs/05_logs/automation_runs/<run_id>/...`
+`workflows/project/logs/automation_runs/<run_id>/...`
 
 ### 异步启动（推荐）
 

@@ -5,8 +5,8 @@ set -euo pipefail
 # Intended to be called from n8n (WSL runner).
 #
 # Usage:
-#   tools/n8n/run-cursor-task.sh \
-#     --task-pack docs/03_taskpacks/T-0001_c0_z1_dialogue.md \
+#   workflows/project/n8n/run-cursor-task.sh \
+#     --task-pack design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md \
 #     --prompt-file .cursor/current_task_prompt.md \
 #     --task-type doc \
 #     --complexity normal \
@@ -137,7 +137,7 @@ is_allowed_change() {
   # Always allow internal prompt files
   if [[ "$f" == ".cursor/"* ]]; then return 0; fi
   # Allow fixed-flow audit logs (user requested to keep committing them for now)
-  if [[ "$f" == "docs/05_logs/automation_runs/"* ]]; then return 0; fi
+  if [[ "$f" == "workflows/project/logs/automation_runs/"* ]]; then return 0; fi
   for d in "${DELIVERABLES[@]}"; do
     [[ -n "$d" ]] || continue
     if [[ "$f" == "$d" ]]; then return 0; fi

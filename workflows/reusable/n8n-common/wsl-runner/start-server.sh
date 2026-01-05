@@ -5,6 +5,6 @@ set -euo pipefail
 export HOST="${HOST:-127.0.0.1}"
 export PORT="${PORT:-3210}"
 
-exec node tools/n8n/wsl-runner/server.mjs
+exec node workflows/project/n8n/wsl-runner/server.mjs
 
 

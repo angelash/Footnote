@@ -12,7 +12,7 @@
 
 ### 1.1 与 AI-Native 固定流程（n8n）的对齐说明（现状）
 
-- **自动化执行入口（推荐）**：`POST http://localhost:5680/webhook/fixed-flow`（见 `docs/02_specs/pipelines/n8n_fixed_flow_standard.md`）
+- **自动化执行入口（推荐）**：`POST http://localhost:5680/webhook/fixed-flow`（见 `workflows/project/pipelines/n8n_fixed_flow_standard.md`）
 - **默认门禁命令（当前实现）**：工作流运行 `npm run validate --if-present`
   - 如果你希望“命名/尺寸/格式/质量”校验成为强门禁，需要把资产校验器**接入到** `npm run validate`（或在工作流里扩展 Run Validate 命令）
 - **提交策略（v1 PoC）**：fixed-flow 默认会 `commit/push main`；大批量资产建议拆分并走分支/PR（后续演进项）

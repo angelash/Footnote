@@ -36,7 +36,7 @@ mkdir -p .cursor
 cat > .cursor/test-prompt.md << 'EOF'
 # Test Task
 
-Please list the files in docs/03_taskpacks/ directory.
+Please list the files in design/ai-native/03_taskpacks/ directory.
 EOF
 echo "   ✓ 提示文件已创建: .cursor/test-prompt.md"
 echo ""

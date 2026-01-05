@@ -5,14 +5,14 @@ purpose: "管理项目进度、资源调度、变更控制与风险台账"
 
 authority:
   can_read:
-    - "/docs/**"
+    - "/design/**"
   can_write:
-    - "/docs/01_bibles/production_plan.md"
-    - "/docs/05_logs/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/ai-native/01_bibles/production_plan.md"
+    - "/workflows/project/logs/**"
+    - "/design/ai-native/03_taskpacks/**"
   forbidden_write:
-    - "/docs/00_charter/project_charter.md"
-    - "/src/**"
+    - "/design/ai-native/00_charter/project_charter.md"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_design_decision: true

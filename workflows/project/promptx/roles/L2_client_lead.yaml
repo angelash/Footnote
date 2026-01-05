@@ -9,16 +9,16 @@ purpose: "把规格拆成可合并PR级任务包并验收"
 # 权限定义
 authority:
   can_read:
-    - "/docs/**"
-    - "/src/**"
+    - "/design/**"
+    - "/game/src/**"
     - "/content/**"
     - "/tools/**"
   can_write:
-    - "/docs/02_specs/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/02_specs/**"
+    - "/design/03_taskpacks/**"
   forbidden_write:
-    - "/docs/00_charter/**"   # 冻结层
-    - "/docs/01_bibles/**"    # L1层（需CR）
+    - "/design/00_charter/**"   # 冻结层
+    - "/design/01_bibles/**"    # L1层（需CR）
 
 # 边界约束
 scope_guardrails:

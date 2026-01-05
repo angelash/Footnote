@@ -200,7 +200,7 @@ pm2 startup
 #### 创建 WSL 桥接脚本
 
 ```powershell
-# tools/n8n/wsl-pm2-bridge.ps1
+# workflows/project/n8n/wsl-pm2-bridge.ps1
 # 通过 WSL 管理 WSL 中的 PM2
 
 param(
@@ -248,7 +248,7 @@ wsl bash -c "cd /home/shash/work/Footnote && $wslCommand"
 ### 方案 2: 自动同步脚本
 
 ```powershell
-# tools/n8n/sync-workflows.ps1
+# workflows/project/n8n/sync-workflows.ps1
 # 从主实例同步工作流到从实例
 
 $primaryUrl = "http://localhost:5678/api/v1"
@@ -328,7 +328,7 @@ foreach ($workflow in $workflows.data) {
 // 调用从实例的 Webhook
 POST http://localhost:5680/webhook/execute-task
 {
-  "task_pack_path": "docs/03_taskpacks/T-0001_c0_z1_dialogue.md",
+  "task_pack_path": "design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md",
   "role": "L3_writer"
 }
 ```
@@ -350,7 +350,7 @@ wsl bash -c "cd /home/shash/work/Footnote && pm2 monit"
 ### 统一管理脚本
 
 ```powershell
-# tools/n8n/manage-cluster.ps1
+# workflows/project/n8n/manage-cluster.ps1
 function Show-Status {
     Write-Host "=== n8n 集群状态 ===" -ForegroundColor Cyan
     

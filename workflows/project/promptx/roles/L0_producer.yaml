@@ -9,15 +9,15 @@ purpose: "把模糊目标固化为里程碑/取舍/风险台账；不介入执�
 # 权限定义
 authority:
   can_read:
-    - "/docs/**"
     - "/design/**"
-    - "/src/**"
+    - "/design/**"
+    - "/game/src/**"
   can_write:
-    - "/docs/01_bibles/production_plan.md"
-    - "/docs/05_logs/decisions_log.md"
-    - "/docs/00_charter/change_control.md"
+    - "/design/01_bibles/production_plan.md"
+    - "/design/05_logs/decisions_log.md"
+    - "/design/00_charter/change_control.md"
   forbidden_write:
-    - "/docs/00_charter/project_charter.md"  # 宪法只能由人类制作人修改
+    - "/design/00_charter/project_charter.md"  # 宪法只能由人类制作人修改
 
 # 边界约束
 scope_guardrails:

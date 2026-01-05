@@ -5,15 +5,15 @@ purpose: "定义QA Bible，规范测试策略与验收门禁"
 
 authority:
   can_read:
-    - "/docs/**"
-    - "/src/**"
-    - "/tests/**"
+    - "/design/**"
+    - "/game/src/**"
+    - "/game/tests/**"
   can_write:
-    - "/docs/01_bibles/qa_bible.md"
-    - "/docs/04_acceptance/**"
+    - "/design/01_bibles/qa_bible.md"
+    - "/design/04_acceptance/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_design_change: true

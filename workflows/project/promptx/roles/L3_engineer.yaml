@@ -13,9 +13,9 @@ authority:
   can_write:
     - "TaskPack.Deliverables paths only"  # 只写任务包指定的输出
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/docs/02_specs/**"  # L3不能改Spec
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/design/02_specs/**"  # L3不能改Spec
 
 # 边界约束
 scope_guardrails:

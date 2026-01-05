@@ -25,7 +25,7 @@ function Start-All {
 
     # WSL 从实例：使用仓库内启动脚本（包含端口 5680 配置）
     wsl bash -c "cd /home/shash/work/Footnote && pm2 delete n8n-secondary 2>/dev/null"
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
+    wsl bash -c "cd /home/shash/work/Footnote && pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
     Write-Host "完成！" -ForegroundColor Green
 }
 

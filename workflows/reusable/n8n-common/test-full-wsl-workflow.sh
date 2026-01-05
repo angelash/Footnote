@@ -43,7 +43,7 @@ mkdir -p .cursor
 cat > .cursor/test-task.md << 'TASKEOF'
 # 测试任务
 
-请列出 docs/03_taskpacks/ 目录下的所有文件，并显示每个文件的第一行。
+请列出 design/ai-native/03_taskpacks/ 目录下的所有文件，并显示每个文件的第一行。
 TASKEOF
 echo "   ✓ 测试任务文件已创建: .cursor/test-task.md"
 echo "   内容预览:"
@@ -73,10 +73,10 @@ echo ""
 
 # 8. 测试文件读取（模拟 n8n 工作流）
 echo "8. 模拟 n8n 工作流文件操作:"
-if [ -f "docs/03_taskpacks/T-0001_c0_z1_dialogue.md" ]; then
+if [ -f "design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md" ]; then
     echo "   ✓ 可以读取任务包文件"
-    echo "   示例任务包: docs/03_taskpacks/T-0001_c0_z1_dialogue.md"
-    head -5 "docs/03_taskpacks/T-0001_c0_z1_dialogue.md" | sed 's/^/      /'
+    echo "   示例任务包: design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md"
+    head -5 "design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md" | sed 's/^/      /'
 else
     echo "   ✗ 任务包文件不存在"
 fi
@@ -87,7 +87,7 @@ echo ""
 echo "✅ 所有基础检查通过！"
 echo ""
 echo "📝 下一步:"
-echo "   1. 在 n8n 中导入更新后的工作流: tools/n8n/cursor-cli-task-workflow.json"
+echo "   1. 在 n8n 中导入更新后的工作流: workflows/project/n8n/cursor-cli-task-workflow.json"
 echo "   2. 确认工作流中的 project_root 参数为: $PROJECT_ROOT"
 echo "   3. 测试执行一个真实任务"
 echo ""

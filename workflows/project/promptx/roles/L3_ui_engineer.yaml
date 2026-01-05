@@ -6,17 +6,17 @@ purpose: "严格按Task Pack实现UI模块，使用ui.config.ts常量"
 authority:
   can_read:
     - "TaskPack.AllowedInputs"
-    - "/docs/02_specs/ui/**"
-    - "/src/systems/ui/**"
-    - "/src/config/ui.config.ts"
+    - "/design/02_specs/ui/**"
+    - "/game/src/systems/ui/**"
+    - "/game/src/config/ui.config.ts"
   can_write:
-    - "/src/systems/ui/**"
-    - "/src/scenes/**"
+    - "/game/src/systems/ui/**"
+    - "/game/src/scenes/**"
   forbidden_write:
-    - "/docs/**"
-    - "/src/config/**"
-    - "/src/systems/narrative/**"
-    - "/src/systems/world/**"
+    - "/design/**"
+    - "/game/src/config/**"
+    - "/game/src/systems/narrative/**"
+    - "/game/src/systems/world/**"
 
 scope_guardrails:
   forbid_scope_expansion: true

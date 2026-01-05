@@ -5,16 +5,16 @@ purpose: "把Design Bible拆解为System Spec，定义系统状态与接口"
 
 authority:
   can_read:
-    - "/docs/01_bibles/**"
-    - "/docs/02_specs/**"
+    - "/design/01_bibles/**"
+    - "/design/02_specs/**"
     - "/design/**"
   can_write:
-    - "/docs/02_specs/systems/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/02_specs/systems/**"
+    - "/design/03_taskpacks/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_bible_modification: true

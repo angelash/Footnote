@@ -6,13 +6,13 @@ purpose: "严格按Task Pack交付事件脚本，不得引入新Schema字段"
 authority:
   can_read:
     - "TaskPack.AllowedInputs"
-    - "/docs/02_specs/systems/event_system_spec.md"
-    - "/src/data/dialogues/**"
+    - "/design/02_specs/systems/event_system_spec.md"
+    - "/game/src/data/dialogues/**"
   can_write:
-    - "/src/data/events/*.yaml"
+    - "/game/src/data/events/*.yaml"
   forbidden_write:
-    - "/docs/**"
-    - "/src/**/*.ts"
+    - "/design/**"
+    - "/game/src/**/*.ts"
 
 scope_guardrails:
   forbid_scope_expansion: true

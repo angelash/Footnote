@@ -16,7 +16,7 @@
           "values": [
             {
               "name": "task_pack_path",
-              "stringValue": "docs/03_taskpacks/T-0001_c0_z1_dialogue.md"
+              "stringValue": "design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md"
             },
             {
               "name": "role",
@@ -88,7 +88,7 @@
     },
     {
       "parameters": {
-        "command": "wsl bash -c \"cd {{ $('Set Task Parameters').first().json.project_root_wsl }} && tools/n8n/run-cursor-task.sh --task-pack {{ $('Set Task Parameters').first().json.task_pack_path }} --prompt-file .cursor/current_task_prompt.md --task-type {{ $('Set Task Parameters').first().json.task_type }} --complexity {{ $('Set Task Parameters').first().json.complexity }} --model-override {{ $('Set Task Parameters').first().json.model_override }}\"",
+        "command": "wsl bash -c \"cd {{ $('Set Task Parameters').first().json.project_root_wsl }} && workflows/project/n8n/run-cursor-task.sh --task-pack {{ $('Set Task Parameters').first().json.task_pack_path }} --prompt-file .cursor/current_task_prompt.md --task-type {{ $('Set Task Parameters').first().json.task_type }} --complexity {{ $('Set Task Parameters').first().json.complexity }} --model-override {{ $('Set Task Parameters').first().json.model_override }}\"",
         "options": {}
       },
       "id": "execute-cursor",

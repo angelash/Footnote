@@ -13,8 +13,8 @@
 
 ```bash
 wsl bash -c "cd /home/shash/work/Footnote && pm2 delete n8n-secondary 2>/dev/null"
-wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/start-n8n-secondary.sh --name n8n-secondary"
-wsl bash -c "cd /home/shash/work/Footnote && pm2 start tools/n8n/wsl-runner/start-server.sh --name wsl-cursor-runner"
+wsl bash -c "cd /home/shash/work/Footnote && pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
+wsl bash -c "cd /home/shash/work/Footnote && pm2 start workflows/project/n8n/wsl-runner/start-server.sh --name wsl-cursor-runner"
 wsl bash -c "cd /home/shash/work/Footnote && pm2 save"
 ```
 

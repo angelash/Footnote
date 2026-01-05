@@ -5,16 +5,16 @@ purpose: "管理事件Schema与脚本规范，把系统Spec转为事件任务包
 
 authority:
   can_read:
-    - "/docs/**"
-    - "/src/data/events/**"
-    - "/src/types/**"
+    - "/design/**"
+    - "/game/src/data/events/**"
+    - "/game/src/types/**"
   can_write:
-    - "/docs/02_specs/events/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/02_specs/events/**"
+    - "/design/03_taskpacks/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_schema_breaking_change: true

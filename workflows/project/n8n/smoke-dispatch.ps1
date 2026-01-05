@@ -1,7 +1,7 @@
 param(
     # NOTE: 用 127.0.0.1 避免部分环境 localhost/IPv6/代理解析导致的连接失败
     [string]$PrimaryWebhookUrl = "http://127.0.0.1:5678/webhook/dispatch-task",
-    [string]$TaskPackPath = "docs/03_taskpacks/T-0001_c0_z1_dialogue.md",
+    [string]$TaskPackPath = "design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md",
     [string]$Role = "L3_writer",
     [string]$TaskType = "doc",
     [string]$Complexity = "normal",

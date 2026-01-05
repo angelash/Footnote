@@ -5,17 +5,17 @@ purpose: "管理内容/资产管线，开发校验器与自动化工具"
 
 authority:
   can_read:
-    - "/docs/**"
+    - "/design/**"
     - "/tools/**"
     - "/scripts/**"
   can_write:
-    - "/docs/02_specs/pipelines/**"
-    - "/docs/03_taskpacks/**"
+    - "/design/02_specs/pipelines/**"
+    - "/design/03_taskpacks/**"
     - "/tools/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_game_code_change: true

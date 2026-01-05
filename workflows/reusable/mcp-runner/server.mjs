@@ -4,7 +4,7 @@
  *
  * Why: Some n8n builds in this repo do not include "Execute Command" node.
  * This service replaces executeCommand by providing an HTTP endpoint that
- * runs tools/mcp-runner/mcp-runner.mjs "agent" logic inside Node.
+ * runs workflows/reusable/mcp-runner/mcp-runner.mjs "agent" logic inside Node.
  *
  * Endpoints:
  * - GET  /health

@@ -28,7 +28,7 @@
             "values": [
               {
                 "name": "task_pack_path",
-                "stringValue": "={{ $json.body?.task_pack_path || 'docs/03_taskpacks/T-0001_c0_z1_dialogue.md' }}"
+                "stringValue": "={{ $json.body?.task_pack_path || 'design/ai-native/03_taskpacks/T-0001_c0_z1_dialogue.md' }}"
               },
               {
                 "name": "role",

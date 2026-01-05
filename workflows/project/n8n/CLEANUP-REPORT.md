@@ -15,7 +15,7 @@
 - ❌ `tools/wsl-cursor-test-report.md` - 旧的测试报告（使用 cursor CLI，不是 cursor-agent）
 
 ### 3. 已完成的配置文档
-- ❌ `tools/n8n/WSL-CONFIG-REQUIRED.md` - 配置已完成，不再需要
+- ❌ `workflows/project/n8n/WSL-CONFIG-REQUIRED.md` - 配置已完成，不再需要
 
 ### 4. 临时测试文件（WSL 中）
 - ❌ `.cursor/test-message.txt`
@@ -32,7 +32,7 @@
 - ✅ `tools/wsl-env-check.sh` - WSL 环境检查
 
 ### 文档（参考价值）
-- ✅ `tools/n8n/WSL-SETUP.md` - WSL 设置指南
+- ✅ `workflows/project/n8n/WSL-SETUP.md` - WSL 设置指南
 
 ### 规则文件（正常文件）
 - ✅ `.cursor/rules/04-testing.mdc` - 测试规范

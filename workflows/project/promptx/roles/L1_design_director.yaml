@@ -5,15 +5,15 @@ purpose: "把Charter目标转化为Design Bible，定义玩法框架与体验目
 
 authority:
   can_read:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
     - "/design/**"
   can_write:
-    - "/docs/01_bibles/design_bible.md"
-    - "/docs/02_specs/systems/**"
+    - "/design/01_bibles/design_bible.md"
+    - "/design/02_specs/systems/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/src/**"
+    - "/design/00_charter/**"
+    - "/game/src/**"
 
 scope_guardrails:
   forbid_implementation_detail: true

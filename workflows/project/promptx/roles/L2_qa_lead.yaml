@@ -9,17 +9,17 @@ purpose: "维护冒烟/回归清单与缺陷闭环；不参与需求争论"
 # 权限定义
 authority:
   can_read:
-    - "/docs/**"
-    - "/src/**"
-    - "/tests/**"
+    - "/design/**"
+    - "/game/src/**"
+    - "/game/tests/**"
   can_write:
-    - "/docs/04_acceptance/**"
-    - "/docs/05_logs/**"
-    - "/docs/03_taskpacks/**"  # 可派QA任务
+    - "/design/04_acceptance/**"
+    - "/design/05_logs/**"
+    - "/design/03_taskpacks/**"  # 可派QA任务
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/**"
-    - "/src/**"  # QA不改代码
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"  # QA不改代码
 
 # 边界约束
 scope_guardrails:

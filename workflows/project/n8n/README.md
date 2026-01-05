@@ -11,29 +11,29 @@
 3. **Cursor Agent（WSL）**：由脚本封装调用，完成实际任务并受 Deliverables 护栏约束
 
 关键文件：
-- `tools/n8n/wsl-runner/server.mjs`：WSL Runner（/fixed-flow、/execute-task、/compose-taskpack、/fixed-flow/status）
-- `tools/n8n/run-cursor-task.sh`：调用 `cursor-agent` + 选模型策略 + Deliverables guardrail
-- `tools/n8n/cli-import/secondary-fixed-flow.export.json`：n8n 导入的 fixed-flow 入口工作流（HTTP 转发到 3210）
+- `workflows/project/n8n/wsl-runner/server.mjs`：WSL Runner（/fixed-flow、/execute-task、/compose-taskpack、/fixed-flow/status）
+- `workflows/project/n8n/run-cursor-task.sh`：调用 `cursor-agent` + 选模型策略 + Deliverables guardrail
+- `workflows/project/n8n/cli-import/secondary-fixed-flow.export.json`：n8n 导入的 fixed-flow 入口工作流（HTTP 转发到 3210）
 
 ---
 
 ## 目录与文件说明（按用途）
 
-### A) `tools/n8n/`（核心：n8n 部署与工作流资产）
+### A) `workflows/project/n8n/`（核心：n8n 部署与工作流资产）
 
 | 路径 | 用途 | 谁用 | 是否必需 |
 |---|---|---|---|
-| `tools/n8n/run-cursor-task.sh` | 统一封装 `cursor-agent` 调用；按 `task_type/complexity` 选模型；Deliverables 白名单护栏 | WSL Runner | **必需** |
-| `tools/n8n/wsl-runner/server.mjs` | WSL HTTP Runner：`/fixed-flow` 编排、落盘、锁、git、通知；提供 `/fixed-flow/status` 查询 | n8n / 你 | **必需** |
-| `tools/n8n/wsl-runner/start-server.sh` | 启动 WSL Runner 的脚本 | 运维 | **必需**（如果你用脚本启动） |
-| `tools/n8n/cli-import/*.export.json` | n8n 工作流“权威导入包”（建议只保留这套） | 你（导入） | **建议** |
-| `tools/n8n/*-workflow.json` | n8n 工作流源码/入口（launcher/factory/dispatch 等） | 你（导入/迭代） | **建议** |
-| `tools/n8n/start-n8n-secondary.sh` | WSL n8n 启动脚本（含关键 env） | 运维 | **建议** |
-| `tools/n8n/ecosystem.config.wsl.cjs` | PM2：WSL n8n 的启动配置示例 | 运维 | 可选 |
-| `tools/n8n/ecosystem.config.cjs` | PM2：Windows MCP Runner/服务等端口配置（如 3211） | 运维 | 可选 |
-| `tools/n8n/smoke-secondary.ps1` | 5680 入口冒烟（compose/execute） | 你/CI | **建议** |
-| `tools/n8n/CLUSTER-SETUP.md` | 集群/PM2 配置说明（已更新为 `.cjs` 示例） | 你/运维 | 参考 |
-| `tools/n8n/README.md` / `QUICK-START.md` / `DEPLOYMENT-GUIDE.md` | 使用说明/启动指南 | 你/团队 | 参考 |
+| `workflows/project/n8n/run-cursor-task.sh` | 统一封装 `cursor-agent` 调用；按 `task_type/complexity` 选模型；Deliverables 白名单护栏 | WSL Runner | **必需** |
+| `workflows/project/n8n/wsl-runner/server.mjs` | WSL HTTP Runner：`/fixed-flow` 编排、落盘、锁、git、通知；提供 `/fixed-flow/status` 查询 | n8n / 你 | **必需** |
+| `workflows/project/n8n/wsl-runner/start-server.sh` | 启动 WSL Runner 的脚本 | 运维 | **必需**（如果你用脚本启动） |
+| `workflows/project/n8n/cli-import/*.export.json` | n8n 工作流“权威导入包”（建议只保留这套） | 你（导入） | **建议** |
+| `workflows/project/n8n/*-workflow.json` | n8n 工作流源码/入口（launcher/factory/dispatch 等） | 你（导入/迭代） | **建议** |
+| `workflows/project/n8n/start-n8n-secondary.sh` | WSL n8n 启动脚本（含关键 env） | 运维 | **建议** |
+| `workflows/project/n8n/ecosystem.config.wsl.cjs` | PM2：WSL n8n 的启动配置示例 | 运维 | 可选 |
+| `workflows/project/n8n/ecosystem.config.cjs` | PM2：Windows MCP Runner/服务等端口配置（如 3211） | 运维 | 可选 |
+| `workflows/project/n8n/smoke-secondary.ps1` | 5680 入口冒烟（compose/execute） | 你/CI | **建议** |
+| `workflows/project/n8n/CLUSTER-SETUP.md` | 集群/PM2 配置说明（已更新为 `.cjs` 示例） | 你/运维 | 参考 |
+| `workflows/project/n8n/README.md` / `QUICK-START.md` / `DEPLOYMENT-GUIDE.md` | 使用说明/启动指南 | 你/团队 | 参考 |
 
 **端口约定（当前）**
 - WSL Runner：`http://127.0.0.1:3210`
@@ -72,7 +72,7 @@
 ## 清理策略（你要求“先都提交，后面完善再清理”）
 
 当前策略：
-- **保留并提交**：`docs/05_logs/automation_runs/**`（审计/可续跑证据）
+- **保留并提交**：`workflows/project/logs/automation_runs/**`（审计/可续跑证据）
 - **不再污染**：`.cursor/current_task_prompt.md`（prompt 已迁移到 run 日志目录：`.../_prompt.md`）
 
 后续（架构完善后）可以考虑：

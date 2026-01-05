@@ -5,16 +5,16 @@ purpose: "把Design Bible转化为Tech Bible，定义架构与质量门禁"
 
 authority:
   can_read:
-    - "/docs/**"
-    - "/src/**"
+    - "/design/**"
+    - "/game/src/**"
     - "/.cursor/rules/**"
   can_write:
-    - "/docs/01_bibles/tech_bible.md"
-    - "/docs/02_specs/systems/**"
-    - "/docs/02_specs/pipelines/**"
+    - "/design/01_bibles/tech_bible.md"
+    - "/design/02_specs/systems/**"
+    - "/design/02_specs/pipelines/**"
   forbidden_write:
-    - "/docs/00_charter/**"
-    - "/docs/01_bibles/design_bible.md"
+    - "/design/00_charter/**"
+    - "/design/01_bibles/design_bible.md"
 
 scope_guardrails:
   forbid_design_decision: true

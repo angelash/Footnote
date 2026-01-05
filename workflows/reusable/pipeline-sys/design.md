@@ -1,5 +1,8 @@
 ## Pipeline-Sys：自建流程系统（v1 / v2 / v3 规格书）
 
+相关配套文档：
+- 代码架构设计：`workflows/reusable/pipeline-sys/code-architecture.md`
+
 本文件把“自建 Orchestrator + 行为树可视化”落成可执行规格，所有关键点给出确定方案，不留分叉。
 
 ---

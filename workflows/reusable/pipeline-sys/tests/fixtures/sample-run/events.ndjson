@@ -1,0 +1,13 @@
+{"ts":"2026-01-05T12:00:00.000Z","run_id":"RUN-20260105-120000-test","type":"RUN_STARTED","node_id":"","seq":1,"payload":{"task_id":"TASK-TEST-001"}}
+{"ts":"2026-01-05T12:00:00.100Z","run_id":"RUN-20260105-120000-test","type":"LOCK_ACQUIRED","node_id":"","seq":2,"payload":{"lock_dir":"_lock/RUN-20260105-120000-test"}}
+{"ts":"2026-01-05T12:00:00.200Z","run_id":"RUN-20260105-120000-test","type":"NODE_STARTED","node_id":"stage.intake","seq":3,"payload":{"attempt":1}}
+{"ts":"2026-01-05T12:00:05.000Z","run_id":"RUN-20260105-120000-test","type":"NODE_FINISHED","node_id":"stage.intake","seq":4,"payload":{"status":"SUCCESS","elapsed_ms":4800}}
+{"ts":"2026-01-05T12:00:05.100Z","run_id":"RUN-20260105-120000-test","type":"NODE_STARTED","node_id":"stage.preflight","seq":5,"payload":{"attempt":1}}
+{"ts":"2026-01-05T12:00:15.000Z","run_id":"RUN-20260105-120000-test","type":"NODE_FINISHED","node_id":"stage.preflight","seq":6,"payload":{"status":"SUCCESS","elapsed_ms":9900}}
+{"ts":"2026-01-05T12:00:15.100Z","run_id":"RUN-20260105-120000-test","type":"NODE_STARTED","node_id":"execute.plan","seq":7,"payload":{"attempt":1}}
+{"ts":"2026-01-05T12:00:30.000Z","run_id":"RUN-20260105-120000-test","type":"NODE_LOG","node_id":"execute.plan","seq":8,"payload":{"stream":"stdout","text":"Planning task execution..."}}
+{"ts":"2026-01-05T12:01:00.000Z","run_id":"RUN-20260105-120000-test","type":"NODE_FINISHED","node_id":"execute.plan","seq":9,"payload":{"status":"SUCCESS","elapsed_ms":44900}}
+{"ts":"2026-01-05T12:01:00.100Z","run_id":"RUN-20260105-120000-test","type":"NODE_STARTED","node_id":"execute.edit","seq":10,"payload":{"attempt":1}}
+{"ts":"2026-01-05T12:03:00.000Z","run_id":"RUN-20260105-120000-test","type":"NODE_LOG","node_id":"execute.edit","seq":11,"payload":{"stream":"stdout","text":"Editing files..."}}
+{"ts":"2026-01-05T12:05:00.000Z","run_id":"RUN-20260105-120000-test","type":"NODE_LOG","node_id":"execute.edit","seq":12,"payload":{"stream":"stdout","text":"Still editing, please wait..."}}
+

@@ -1,0 +1,9 @@
+{
+  "git_clean": true,
+  "branch": "main",
+  "head_commit": "abc123def456",
+  "node_version": "v20.10.0",
+  "npm_version": "10.2.3",
+  "checks_passed": true
+}
+

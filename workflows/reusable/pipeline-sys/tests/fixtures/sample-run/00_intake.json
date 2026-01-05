@@ -1,0 +1,8 @@
+{
+  "task_id": "TASK-TEST-001",
+  "project_root": "/home/user/project",
+  "task_description": "Test task for Pipeline-Sys E2E testing",
+  "auto": true,
+  "received_at": "2026-01-05T12:00:00.000Z"
+}
+

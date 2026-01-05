@@ -34,8 +34,8 @@ export async function listRuns(): Promise<IRunListItem[]> {
   const runs: Array<IRunListItem & { mtime: number }> = [];
   
   for (const runId of runIds) {
-    const runDir = path.posix.join(runsDir, runId);
-    const statusPath = path.posix.join(runDir, 'status.json');
+    const runDir = path.join(runsDir, runId);
+    const statusPath = path.join(runDir, 'status.json');
     
     try {
       const stat = await fs.stat(statusPath);
@@ -70,7 +70,7 @@ export async function listRuns(): Promise<IRunListItem[]> {
  */
 export async function runExists(runId: string): Promise<boolean> {
   const runsDir = safeResolveUnderProject(config.projectRoot, config.automationRunsDir);
-  const runDir = path.posix.join(runsDir, runId);
+  const runDir = path.join(runsDir, runId);
   
   try {
     await fs.access(runDir);
@@ -85,6 +85,6 @@ export async function runExists(runId: string): Promise<boolean> {
  */
 export function getRunDir(runId: string): string {
   const runsDir = safeResolveUnderProject(config.projectRoot, config.automationRunsDir);
-  return path.posix.join(runsDir, runId);
+  return path.join(runsDir, runId);
 }
 

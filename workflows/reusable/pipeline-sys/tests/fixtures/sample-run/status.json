@@ -1,0 +1,17 @@
+{
+  "run_id": "RUN-20260105-120000-test",
+  "task_id": "TASK-TEST-001",
+  "stage": 4,
+  "current_node_id": "execute.edit",
+  "attempt": 1,
+  "ok": false,
+  "error": null,
+  "started_at": "2026-01-05T12:00:00.000Z",
+  "updated_at": "2026-01-05T12:05:30.000Z",
+  "repo": {
+    "root": "/home/user/project",
+    "branch": "main",
+    "head": "abc123def456"
+  }
+}
+

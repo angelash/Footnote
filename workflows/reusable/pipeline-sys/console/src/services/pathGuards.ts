@@ -13,11 +13,11 @@ import path from 'node:path';
  * @throws 路径穿越时抛出错误
  */
 export function safeResolveUnderProject(projectRoot: string, relPath: string): string {
-  // 使用 posix 路径处理（WSL 环境）
-  const abs = path.posix.resolve(projectRoot, relPath);
-  const pr = path.posix.resolve(projectRoot);
+  // 跨平台路径处理
+  const abs = path.resolve(projectRoot, relPath);
+  const pr = path.resolve(projectRoot);
   
-  if (!abs.startsWith(pr + '/') && abs !== pr) {
+  if (!abs.startsWith(pr + path.sep) && abs !== pr) {
     throw new Error(`Path escapes project_root: ${relPath}`);
   }
   
@@ -32,10 +32,10 @@ export function safeResolveUnderProject(projectRoot: string, relPath: string): s
  * @throws 路径穿越时抛出错误
  */
 export function safeResolveUnderRun(runDir: string, relPath: string): string {
-  const abs = path.posix.resolve(runDir, relPath);
-  const rd = path.posix.resolve(runDir);
+  const abs = path.resolve(runDir, relPath);
+  const rd = path.resolve(runDir);
   
-  if (!abs.startsWith(rd + '/') && abs !== rd) {
+  if (!abs.startsWith(rd + path.sep) && abs !== rd) {
     throw new Error(`Path escapes run directory: ${relPath}`);
   }
   
@@ -53,6 +53,6 @@ export function isHiddenDir(name: string): boolean {
  * 归一化路径（移除 ..、.、多余斜杠）
  */
 export function normalizePath(p: string): string {
-  return path.posix.normalize(p);
+  return path.normalize(p);
 }
 

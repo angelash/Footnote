@@ -1,0 +1,96 @@
+{
+  "version": "v1",
+  "run_id": "RUN-20260105-100000-done",
+  "nodes": [
+    {
+      "id": "stage.intake",
+      "type": "stage",
+      "title": "Intake",
+      "parent_id": null,
+      "outputs": [{ "label": "Intake Params", "rel_path": "00_intake.json", "kind": "json" }]
+    },
+    {
+      "id": "stage.preflight",
+      "type": "stage",
+      "title": "Preflight",
+      "parent_id": null,
+      "outputs": [{ "label": "Preflight Result", "rel_path": "01_preflight.json", "kind": "json" }]
+    },
+    {
+      "id": "execute",
+      "type": "group",
+      "title": "Execute",
+      "parent_id": null,
+      "outputs": []
+    },
+    {
+      "id": "execute.plan",
+      "type": "task",
+      "title": "Plan",
+      "parent_id": "execute",
+      "outputs": [{ "label": "Plan Result", "rel_path": "nodes/execute.plan.json", "kind": "json" }]
+    },
+    {
+      "id": "execute.edit",
+      "type": "task",
+      "title": "Edit",
+      "parent_id": "execute",
+      "outputs": [{ "label": "Edit Result", "rel_path": "nodes/execute.edit.json", "kind": "json" }]
+    },
+    {
+      "id": "execute.lint",
+      "type": "task",
+      "title": "Lint",
+      "parent_id": "execute",
+      "outputs": [{ "label": "Lint Result", "rel_path": "nodes/execute.lint.json", "kind": "json" }]
+    },
+    {
+      "id": "execute.test",
+      "type": "task",
+      "title": "Test",
+      "parent_id": "execute",
+      "outputs": [{ "label": "Test Result", "rel_path": "nodes/execute.test.json", "kind": "json" }]
+    },
+    {
+      "id": "execute.summary",
+      "type": "task",
+      "title": "Summary",
+      "parent_id": "execute",
+      "outputs": [{ "label": "Summary", "rel_path": "nodes/execute.summary.md", "kind": "markdown" }]
+    },
+    {
+      "id": "stage.notify",
+      "type": "stage",
+      "title": "Notify",
+      "parent_id": null,
+      "outputs": [{ "label": "Notify Result", "rel_path": "07_notify.json", "kind": "json" }]
+    },
+    {
+      "id": "stage.done",
+      "type": "stage",
+      "title": "Done",
+      "parent_id": null,
+      "outputs": []
+    },
+    {
+      "id": "stage.git",
+      "type": "stage",
+      "title": "Git",
+      "parent_id": null,
+      "outputs": [{ "label": "Git Result", "rel_path": "06_git.json", "kind": "json" }]
+    }
+  ],
+  "edges": [
+    { "from": "stage.intake", "to": "stage.preflight" },
+    { "from": "stage.preflight", "to": "execute.plan" },
+    { "from": "execute.plan", "to": "execute.edit" },
+    { "from": "execute.edit", "to": "execute.lint" },
+    { "from": "execute.lint", "to": "execute.test" },
+    { "from": "execute.test", "to": "execute.summary" },
+    { "from": "execute.summary", "to": "stage.notify" },
+    { "from": "stage.notify", "to": "stage.done" },
+    { "from": "stage.done", "to": "stage.git" }
+  ],
+  "layout": { "direction": "TB", "group_padding": 16 }
+}
+

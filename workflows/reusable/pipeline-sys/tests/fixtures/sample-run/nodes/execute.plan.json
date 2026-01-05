@@ -1,0 +1,27 @@
+{
+  "plan_id": "PLAN-001",
+  "steps": [
+    {
+      "step": 1,
+      "description": "Read and understand the task requirements",
+      "estimated_time_ms": 10000
+    },
+    {
+      "step": 2,
+      "description": "Identify files to modify",
+      "estimated_time_ms": 5000
+    },
+    {
+      "step": 3,
+      "description": "Make necessary code changes",
+      "estimated_time_ms": 300000
+    },
+    {
+      "step": 4,
+      "description": "Run linting and tests",
+      "estimated_time_ms": 60000
+    }
+  ],
+  "total_estimated_ms": 375000
+}
+

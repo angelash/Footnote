@@ -1,0 +1,107 @@
+{
+  "version": "v1",
+  "run_id": "RUN-20260105-100000-done",
+  "updated_at": "2026-01-05T10:15:00.000Z",
+  "nodes": {
+    "stage.intake": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:00:00.000Z",
+      "ended_at": "2026-01-05T10:00:05.000Z",
+      "elapsed_ms": 5000,
+      "last_error": null,
+      "outputs": [{ "label": "Intake Params", "rel_path": "00_intake.json", "kind": "json" }]
+    },
+    "stage.preflight": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:00:05.000Z",
+      "ended_at": "2026-01-05T10:00:10.000Z",
+      "elapsed_ms": 5000,
+      "last_error": null,
+      "outputs": [{ "label": "Preflight Result", "rel_path": "01_preflight.json", "kind": "json" }]
+    },
+    "execute": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:00:10.000Z",
+      "ended_at": "2026-01-05T10:10:00.000Z",
+      "elapsed_ms": 590000,
+      "last_error": null,
+      "outputs": []
+    },
+    "execute.plan": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:00:10.000Z",
+      "ended_at": "2026-01-05T10:01:00.000Z",
+      "elapsed_ms": 50000,
+      "last_error": null,
+      "outputs": [{ "label": "Plan Result", "rel_path": "nodes/execute.plan.json", "kind": "json" }]
+    },
+    "execute.edit": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:01:00.000Z",
+      "ended_at": "2026-01-05T10:06:00.000Z",
+      "elapsed_ms": 300000,
+      "last_error": null,
+      "outputs": [{ "label": "Edit Result", "rel_path": "nodes/execute.edit.json", "kind": "json" }]
+    },
+    "execute.lint": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:06:00.000Z",
+      "ended_at": "2026-01-05T10:07:00.000Z",
+      "elapsed_ms": 60000,
+      "last_error": null,
+      "outputs": [{ "label": "Lint Result", "rel_path": "nodes/execute.lint.json", "kind": "json" }]
+    },
+    "execute.test": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:07:00.000Z",
+      "ended_at": "2026-01-05T10:09:00.000Z",
+      "elapsed_ms": 120000,
+      "last_error": null,
+      "outputs": [{ "label": "Test Result", "rel_path": "nodes/execute.test.json", "kind": "json" }]
+    },
+    "execute.summary": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:09:00.000Z",
+      "ended_at": "2026-01-05T10:10:00.000Z",
+      "elapsed_ms": 60000,
+      "last_error": null,
+      "outputs": [{ "label": "Summary", "rel_path": "nodes/execute.summary.md", "kind": "markdown" }]
+    },
+    "stage.notify": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:10:00.000Z",
+      "ended_at": "2026-01-05T10:10:05.000Z",
+      "elapsed_ms": 5000,
+      "last_error": null,
+      "outputs": [{ "label": "Notify Result", "rel_path": "07_notify.json", "kind": "json" }]
+    },
+    "stage.done": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:10:05.000Z",
+      "ended_at": "2026-01-05T10:10:10.000Z",
+      "elapsed_ms": 5000,
+      "last_error": null,
+      "outputs": []
+    },
+    "stage.git": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T10:10:10.000Z",
+      "ended_at": "2026-01-05T10:15:00.000Z",
+      "elapsed_ms": 290000,
+      "last_error": null,
+      "outputs": [{ "label": "Git Result", "rel_path": "06_git.json", "kind": "json" }]
+    }
+  }
+}
+

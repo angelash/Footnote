@@ -1,0 +1,113 @@
+{
+  "version": "v1",
+  "run_id": "RUN-20260105-120000-test",
+  "updated_at": "2026-01-05T12:05:30.000Z",
+  "nodes": {
+    "stage.intake": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T12:00:00.000Z",
+      "ended_at": "2026-01-05T12:00:05.000Z",
+      "elapsed_ms": 5000,
+      "last_error": null,
+      "outputs": [
+        { "label": "Intake Params", "rel_path": "00_intake.json", "kind": "json" }
+      ]
+    },
+    "stage.preflight": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T12:00:05.000Z",
+      "ended_at": "2026-01-05T12:00:15.000Z",
+      "elapsed_ms": 10000,
+      "last_error": null,
+      "outputs": [
+        { "label": "Preflight Result", "rel_path": "01_preflight.json", "kind": "json" }
+      ]
+    },
+    "execute": {
+      "status": "RUNNING",
+      "attempt": 1,
+      "started_at": "2026-01-05T12:00:15.000Z",
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    },
+    "execute.plan": {
+      "status": "SUCCESS",
+      "attempt": 1,
+      "started_at": "2026-01-05T12:00:15.000Z",
+      "ended_at": "2026-01-05T12:01:00.000Z",
+      "elapsed_ms": 45000,
+      "last_error": null,
+      "outputs": [
+        { "label": "Plan Result", "rel_path": "nodes/execute.plan.json", "kind": "json" }
+      ]
+    },
+    "execute.edit": {
+      "status": "RUNNING",
+      "attempt": 1,
+      "started_at": "2026-01-05T12:01:00.000Z",
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    },
+    "execute.lint": {
+      "status": "PENDING",
+      "attempt": 0,
+      "started_at": null,
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    },
+    "execute.test": {
+      "status": "PENDING",
+      "attempt": 0,
+      "started_at": null,
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    },
+    "execute.summary": {
+      "status": "PENDING",
+      "attempt": 0,
+      "started_at": null,
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    },
+    "stage.notify": {
+      "status": "PENDING",
+      "attempt": 0,
+      "started_at": null,
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    },
+    "stage.done": {
+      "status": "PENDING",
+      "attempt": 0,
+      "started_at": null,
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    },
+    "stage.git": {
+      "status": "PENDING",
+      "attempt": 0,
+      "started_at": null,
+      "ended_at": null,
+      "elapsed_ms": null,
+      "last_error": null,
+      "outputs": []
+    }
+  }
+}
+

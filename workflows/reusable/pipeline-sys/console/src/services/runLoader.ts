@@ -15,7 +15,7 @@ import type { IStatusV1, IGraphV1, INodeRunsSnapshotV1 } from '@pipeline-sys/sha
  */
 export async function loadStatus(runId: string): Promise<IStatusV1 | null> {
   const runDir = getRunDir(runId);
-  const statusPath = path.posix.join(runDir, 'status.json');
+  const statusPath = path.join(runDir, 'status.json');
   
   try {
     const content = await fs.readFile(statusPath, 'utf8');
@@ -35,7 +35,7 @@ export async function loadStatus(runId: string): Promise<IStatusV1 | null> {
  */
 export async function loadGraph(runId: string): Promise<IGraphV1 | null> {
   const runDir = getRunDir(runId);
-  const graphPath = path.posix.join(runDir, 'graph.json');
+  const graphPath = path.join(runDir, 'graph.json');
   
   try {
     const content = await fs.readFile(graphPath, 'utf8');
@@ -55,7 +55,7 @@ export async function loadGraph(runId: string): Promise<IGraphV1 | null> {
  */
 export async function loadNodeRuns(runId: string): Promise<INodeRunsSnapshotV1 | null> {
   const runDir = getRunDir(runId);
-  const nodeRunsPath = path.posix.join(runDir, 'node_runs.json');
+  const nodeRunsPath = path.join(runDir, 'node_runs.json');
   
   try {
     const content = await fs.readFile(nodeRunsPath, 'utf8');
@@ -105,6 +105,6 @@ export async function readRunFile(runId: string, relPath: string): Promise<{
  */
 export function getEventsPath(runId: string): string {
   const runDir = getRunDir(runId);
-  return path.posix.join(runDir, 'events.ndjson');
+  return path.join(runDir, 'events.ndjson');
 }
 

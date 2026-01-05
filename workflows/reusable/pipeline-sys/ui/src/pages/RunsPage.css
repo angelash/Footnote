@@ -1,0 +1,114 @@
+.runs-page {
+  min-height: 100vh;
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, #0a0f14 100%);
+}
+
+.runs-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.runs-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, var(--color-running), var(--color-success));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.runs-subtitle {
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-xs);
+}
+
+.runs-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.runs-loading,
+.runs-empty {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+}
+
+.runs-empty .empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--spacing-md);
+}
+
+.runs-empty .empty-hint {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: var(--spacing-sm);
+}
+
+.runs-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid var(--color-failed);
+  border-radius: var(--radius-md);
+  color: var(--color-failed);
+}
+
+.runs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.runs-table th,
+.runs-table td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.runs-table th {
+  background: var(--color-bg-tertiary);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.runs-table tbody tr:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.runs-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.run-link {
+  font-family: 'SF Mono', monospace;
+  font-weight: 500;
+}
+
+.task-id {
+  color: var(--color-text-secondary);
+  font-family: 'SF Mono', monospace;
+}
+
+.stage {
+  font-family: 'SF Mono', monospace;
+  color: var(--color-running);
+}
+
+.time {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+

@@ -1,0 +1,52 @@
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-pending {
+  background: rgba(110, 118, 129, 0.2);
+  color: var(--color-pending);
+}
+
+.status-running {
+  background: rgba(88, 166, 255, 0.2);
+  color: var(--color-running);
+  animation: pulse-running 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-running {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.status-success {
+  background: rgba(63, 185, 80, 0.2);
+  color: var(--color-success);
+}
+
+.status-failed {
+  background: rgba(248, 81, 73, 0.2);
+  color: var(--color-failed);
+}
+
+.status-skipped {
+  background: rgba(72, 79, 88, 0.2);
+  color: var(--color-skipped);
+}
+
+.status-cancelled {
+  background: rgba(210, 153, 34, 0.2);
+  color: var(--color-cancelled);
+}
+
+.status-timeout {
+  background: rgba(163, 113, 247, 0.2);
+  color: var(--color-timeout);
+}
+

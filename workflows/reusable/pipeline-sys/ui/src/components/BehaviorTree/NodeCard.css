@@ -1,0 +1,103 @@
+.node-card {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  min-width: 160px;
+  transition: var(--transition-fast);
+}
+
+.node-card:hover {
+  border-color: var(--color-text-muted);
+}
+
+.node-card-pending {
+  border-left: 3px solid var(--color-pending);
+}
+
+.node-card-running {
+  border-left: 3px solid var(--color-running);
+  animation: glow-running 2s ease-in-out infinite;
+}
+
+@keyframes glow-running {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(88, 166, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.5);
+  }
+}
+
+.node-card-success {
+  border-left: 3px solid var(--color-success);
+}
+
+.node-card-failed {
+  border-left: 3px solid var(--color-failed);
+}
+
+.node-card-skipped {
+  border-left: 3px solid var(--color-skipped);
+  opacity: 0.6;
+}
+
+.node-card-cancelled {
+  border-left: 3px solid var(--color-cancelled);
+}
+
+.node-card-timeout {
+  border-left: 3px solid var(--color-timeout);
+}
+
+.node-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.node-type-icon {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.node-title {
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.node-card-body {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.node-attempt {
+  font-size: 0.7rem;
+  color: var(--color-cancelled);
+  font-weight: 600;
+}
+
+.node-elapsed {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-family: 'SF Mono', monospace;
+}
+
+/* ReactFlow handle styling */
+.node-card .react-flow__handle {
+  width: 8px;
+  height: 8px;
+  background: var(--color-border);
+  border: none;
+}
+
+.node-card .react-flow__handle-top {
+  top: -4px;
+}
+
+.node-card .react-flow__handle-bottom {
+  bottom: -4px;
+}
+

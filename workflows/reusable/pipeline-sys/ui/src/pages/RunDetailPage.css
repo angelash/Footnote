@@ -1,0 +1,133 @@
+.run-detail-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--color-bg-primary);
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--spacing-md);
+  color: var(--color-text-secondary);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-running);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-icon {
+  font-size: 3rem;
+}
+
+/* Header */
+.run-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.run-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.run-header-left .back-link {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.run-header-left h1 {
+  font-size: 1rem;
+  font-family: 'SF Mono', monospace;
+  font-weight: 500;
+}
+
+.live-badge {
+  color: var(--color-success);
+  font-size: 0.75rem;
+  font-weight: 600;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.run-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.run-header-right .task-id {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+}
+
+.cancel-button {
+  background: var(--color-failed);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #da3633;
+}
+
+/* Main content */
+.run-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.run-graph-container {
+  flex: 1;
+  position: relative;
+  background: var(--color-bg-primary);
+}
+
+.no-graph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+}
+
+.run-panel-container {
+  width: 400px;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  overflow: auto;
+}
+
+/* Timeline */
+.run-timeline-container {
+  height: 200px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  overflow: auto;
+  flex-shrink: 0;
+}
+

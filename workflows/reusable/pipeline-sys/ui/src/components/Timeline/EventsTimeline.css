@@ -1,0 +1,140 @@
+.events-timeline {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.timeline-header h4 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.event-count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.timeline-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-sm);
+}
+
+.timeline-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-muted);
+}
+
+.timeline-event {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.75rem;
+  font-family: 'SF Mono', monospace;
+  border-radius: var(--radius-sm);
+}
+
+.timeline-event:hover {
+  background: var(--color-bg-tertiary);
+}
+
+.event-time {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  width: 70px;
+}
+
+.event-icon {
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+.event-type {
+  flex-shrink: 0;
+  width: 160px;
+  color: var(--color-text-secondary);
+}
+
+.event-node {
+  flex-shrink: 0;
+  width: 120px;
+  color: var(--color-running);
+}
+
+.event-payload {
+  flex: 1;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Event type colors */
+.event-running {
+  background: rgba(88, 166, 255, 0.05);
+}
+
+.event-running .event-icon {
+  color: var(--color-running);
+}
+
+.event-success {
+  background: rgba(63, 185, 80, 0.05);
+}
+
+.event-success .event-icon {
+  color: var(--color-success);
+}
+
+.event-failed {
+  background: rgba(248, 81, 73, 0.05);
+}
+
+.event-failed .event-icon,
+.event-failed .event-payload {
+  color: var(--color-failed);
+}
+
+.event-cancelled {
+  background: rgba(210, 153, 34, 0.05);
+}
+
+.event-cancelled .event-icon {
+  color: var(--color-cancelled);
+}
+
+.event-timeout {
+  background: rgba(163, 113, 247, 0.05);
+}
+
+.event-timeout .event-icon {
+  color: var(--color-timeout);
+}
+
+.event-log {
+  opacity: 0.7;
+}
+
+.event-log .event-icon {
+  color: var(--color-text-muted);
+}
+

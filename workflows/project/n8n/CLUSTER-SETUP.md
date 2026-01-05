@@ -127,6 +127,8 @@ pm2 save
 pm2 startup
 ```
 
+> 📖 **详细配置指南**：请参考 [PM2 开机自启动配置指南](./PM2-AUTO-START-GUIDE.md)，包含完整的配置步骤和常见问题解决方案。
+
 ---
 
 ### 2. WSL 从实例配置
@@ -192,6 +194,8 @@ pm2 start ecosystem.config.wsl.cjs --only n8n-secondary
 pm2 save
 pm2 startup
 ```
+
+> ⚠️ **重要**：执行 `pm2 startup` 时，如果遇到 PATH 环境变量问题（如 `env: 'Files/NVIDIA': No such file or directory`），请参考 [PM2 开机自启动配置指南](./PM2-AUTO-START-GUIDE.md) 中的解决方案。
 
 ---
 

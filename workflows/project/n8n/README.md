@@ -33,6 +33,7 @@
 | `workflows/project/n8n/ecosystem.config.cjs` | PM2：Windows MCP Runner/服务等端口配置（如 3211） | 运维 | 可选 |
 | `workflows/project/n8n/smoke-secondary.ps1` | 5680 入口冒烟（compose/execute） | 你/CI | **建议** |
 | `workflows/project/n8n/CLUSTER-SETUP.md` | 集群/PM2 配置说明（已更新为 `.cjs` 示例） | 你/运维 | 参考 |
+| `workflows/project/n8n/PM2-AUTO-START-GUIDE.md` | PM2 开机自启动配置指南（包含 PATH 问题解决方案） | 你/运维 | **建议** |
 | `workflows/project/n8n/README.md` / `QUICK-START.md` / `DEPLOYMENT-GUIDE.md` | 使用说明/启动指南 | 你/团队 | 参考 |
 
 **端口约定（当前）**

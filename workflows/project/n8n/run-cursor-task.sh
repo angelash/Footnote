@@ -10,7 +10,9 @@ set -euo pipefail
 #     --prompt-file .cursor/current_task_prompt.md \
 #     --task-type doc \
 #     --complexity normal \
-#     [--model-override gpt-5.2-high]
+#     [--model-override gpt-5.2-high] \
+#     [--chat-id <uuid>] \
+#     [--chat-id-file <path>]
 
 die() { echo "[run-cursor-task] ERROR: $*" >&2; exit 1; }
 
@@ -22,6 +24,8 @@ COMPLEXITY="normal"
 MODEL_OVERRIDE="auto"
 CURSOR_AGENT="${CURSOR_AGENT:-$HOME/.local/bin/cursor-agent}"
 OUTPUT_FORMAT="${OUTPUT_FORMAT:-text}"
+CHAT_ID=""
+CHAT_ID_FILE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -30,6 +34,8 @@ while [[ $# -gt 0 ]]; do
     --task-type) TASK_TYPE="$2"; shift 2;;
     --complexity) COMPLEXITY="$2"; shift 2;;
     --model-override) MODEL_OVERRIDE="$2"; shift 2;;
+    --chat-id) CHAT_ID="$2"; shift 2;;
+    --chat-id-file) CHAT_ID_FILE="$2"; shift 2;;
     *) die "Unknown arg: $1";;
   esac
 done
@@ -113,17 +119,53 @@ trap 'rm -f "$BEFORE_DIFF" "$AFTER_DIFF"' EXIT
 
 git diff --name-only > "$BEFORE_DIFF" || true
 
+# Handle chat ID for conversation history
+# If chat-id-file is provided, try to read existing chat ID
+if [[ -n "$CHAT_ID_FILE" && -f "$CHAT_ID_FILE" ]]; then
+  CHAT_ID="$(cat "$CHAT_ID_FILE" 2>/dev/null | tr -d '[:space:]' || echo "")"
+fi
+
+# If no chat ID yet, create a new chat
+if [[ -z "$CHAT_ID" ]]; then
+  echo "[run-cursor-task] Creating new chat session..." >&2
+  CHAT_ID="$("$CURSOR_AGENT" create-chat 2>/dev/null | tr -d '[:space:]' || echo "")"
+  if [[ -z "$CHAT_ID" ]]; then
+    echo "[run-cursor-task] WARN: Failed to create chat, continuing without conversation history" >&2
+  else
+    echo "[run-cursor-task] Created chat: $CHAT_ID" >&2
+    # Save chat ID to file if provided
+    if [[ -n "$CHAT_ID_FILE" ]]; then
+      echo "$CHAT_ID" > "$CHAT_ID_FILE"
+      echo "[run-cursor-task] Saved chat ID to: $CHAT_ID_FILE" >&2
+    fi
+  fi
+else
+  echo "[run-cursor-task] Resuming chat: $CHAT_ID" >&2
+fi
+
 # Run Cursor Agent (headless)
 PROMPT_CONTENT="$(cat "$PROMPT_FILE")"
 
 set +e
-"$CURSOR_AGENT" \
-  --print \
-  --force \
-  --approve-mcps \
-  --output-format "$OUTPUT_FORMAT" \
-  --model "$MODEL" \
-  "$PROMPT_CONTENT"
+# Build command with optional --resume
+CURSOR_CMD=(
+  "$CURSOR_AGENT"
+  --print
+  --force
+  --approve-mcps
+  --output-format "$OUTPUT_FORMAT"
+  --model "$MODEL"
+)
+
+# Add --resume if we have a chat ID
+if [[ -n "$CHAT_ID" ]]; then
+  CURSOR_CMD+=(--resume "$CHAT_ID")
+fi
+
+# Add prompt content
+CURSOR_CMD+=("$PROMPT_CONTENT")
+
+"${CURSOR_CMD[@]}"
 AGENT_EXIT=$?
 set -e
 
@@ -160,6 +202,11 @@ fi
 if [[ $AGENT_EXIT -ne 0 ]]; then
   echo "[run-cursor-task] cursor-agent exit=$AGENT_EXIT" >&2
   exit "$AGENT_EXIT"
+fi
+
+# Output chat ID for logging
+if [[ -n "$CHAT_ID" ]]; then
+  echo "[run-cursor-task] chat_id=$CHAT_ID" >&2
 fi
 
 echo "[run-cursor-task] OK" >&2

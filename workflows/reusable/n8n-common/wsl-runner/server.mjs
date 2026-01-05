@@ -342,34 +342,53 @@ async function handleExecuteTask(body) {
   // - If run_id is provided (fixed-flow), write the prompt under the run logs directory for auditability.
   // - Otherwise (plain /execute-task), write to /tmp to avoid touching the repo at all.
   let promptAbs = "";
+  let chatIdFileAbs = "";
   if (runId) {
-    const rel = path.posix.join(AUTOMATION_RUNS_DIR, runId, "_prompt.md");
-    promptAbs = safeResolveUnderProject(projectRoot, rel);
+    const runRelDir = path.posix.join(AUTOMATION_RUNS_DIR, runId);
+    const runAbsDir = safeResolveUnderProject(projectRoot, runRelDir);
+    await ensureDir(runAbsDir);
+    promptAbs = path.posix.join(runAbsDir, "_prompt.md");
+    chatIdFileAbs = path.posix.join(runAbsDir, "_chat_id.txt");
   } else {
     const nonce = `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
     promptAbs = path.posix.join("/tmp", `cursor_prompt_${nonce}.md`);
+    chatIdFileAbs = path.posix.join("/tmp", `cursor_chat_id_${nonce}.txt`);
   }
   await fs.mkdir(path.posix.dirname(promptAbs), { recursive: true });
   await fs.writeFile(promptAbs, prompt, "utf8");
 
   const startedAt = Date.now();
-  const agentRes = await run(
-    "bash",
-    [
-      "workflows/project/n8n/run-cursor-task.sh",
-      "--task-pack",
-      taskPackPath,
-      "--prompt-file",
-      promptAbs,
-      "--task-type",
-      taskType,
-      "--complexity",
-      complexity,
-      "--model-override",
-      modelOverride,
-    ],
-    { cwd: projectRoot, env: process.env }
-  );
+  const agentArgs = [
+    "workflows/project/n8n/run-cursor-task.sh",
+    "--task-pack",
+    taskPackPath,
+    "--prompt-file",
+    promptAbs,
+    "--task-type",
+    taskType,
+    "--complexity",
+    complexity,
+    "--model-override",
+    modelOverride,
+  ];
+  
+  // Add chat-id-file if we have a runId (for conversation history)
+  if (runId && chatIdFileAbs) {
+    agentArgs.push("--chat-id-file", chatIdFileAbs);
+  }
+  
+  const agentRes = await run("bash", agentArgs, { cwd: projectRoot, env: process.env });
+  
+  // Read chat ID if it was created
+  let chatId = null;
+  if (chatIdFileAbs) {
+    try {
+      const chatIdText = await fs.readFile(chatIdFileAbs, "utf8");
+      chatId = chatIdText.trim();
+    } catch {
+      // Chat ID file may not exist if creation failed
+    }
+  }
 
   const validateRes = await run("bash", ["-lc", "npm run validate --if-present"], {
     cwd: projectRoot,
@@ -384,6 +403,8 @@ async function handleExecuteTask(body) {
     task_type: taskType,
     complexity,
     model_override: modelOverride,
+    chat_id: chatId || null,
+    chat_id_file: chatIdFileAbs || null,
     agent: agentRes,
     validate: validateRes,
   };

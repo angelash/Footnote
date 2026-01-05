@@ -1,133 +1,336 @@
-现在n8n就作为调用wsl的cursor-cli就算了，所有流程用自建系统来处理，第一步可以是在windows上开发搭建，流程都是AI生成，但是要提供web的可视化展示，还有进度可视化，想达到类似虚幻里行为树那样的界面，能看到任务组织和任务流转情况，第一版不需要在网页上编辑，这个道理上需要做成BS架构，你觉得怎样？
+## Pipeline-Sys：自建流程系统（v1 / v2 / v3 规格书）
 
+本文件把“自建 Orchestrator + 行为树可视化”落成可执行规格，所有关键点给出确定方案，不留分叉。
 
+---
 
-我觉得你这个方向**非常对**，而且比“让 AI 去操控 n8n 工作流”靠谱一个数量级。原因很现实：你要的是**“AI 生成流程 + 稳定执行 + 可观测”**，而 n8n 擅长的是**“人点点改改 + SaaS 粘合”**。你现在把 n8n 降级成“一个执行器入口（调用 WSL 的 cursor-cli）”，把编排与观测放到自建系统里，这就是正确分层。
+## 0. 背景与目标
 
-下面按你说的目标（**BS 架构、只展示不编辑、像 UE 行为树一样可视化、能看任务组织与流转、还要进度可视化**）给你一套第一版就能落地的方案。
+### 0.1 背景
+当前仓库已经落地：
+- `workflows/reusable/n8n-common/wsl-runner/server.mjs`：WSL 内 HTTP Runner（端口 `3210`），负责固定流程 `/fixed-flow` 执行与落盘审计
+- `workflows/project/n8n/fixed-flow-pipeline.json`：n8n 只做 Webhook 入口，转发到 `http://localhost:3210/fixed-flow`
+- 固定流程落盘根目录：`workflows/project/logs/automation_runs/<run_id>/`
 
-------
+Pipeline-Sys 的 v1 目标是：在不推翻现有链路的前提下，把运行态变成“像 UE 行为树一样可观测”，并补齐取消、超时、重试、锁防僵尸等执行语义。
 
-## 你要的系统本质是什么
+### 0.2 目标（必须达成）
+- **BS 架构**：浏览器访问 Web UI，UI 只展示与操作控制按钮，不提供图编辑
+- **行为树可视化**：节点状态、边流转高亮、时间线事件、节点日志与产物可点开
+- **执行语义完整**：取消、超时、重试、串行锁防僵尸、幂等与可恢复语义明确且落盘可审计
+- **颗粒度提升**：把 `execute` 细分为 `plan / edit / lint / test / summary` 子节点
+- **单仓库单任务串行**：同一 `project_root` 同时只允许一个 run 处于 running
+- **全程落盘根目录固定**：`workflows/project/logs/automation_runs/`
 
-**不是“另一个 n8n”**，而是一个 **Flow Orchestrator + Graph Observer**：
+### 0.3 非目标（v1 不做）
+- Web 端流程编辑
+- 多仓库并发队列
+- 分布式执行器集群
+- 运行数据写入数据库
 
-- **Flow Orchestrator（后端）**：把 AI 生成的“流程描述”编译成可执行 DAG/状态机，调度执行，处理重试/超时/依赖/并发
-- **Graph Observer（前端）**：把运行态（节点状态、边流转、日志、耗时、产物）实时可视化成“行为树/任务树”效果
+---
 
-第一版不做网页编辑，这会大幅降低复杂度，非常明智。
+## 1. 版本规划
 
-------
+### 1.1 v1（固定流程可观测 + 可控）
+v1 只针对固定流程 `/fixed-flow`，以“可观测 + 执行语义补齐”为核心。
 
-## 第一版（MVP）建议你这样切
+**v1 交付物**：
+- 运行工件：在 `workflows/project/logs/automation_runs/<run_id>/` 增加事件流与节点快照
+- Runner 行为：在 `wsl-runner` 中实现取消、超时、重试、锁防僵尸、execute 子节点事件化
+- Console 服务：新增一个只读看板服务 `pipeline-sys`（HTTP + SSE），读取 run 目录并渲染行为树 UI
 
-### 1) 输入：AI 只生成“流程 DSL”（JSON/YAML）
+### 1.2 v2（FlowSpec 进入系统，Runner 变成 Executor）
+v2 引入 FlowSpec DSL，Pipeline-Sys 后端负责编排，Runner 仅做 Executor。
 
-- 你定义一个很小的 DSL：`nodes[] + edges[] + params + retry/timeout + artifacts`
-- AI 只管产出 DSL（可 diff、可存档、可回放），系统负责校验/编译/执行
-   **关键点：AI 不直接碰运行态/DB，避免你在 n8n 里遇到的那些版本坑。**
+### 1.3 v3（多执行器与规模化治理）
+v3 支持多执行域、资源隔离、指标告警与权限治理。
 
-### 2) 执行：Windows 上跑 Orchestrator，调用 WSL cursor-cli
+---
 
-- 执行器用 `wsl.exe -d <distro> -- bash -lc "<cmd>"` 调 WSL 里的 cursor-cli
-- 把 stdout/stderr/exit code 结构化成事件流
-- n8n 如果要保留，就让它只是一个“触发器/入口”，但执行与观测都归你自建系统
+## 2. v1 架构与边界
 
-### 3) 观测：Web 只做“只读可视化 + 进度 + 日志”
+### 2.1 组件职责
+- **n8n（入口）**：只负责触发 Webhook，不承载编排状态
+- **WSL Runner（执行与落盘）**：唯一执行权威，负责写 run 工件目录，提供控制接口
+- **Pipeline-Sys Console（观测与控制面）**：读取 run 工件并展示，向 Runner 发起控制命令
 
-- 类似 UE 行为树：节点颜色表示状态（Pending/Running/Success/Failed/Skipped）
-- 边高亮表示“刚刚完成/正在流转”
-- 右侧面板：节点详情、参数、实时日志、产物链接
-- 底部时间线：事件流（开始/结束/重试/取消/超时）
+### 2.2 运行域与路径
+- **代码仓库工作副本**：`/home/shash/work/Footnote`（WSL 路径）
+- **全程落盘根目录**：`workflows/project/logs/automation_runs/`（相对 repo root）
+- **审计附加日志**：`workflows/project/logs/decisions_log.md`、`rollback_log.md`、`task_log.md`
 
-------
+---
 
-## 前后端技术选型（对你最省事的）
+## 3. v1 运行工件目录结构（强制）
 
-### 后端（建议 Node/TS）
+每次 run 的目录固定为：
 
-- **API**：Fastify/NestJS 都行（你偏工程化就 NestJS）
-- **实时推送**：WebSocket（最直接），或 SSE（更简单）
-- **任务队列**：第一版不用 Redis 也行，先用内存队列 + SQLite；第二版再上 BullMQ/Redis
-- **存储**：SQLite（单机 MVP 最省心），事件表 + 运行表 + 日志表
+```
+workflows/project/logs/automation_runs/<run_id>/
+  status.json                # run 总状态快照（含当前节点、错误摘要）
+  graph.json                 # 行为树图谱（nodes/edges，含层级与布局 hint）
+  events.ndjson              # 事件流（追加写，NDJSON）
+  node_runs.json             # 节点状态快照（便于 UI 免回放 events）
+  control.json               # 控制面请求（cancel/retry）持久化
 
-### 前端（建议 React）
+  00_intake.json             # 入口参数快照
+  01_preflight.json          # preflight 结果
+  02_plan.json               # plan 产物（固定格式）
+  03_taskpack.md             # task pack 快照
+  04_execute.json            # cursor-agent 执行结果（含回执文本）
+  05_validate.json           # validate 汇总（lint/test 分段）
+  06_git.json                # git 汇总（写在 commit 前）
+  07_notify.json             # 通知结果
 
-- **图渲染**：React Flow（最快做出“行为树/DAG UI”），布局用 dagre/elk
-- **状态刷新**：WebSocket 推送事件，前端增量更新节点状态/高亮
-- **日志面板**：按节点订阅 log stream（或拉取分页）
+  nodes/                     # v1 新增：子节点细分产物（命名稳定）
+    execute.plan.json
+    execute.edit.json
+    execute.lint.json
+    execute.test.json
+    execute.summary.md
 
-------
+  artifacts/                 # 可选：截图、导出、临时文件（只存引用，不进 events payload）
+```
 
-## 数据模型（这是成败关键，别学 n8n 的隐式版本）
+说明：
+- `events.ndjson` 是唯一的“流转事实源”，`status.json` 与 `node_runs.json` 是便于读取的快照
+- `nodes/*` 是对子节点的稳定输出接口，UI 与后续 v2 编排均以此为准
 
-你只需要 3 个核心概念：
+---
 
-1. **FlowSpec（静态）**
+## 4. v1 行为树图谱（graph.json）
 
-- AI 生成的 DSL 原文（不可变，可版本化）
+### 4.1 节点列表（固定）
+v1 图谱节点 ID 固定，禁止随意改名：
 
-1. **Run（一次运行）**
+- `stage.intake`
+- `stage.preflight`
+- `execute`（group）
+  - `execute.plan`
+  - `execute.edit`
+  - `execute.lint`
+  - `execute.test`
+  - `execute.summary`
+- `stage.notify`
+- `stage.done`
+- `stage.git`
 
-- runId、开始/结束、全局状态、触发来源、输入参数快照
+### 4.2 边关系（固定）
+依赖边固定为：
 
-1. **NodeRun（每个节点在某个 run 中的状态）**
+```
+stage.intake -> stage.preflight -> execute.plan -> execute.edit -> execute.lint -> execute.test -> execute.summary -> stage.notify -> stage.done -> stage.git
+```
 
-- nodeId、status、start/end、attempt、stdout/stderr 摘要、artifact refs
+### 4.3 状态枚举（固定）
+所有节点状态取值固定为：
+- `PENDING`
+- `RUNNING`
+- `SUCCESS`
+- `FAILED`
+- `SKIPPED`
+- `CANCELLED`
+- `TIMEOUT`
 
-再加一个强烈建议：**Event Log（事件溯源）**
+### 4.4 graph.json 格式（固定字段）
+`graph.json` 必须包含：
+- `version`: `"v1"`
+- `run_id`
+- `nodes[]`: `{ id, type, title, parent_id, outputs[] }`
+- `edges[]`: `{ from, to }`
+- `layout`: `{ direction: "TB", group_padding: number }`
 
-- `RUN_STARTED / NODE_STARTED / NODE_LOG / NODE_FINISHED / NODE_RETRY / RUN_FINISHED ...`
-- UI 的“流转感”和“时间线”全靠它
+`outputs[]` 为 UI 的“产物入口”，每个元素格式：
+- `{ label, rel_path, kind }`
+其中 `kind` 取值固定为：`json`、`markdown`、`text`、`file`
 
-**你要的“像行为树一样看流转”，本质就是把事件流可视化。**
+---
 
-------
+## 5. v1 事件流（events.ndjson）
 
-## 执行语义（MVP 先定死，别一上来做成万能）
+### 5.1 事件写入规则（强制）
+- `events.ndjson` 只追加写
+- 每行是一个 JSON 对象，不允许多行
+- 单条事件 payload 必须小于 64KB
+- 大输出只写入 `artifacts/`，events 只存 `artifact_ref`
 
-第一版建议只支持 5 种节点类型就够了：
+### 5.2 事件类型（固定）
+v1 支持的事件类型固定为：
+- `RUN_STARTED`
+- `NODE_STARTED`
+- `NODE_LOG`（可多次）
+- `NODE_FINISHED`
+- `NODE_RETRY_SCHEDULED`
+- `NODE_TIMEOUT`
+- `RUN_CANCEL_REQUESTED`
+- `RUN_CANCELLED`
+- `RUN_FINISHED`
+- `LOCK_ACQUIRED`
+- `LOCK_STALE_CLEARED`
+- `LOCK_RELEASED`
 
-1. `command`：执行命令（wsl/cmd/powershell）
-2. `http`：调用服务（以后替代危险 exec）
-3. `script`：运行一段 TS/Python（受控）
-4. `gate`：条件分支（基于上游输出）
-5. `group`：仅用于 UI 分组（像行为树的 Composite 节点）
+### 5.3 事件结构（固定字段）
+每条事件必须包含：
+- `ts`：ISO8601
+- `run_id`
+- `type`
+- `node_id`：非 node 事件写空字符串
+- `seq`：从 1 开始递增
+- `payload`：对象
 
-并发规则先简单：
+`NODE_LOG.payload` 固定字段：
+- `stream`: `"stdout"`、`"stderr"`、`"system"`
+- `text`: 日志片段（截断到 4000 字符）
+- `artifact_ref`: 可选，指向 `artifacts/...`
 
-- DAG 拓扑调度：入度为 0 就可跑
-- 每个 run 一个全局并发上限（例如 4）
-- 每个节点有 timeout/retry
+---
 
-------
+## 6. v1 执行语义（取消 / 超时 / 重试）
 
-## 你提的“BS 架构”完全正确，但这里有个更前瞻的点
+本节定义 Runner 必须实现的确定行为，Pipeline-Sys 只负责发控制请求与展示。
 
-你最终会走向“多机/多执行器”（Windows、本机 WSL、服务器、容器、甚至手机），所以从第一版就建议你把执行层做成**可插拔 Executor**：
+### 6.1 取消语义（强制）
+- UI 点击 Cancel 时，Console 调用 Runner：`POST /fixed-flow/cancel`，body：`{ run_id, project_root }`
+- Runner 在 `<run_id>/control.json` 写入：`{ cancel: { requested_at, requested_by } }`
+- Runner 追加事件：`RUN_CANCEL_REQUESTED`
+- Runner 终止当前正在运行的命令进程组（kill process group）
+- Runner 将当前 `node_id` 标记为 `CANCELLED`，后续节点统一标记为 `SKIPPED`
+- Runner 更新 `status.json.ok=false`，`status.json.error="cancelled"`，并追加事件 `RUN_CANCELLED`
+- Runner 写入 `07_notify.json`（ok=false，stage=当前节点对应 stage）
+- Runner 释放串行锁
 
-- `LocalWindowsExecutor`
-- `WSLExecutor`
-- `RemoteAgentExecutor（HTTP）`（第二版上）
+### 6.2 超时语义（强制）
+- 每个 node 都有固定 timeout：
+  - `execute.edit`: 60 分钟
+  - `execute.lint`: 20 分钟
+  - `execute.test`: 30 分钟
+  - 其余节点: 5 分钟
+- 超时触发时 Runner 必须：
+  - 追加事件 `NODE_TIMEOUT`
+  - 终止命令进程组
+  - 将节点状态置为 `TIMEOUT`
+  - 进入重试判定
 
-这样后面你把 cursor-cli 从 WSL 迁到别的机器，不会伤筋动骨。
+### 6.3 重试语义（强制）
+- 重试只发生在：`execute.edit`、`execute.lint`、`execute.test`
+- 最大尝试次数固定：2 次（attempt=1 首次，attempt=2 重试）
+- 重试退避时间固定：10 秒
+- 触发条件固定：节点 exit code 非 0，节点 TIMEOUT
+- 重试行为：
+  - 追加事件 `NODE_RETRY_SCHEDULED`
+  - 等待 10 秒
+  - attempt+1 重新执行节点
+- attempt=2 仍失败时：节点状态 `FAILED`，run 状态 `FAILED`
 
-------
+### 6.4 幂等与恢复（v1 定义）
+- `run_id` 唯一目录不可覆盖
+- Runner 在启动 run 时若发现目录已存在：直接返回错误 `run_id_exists`
+- `resume_from_stage` 在 v1 保留，语义固定为：从指定 node_id 重新开始执行，其前序节点标记为 `SKIPPED`，不重写旧产物文件
 
-## 第一版里你最容易踩的 3 个坑（提前给你避雷）
+---
 
-1. **把“日志”当字符串保存** → 后面 UI 卡死
-   - 正确：日志是事件流，分段存，分页/流式
-2. **把“节点输出”全塞到内存** → 一跑长任务就爆
-   - 正确：输出落盘（artifact），DB 只存引用与摘要
-3. **AI 生成 DSL 不校验** → 运行期才发现边断了/循环了
-   - 正确：后端做 compile：拓扑校验、循环检测、必填参数校验、类型校验
+## 7. v1 串行锁（防僵尸版本）
 
-------
+### 7.1 目录与元信息
+- 锁根目录固定：`workflows/project/logs/automation_runs/_lock/`
+- 锁实例目录固定：`_lock/<run_id>/`
+- 元信息文件固定：`_lock/<run_id>/lock.json`
 
-## 你这套路线的最小里程碑（很务实）
+`lock.json` 固定字段：
+- `run_id`
+- `project_root`
+- `pid`
+- `host`
+- `started_at`
+- `updated_at`
+- `ttl_ms`（固定：7200000）
 
-- **M0**：FlowSpec JSON → 编译 DAG → 顺序执行 → UI 静态展示
-- **M1**：并发调度 + 节点状态实时变更 + 节点日志面板
-- **M2**：失败重试/超时/取消 + 运行历史列表 + 产物管理
-- **M3**：Executor 抽象 + Remote Agent（HTTP）+ 权限/鉴权
+### 7.2 心跳规则（强制）
+Runner 在 run 执行期间每 10 秒刷新 `updated_at`。
+
+### 7.3 防僵尸清理规则（强制）
+当 Runner 尝试获取锁且发现 `_lock/` 内已有目录时，必须按顺序处理：
+1. 读取每个 `lock.json`
+2. 若 `updated_at` 距当前超过 `ttl_ms`：判定为 stale，删除该锁目录，并追加事件 `LOCK_STALE_CLEARED`
+3. 若 `pid` 在系统进程表中不存在：判定为 stale，删除该锁目录，并追加事件 `LOCK_STALE_CLEARED`
+4. 清理完成后仍存在锁目录：返回错误 `lock_busy`，并把占用锁的 `run_id` 列入错误 payload
+
+### 7.4 锁事件（强制）
+- 成功获取锁追加事件：`LOCK_ACQUIRED`
+- 正常结束释放锁追加事件：`LOCK_RELEASED`
+- 异常结束也必须释放锁并追加 `LOCK_RELEASED`
+
+---
+
+## 8. v1 API（Pipeline-Sys Console）
+
+### 8.1 运行列表
+- `GET /api/runs`
+  - 返回：按目录扫描 `automation_runs/` 的 run 列表（按时间倒序）
+
+### 8.2 运行详情
+- `GET /api/runs/:runId`
+  - 返回：`status.json`、`graph.json`、`node_runs.json`、关键产物路径
+
+### 8.3 事件流（SSE）
+- `GET /api/runs/:runId/events`
+  - 返回：SSE，按 `events.ndjson` 增量推送
+
+### 8.4 节点产物读取
+- `GET /api/runs/:runId/file?path=<rel_path>`
+  - 限制：只允许读取该 run 目录内的相对路径
+
+### 8.5 控制接口
+- `POST /api/runs/:runId/cancel`
+  - Console 转发到 Runner：`POST /fixed-flow/cancel`
+- `POST /api/runs/:runId/retry`
+  - body：`{ node_id }`
+  - Console 转发到 Runner：`POST /fixed-flow/retry`
+
+---
+
+## 9. v1 UI（行为树看板）
+
+### 9.1 页面结构（固定）
+- Run 列表页：按状态过滤（running、success、failed、cancelled），点击进入详情
+- Run 详情页：左侧行为树图，右侧节点详情面板，底部事件时间线
+
+### 9.2 行为树渲染规则（固定）
+- 使用 React Flow 渲染
+- 布局方向：自上向下
+- `execute` 为 group 节点，子节点缩进显示
+- 节点颜色规则固定：
+  - PENDING 灰
+  - RUNNING 蓝
+  - SUCCESS 绿
+  - FAILED 红
+  - SKIPPED 浅灰
+  - CANCELLED 橙
+  - TIMEOUT 紫
+- 最近一次状态变更的边高亮 3 秒
+
+### 9.3 节点详情面板（固定）
+显示内容：
+- 基本信息：node_id、status、attempt、start/end、elapsed
+- 日志：按 `NODE_LOG` 渲染，支持 tail 与分页
+- 产物：来自 `graph.json.nodes[].outputs[]`，点击打开文件
+
+---
+
+## 10. v2 规格摘要（FlowSpec 编排）
+
+v2 引入 `flowspec.json`，Pipeline-Sys 后端编译 DAG 并驱动 Executor：
+- FlowSpec 存放：`workflows/project/flowspecs/<flow_id>.json`
+- Run 目录新增：`flowspec.snapshot.json`
+- Executor 接口固定：`execute(command, cwd, env, timeout_ms)`，返回 `{ exit_code, stdout_ref, stderr_ref }`
+
+---
+
+## 11. v3 规格摘要（多执行器与治理）
+
+v3 目标：多执行域、资源隔离与治理能力：
+- 多 Executor 注册表
+- 并发队列与限流
+- 指标与告警
+- 权限与审计策略

@@ -4,7 +4,7 @@ globs: ["**/*"]
 alwaysApply: true
 ---
 
-# AI-Native 工作流规范
+## AI-Native 工作流规范
 
 ## 核心理念
 
@@ -44,18 +44,23 @@ AI 像 100 人团队一样逐级分工交付：
 ## 工件分层
 
 ```
-docs/
+design/ai-native/
 ├── 00_charter/     # 宪法层（冻结）- L0 产出
 ├── 01_bibles/      # 总纲层 - L1 产出
 ├── 02_specs/       # 规格层 - L2 产出
 ├── 03_taskpacks/   # 派单层 - L2 派单给 L3
-├── 04_acceptance/  # 验收层 - QA
-└── 05_logs/        # 审计层 - 日志
+└── 04_acceptance/  # 验收层 - QA
+
+workflows/project/logs/
+├── automation_runs/  # 固定流程运行审计（全程落盘根目录）
+├── decisions_log.md  # 决策记录
+├── rollback_log.md   # 回滚记录
+└── task_log.md       # 任务记录
 ```
 
 ### 冻结目录（禁止 L2/L3 修改）
-- `/docs/00_charter/**`
-- `/docs/01_bibles/**`（L2/L3 需走 CR 流程）
+- `/design/ai-native/00_charter/**`
+- `/design/ai-native/01_bibles/**`（L2/L3 需走 CR 流程）
 
 ---
 
@@ -77,7 +82,7 @@ docs/
 
 > 说明：该条是“流程工程化”要求，不依赖模型记忆；用于确保你可以在 n8n 里控制/观察全链路，并能从任意阶段续跑。
 
-- [ ] **全程落盘**：每次执行必须写入 `docs/05_logs/automation_runs/<run_id>/`，至少包含：
+- [ ] **全程落盘**：每次执行必须写入 `workflows/project/logs/automation_runs/<run_id>/`，至少包含：
   - `status.json`（stage 指针、ok、错误摘要）
   - `00_intake.json`（入口参数）
   - `04_execute.json`（执行结果/回执）
@@ -192,8 +197,8 @@ docs/
 
 ## 参考文档
 
-- 落地计划: `docs/AI-Native流程改造落地计划.md`
-- 任务包模板: `docs/03_taskpacks/_template.md`
+- 落地计划: `design/production/AI-Native流程改造落地计划.md`
+- 任务包模板: `design/ai-native/03_taskpacks/_template.md`
 - 角色包: `promptx/roles/*.yaml`
 - Issue 模板: `.github/ISSUE_TEMPLATE/*.yml`
 - PR 模板: `.github/PULL_REQUEST_TEMPLATE.md`

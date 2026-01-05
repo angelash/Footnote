@@ -4,7 +4,7 @@ globs: ["**/*.ts", "**/*.tsx", "**/*.yaml", "**/*.json"]
 alwaysApply: true
 ---
 
-# Footnote 项目总览
+## Footnote 项目总览
 
 ## 项目定位
 **《备注 / Footnote》** - 叙事驱动的2D系统策略冒险H5竖版手机游戏
@@ -73,19 +73,19 @@ alwaysApply: true
 ### AI-Native 工件层级（优先参考）
 | 层级 | 路径 | 说明 |
 |------|------|------|
-| 宪法层 | `docs/00_charter/` | 项目宪章、变更控制（冻结） |
-| 总纲层 | `docs/01_bibles/` | 设计/技术/美术/QA 总纲 |
-| 规格层 | `docs/02_specs/` | 系统/UI/流程规格 |
-| 派单层 | `docs/03_taskpacks/` | 任务包 |
-| 验收层 | `docs/04_acceptance/` | QA清单 |
-| 审计层 | `docs/05_logs/` | 日志 |
+| 宪法层 | `design/ai-native/00_charter/` | 项目宪章、变更控制（冻结） |
+| 总纲层 | `design/ai-native/01_bibles/` | 设计/技术/美术/QA 总纲 |
+| 规格层 | `design/ai-native/02_specs/` | 系统/UI/流程规格 |
+| 派单层 | `design/ai-native/03_taskpacks/` | 任务包 |
+| 验收层 | `design/ai-native/04_acceptance/` | QA清单 |
+| 审计层 | `workflows/project/logs/` | 日志（含自动化运行审计） |
 
 ### Bible 总纲索引
-- 设计总纲: `docs/01_bibles/design_bible.md`
-- 技术总纲: `docs/01_bibles/tech_bible.md`
-- 美术总纲: `docs/01_bibles/art_bible.md`
-- QA总纲: `docs/01_bibles/qa_bible.md`
-- 生产计划: `docs/01_bibles/production_plan.md`
+- 设计总纲: `design/ai-native/01_bibles/design_bible.md`
+- 技术总纲: `design/ai-native/01_bibles/tech_bible.md`
+- 美术总纲: `design/ai-native/01_bibles/art_bible.md`
+- QA总纲: `design/ai-native/01_bibles/qa_bible.md`
+- 生产计划: `design/ai-native/01_bibles/production_plan.md`
 
 ### 设计文档（详细参考）
 - 世界观: `design/01-narrative/世界观完整版 v3（v1基础合并v2迭代）.md`

@@ -29,7 +29,7 @@
     },
     {
       "parameters": {
-        "fileSelector": "={{ $json.status_path }}"
+        "filePath": "={{ $json.status_path }}"
       },
       "id": "read-status",
       "name": "Read Status",

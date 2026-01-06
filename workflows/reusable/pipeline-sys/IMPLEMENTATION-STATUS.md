@@ -228,71 +228,110 @@ stage.intake → stage.preflight → execute.plan → execute.edit → execute.l
 
 ---
 
-## 6. 待完成项
+## 6. WSL Runner 改造状态
 
-### 6.1 WSL Runner 改造（关键）
+### 6.1 模块化改造 - ✅ 已完成
 
-当前 `workflows/reusable/n8n-common/wsl-runner/server.mjs` 需要改造以输出新格式工件：
+WSL Runner 已完成模块化拆分，`server.mjs` 保留路由分发，逻辑拆到 `lib/`：
 
-- [ ] 生成 `graph.json` - 行为树图谱
-- [ ] 追加 `events.ndjson` - 事件流
-- [ ] 维护 `node_runs.json` - 节点状态快照
-- [ ] 创建 `nodes/` 子目录 - 子节点产物
-- [ ] 实现 `POST /fixed-flow/cancel` - 取消控制
-- [ ] 实现 `POST /fixed-flow/retry` - 重试控制
-- [ ] 实现串行锁心跳和防僵尸
+```
+workflows/reusable/n8n-common/wsl-runner/
+  server.mjs           # HTTP server + 路由分发
+  start-server.sh      # 启动脚本
+  README.md            # 说明文档
+  lib/
+    graph.mjs          # ✅ graph.json 生成
+    events.mjs         # ✅ events.ndjson 追加（12种事件类型）
+    nodeRuns.mjs       # ✅ node_runs.json 维护
+    control.mjs        # ✅ 取消/重试请求处理
+    lock.mjs           # ✅ 防僵尸锁 + 心跳 + TTL + PID检查
+    io.mjs             # ✅ 文件读写工具
+    paths.mjs          # ✅ 路径计算
+    exec.mjs           # ✅ 命令执行包装
+    stages.mjs         # ✅ Stage -> Node 映射
+    notify.mjs         # ✅ 通知
+    index.mjs          # ✅ 统一导出
+```
 
-### 6.2 端到端测试
+### 6.2 v1 新格式功能清单
+
+| 功能 | 模块 | 状态 |
+|------|------|------|
+| 生成 `graph.json` | `graph.mjs` | ✅ `writeGraph()` |
+| 追加 `events.ndjson` | `events.mjs` | ✅ `appendEvent()` + 12种 emit 函数 |
+| 维护 `node_runs.json` | `nodeRuns.mjs` | ✅ `updateNodeRun()` + 状态辅助函数 |
+| 创建 `nodes/` 子目录 | `graph.mjs` | ✅ 输出路径已定义 |
+| `POST /fixed-flow/cancel` | `control.mjs` | ✅ `writeCancelRequest()` |
+| `POST /fixed-flow/retry` | `control.mjs` | ✅ `writeRetryRequest()` |
+| 串行锁心跳 | `lock.mjs` | ✅ 10秒心跳 |
+| TTL 防僵尸 | `lock.mjs` | ✅ 2小时 TTL + PID 检查 |
+
+### 6.3 待验证项
+
+- [ ] `server.mjs` 是否已集成调用 `lib/` 模块
+- [ ] 实际运行时是否产出新格式工件
+
+---
+
+## 7. 待完成项
+
+### 7.1 端到端测试
 
 - [ ] Console ↔ Runner 通信测试
 - [ ] UI ↔ Console SSE 订阅测试
 - [ ] 完整流程 E2E 测试
 
-### 6.3 服务配置
+### 7.2 服务配置
 
 - [ ] PM2 配置自启动
 - [ ] 服务健康监控
 
+### 7.3 集成验证
+
+- [ ] 验证 `server.mjs` 调用 `lib/` 模块
+- [ ] 验证新运行产出新格式工件
+- [ ] 验证 UI 能正确展示新格式数据
+
 ---
 
-## 7. API 接口参考
+## 8. API 接口参考
 
-### 7.1 运行列表
+### 8.1 运行列表
 
 ```
 GET /api/runs
 Response: { runs: IRunListItem[] }
 ```
 
-### 7.2 运行详情
+### 8.2 运行详情
 
 ```
 GET /api/runs/:runId
 Response: { status, graph, nodeRuns, outputs }
 ```
 
-### 7.3 事件流（SSE）
+### 8.3 事件流（SSE）
 
 ```
 GET /api/runs/:runId/events
 Response: text/event-stream
 ```
 
-### 7.4 文件读取
+### 8.4 文件读取
 
 ```
 GET /api/runs/:runId/file?path=<rel_path>
 Response: 文件内容
 ```
 
-### 7.5 取消运行
+### 8.5 取消运行
 
 ```
 POST /api/runs/:runId/cancel
 Response: { ok, message }
 ```
 
-### 7.6 重试节点
+### 8.6 重试节点
 
 ```
 POST /api/runs/:runId/retry
@@ -302,7 +341,7 @@ Response: { ok, message }
 
 ---
 
-## 8. 相关文档
+## 9. 相关文档
 
 | 文档 | 路径 | 说明 |
 |------|------|------|

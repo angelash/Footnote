@@ -80,6 +80,16 @@ export {
   createSubflowExecutor,
 } from './executors/index.mjs';
 
+// Flow Runner - 流程调度器
+export {
+  FlowRunner,
+  createFlowRunner,
+  runFlow,
+  RunStatus,
+  NodeStatus,
+  EventType,
+} from './flow-runner.mjs';
+
 /**
  * v2 版本号
  */

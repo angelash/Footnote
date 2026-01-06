@@ -1,11 +1,13 @@
-# Pipeline-Sys v1 实现状态报告
+# Pipeline-Sys 实现状态报告
 
 > 更新时间：2026-01-06
-> 状态：**✅ v1 全部完成**
+> 状态：**✅ v1 已完成 | ✅ v2 核心完成**
 
 ---
 
 ## 📊 总体状态
+
+### v1 - 固定流程可视化
 
 | 模块 | 状态 | 完成度 |
 |------|------|--------|
@@ -15,9 +17,21 @@
 | **WSL Runner 集成** | ✅ 完成 | 100% |
 | **测试 Fixtures** | ✅ 完成 | 100% |
 
+### v2 - 配置化流程引擎
+
+| Phase | 模块 | 状态 | 测试 |
+|-------|------|------|------|
+| **Phase 1** | 解析器 + 表达式 + 上下文 + 执行器基类 | ✅ 完成 | 113 通过 |
+| **Phase 2** | Shell/Transform/File/HTTP/Notify 执行器 | ✅ 完成 | 28 通过 |
+| **Phase 3** | Condition/Parallel/Loop/Subflow 控制流 | ✅ 完成 | 26 通过 |
+| **Phase 4** | FlowRunner 流程调度器 | ✅ 完成 | 20 通过 |
+| Phase 5 | 与 v1 集成 | 📝 文档完成 | - |
+
+**v2 总测试：187 个单元测试全部通过 ✅**
+
 ---
 
-## 🏗️ 架构概览
+## 🏗️ v1 架构概览
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -28,12 +42,9 @@
 │   │   n8n    │────▶│  Runner  │────▶│  File System (Run Artifacts)  │   │
 │   │ (Webhook)│     │ (3210)   │     │  automation_runs/<run_id>/    │   │
 │   └──────────┘     └──────────┘     │    status.json                │   │
-│                          │          │    graph.json ✨NEW            │   │
-│                          │          │    events.ndjson ✨NEW         │   │
-│                          │          │    node_runs.json ✨NEW        │   │
-│                          │          │    00_intake.json              │   │
-│                          │          │    01_preflight.json           │   │
-│                          │          │    ...                         │   │
+│                          │          │    graph.json                  │   │
+│                          │          │    events.ndjson               │   │
+│                          │          │    node_runs.json              │   │
 │                          │          └──────────────────────────────┘   │
 │                          │                       │                      │
 │                          ▼                       ▼                      │
@@ -48,185 +59,198 @@
 
 ---
 
-## ✅ 已完成功能
-
-### 1. Shared Types 模块 (`shared/`)
-- [x] `NodeStatus` 枚举（PENDING/RUNNING/SUCCESS/FAILED/SKIPPED/CANCELLED/TIMEOUT）
-- [x] `EventType` 枚举（RUN_STARTED/NODE_STARTED/NODE_LOG/NODE_FINISHED/...）
-- [x] `IGraphNode`, `IGraphEdge`, `IGraph` 类型
-- [x] `INodeRun`, `INodeRunsSnapshot` 类型
-- [x] `IStatus` 类型
-- [x] `IEvent` 类型
-- [x] 类型守卫函数
-- [x] 单元测试
-
-### 2. Console Backend 模块 (`console/`)
-- [x] Fastify HTTP 服务器
-- [x] CORS 支持
-- [x] 健康检查端点 (`GET /health`)
-- [x] 运行列表 API (`GET /api/runs`)
-- [x] 运行详情 API (`GET /api/runs/:runId`)
-- [x] 事件 SSE 流 (`GET /api/events/:runId`)
-- [x] 文件获取 API (`GET /api/file/:runId/*`)
-- [x] 控制 API (`POST /api/control/:runId/cancel`, `/retry`)
-- [x] 运行目录扫描服务
-- [x] 路径安全守卫
-- [x] 事件流 Tailer
-- [x] 单元测试
-
-### 3. UI Frontend 模块 (`ui/`)
-- [x] React 18 + TypeScript
-- [x] React Router 路由
-- [x] Zustand 状态管理
-- [x] ReactFlow 行为树可视化
-- [x] 运行列表页面 (`/runs`)
-- [x] 运行详情页面 (`/runs/:runId`)
-- [x] 节点卡片组件（状态颜色、图标、耗时）
-- [x] 节点详情面板
-- [x] 事件时间线组件
-- [x] 状态徽章组件
-- [x] SSE 实时更新
-- [x] Mini Map 导航
-- [x] 缩放控制
-- [x] 响应式布局
-- [x] 单元测试
-
-### 4. WSL Runner 集成 (`n8n-common/wsl-runner/`)
-- [x] `lib/` 模块化重构
-  - [x] `paths.mjs` - 路径工具
-  - [x] `io.mjs` - 文件 IO
-  - [x] `graph.mjs` - 行为树图谱
-  - [x] `events.mjs` - 事件流
-  - [x] `nodeRuns.mjs` - 节点状态
-  - [x] `lock.mjs` - 串行锁
-  - [x] `control.mjs` - 控制请求
-  - [x] `stages.mjs` - Stage 映射
-  - [x] `exec.mjs` - 命令执行
-  - [x] `notify.mjs` - 通知
-- [x] `server.mjs` 集成 lib/ 模块 ✨刚完成
-  - [x] 运行开始时初始化 graph.json
-  - [x] 运行开始时初始化 node_runs.json
-  - [x] 每个阶段发送 NODE_STARTED 事件
-  - [x] 每个阶段发送 NODE_FINISHED 事件
-  - [x] 每个阶段更新 node_runs.json
-  - [x] 记录 NODE_LOG 事件
-  - [x] 发送 RUN_STARTED/RUN_FINISHED 事件
-  - [x] 新的锁机制（acquireLock/releaseLock）
-  - [x] Cancel 接口 (`POST /fixed-flow/cancel`)
-  - [x] Retry 接口 (`POST /fixed-flow/retry`)
-
-### 5. 测试 Fixtures (`tests/fixtures/`)
-- [x] 成功运行 fixture (`RUN-20260105-100000-done`)
-- [x] 失败运行 fixture (`RUN-20260105-120000-test`)
-
----
-
-## 📝 v1 新增 API 端点
-
-### WSL Runner (port 3210)
-
-| 端点 | 方法 | 描述 |
-|------|------|------|
-| `/health` | GET | 健康检查 |
-| `/execute-task` | POST | 执行任务 |
-| `/compose-taskpack` | POST | 生成 TaskPack |
-| `/fixed-flow` | POST | 启动固定流程 |
-| `/fixed-flow/status` | GET | 查询运行状态 |
-| `/fixed-flow/cancel` | POST | 取消运行 ✨NEW |
-| `/fixed-flow/retry` | POST | 重试节点 ✨NEW |
-
-### Console (port 3230)
-
-| 端点 | 方法 | 描述 |
-|------|------|------|
-| `/health` | GET | 健康检查 |
-| `/api/runs` | GET | 获取运行列表 |
-| `/api/runs/:runId` | GET | 获取运行详情（含 graph/nodeRuns）|
-| `/api/events/:runId` | GET | SSE 事件流 |
-| `/api/file/:runId/*` | GET | 获取运行工件文件 |
-| `/api/control/:runId/cancel` | POST | 代理取消请求 |
-| `/api/control/:runId/retry` | POST | 代理重试请求 |
-
----
-
-## 📁 v1 运行工件结构
+## 🆕 v2 模块结构
 
 ```
-automation_runs/<run_id>/
-├── status.json          # 运行状态快照
-├── graph.json           # 行为树结构 ✨NEW
-├── events.ndjson        # 事件日志流 ✨NEW
-├── node_runs.json       # 节点状态快照 ✨NEW
-├── control.json         # 控制请求 ✨NEW
-├── 00_intake.json       # 入参
-├── 01_preflight.json    # Git 检查
-├── 02_plan.json         # 计划
-├── 03_taskpack.md       # TaskPack 副本
-├── 04_execute.json      # 执行结果
-├── 05_validate.json     # 验证结果
-├── 06_git.json          # Git 提交结果
-├── 07_notify.json       # 通知结果
-└── _prompt.md           # Cursor 提示词
+wsl-runner/lib/v2/
+├── index.mjs           # 统一导出（VERSION 2.0.0）
+├── parser.mjs          # FlowSpec 解析器
+├── expression.mjs      # 表达式引擎 (${...} 模板)
+├── context.mjs         # 执行上下文管理
+├── executor-base.mjs   # 执行器基类（重试/超时/取消）
+├── flow-runner.mjs     # 流程调度器核心
+├── executors/
+│   ├── index.mjs       # 执行器注册中心
+│   ├── shell.mjs       # Shell 命令执行
+│   ├── transform.mjs   # 数据转换
+│   ├── file.mjs        # 文件操作
+│   ├── http.mjs        # HTTP 请求
+│   ├── notify.mjs      # 通知发送
+│   ├── condition.mjs   # 条件分支
+│   ├── parallel.mjs    # 并行执行
+│   ├── loop.mjs        # 循环（forEach/times/while）
+│   └── subflow.mjs     # 子流程调用
+├── tests/
+│   ├── vitest.config.mjs
+│   ├── parser.test.mjs       # 22 tests
+│   ├── expression.test.mjs   # 37 tests
+│   ├── context.test.mjs      # 32 tests
+│   ├── executor-base.test.mjs # 22 tests
+│   ├── executors.test.mjs    # 28 tests
+│   ├── control-flow.test.mjs # 26 tests
+│   └── flow-runner.test.mjs  # 20 tests
+└── README.md           # v2 用法文档
 ```
 
 ---
 
-## 🚀 快速启动
+## ✅ v2 功能清单
 
-### 1. 启动 Console 服务
+### 解析器 (parser.mjs)
+- [x] FlowSpec JSON 加载和验证
+- [x] 节点类型枚举
+- [x] 图遍历工具（前驱/后继/入口/出口）
+- [x] 错误处理和详细报错
+
+### 表达式引擎 (expression.mjs)
+- [x] `${...}` 模板变量插值
+- [x] 深度对象插值
+- [x] 安全表达式求值
+- [x] 条件表达式
+- [x] 输出映射解析
+- [x] 变量引用提取
+
+### 执行上下文 (context.mjs)
+- [x] 变量作用域管理
+- [x] 输入参数绑定
+- [x] 节点状态追踪
+- [x] 上下文快照
+- [x] 序列化/反序列化
+
+### 执行器基类 (executor-base.mjs)
+- [x] 重试机制（指数退避）
+- [x] 超时控制
+- [x] 取消信号传播
+- [x] 事件发射
+- [x] 执行器注册表
+
+### 基础执行器
+| 类型 | 功能 |
+|------|------|
+| `shell` | 执行 Shell 命令，支持 cwd/env/args |
+| `transform` | JavaScript 表达式数据转换 |
+| `file` | 读/写/删/复制/移动/列目录/创建目录/stat |
+| `http` | GET/POST/PUT/PATCH/DELETE，支持认证/重试 |
+| `notify` | console/webhook/log 通道通知 |
+
+### 控制流执行器
+| 类型 | 功能 |
+|------|------|
+| `condition` | if/else 条件分支，支持多目标 |
+| `parallel` | 并行执行分支，waitForAll/failFast 策略 |
+| `loop` | forEach/times/while/doWhile 循环 |
+| `subflow` | 子流程调用，输入/输出映射 |
+
+### 流程调度器 (flow-runner.mjs)
+- [x] FlowSpec 解析和执行
+- [x] 自动入口节点检测
+- [x] 按 on_success/on_failure 链路调度
+- [x] 条件分支路由
+- [x] 并行节点执行
+- [x] 运行取消
+- [x] 工件生成（status/graph/events/node_runs）
+- [x] 事件发射（RUN_*/NODE_*）
+
+---
+
+## 🔧 v2 使用示例
+
+### 基本用法
+
+```javascript
+import { runFlow } from './lib/v2/index.mjs';
+
+const result = await runFlow({
+  id: 'my-flow',
+  name: 'My Flow',
+  nodes: [
+    { id: 'echo', type: 'shell', command: 'echo hello' },
+  ],
+});
+
+console.log(result.success);  // true
+console.log(result.output);   // { echo: { stdout: 'hello\n', ... } }
+```
+
+### FlowSpec JSON
+
+```json
+{
+  "id": "example",
+  "name": "Example Flow",
+  "inputs": {
+    "projectRoot": { "type": "string", "required": true }
+  },
+  "nodes": [
+    {
+      "id": "preflight",
+      "type": "shell",
+      "command": "git status",
+      "cwd": "${inputs.projectRoot}",
+      "on_success": "build"
+    },
+    {
+      "id": "build",
+      "type": "shell",
+      "command": "npm run build",
+      "cwd": "${inputs.projectRoot}"
+    }
+  ]
+}
+```
+
+详见 `wsl-runner/lib/v2/README.md`
+
+---
+
+## 📈 测试覆盖
+
+| 模块 | 测试数 | 状态 |
+|------|--------|------|
+| parser | 22 | ✅ |
+| expression | 37 | ✅ |
+| context | 32 | ✅ |
+| executor-base | 22 | ✅ |
+| executors | 28 | ✅ |
+| control-flow | 26 | ✅ |
+| flow-runner | 20 | ✅ |
+| **总计** | **187** | **✅ 全部通过** |
+
+运行测试：
 ```bash
-cd workflows/reusable/pipeline-sys/console
-npm run dev
-# 监听 http://127.0.0.1:3230
+cd workflows/reusable/n8n-common/wsl-runner/lib/v2/tests
+npx vitest run --config vitest.config.mjs
 ```
-
-### 2. 启动 UI 服务
-```bash
-cd workflows/reusable/pipeline-sys/ui
-npm run dev
-# 监听 http://127.0.0.1:3231
-```
-
-### 3. 启动 WSL Runner（WSL 环境）
-```bash
-cd workflows/reusable/n8n-common/wsl-runner
-node server.mjs
-# 监听 http://127.0.0.1:3210
-```
-
-### 4. 打开浏览器
-访问 http://localhost:3231 查看行为树可视化界面
 
 ---
 
-## 🔄 v2 规划预览
+## 🗺️ 路线图
 
-### 目标
-从固定流程升级为 **配置化流程（FlowSpec DSL）**
+### v1 ✅ 已完成
+- 固定流程执行和可视化
+- 行为树 UI
+- 实时事件流
+- 取消/重试控制
 
-### 核心特性
-- [ ] FlowSpec JSON Schema 设计
-- [ ] 流程配置解析器
-- [ ] 动态节点类型支持
-- [ ] 条件分支（if/else）
-- [ ] 并行执行（parallel）
-- [ ] 循环支持（for/while）
-- [ ] 外部工具调用
+### v2 ✅ 核心完成
+- FlowSpec DSL 设计
+- 配置化流程解析
+- 9 种节点类型
+- 流程调度器
+- 187 个单元测试
+
+### v2.1 待完成
+- [ ] WSL Runner 集成 v2 引擎
+- [ ] 流程文件热加载
 - [ ] 流程版本管理
+- [ ] 流程编辑器 UI
 
-### 预计完成时间
-2026 Q2
-
----
-
-## 📈 测试覆盖率
-
-| 模块 | 单元测试 | E2E 测试 |
-|------|----------|----------|
-| shared | ✅ 通过 | - |
-| console | ✅ 通过 | 待完善 |
-| ui | ✅ 通过 | 待完善 |
+### v3 计划
+- [ ] 分布式执行
+- [ ] 多执行器集群
+- [ ] 流程治理和审计
 
 ---
 
-*报告生成：Pipeline-Sys v1 收尾验证*
+*报告生成：2026-01-06*
+*版本：v1.0.0 / v2.0.0*

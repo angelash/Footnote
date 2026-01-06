@@ -1,0 +1,631 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pipeline-sys.local/flowspec/v2.0.0",
+  "title": "FlowSpec v2.0.0",
+  "description": "Pipeline-Sys v2 流程定义语言（Domain Specific Language）",
+  "type": "object",
+  "required": ["version", "name", "nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^2\\.[0-9]+\\.[0-9]+$",
+      "description": "FlowSpec 版本号，必须为 2.x.x"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "流程名称"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "流程描述"
+    },
+    "author": {
+      "type": "string",
+      "description": "作者"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "标签列表"
+    },
+    "variables": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/Variable"
+      },
+      "description": "流程级变量定义"
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/InputParam"
+      },
+      "description": "流程输入参数定义"
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/OutputParam"
+      },
+      "description": "流程输出参数定义"
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/Node"
+      },
+      "description": "节点列表（按执行顺序）"
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Edge"
+      },
+      "description": "自定义边（可选，默认按节点顺序连接）"
+    },
+    "settings": {
+      "$ref": "#/$defs/FlowSettings"
+    }
+  },
+  "$defs": {
+    "Variable": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "object", "array"],
+          "description": "变量类型"
+        },
+        "default": {
+          "description": "默认值"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "InputParam": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "object", "array", "file"],
+          "description": "参数类型"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否必填"
+        },
+        "default": {
+          "description": "默认值"
+        },
+        "description": {
+          "type": "string"
+        },
+        "validation": {
+          "type": "object",
+          "properties": {
+            "pattern": { "type": "string" },
+            "minLength": { "type": "integer" },
+            "maxLength": { "type": "integer" },
+            "min": { "type": "number" },
+            "max": { "type": "number" },
+            "enum": { "type": "array" }
+          }
+        }
+      }
+    },
+    "OutputParam": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "object", "array", "file"]
+        },
+        "from": {
+          "type": "string",
+          "description": "来源节点 ID 和输出字段，如 'execute.edit.output'"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "Node": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_.-]*$",
+          "description": "节点唯一标识符"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "shell",
+            "http",
+            "condition",
+            "parallel",
+            "loop",
+            "subflow",
+            "transform",
+            "file",
+            "notify",
+            "manual",
+            "custom"
+          ],
+          "description": "节点类型"
+        },
+        "name": {
+          "type": "string",
+          "description": "节点显示名称"
+        },
+        "description": {
+          "type": "string"
+        },
+        "disabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "是否禁用此节点"
+        },
+        "config": {
+          "$ref": "#/$defs/NodeConfig",
+          "description": "节点类型特定配置"
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "节点输入映射"
+        },
+        "outputs": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "节点输出定义"
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 1000,
+          "description": "超时时间（毫秒）"
+        },
+        "retry": {
+          "$ref": "#/$defs/RetryConfig"
+        },
+        "condition": {
+          "type": "string",
+          "description": "执行条件表达式，返回 true 时才执行"
+        },
+        "onError": {
+          "type": "string",
+          "enum": ["fail", "skip", "continue"],
+          "default": "fail",
+          "description": "错误处理策略"
+        },
+        "meta": {
+          "type": "object",
+          "description": "元数据（UI 位置、注释等）"
+        }
+      }
+    },
+    "NodeConfig": {
+      "oneOf": [
+        { "$ref": "#/$defs/ShellNodeConfig" },
+        { "$ref": "#/$defs/HttpNodeConfig" },
+        { "$ref": "#/$defs/ConditionNodeConfig" },
+        { "$ref": "#/$defs/ParallelNodeConfig" },
+        { "$ref": "#/$defs/LoopNodeConfig" },
+        { "$ref": "#/$defs/SubflowNodeConfig" },
+        { "$ref": "#/$defs/TransformNodeConfig" },
+        { "$ref": "#/$defs/FileNodeConfig" },
+        { "$ref": "#/$defs/NotifyNodeConfig" },
+        { "$ref": "#/$defs/ManualNodeConfig" },
+        { "$ref": "#/$defs/CustomNodeConfig" }
+      ]
+    },
+    "ShellNodeConfig": {
+      "type": "object",
+      "required": ["command"],
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Shell 命令"
+        },
+        "shell": {
+          "type": "string",
+          "enum": ["bash", "sh", "zsh", "powershell", "cmd"],
+          "default": "bash"
+        },
+        "cwd": {
+          "type": "string",
+          "description": "工作目录，支持变量替换"
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "环境变量"
+        },
+        "stdin": {
+          "type": "string",
+          "description": "标准输入"
+        },
+        "captureStdout": {
+          "type": "boolean",
+          "default": true
+        },
+        "captureStderr": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "HttpNodeConfig": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"],
+          "default": "GET"
+        },
+        "url": {
+          "type": "string",
+          "description": "请求 URL，支持变量替换"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "body": {
+          "description": "请求体"
+        },
+        "bodyType": {
+          "type": "string",
+          "enum": ["json", "form", "text", "binary"],
+          "default": "json"
+        },
+        "auth": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["basic", "bearer", "apikey"]
+            },
+            "credentials": {
+              "type": "string",
+              "description": "凭证变量引用"
+            }
+          }
+        },
+        "validateStatus": {
+          "type": "string",
+          "description": "状态码验证表达式，如 'status >= 200 && status < 300'"
+        }
+      }
+    },
+    "ConditionNodeConfig": {
+      "type": "object",
+      "required": ["expression"],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "条件表达式"
+        },
+        "then": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Node" },
+          "description": "条件为真时执行的节点"
+        },
+        "else": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Node" },
+          "description": "条件为假时执行的节点"
+        }
+      }
+    },
+    "ParallelNodeConfig": {
+      "type": "object",
+      "required": ["branches"],
+      "properties": {
+        "branches": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["id", "nodes"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "nodes": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/Node" }
+              }
+            }
+          },
+          "description": "并行分支列表"
+        },
+        "waitAll": {
+          "type": "boolean",
+          "default": true,
+          "description": "是否等待所有分支完成"
+        },
+        "failFast": {
+          "type": "boolean",
+          "default": false,
+          "description": "任一分支失败时是否立即终止"
+        }
+      }
+    },
+    "LoopNodeConfig": {
+      "type": "object",
+      "required": ["mode"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["for", "forEach", "while"],
+          "description": "循环模式"
+        },
+        "iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "for 循环次数"
+        },
+        "collection": {
+          "type": "string",
+          "description": "forEach 循环的集合变量引用"
+        },
+        "condition": {
+          "type": "string",
+          "description": "while 循环条件表达式"
+        },
+        "maxIterations": {
+          "type": "integer",
+          "default": 1000,
+          "description": "最大迭代次数（防止死循环）"
+        },
+        "body": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Node" },
+          "description": "循环体节点"
+        },
+        "itemVar": {
+          "type": "string",
+          "default": "item",
+          "description": "当前元素变量名"
+        },
+        "indexVar": {
+          "type": "string",
+          "default": "index",
+          "description": "当前索引变量名"
+        }
+      }
+    },
+    "SubflowNodeConfig": {
+      "type": "object",
+      "required": ["flowPath"],
+      "properties": {
+        "flowPath": {
+          "type": "string",
+          "description": "子流程文件路径或 ID"
+        },
+        "inputMapping": {
+          "type": "object",
+          "description": "输入参数映射"
+        },
+        "outputMapping": {
+          "type": "object",
+          "description": "输出参数映射"
+        }
+      }
+    },
+    "TransformNodeConfig": {
+      "type": "object",
+      "required": ["expression"],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "转换表达式（支持 JSONata 或 JavaScript）"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["jsonata", "javascript"],
+          "default": "jsonata"
+        }
+      }
+    },
+    "FileNodeConfig": {
+      "type": "object",
+      "required": ["operation", "path"],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": ["read", "write", "append", "delete", "copy", "move", "exists", "list"],
+          "description": "文件操作类型"
+        },
+        "path": {
+          "type": "string",
+          "description": "文件路径"
+        },
+        "content": {
+          "type": "string",
+          "description": "write/append 操作的内容"
+        },
+        "destination": {
+          "type": "string",
+          "description": "copy/move 操作的目标路径"
+        },
+        "encoding": {
+          "type": "string",
+          "default": "utf-8"
+        },
+        "glob": {
+          "type": "string",
+          "description": "list 操作的 glob 模式"
+        }
+      }
+    },
+    "NotifyNodeConfig": {
+      "type": "object",
+      "required": ["channel"],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": ["console", "http", "email", "slack", "webhook"],
+          "description": "通知渠道"
+        },
+        "message": {
+          "type": "string",
+          "description": "通知消息模板"
+        },
+        "level": {
+          "type": "string",
+          "enum": ["info", "success", "warning", "error"],
+          "default": "info"
+        },
+        "webhookUrl": {
+          "type": "string",
+          "description": "Webhook URL"
+        }
+      }
+    },
+    "ManualNodeConfig": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "人工审批提示信息"
+        },
+        "timeout": {
+          "type": "integer",
+          "description": "等待超时时间（毫秒）"
+        },
+        "approvers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "审批人列表"
+        }
+      }
+    },
+    "CustomNodeConfig": {
+      "type": "object",
+      "required": ["handler"],
+      "properties": {
+        "handler": {
+          "type": "string",
+          "description": "自定义处理器模块路径"
+        },
+        "options": {
+          "type": "object",
+          "description": "自定义选项"
+        }
+      }
+    },
+    "Edge": {
+      "type": "object",
+      "required": ["from", "to"],
+      "properties": {
+        "from": {
+          "type": "string",
+          "description": "源节点 ID"
+        },
+        "to": {
+          "type": "string",
+          "description": "目标节点 ID"
+        },
+        "label": {
+          "type": "string",
+          "description": "边标签"
+        },
+        "condition": {
+          "type": "string",
+          "description": "条件表达式"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["default", "success", "failure", "conditional"],
+          "default": "default"
+        }
+      }
+    },
+    "RetryConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 3
+        },
+        "delay": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1000,
+          "description": "重试延迟（毫秒）"
+        },
+        "backoff": {
+          "type": "string",
+          "enum": ["fixed", "linear", "exponential"],
+          "default": "fixed"
+        },
+        "backoffMultiplier": {
+          "type": "number",
+          "default": 2
+        }
+      }
+    },
+    "FlowSettings": {
+      "type": "object",
+      "properties": {
+        "timeout": {
+          "type": "integer",
+          "description": "全局超时时间（毫秒）"
+        },
+        "concurrency": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "最大并发实例数"
+        },
+        "retryOnFailure": {
+          "type": "boolean",
+          "default": false
+        },
+        "continueOnError": {
+          "type": "boolean",
+          "default": false
+        },
+        "logLevel": {
+          "type": "string",
+          "enum": ["debug", "info", "warn", "error"],
+          "default": "info"
+        },
+        "hooks": {
+          "type": "object",
+          "properties": {
+            "onStart": { "type": "string" },
+            "onSuccess": { "type": "string" },
+            "onFailure": { "type": "string" },
+            "onComplete": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
+

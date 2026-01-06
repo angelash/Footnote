@@ -1,0 +1,272 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "version": "2.0.0",
+  "name": "AI-Native Fixed Flow",
+  "description": "Cursor Agent 自动化任务执行流程（v1 固定流程的 v2 配置化迁移）",
+  "author": "Pipeline-Sys",
+  "tags": ["ai-native", "cursor", "automation"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": false,
+      "description": "TaskPack 文件路径（可选，不提供则自动生成）"
+    },
+    "role": {
+      "type": "string",
+      "required": false,
+      "default": "L3_engineer",
+      "description": "执行角色"
+    },
+    "task_type": {
+      "type": "string",
+      "required": false,
+      "default": "code",
+      "validation": {
+        "enum": ["code", "doc", "test", "review"]
+      }
+    },
+    "complexity": {
+      "type": "string",
+      "required": false,
+      "default": "normal",
+      "validation": {
+        "enum": ["simple", "normal", "complex"]
+      }
+    },
+    "model_override": {
+      "type": "string",
+      "required": false,
+      "default": "auto"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "${env.PROJECT_ROOT}"
+    }
+  },
+
+  "outputs": {
+    "ok": {
+      "type": "boolean",
+      "from": "stage.done.ok"
+    },
+    "run_id": {
+      "type": "string",
+      "from": "stage.intake.run_id"
+    },
+    "head": {
+      "type": "string",
+      "from": "stage.git.head"
+    }
+  },
+
+  "variables": {
+    "run_id": {
+      "type": "string",
+      "description": "运行 ID，由 intake 节点生成"
+    },
+    "run_dir": {
+      "type": "string",
+      "description": "运行日志目录"
+    },
+    "branch": {
+      "type": "string",
+      "description": "Git 分支名"
+    },
+    "head": {
+      "type": "string",
+      "description": "Git HEAD commit"
+    },
+    "taskpack_content": {
+      "type": "string",
+      "description": "TaskPack 内容"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "stage.intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "初始化运行参数，生成 run_id",
+      "config": {
+        "language": "javascript",
+        "expression": "({ run_id: 'RUN-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Date.now().toString(36), run_dir: 'workflows/project/logs/automation_runs/' + run_id, ...inputs })"
+      },
+      "timeout": 300000,
+      "outputs": {
+        "run_id": "$.run_id",
+        "run_dir": "$.run_dir"
+      }
+    },
+    {
+      "id": "stage.preflight",
+      "type": "shell",
+      "name": "Git 预检",
+      "description": "检查工作区状态，获取分支和 HEAD",
+      "config": {
+        "command": "git status --porcelain && git branch --show-current && git rev-parse HEAD",
+        "cwd": "${inputs.project_root}",
+        "shell": "bash"
+      },
+      "timeout": 300000,
+      "retry": {
+        "enabled": false
+      },
+      "outputs": {
+        "branch": "$.stdout.split('\\n')[1]",
+        "head": "$.stdout.split('\\n')[2]"
+      }
+    },
+    {
+      "id": "execute.plan",
+      "type": "transform",
+      "name": "生成执行计划",
+      "description": "根据输入参数生成执行计划",
+      "config": {
+        "language": "javascript",
+        "expression": "({ role: inputs.role, task_type: inputs.task_type, complexity: inputs.complexity, model: inputs.model_override, planned_at: new Date().toISOString() })"
+      },
+      "timeout": 300000
+    },
+    {
+      "id": "execute.edit",
+      "type": "shell",
+      "name": "Cursor Agent 执行",
+      "description": "调用 Cursor CLI 执行代码编辑任务",
+      "config": {
+        "command": "cursor-agent execute --task-pack \"${variables.taskpack_path}\" --role ${inputs.role} --model ${inputs.model_override}",
+        "cwd": "${inputs.project_root}",
+        "shell": "bash",
+        "env": {
+          "CURSOR_HEADLESS": "1"
+        }
+      },
+      "timeout": 3600000,
+      "retry": {
+        "enabled": true,
+        "maxAttempts": 2,
+        "delay": 10000,
+        "backoff": "fixed"
+      },
+      "condition": "variables.taskpack_content != null"
+    },
+    {
+      "id": "execute.lint",
+      "type": "shell",
+      "name": "代码检查",
+      "description": "运行 ESLint/TypeScript 检查",
+      "config": {
+        "command": "npm run lint --if-present",
+        "cwd": "${inputs.project_root}",
+        "shell": "bash"
+      },
+      "timeout": 1200000,
+      "retry": {
+        "enabled": true,
+        "maxAttempts": 2,
+        "delay": 5000
+      },
+      "onError": "continue"
+    },
+    {
+      "id": "execute.test",
+      "type": "shell",
+      "name": "测试验证",
+      "description": "运行测试套件",
+      "config": {
+        "command": "npm run test --if-present",
+        "cwd": "${inputs.project_root}",
+        "shell": "bash"
+      },
+      "timeout": 1800000,
+      "retry": {
+        "enabled": true,
+        "maxAttempts": 2,
+        "delay": 10000
+      },
+      "onError": "continue"
+    },
+    {
+      "id": "execute.summary",
+      "type": "transform",
+      "name": "生成执行摘要",
+      "description": "汇总执行结果",
+      "config": {
+        "language": "javascript",
+        "expression": "({ edit_ok: nodes['execute.edit'].status === 'SUCCESS', lint_ok: nodes['execute.lint'].status === 'SUCCESS', test_ok: nodes['execute.test'].status === 'SUCCESS', summary: '编辑: ' + (nodes['execute.edit'].status === 'SUCCESS' ? '✓' : '✗') + ', Lint: ' + (nodes['execute.lint'].status === 'SUCCESS' ? '✓' : '✗') + ', Test: ' + (nodes['execute.test'].status === 'SUCCESS' ? '✓' : '✗') })"
+      },
+      "timeout": 300000
+    },
+    {
+      "id": "stage.notify",
+      "type": "notify",
+      "name": "发送通知",
+      "description": "发送执行结果通知",
+      "config": {
+        "channel": "webhook",
+        "webhookUrl": "https://newsfeed.4399om.com/api/messages/send.json",
+        "message": "任务 ${inputs.task_id} 执行完成: ${nodes['execute.summary'].output.summary}",
+        "level": "info"
+      },
+      "timeout": 300000,
+      "onError": "continue"
+    },
+    {
+      "id": "stage.done",
+      "type": "transform",
+      "name": "完成标记",
+      "description": "标记流程完成",
+      "config": {
+        "language": "javascript",
+        "expression": "({ ok: true, finished_at: new Date().toISOString(), duration: Date.now() - new Date(nodes['stage.intake'].started_at).getTime() })"
+      },
+      "timeout": 300000,
+      "outputs": {
+        "ok": "$.ok"
+      }
+    },
+    {
+      "id": "stage.git",
+      "type": "shell",
+      "name": "Git 提交推送",
+      "description": "提交变更并推送到远程",
+      "config": {
+        "command": "git add -A && git commit -m \"[AI-Native] ${inputs.task_id}: ${inputs.title}\" && git push origin HEAD",
+        "cwd": "${inputs.project_root}",
+        "shell": "bash"
+      },
+      "timeout": 300000,
+      "condition": "nodes['stage.done'].output.ok === true",
+      "onError": "continue",
+      "outputs": {
+        "head": "$.stdout.match(/([a-f0-9]{40})/)?.[1]"
+      }
+    }
+  ],
+
+  "settings": {
+    "timeout": 7200000,
+    "concurrency": 1,
+    "logLevel": "info",
+    "hooks": {
+      "onStart": "console.log('Flow started')",
+      "onSuccess": "console.log('Flow succeeded')",
+      "onFailure": "console.log('Flow failed')",
+      "onComplete": "console.log('Flow completed')"
+    }
+  }
+}
+

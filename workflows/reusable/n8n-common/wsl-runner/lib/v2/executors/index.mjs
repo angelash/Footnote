@@ -8,22 +8,35 @@
 
 import { globalRegistry } from '../executor-base.mjs';
 
-// 导入所有执行器
+// 导入基础执行器
 import { ShellExecutor, createShellExecutor } from './shell.mjs';
 import { TransformExecutor, createTransformExecutor } from './transform.mjs';
 import { FileExecutor, createFileExecutor } from './file.mjs';
 import { HttpExecutor, createHttpExecutor } from './http.mjs';
 import { NotifyExecutor, createNotifyExecutor } from './notify.mjs';
 
+// 导入控制流执行器
+import { ConditionExecutor, createConditionExecutor } from './condition.mjs';
+import { ParallelExecutor, createParallelExecutor } from './parallel.mjs';
+import { LoopExecutor, createLoopExecutor } from './loop.mjs';
+import { SubflowExecutor, createSubflowExecutor } from './subflow.mjs';
+
 /**
  * 注册所有内置执行器到全局注册表
  */
 export function registerBuiltinExecutors() {
+  // 基础执行器
   globalRegistry.register('shell', ShellExecutor);
   globalRegistry.register('transform', TransformExecutor);
   globalRegistry.register('file', FileExecutor);
   globalRegistry.register('http', HttpExecutor);
   globalRegistry.register('notify', NotifyExecutor);
+  
+  // 控制流执行器
+  globalRegistry.register('condition', ConditionExecutor);
+  globalRegistry.register('parallel', ParallelExecutor);
+  globalRegistry.register('loop', LoopExecutor);
+  globalRegistry.register('subflow', SubflowExecutor);
 }
 
 /**
@@ -55,13 +68,21 @@ export function getRegisteredTypes() {
 // 自动注册内置执行器
 registerBuiltinExecutors();
 
-// 导出所有执行器类
+// 导出基础执行器类
 export {
   ShellExecutor,
   TransformExecutor,
   FileExecutor,
   HttpExecutor,
   NotifyExecutor,
+};
+
+// 导出控制流执行器类
+export {
+  ConditionExecutor,
+  ParallelExecutor,
+  LoopExecutor,
+  SubflowExecutor,
 };
 
 // 导出工厂函数
@@ -71,6 +92,10 @@ export {
   createFileExecutor,
   createHttpExecutor,
   createNotifyExecutor,
+  createConditionExecutor,
+  createParallelExecutor,
+  createLoopExecutor,
+  createSubflowExecutor,
 };
 
 // 导出全局注册表
@@ -82,10 +107,16 @@ export default {
   hasExecutor,
   getRegisteredTypes,
   globalRegistry,
+  // 基础执行器
   ShellExecutor,
   TransformExecutor,
   FileExecutor,
   HttpExecutor,
   NotifyExecutor,
+  // 控制流执行器
+  ConditionExecutor,
+  ParallelExecutor,
+  LoopExecutor,
+  SubflowExecutor,
 };
 

@@ -58,6 +58,7 @@ export {
   getExecutor,
   hasExecutor,
   getRegisteredTypes,
+  // 基础执行器
   ShellExecutor,
   TransformExecutor,
   FileExecutor,
@@ -68,6 +69,15 @@ export {
   createFileExecutor,
   createHttpExecutor,
   createNotifyExecutor,
+  // 控制流执行器
+  ConditionExecutor,
+  ParallelExecutor,
+  LoopExecutor,
+  SubflowExecutor,
+  createConditionExecutor,
+  createParallelExecutor,
+  createLoopExecutor,
+  createSubflowExecutor,
 } from './executors/index.mjs';
 
 /**

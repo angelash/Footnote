@@ -42,7 +42,7 @@ export {
   createContextFromFlow,
 } from './context.mjs';
 
-// Executor - 节点执行器
+// Executor Base - 节点执行器基类
 export {
   NodeExecutor,
   ExecutorRegistry,
@@ -51,6 +51,24 @@ export {
   successResult,
   failureResult,
 } from './executor-base.mjs';
+
+// Executors - 内置执行器
+export {
+  registerBuiltinExecutors,
+  getExecutor,
+  hasExecutor,
+  getRegisteredTypes,
+  ShellExecutor,
+  TransformExecutor,
+  FileExecutor,
+  HttpExecutor,
+  NotifyExecutor,
+  createShellExecutor,
+  createTransformExecutor,
+  createFileExecutor,
+  createHttpExecutor,
+  createNotifyExecutor,
+} from './executors/index.mjs';
 
 /**
  * v2 版本号

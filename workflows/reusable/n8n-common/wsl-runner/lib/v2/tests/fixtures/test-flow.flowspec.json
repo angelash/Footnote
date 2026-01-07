@@ -1,0 +1,28 @@
+{
+  "id": "test-flow",
+  "name": "Test Flow",
+  "version": "1.0.0",
+  "description": "A simple test flow for v2 integration testing",
+  "inputs": {
+    "message": {
+      "type": "string",
+      "default": "Hello from v2!"
+    }
+  },
+  "nodes": [
+    {
+      "id": "step1",
+      "type": "transform",
+      "name": "Generate Message",
+      "expression": "({ greeting: inputs.message, timestamp: new Date().toISOString() })",
+      "on_success": "step2"
+    },
+    {
+      "id": "step2",
+      "type": "transform",
+      "name": "Process Message",
+      "expression": "({ result: nodes.step1.output.greeting.toUpperCase(), time: nodes.step1.output.timestamp })"
+    }
+  ]
+}
+

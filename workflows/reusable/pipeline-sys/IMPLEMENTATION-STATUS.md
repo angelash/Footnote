@@ -25,9 +25,10 @@
 | **Phase 2** | Shell/Transform/File/HTTP/Notify 执行器 | ✅ 完成 | 28 通过 |
 | **Phase 3** | Condition/Parallel/Loop/Subflow 控制流 | ✅ 完成 | 26 通过 |
 | **Phase 4** | FlowRunner 流程调度器 | ✅ 完成 | 20 通过 |
-| Phase 5 | 与 v1 集成 | 📝 文档完成 | - |
+| **Phase 5** | 文档 | ✅ 完成 | - |
+| **v2.1** | WSL Runner 集成 | ✅ 完成 | 10 通过 |
 
-**v2 总测试：187 个单元测试全部通过 ✅**
+**v2 总测试：197 个单元测试全部通过 ✅**
 
 ---
 
@@ -203,6 +204,44 @@ console.log(result.output);   // { echo: { stdout: 'hello\n', ... } }
 
 ---
 
+## 🔌 v2.1 API 端点
+
+### WSL Runner (port 3210)
+
+| 端点 | 方法 | 描述 |
+|------|------|------|
+| `/v2/run` | POST | 执行配置化流程 |
+| `/v2/run/status` | GET | 查询运行状态 |
+| `/v2/run/cancel` | POST | 取消运行 |
+
+### `/v2/run` 请求示例
+
+```json
+{
+  "flowspec": {
+    "id": "my-flow",
+    "name": "My Flow",
+    "nodes": [
+      { "id": "step1", "type": "transform", "expression": "42" }
+    ]
+  },
+  "inputs": {},
+  "async": false
+}
+```
+
+或从文件加载：
+
+```json
+{
+  "flowspec": "workflows/flows/my-flow.flowspec.json",
+  "inputs": { "projectRoot": "/path/to/project" },
+  "async": true
+}
+```
+
+---
+
 ## 📈 测试覆盖
 
 | 模块 | 测试数 | 状态 |
@@ -214,7 +253,8 @@ console.log(result.output);   // { echo: { stdout: 'hello\n', ... } }
 | executors | 28 | ✅ |
 | control-flow | 26 | ✅ |
 | flow-runner | 20 | ✅ |
-| **总计** | **187** | **✅ 全部通过** |
+| e2e-runner | 10 | ✅ |
+| **总计** | **197** | **✅ 全部通过** |
 
 运行测试：
 ```bash
@@ -239,8 +279,12 @@ npx vitest run --config vitest.config.mjs
 - 流程调度器
 - 187 个单元测试
 
-### v2.1 待完成
-- [ ] WSL Runner 集成 v2 引擎
+### v2.1 ✅ 已完成
+- [x] WSL Runner 集成 v2 引擎
+- [x] `/v2/run` API 端点
+- [x] E2E 测试
+
+### v2.2 待完成
 - [ ] 流程文件热加载
 - [ ] 流程版本管理
 - [ ] 流程编辑器 UI
@@ -252,5 +296,5 @@ npx vitest run --config vitest.config.mjs
 
 ---
 
-*报告生成：2026-01-06*
-*版本：v1.0.0 / v2.0.0*
+*报告生成：2026-01-07*
+*版本：v1.0.0 / v2.1.0*

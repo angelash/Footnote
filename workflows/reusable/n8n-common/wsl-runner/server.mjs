@@ -58,6 +58,9 @@ import {
   getNodeTimeout,
 } from "./lib/index.mjs";
 
+// v2 引擎
+import { createFlowRunner, RunStatus } from "./lib/v2/index.mjs";
+
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || "3210");
 
@@ -507,6 +510,117 @@ async function handleComposeTaskpack(body) {
   await fs.writeFile(absPath, content, "utf8");
 
   return { ok: true, task_id: taskId, task_pack_path: relPath };
+}
+
+// ============================================
+// v2 Handler：配置化流程执行
+// ============================================
+
+/**
+ * 处理 v2 流程执行请求
+ * 
+ * @param {Object} body 请求体
+ * @param {string} body.flowspec - FlowSpec JSON 对象或文件路径
+ * @param {Object} [body.inputs] - 流程输入参数
+ * @param {string} [body.run_id] - 自定义运行 ID
+ * @param {string} [body.project_root] - 项目根目录
+ * @param {boolean} [body.async] - 是否异步执行
+ * @returns {Promise<Object>} 执行结果
+ */
+async function handleV2Run(body) {
+  const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
+  const flowspec = body.flowspec;
+  const inputs = body.inputs || {};
+  const customRunId = body.run_id || body.runId;
+  const isAsync = body.async === true;
+
+  if (!flowspec) {
+    return { ok: false, error: "flowspec is required (JSON object or file path)" };
+  }
+
+  // 生成或使用自定义 run_id
+  const runId = customRunId || makeRunId();
+  const runRelDir = path.posix.join(AUTOMATION_RUNS_DIR, runId);
+  const runAbsDir = safeResolveUnderProject(projectRoot, runRelDir);
+
+  // 确保运行目录存在
+  await ensureDir(runAbsDir);
+
+  // 解析 FlowSpec
+  let flowSpecObj;
+  if (typeof flowspec === "string") {
+    // 从文件路径加载
+    const flowPath = safeResolveUnderProject(projectRoot, flowspec);
+    try {
+      const content = await fs.readFile(flowPath, "utf8");
+      flowSpecObj = JSON.parse(content);
+    } catch (e) {
+      return { ok: false, error: `Failed to load flowspec: ${e.message}` };
+    }
+  } else {
+    flowSpecObj = flowspec;
+  }
+
+  // 创建工件写入器
+  const artifactWriter = async (name, data, options = {}) => {
+    const absPath = path.posix.join(runAbsDir, name);
+    if (options.raw) {
+      await writeText(absPath, data);
+    } else {
+      await writeJson(absPath, data);
+    }
+  };
+
+  // 创建 FlowRunner
+  const runner = createFlowRunner({
+    runId,
+    runDir: runAbsDir,
+    artifactWriter,
+    emitEvents: true,
+  });
+
+  // 执行函数
+  const executeFlow = async () => {
+    try {
+      const result = await runner.run(flowSpecObj, inputs);
+      return {
+        ok: result.success,
+        run_id: runId,
+        status: result.status,
+        flow_id: result.flowId,
+        duration_ms: result.duration,
+        error: result.error,
+        output: result.output,
+        logs_dir: runRelDir,
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        run_id: runId,
+        error: e.message,
+        logs_dir: runRelDir,
+      };
+    }
+  };
+
+  // 同步或异步执行
+  if (isAsync) {
+    // 异步执行：立即返回，后台运行
+    executeFlow().catch(e => {
+      console.error(`[v2/run] async error for ${runId}:`, e);
+    });
+
+    return {
+      ok: true,
+      run_id: runId,
+      flow_id: flowSpecObj.id,
+      logs_dir: runRelDir,
+      started_async: true,
+    };
+  } else {
+    // 同步执行：等待完成
+    return await executeFlow();
+  }
 }
 
 async function handleFixedFlow(body) {
@@ -1006,6 +1120,54 @@ const server = http.createServer(async (req, res) => {
       try {
         await writeRetryRequest(projectRoot, runId, nodeId, body.requested_by || 'api');
         return json(res, 200, { ok: true, run_id: runId, node_id: nodeId, message: "retry_requested" });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // ============================================
+    // v2 端点：配置化流程执行
+    // ============================================
+
+    // POST /v2/run - 执行 FlowSpec 流程
+    if (req.method === "POST" && req.url === "/v2/run") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run(body);
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // GET /v2/run/status - 查询 v2 运行状态
+    if (req.method === "GET" && req.url?.startsWith("/v2/run/status")) {
+      const q = getQueryParams(req.url);
+      const projectRoot = q.project_root || q.projectRoot || DEFAULT_PROJECT_ROOT;
+      const runId = q.run_id || q.runId;
+      if (!runId) return json(res, 400, { ok: false, error: "run_id is required" });
+
+      const runRelDir = path.posix.join(AUTOMATION_RUNS_DIR, runId);
+      const runAbsDir = safeResolveUnderProject(projectRoot, runRelDir);
+      const statusAbs = path.posix.join(runAbsDir, "status.json");
+      try {
+        const text = await fs.readFile(statusAbs, "utf8");
+        return json(res, 200, { ok: true, run_id: runId, status: JSON.parse(text) });
+      } catch (e) {
+        return json(res, 404, { ok: false, error: "status_not_found", run_id: runId });
+      }
+    }
+
+    // POST /v2/run/cancel - 取消 v2 运行
+    if (req.method === "POST" && req.url === "/v2/run/cancel") {
+      const body = await readJsonBody(req);
+      const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
+      const runId = body.run_id || body.runId;
+      if (!runId) return json(res, 400, { ok: false, error: "run_id is required" });
+
+      try {
+        await writeCancelRequest(projectRoot, runId, body.requested_by || 'api');
+        return json(res, 200, { ok: true, run_id: runId, message: "cancel_requested" });
       } catch (e) {
         return json(res, 500, { ok: false, error: String(e?.message || e) });
       }

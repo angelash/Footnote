@@ -68,13 +68,13 @@
 
 ```mermaid
 flowchart LR
-  U[你 / 团队<br/>需求 / 验收] -->|编写/选择| TP[Task Pack<br/>design/ai-native/03_taskpacks/*.md]
+  U["你 / 团队<br/>需求 / 验收"] -->|编写/选择| TP["Task Pack<br/>design/ai-native/03_taskpacks/*.md"]
 
-  subgraph WSL[WSL 执行域（推荐）]
-    N8N[n8n-secondary<br/>5680]
-    REPO[Repo 工作副本<br/>/home/.../Footnote]
-    CA[cursor-agent<br/>写代码 / 写文档]
-    V[Validators<br/>npm run validate / typecheck / test]
+  subgraph WSL["WSL 执行域（推荐）"]
+    N8N["n8n-secondary<br/>5680"]
+    REPO["Repo 工作副本<br/>/home/.../Footnote"]
+    CA["cursor-agent<br/>写代码 / 写文档"]
+    V["Validators<br/>npm run validate / typecheck / test"]
   end
 
   TP -->|Webhook/Manual| N8N
@@ -84,13 +84,13 @@ flowchart LR
   N8N -->|run| V
   V -->|PASS/FAIL| N8N
 
-  N8N --> R[Execution Receipt<br/>回执 / 日志]
-  N8N -->|可选| NOTI[完成通知接口]
+  N8N --> R["Execution Receipt<br/>回执 / 日志"]
+  N8N -->|可选| NOTI["完成通知接口"]
 
-  subgraph Windows[Windows 扩展域（可选）]
-    N8NP[n8n-primary<br/>5678 可选]
-    MR[mcp-runner<br/>无 cursor-agent<br/>驱动 Browser MCP]
-    MCP[Browser / Chrome MCP<br/>3000/mcp]
+  subgraph Windows["Windows 扩展域（可选）"]
+    N8NP["n8n-primary<br/>5678（可选）"]
+    MR["mcp-runner<br/>无 cursor-agent<br/>驱动 Browser MCP"]
+    MCP["Browser / Chrome MCP<br/>3000/mcp"]
   end
 
   N8NP -.->|可选分发| N8N
@@ -110,15 +110,15 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A[触发执行<br/>Webhook / Schedule] --> B[落盘 run_id + intake<br/>workflows/project/logs/automation_runs]
-  B --> C[构建最小上下文<br/>只读 Allowed Inputs<br/>只写 Deliverables]
-  C --> D[调用 cursor-agent<br/>选模型 / 角色]
-  D --> E[生成变更<br/>写入 Deliverables]
-  E --> F[运行校验器<br/>validate / typecheck / test]
+  A["触发执行<br/>Webhook / Schedule"] --> B["落盘 run_id + intake<br/>workflows/project/logs/automation_runs"]
+  B --> C["构建最小上下文<br/>只读 Allowed Inputs<br/>只写 Deliverables"]
+  C --> D["调用 cursor-agent<br/>选模型 / 角色"]
+  D --> E["生成变更<br/>写入 Deliverables"]
+  E --> F["运行校验器<br/>validate / typecheck / test"]
   F --> G{校验通过?}
-  G -- 否 --> H[FAIL<br/>输出错误摘要 / 回执<br/>标记返工]
-  G -- 是 --> I[PASS<br/>进入 git 阶段<br/>commit/push]
-  I --> J[通知 / 记录（强制）]
+  G -- 否 --> H["FAIL<br/>输出错误摘要 / 回执<br/>标记返工"]
+  G -- 是 --> I["PASS<br/>进入 git 阶段<br/>commit/push"]
+  I --> J["通知 / 记录（强制）"]
   H --> J
 ```
 
@@ -128,7 +128,7 @@ flowchart TD
 sequenceDiagram
   autonumber
   participant Client as 调用方/你
-  participant N8NP as n8n-primary :5678 (可选)
+  participant N8NP as n8n-primary :5678（可选）
   participant N8NS as n8n-secondary :5680
   participant Repo as WSL Repo
   participant CA as cursor-agent

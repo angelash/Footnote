@@ -483,40 +483,40 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    INTAKE[pm-intake<br/>入口]
+    INTAKE["pm-intake<br/>入口"]
     
-    INTAKE --> DECOMPOSE[lead-decompose<br/>通用组长拆解]
-    INTAKE --> DIRECT[直接执行岗]
-    INTAKE --> WHITEBOX[白盒快速通道]
+    INTAKE --> DECOMPOSE["lead-decompose<br/>通用组长拆解"]
+    INTAKE --> DIRECT["直接执行岗"]
+    INTAKE --> WHITEBOX["白盒快速通道"]
     
-    subgraph 组长拆解
-        DECOMPOSE --> LEVEL_LEAD[l2-level-lead<br/>关卡组长]
-        DECOMPOSE --> ART_LEAD[l2-art-lead<br/>美术组长]
+    subgraph LEAD_GROUP["组长拆解"]
+        DECOMPOSE --> LEVEL_LEAD["l2-level-lead<br/>关卡组长"]
+        DECOMPOSE --> ART_LEAD["l2-art-lead<br/>美术组长"]
     end
     
-    subgraph 策划执行
-        LEVEL_LEAD --> LEVEL_DSN[l3-level-designer<br/>场景策划]
-        LEVEL_LEAD --> SCRIPTER[l3-scripter<br/>脚本员]
+    subgraph PLAN_EXEC["策划执行"]
+        LEVEL_LEAD --> LEVEL_DSN["l3-level-designer<br/>场景策划"]
+        LEVEL_LEAD --> SCRIPTER["l3-scripter<br/>脚本员"]
     end
     
-    subgraph 美术执行
-        ART_LEAD --> ENV_ARTIST[l3-environment-artist<br/>场景美术]
-        ART_LEAD --> CHAR_ARTIST[l3-character-artist<br/>角色美术]
-        ART_LEAD --> ANIMATOR[l3-animator<br/>动画]
-        ART_LEAD --> VFX_ARTIST[l3-vfx-artist<br/>特效]
+    subgraph ART_EXEC["美术执行"]
+        ART_LEAD --> ENV_ARTIST["l3-environment-artist<br/>场景美术"]
+        ART_LEAD --> CHAR_ARTIST["l3-character-artist<br/>角色美术"]
+        ART_LEAD --> ANIMATOR["l3-animator<br/>动画"]
+        ART_LEAD --> VFX_ARTIST["l3-vfx-artist<br/>特效"]
     end
     
-    subgraph 直接执行
-        DIRECT --> EXECUTE[l3-execute<br/>程序员]
-        DIRECT --> UI_ENG[l3-ui-engineer<br/>UI程序员]
-        DIRECT --> WRITER[l3-writer<br/>写手]
-        DIRECT --> TESTER[l3-tester<br/>测试员]
+    subgraph DIRECT_EXEC["直接执行"]
+        DIRECT --> EXECUTE["l3-execute<br/>程序员"]
+        DIRECT --> UI_ENG["l3-ui-engineer<br/>UI程序员"]
+        DIRECT --> WRITER["l3-writer<br/>写手"]
+        DIRECT --> TESTER["l3-tester<br/>测试员"]
     end
     
-    subgraph 白盒占位
-        WHITEBOX --> WB_SCENE[whitebox-scene<br/>白盒场景]
-        WHITEBOX --> WB_CHAR[whitebox-character<br/>白盒角色]
-        WHITEBOX --> WB_OBJ[whitebox-object<br/>白盒物件]
+    subgraph WHITEBOX_GROUP["白盒占位"]
+        WHITEBOX --> WB_SCENE["whitebox-scene<br/>白盒场景"]
+        WHITEBOX --> WB_CHAR["whitebox-character<br/>白盒角色"]
+        WHITEBOX --> WB_OBJ["whitebox-object<br/>白盒物件"]
     end
     
     %% 白盒到正式资源的替换链
@@ -526,39 +526,39 @@ flowchart TB
     
     style INTAKE fill:#00fff0,stroke:#333,color:#000
     style WHITEBOX fill:#ffd93d,stroke:#333,color:#000
-    style 白盒占位 fill:#2d2818,stroke:#ffd93d
+    style WHITEBOX_GROUP fill:#2d2818,stroke:#ffd93d
 ```
 
 ### 4.2 详细依赖（树状图）
 
 ```mermaid
 flowchart LR
-    subgraph 主流程
-        PM[pm-intake] --> LD[lead-decompose]
-        PM --> L3E[l3-execute]
-        PM --> L3U[l3-ui-engineer]
-        PM --> L3S[l3-scripter]
-        PM --> L3W[l3-writer]
-        PM --> L3T[l3-tester]
+    subgraph MAIN_FLOW["主流程"]
+        PM["pm-intake"] --> LD["lead-decompose"]
+        PM --> L3E["l3-execute"]
+        PM --> L3U["l3-ui-engineer"]
+        PM --> L3S["l3-scripter"]
+        PM --> L3W["l3-writer"]
+        PM --> L3T["l3-tester"]
     end
     
-    subgraph 组长拆解
-        LD --> LL[l2-level-lead]
-        LD --> AL[l2-art-lead]
+    subgraph LEAD_DECOMPOSE["组长拆解"]
+        LD --> LL["l2-level-lead"]
+        LD --> AL["l2-art-lead"]
         
-        LL --> LVL[l3-level-designer]
-        LL --> SCR[l3-scripter]
+        LL --> LVL["l3-level-designer"]
+        LL --> SCR["l3-scripter"]
         
-        AL --> ENV[l3-environment-artist]
-        AL --> CHR[l3-character-artist]
-        AL --> ANI[l3-animator]
-        AL --> VFX[l3-vfx-artist]
+        AL --> ENV["l3-environment-artist"]
+        AL --> CHR["l3-character-artist"]
+        AL --> ANI["l3-animator"]
+        AL --> VFX["l3-vfx-artist"]
     end
     
-    subgraph 白盒快速通道
-        WB[whitebox-*] --> WBS[whitebox-scene]
-        WB --> WBC[whitebox-character]
-        WB --> WBO[whitebox-object]
+    subgraph WHITEBOX_FAST["白盒快速通道"]
+        WB["whitebox-*"] --> WBS["whitebox-scene"]
+        WB --> WBC["whitebox-character"]
+        WB --> WBO["whitebox-object"]
     end
     
     LVL -->|触发白盒| WBS

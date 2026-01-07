@@ -120,9 +120,16 @@ function lintGithubMermaid(diagram) {
   }
 
   // 2) label/文本里出现尖括号 <...>（常见于 <run_id>），GitHub 解析/渲染容易出问题
-  const angle = /<[^>\r\n]+>/;
-  if (angle.test(diagram)) {
-    issues.push('检测到尖括号 <...>：建议改成 {run_id} 或 run_id，避免 GitHub Mermaid 解析异常');
+  //    注意：<br/> 是项目推荐写法，属于允许列表，不应报警
+  const angleRe = /<[^>\r\n]+>/g;
+  const angleMatches = diagram.match(angleRe) || [];
+  const badAngles = angleMatches.filter((m) => {
+    const t = m.trim().toLowerCase();
+    return t !== '<br/>' && t !== '<br />' && t !== '<br>';
+  });
+  if (badAngles.length > 0) {
+    const examples = badAngles.slice(0, 3).join(', ');
+    issues.push(`检测到尖括号 <...>（例如 ${examples}）：建议改成 {run_id} 或 run_id，避免 GitHub Mermaid 解析异常`);
   }
 
   // 3) 对于 flowchart/graph，建议把含标点/空格的 label 统一改成引号包裹
@@ -172,6 +179,7 @@ async function strictRender(diagram) {
 
 /** @type {Array<{file: string; startLine: number; message: string; kind: 'error' | 'warn'}>} */
 const findings = [];
+let mermaidBlocksScanned = 0;
 
 for (const target of scanTargets) {
   const mdFiles = await walkMarkdown(target);
@@ -185,6 +193,7 @@ for (const target of scanTargets) {
 
     const blocks = extractMermaidBlocks(content);
     for (const b of blocks) {
+      mermaidBlocksScanned += 1;
       const issues = lintGithubMermaid(b.diagram);
       for (const issue of issues) {
         findings.push({ file, startLine: b.startLine, message: issue, kind: 'warn' });
@@ -208,8 +217,12 @@ for (const target of scanTargets) {
 const errors = findings.filter((f) => f.kind === 'error');
 const warns = findings.filter((f) => f.kind === 'warn');
 
-if (findings.length === 0) {
-  console.log('[validate-mermaid] OK：未发现 Mermaid code fence');
+if (errors.length === 0 && warns.length === 0) {
+  if (mermaidBlocksScanned === 0) {
+    console.log('[validate-mermaid] OK：未发现 Mermaid code fence');
+  } else {
+    console.log(`[validate-mermaid] OK：扫描 ${mermaidBlocksScanned} 个 Mermaid code fence，0 个错误，0 个警告`);
+  }
   process.exit(0);
 }
 
@@ -220,11 +233,11 @@ for (const f of findings) {
 }
 
 if (errors.length > 0) {
-  console.error(`[validate-mermaid] 失败：${errors.length} 个错误，${warns.length} 个警告`);
+  console.error(`[validate-mermaid] 失败：扫描 ${mermaidBlocksScanned} 个 Mermaid code fence，${errors.length} 个错误，${warns.length} 个警告`);
   process.exit(1);
 }
 
-console.log(`[validate-mermaid] 完成：0 个错误，${warns.length} 个警告`);
+console.log(`[validate-mermaid] 完成：扫描 ${mermaidBlocksScanned} 个 Mermaid code fence，0 个错误，${warns.length} 个警告`);
 process.exit(0);
 
 

@@ -2,19 +2,22 @@
 
 Pipeline-Sys 是一个自建的流程执行可视化系统，提供行为树展示和执行控制能力。
 
+## 文档索引（最新）
+
+- `WORKFLOW-OVERVIEW.md`：**粗/中/低粒度**端到端工作流总览（含 Mermaid 图与示例）
+- `v2-design/ROLE-FLOWS-DESIGN.md`：多岗位流程设计（含白盒→正式资产两阶段）
+- `v2-design/examples/`：可直接执行的 FlowSpec 定义（WSL Runner 通过端点加载执行）
+- `IMPLEMENTATION-STATUS.md`：实现状态（v1/v2 集成与迁移进度）
+- `ANALYSIS-REPORT.md`：完整分析报告（架构/模块/API/运行语义）
+
 ## 架构概览
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│    n8n      │────▶│  WSL Runner │────▶│   Console   │
-│  (Webhook)  │     │  (执行器)   │     │  (看板)     │
-└─────────────┘     └─────────────┘     └─────────────┘
-                           │                    │
-                           ▼                    ▼
-                    ┌─────────────┐     ┌─────────────┐
-                    │  File System│     │     UI      │
-                    │  (工件落盘)  │     │ (React Flow)│
-                    └─────────────┘     └─────────────┘
+```mermaid
+flowchart LR
+    A[n8n<br/>(Webhook，可选入口)] -->|HTTP| B[WSL Runner<br/>(执行器，:3210)]
+    B -->|工件落盘| C[(File System<br/>automation_runs/<run_id>)]
+    C --> D[Console<br/>(Fastify + SSE，:3230)]
+    D --> E[UI<br/>(React + ReactFlow，:3231)]
 ```
 
 ## 目录结构

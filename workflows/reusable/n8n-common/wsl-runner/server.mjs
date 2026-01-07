@@ -623,6 +623,15 @@ async function handleV2Run(body) {
   }
 }
 
+// FlowSpec 路径（相对于项目根目录）
+const FIXED_FLOW_SPEC_PATH = "workflows/reusable/pipeline-sys/v2-design/examples/fixed-flow.flowspec.json";
+
+/**
+ * 处理 /fixed-flow 请求 - 使用 v2 引擎执行配置化流程
+ * 
+ * 这是 v1 硬编码流程的配置化替代版本。
+ * 内部调用 v2 引擎 + fixed-flow.flowspec.json
+ */
 async function handleFixedFlow(body) {
   const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
   const taskId = body.task_id || body.taskId;
@@ -631,413 +640,59 @@ async function handleFixedFlow(body) {
   const taskType = body.task_type || body.taskType || "code";
   const complexity = body.complexity || "normal";
   const modelOverride = body.model_override || body.modelOverride || "auto";
-
-  const auto = body.auto !== false;
-  const resumeFromStage = Number(body.resume_from_stage ?? body.resumeFromStage ?? 0);
+  const taskPackPath = body.task_pack_path || body.taskPackPath || "";
+  const outcome = body.outcome || "";
   const runId = body.run_id || body.runId || makeRunId();
   const asyncMode = body.async !== false;
 
   if (!taskId) throw new Error("task_id is required");
 
-  const runRelDir = path.posix.join(AUTOMATION_RUNS_DIR, runId);
-  const runAbsDir = safeResolveUnderProject(projectRoot, runRelDir);
-
-  const statusAbs = path.posix.join(runAbsDir, "status.json");
-  const intakeAbs = path.posix.join(runAbsDir, "00_intake.json");
-  const preflightAbs = path.posix.join(runAbsDir, "01_preflight.json");
-  const planAbs = path.posix.join(runAbsDir, "02_plan.json");
-  const taskpackAbs = path.posix.join(runAbsDir, "03_taskpack.md");
-  const executeAbs = path.posix.join(runAbsDir, "04_execute.json");
-  const validateAbs = path.posix.join(runAbsDir, "05_validate.json");
-  const gitAbs = path.posix.join(runAbsDir, "06_git.json");
-  const notifyAbs = path.posix.join(runAbsDir, "07_notify.json");
-
-  const startedAt = Date.now();
-  await ensureDir(runAbsDir);
-
-  // v1 新增：初始化事件序列号
-  resetSeq(runId);
-
-  // v1 新增：生成 graph.json（行为树结构）
-  await writeGraph(projectRoot, runId);
-
-  // v1 新增：初始化 node_runs.json（节点状态快照）
-  await writeInitialNodeRuns(projectRoot, runId);
-
-  // v1 新增：发送 RUN_STARTED 事件
-  await emitRunStarted(projectRoot, runId, taskId, title);
-
-  // v1 新增：更新 stage.intake 节点为 RUNNING
-  await setNodeRunning(projectRoot, runId, 'stage.intake', 1);
-  await emitNodeStarted(projectRoot, runId, 'stage.intake', 1, getNodeTimeout('stage.intake'));
-
-  await writeJson(intakeAbs, {
-    task_id: taskId,
-    title,
-    role,
-    task_type: taskType,
-    complexity,
-    model_override: modelOverride,
-    auto,
-    resume_from_stage: resumeFromStage,
+  // 调用 v2 引擎执行 fixed-flow.flowspec.json
+  const v2Result = await handleV2Run({
+    flowspec: FIXED_FLOW_SPEC_PATH,
+    inputs: {
+      task_id: taskId,
+      title,
+      role,
+      task_type: taskType,
+      complexity,
+      model_override: modelOverride,
+      task_pack_path: taskPackPath,
+      project_root: projectRoot,
+      outcome,
+    },
     run_id: runId,
     project_root: projectRoot,
-    received_at: nowIso(),
-    raw_body: body,
+    async: asyncMode,
   });
 
-  // v1 新增：完成 stage.intake 节点
-  await setNodeFinished(projectRoot, runId, 'stage.intake', NodeStatus.SUCCESS, Date.now() - startedAt, null);
-  await emitNodeFinished(projectRoot, runId, 'stage.intake', NodeStatus.SUCCESS, 0, Date.now() - startedAt, null);
-
-  const statusBase = {
-    run_id: runId,
+  // 转换为 v1 兼容的响应格式
+  return {
+    ok: v2Result.ok,
+    run_id: v2Result.run_id,
     task_id: taskId,
-    stage: 0,
-    attempt: 1,
-    ok: false,
-    started_at: nowIso(),
-    updated_at: nowIso(),
-    repo: { root: projectRoot, branch: "", head: "" },
+    stage: v2Result.ok ? 99 : 0,
+    elapsed_ms: v2Result.duration_ms,
+    logs_dir: v2Result.logs_dir,
+    started_async: v2Result.started_async,
+    error: v2Result.error,
+    // v2 扩展字段
+    v2_status: v2Result.status,
+    v2_output: v2Result.output,
   };
+}
 
-  const runFlow = async () => {
-    // v1 新增：获取锁
-    const lockResult = await acquireLock(projectRoot, runId);
-    if (!lockResult.ok) {
-      await setNodeFinished(projectRoot, runId, 'stage.preflight', NodeStatus.FAILED, 0, lockResult.error);
-      await emitRunFinished(projectRoot, runId, false, Date.now() - startedAt, 'stage.preflight', lockResult.error);
-      return { ok: false, run_id: runId, error: lockResult.error, occupied_by: lockResult.occupiedBy };
-    }
+// ============================================
+// [已删除] handleFixedFlowLegacy
+// ============================================
+// v1 硬编码流程已被配置化版本替代。
+// 原代码约 400 行，已删除以简化维护。
+// 如需查看历史版本，请参考 git log。
+// ============================================
 
-    try {
-      // Stage 01: preflight
-      if (resumeFromStage <= 1) {
-        const preflightStart = Date.now();
-        
-        // v1 新增：更新 stage.preflight 节点为 RUNNING
-        await setNodeRunning(projectRoot, runId, 'stage.preflight', 1);
-        await emitNodeStarted(projectRoot, runId, 'stage.preflight', 1, getNodeTimeout('stage.preflight'));
-        
-        await writeJson(statusAbs, { ...statusBase, stage: 1, updated_at: nowIso() });
-        const pf = await gitPreflight(projectRoot);
-        await writeJson(preflightAbs, pf);
-        
-        if (!pf.ok) {
-          // v1 新增：标记 preflight 失败
-          await setNodeFinished(projectRoot, runId, 'stage.preflight', NodeStatus.FAILED, Date.now() - preflightStart, pf.reason);
-          await emitNodeFinished(projectRoot, runId, 'stage.preflight', NodeStatus.FAILED, 1, Date.now() - preflightStart, pf.reason);
-          
-          await writeJson(statusAbs, { ...statusBase, stage: 1, ok: false, error: pf.reason || "preflight_failed", updated_at: nowIso() });
-          const notifyOut = await sendNotify({
-            ok: false,
-            taskId,
-            title,
-            runId,
-            stage: 1,
-            projectRoot,
-            logRelDir: runRelDir,
-            head: statusBase.repo.head,
-          });
-          await writeJson(notifyAbs, notifyOut);
-          
-          // v1 新增：发送运行结束事件
-          await emitRunFinished(projectRoot, runId, false, Date.now() - startedAt, 'stage.preflight', pf.reason);
-          return { ok: false, run_id: runId, stage: 1, error: pf.reason || "preflight_failed" };
-        }
-        
-        statusBase.repo.branch = pf.branch || "";
-        statusBase.repo.head = pf.head || "";
-        
-        // v1 新增：标记 preflight 成功
-        await setNodeFinished(projectRoot, runId, 'stage.preflight', NodeStatus.SUCCESS, Date.now() - preflightStart, null);
-        await emitNodeFinished(projectRoot, runId, 'stage.preflight', NodeStatus.SUCCESS, 0, Date.now() - preflightStart, null);
-      }
-
-    // Stage 02: plan
-    if (resumeFromStage <= 2) {
-      const planStart = Date.now();
-      
-      // v1 新增：更新 execute.plan 节点为 RUNNING
-      await setNodeRunning(projectRoot, runId, 'execute.plan', 1);
-      await emitNodeStarted(projectRoot, runId, 'execute.plan', 1, getNodeTimeout('execute.plan'));
-      
-      await writeJson(statusAbs, { ...statusBase, stage: 2, updated_at: nowIso() });
-      await writeJson(planAbs, {
-        ok: true,
-        planned_at: nowIso(),
-        role,
-        task_type: taskType,
-        complexity,
-        model_override: modelOverride,
-        runner: "wsl-runner",
-      });
-      
-      // v1 新增：标记 plan 成功
-      await setNodeFinished(projectRoot, runId, 'execute.plan', NodeStatus.SUCCESS, Date.now() - planStart, null);
-      await emitNodeFinished(projectRoot, runId, 'execute.plan', NodeStatus.SUCCESS, 0, Date.now() - planStart, null);
-    }
-
-    // Stage 03: taskpack (属于 plan 阶段的子任务，不单独作为节点)
-    let taskPackPath = body.task_pack_path || body.taskPackPath || "";
-    if (resumeFromStage <= 3) {
-      await writeJson(statusAbs, { ...statusBase, stage: 3, updated_at: nowIso() });
-      if (!taskPackPath) {
-        const composed = await handleComposeTaskpack({
-          task_id: taskId,
-          title: title || "Generated TaskPack",
-          task_type: taskType,
-          complexity,
-          model_override: modelOverride,
-          execution_runtime: "wsl",
-          requires_mcp: false,
-          outcome: body.outcome || "",
-          project_root: projectRoot,
-        });
-        taskPackPath = composed.task_pack_path;
-      }
-      const abs = safeResolveUnderProject(projectRoot, taskPackPath);
-      const text = await fs.readFile(abs, "utf8");
-      await writeText(taskpackAbs, text);
-    }
-
-    // Stage 04: execute
-    let execOut = null;
-    if (resumeFromStage <= 4) {
-      const executeStart = Date.now();
-      
-      // v1 新增：更新 execute.edit 节点为 RUNNING
-      await setNodeRunning(projectRoot, runId, 'execute.edit', 1);
-      await emitNodeStarted(projectRoot, runId, 'execute.edit', 1, getNodeTimeout('execute.edit'));
-      
-      await writeJson(statusAbs, { ...statusBase, stage: 4, updated_at: nowIso() });
-      execOut = await handleExecuteTask({
-        project_root: projectRoot,
-        task_pack_path: taskPackPath,
-        run_id: runId,
-        role,
-        task_type: taskType,
-        complexity,
-        model_override: modelOverride,
-      });
-      await writeJson(executeAbs, execOut);
-      
-      // v1 新增：记录执行日志
-      if (execOut.agent?.stdout) {
-        await emitNodeLog(projectRoot, runId, 'execute.edit', 'stdout', execOut.agent.stdout.slice(0, 4000), null);
-      }
-      if (execOut.agent?.stderr) {
-        await emitNodeLog(projectRoot, runId, 'execute.edit', 'stderr', execOut.agent.stderr.slice(0, 4000), null);
-      }
-      
-      if (!execOut.ok) {
-        // v1 新增：标记 execute.edit 失败
-        await setNodeFinished(projectRoot, runId, 'execute.edit', NodeStatus.FAILED, Date.now() - executeStart, "execute_failed");
-        await emitNodeFinished(projectRoot, runId, 'execute.edit', NodeStatus.FAILED, execOut.agent?.code ?? 1, Date.now() - executeStart, "execute_failed");
-        
-        await writeJson(statusAbs, { ...statusBase, stage: 4, ok: false, error: "execute_failed", updated_at: nowIso() });
-        const notifyOut = await sendNotify({
-          ok: false,
-          taskId,
-          title,
-          runId,
-          stage: 4,
-          projectRoot,
-          logRelDir: runRelDir,
-          head: statusBase.repo.head,
-        });
-        await writeJson(notifyAbs, notifyOut);
-        
-        // v1 新增：发送运行结束事件
-        await emitRunFinished(projectRoot, runId, false, Date.now() - startedAt, 'execute.edit', "execute_failed");
-        return { ok: false, run_id: runId, stage: 4, error: "execute_failed", execute: execOut };
-      }
-      
-      // v1 新增：标记 execute.edit 成功
-      await setNodeFinished(projectRoot, runId, 'execute.edit', NodeStatus.SUCCESS, Date.now() - executeStart, null);
-      await emitNodeFinished(projectRoot, runId, 'execute.edit', NodeStatus.SUCCESS, 0, Date.now() - executeStart, null);
-    }
-
-    // Stage 05: validate (lint + test)
-    let validateOut = null;
-    if (resumeFromStage <= 5) {
-      // v1 新增：execute.lint 节点
-      const lintStart = Date.now();
-      await setNodeRunning(projectRoot, runId, 'execute.lint', 1);
-      await emitNodeStarted(projectRoot, runId, 'execute.lint', 1, getNodeTimeout('execute.lint'));
-      
-      await writeJson(statusAbs, { ...statusBase, stage: 5, updated_at: nowIso() });
-      const validateRes = await run("bash", ["-lc", "npm run validate --if-present"], { cwd: projectRoot, env: process.env });
-      validateOut = { ok: validateRes.code === 0, ...validateRes };
-      await writeJson(validateAbs, validateOut);
-      
-      // v1 新增：记录 lint 日志
-      if (validateRes.stdout) {
-        await emitNodeLog(projectRoot, runId, 'execute.lint', 'stdout', validateRes.stdout.slice(0, 4000), null);
-      }
-      if (validateRes.stderr) {
-        await emitNodeLog(projectRoot, runId, 'execute.lint', 'stderr', validateRes.stderr.slice(0, 4000), null);
-      }
-      
-      if (!validateOut.ok) {
-        // v1 新增：标记 lint 失败
-        await setNodeFinished(projectRoot, runId, 'execute.lint', NodeStatus.FAILED, Date.now() - lintStart, "validate_failed");
-        await emitNodeFinished(projectRoot, runId, 'execute.lint', NodeStatus.FAILED, validateRes.code, Date.now() - lintStart, "validate_failed");
-        
-        await writeJson(statusAbs, { ...statusBase, stage: 5, ok: false, error: "validate_failed", updated_at: nowIso() });
-        const notifyOut = await sendNotify({
-          ok: false,
-          taskId,
-          title,
-          runId,
-          stage: 5,
-          projectRoot,
-          logRelDir: runRelDir,
-          head: statusBase.repo.head,
-        });
-        await writeJson(notifyAbs, notifyOut);
-        
-        // v1 新增：发送运行结束事件
-        await emitRunFinished(projectRoot, runId, false, Date.now() - startedAt, 'execute.lint', "validate_failed");
-        return { ok: false, run_id: runId, stage: 5, error: "validate_failed", validate: validateOut };
-      }
-      
-      // v1 新增：标记 lint 成功
-      await setNodeFinished(projectRoot, runId, 'execute.lint', NodeStatus.SUCCESS, Date.now() - lintStart, null);
-      await emitNodeFinished(projectRoot, runId, 'execute.lint', NodeStatus.SUCCESS, 0, Date.now() - lintStart, null);
-      
-      // v1 新增：execute.test 节点（当前与 lint 合并，标记为成功）
-      await setNodeRunning(projectRoot, runId, 'execute.test', 1);
-      await emitNodeStarted(projectRoot, runId, 'execute.test', 1, getNodeTimeout('execute.test'));
-      await setNodeFinished(projectRoot, runId, 'execute.test', NodeStatus.SUCCESS, 0, null);
-      await emitNodeFinished(projectRoot, runId, 'execute.test', NodeStatus.SUCCESS, 0, 0, null);
-      
-      // v1 新增：execute.summary 节点
-      await setNodeRunning(projectRoot, runId, 'execute.summary', 1);
-      await emitNodeStarted(projectRoot, runId, 'execute.summary', 1, getNodeTimeout('execute.summary'));
-      await setNodeFinished(projectRoot, runId, 'execute.summary', NodeStatus.SUCCESS, 0, null);
-      await emitNodeFinished(projectRoot, runId, 'execute.summary', NodeStatus.SUCCESS, 0, 0, null);
-    }
-
-    // Stage 07: notify (pre-commit)
-    // NOTE: We intentionally notify BEFORE git commit to keep "only commit after stage=99".
-    // The notify log will be committed together with status stage=99.
-    let notifyOut = null;
-    if (resumeFromStage <= 7) {
-      const notifyStart = Date.now();
-      
-      // v1 新增：更新 stage.notify 节点为 RUNNING
-      await setNodeRunning(projectRoot, runId, 'stage.notify', 1);
-      await emitNodeStarted(projectRoot, runId, 'stage.notify', 1, getNodeTimeout('stage.notify'));
-      
-      await writeJson(statusAbs, { ...statusBase, stage: 7, updated_at: nowIso() });
-      notifyOut = await sendNotify({
-        ok: true,
-        taskId,
-        title,
-        runId,
-        stage: 7,
-        projectRoot,
-        logRelDir: runRelDir,
-        head: statusBase.repo.head,
-      });
-      await writeJson(notifyAbs, notifyOut);
-      
-      // v1 新增：标记 notify 成功
-      await setNodeFinished(projectRoot, runId, 'stage.notify', NodeStatus.SUCCESS, Date.now() - notifyStart, null);
-      await emitNodeFinished(projectRoot, runId, 'stage.notify', NodeStatus.SUCCESS, 0, Date.now() - notifyStart, null);
-    }
-
-    // Stage 99: done
-    const doneStart = Date.now();
-    
-    // v1 新增：更新 stage.done 节点为 RUNNING
-    await setNodeRunning(projectRoot, runId, 'stage.done', 1);
-    await emitNodeStarted(projectRoot, runId, 'stage.done', 1, getNodeTimeout('stage.done'));
-    
-    await writeJson(statusAbs, { ...statusBase, stage: 99, ok: true, updated_at: nowIso() });
-    
-    // v1 新增：标记 done 成功
-    await setNodeFinished(projectRoot, runId, 'stage.done', NodeStatus.SUCCESS, Date.now() - doneStart, null);
-    await emitNodeFinished(projectRoot, runId, 'stage.done', NodeStatus.SUCCESS, 0, Date.now() - doneStart, null);
-
-    // Stage 100: git commit/push
-    const gitStart = Date.now();
-    
-    // v1 新增：更新 stage.git 节点为 RUNNING
-    await setNodeRunning(projectRoot, runId, 'stage.git', 1);
-    await emitNodeStarted(projectRoot, runId, 'stage.git', 1, getNodeTimeout('stage.git'));
-    
-    // Post stage=99: git commit/push (no further tracked writes afterwards)
-    // If git fails, we do NOT mutate status.json (to avoid "committed then dirty" confusion).
-    const gitOut = await gitCommitPushAfterStage99({ projectRoot, taskId, title, runId, gitAbs });
-    
-    if (!gitOut.ok) {
-      // v1 新增：标记 git 失败
-      await setNodeFinished(projectRoot, runId, 'stage.git', NodeStatus.FAILED, Date.now() - gitStart, "git_failed");
-      await emitNodeFinished(projectRoot, runId, 'stage.git', NodeStatus.FAILED, 1, Date.now() - gitStart, "git_failed");
-      await emitRunFinished(projectRoot, runId, false, Date.now() - startedAt, 'stage.git', "git_failed_post_stage_99");
-      return { ok: false, run_id: runId, stage: 99, error: "git_failed_post_stage_99", git: gitOut };
-    }
-    
-    statusBase.repo.head = gitOut.head || statusBase.repo.head;
-    
-    // v1 新增：标记 git 成功
-    await setNodeFinished(projectRoot, runId, 'stage.git', NodeStatus.SUCCESS, Date.now() - gitStart, null);
-    await emitNodeFinished(projectRoot, runId, 'stage.git', NodeStatus.SUCCESS, 0, Date.now() - gitStart, null);
-    
-    // v1 新增：发送运行成功结束事件
-    await emitRunFinished(projectRoot, runId, true, Date.now() - startedAt, 'stage.git', null);
-
-    return {
-      ok: true,
-      run_id: runId,
-      task_id: taskId,
-      stage: 99,
-      elapsed_ms: Date.now() - startedAt,
-      logs_dir: runRelDir,
-      task_pack_path: taskPackPath,
-    };
-    } finally {
-      // v1 新增：释放锁
-      await releaseLock(projectRoot, runId);
-    }
-  };
-
-  if (!asyncMode) {
-    return await runFlow();
-  }
-
-  // Async: start background run and return immediately.
-  // Background errors are recorded into status.json and notify.json.
-  void (async () => {
-    try {
-      await runFlow();
-    } catch (e) {
-      const err = String(e?.message || e);
-      await writeJson(statusAbs, {
-        ...statusBase,
-        stage: Math.max(0, resumeFromStage || 0),
-        ok: false,
-        error: err,
-        updated_at: nowIso(),
-      });
-      const notifyOut = await sendNotify({
-        ok: false,
-        taskId,
-        title,
-        runId,
-        stage: Math.max(0, resumeFromStage || 0),
-        projectRoot,
-        logRelDir: runRelDir,
-        head: statusBase.repo.head,
-      });
-      await writeJson(notifyAbs, notifyOut);
-    }
-  })();
-
-  await writeJson(statusAbs, { ...statusBase, stage: 0, ok: false, updated_at: nowIso(), note: "started_async" });
-  return { ok: true, run_id: runId, task_id: taskId, stage: 0, logs_dir: runRelDir, started_async: true };
+// 占位函数 - 防止意外调用
+async function handleFixedFlowLegacy(_body) {
+  throw new Error("handleFixedFlowLegacy has been removed. Use handleFixedFlow (v2 engine) instead.");
 }
 
 function getQueryParams(url) {

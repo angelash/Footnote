@@ -1,0 +1,215 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "pm-intake",
+  "name": "制作人入口流程",
+  "version": "1.0.0",
+  "description": "L0 制作人统一入口，把模糊需求转化为可执行的 TaskPack",
+  "author": "Pipeline-Sys",
+  "tags": ["l0", "producer", "intake", "taskpack-generation"],
+
+  "inputs": {
+    "request_id": {
+      "type": "string",
+      "required": true,
+      "description": "请求 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "需求标题"
+    },
+    "description": {
+      "type": "string",
+      "required": true,
+      "description": "需求描述（自然语言）"
+    },
+    "requester": {
+      "type": "string",
+      "required": false,
+      "default": "human",
+      "description": "请求者"
+    },
+    "priority": {
+      "type": "string",
+      "required": false,
+      "default": "normal",
+      "description": "优先级 (low/normal/high/critical)"
+    },
+    "target_role": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "目标执行角色（可选，不填则自动判断）"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "已有 TaskPack 路径（如提供则跳过生成）"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    },
+    "auto_execute": {
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "是否自动执行生成的 TaskPack"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "接收需求",
+      "description": "记录入口请求参数",
+      "expression": "({ request_id: inputs.request_id, title: inputs.title, description: inputs.description, requester: inputs.requester, priority: inputs.priority, received_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "check_existing_taskpack"
+    },
+    {
+      "id": "check_existing_taskpack",
+      "type": "condition",
+      "name": "检查是否已有 TaskPack",
+      "expression": "inputs.task_pack_path && inputs.task_pack_path.length > 0",
+      "on_true": "load_existing_taskpack",
+      "on_false": "analyze_request"
+    },
+    {
+      "id": "load_existing_taskpack",
+      "type": "file",
+      "name": "加载已有 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "determine_executor",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "analyze_request",
+      "type": "transform",
+      "name": "分析需求",
+      "description": "判断任务类型和目标角色",
+      "expression": "(() => { const desc = inputs.description.toLowerCase(); let role = inputs.target_role; let task_type = 'code'; if (!role) { if (desc.includes('文案') || desc.includes('对白') || desc.includes('剧情') || desc.includes('写')) { role = 'L3_writer'; task_type = 'doc'; } else if (desc.includes('测试') || desc.includes('验证') || desc.includes('QA')) { role = 'L3_tester'; task_type = 'code'; } else if (desc.includes('UI') || desc.includes('界面')) { role = 'L3_ui_engineer'; task_type = 'code'; } else { role = 'L3_engineer'; task_type = 'code'; } } return { role, task_type, complexity: inputs.priority === 'critical' ? 'complex' : 'normal' }; })()",
+      "timeout_ms": 60000,
+      "on_success": "generate_taskpack"
+    },
+    {
+      "id": "generate_taskpack",
+      "type": "shell",
+      "name": "生成 TaskPack",
+      "description": "根据分析结果生成 TaskPack 文件",
+      "command": "node -e \"const fs = require('fs'); const path = require('path'); const reqId = '${inputs.request_id}'; const title = '${inputs.title}'.replace(/'/g, ''); const desc = '${inputs.description}'.replace(/'/g, ''); const ts = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15); const taskId = 'T-' + ts + '_' + reqId.slice(0, 8); const fileName = taskId + '_task.md'; const relPath = 'design/ai-native/03_taskpacks/' + fileName; const content = ['---', 'task_id: ' + taskId, 'title: \\\"' + title + '\\\"', 'task_type: code', 'complexity: normal', 'model_override: auto', 'execution_runtime: wsl', 'requires_mcp: false', 'source: pm-intake', 'request_id: ' + reqId, '---', '', '# TASK-PACK: ' + taskId, '', '## 1. Outcome（可观察结果）', desc, '', '## 2. Allowed Inputs（允许引用的输入）', '- [`dir`] `./`', '', '## 3. Deliverables（必须交付物）', '- (由执行者根据任务确定)', '', '## 4. Constraints（硬约束 / 禁止事项）', '- 不得修改冻结目录：`design/ai-native/00_charter/**`、`design/ai-native/01_bibles/**`', '', '## 5. Acceptance Checklist（验收清单）', '- [ ] 交付物落盘', '- [ ] 通过 validate 检查', ''].join('\\n'); fs.mkdirSync(path.dirname(relPath), { recursive: true }); fs.writeFileSync(relPath, content); console.log(JSON.stringify({ task_id: taskId, task_pack_path: relPath }));\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "determine_executor",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "determine_executor",
+      "type": "transform",
+      "name": "确定执行器",
+      "description": "根据角色和任务类型选择执行流程",
+      "expression": "(() => { const role = nodes.analyze_request ? nodes.analyze_request.output.role : 'L3_engineer'; const taskType = nodes.analyze_request ? nodes.analyze_request.output.task_type : 'code'; let flowId = 'l3-execute'; if (role === 'L3_writer') flowId = 'l3-writer'; else if (role === 'L3_tester') flowId = 'l3-tester'; return { flow_id: flowId, role, task_type: taskType }; })()",
+      "timeout_ms": 60000,
+      "on_success": "check_auto_execute"
+    },
+    {
+      "id": "check_auto_execute",
+      "type": "condition",
+      "name": "检查是否自动执行",
+      "expression": "inputs.auto_execute === true",
+      "on_true": "dispatch_to_executor",
+      "on_false": "notify_taskpack_ready"
+    },
+    {
+      "id": "dispatch_to_executor",
+      "type": "http",
+      "name": "分发到执行器",
+      "description": "调用对应的角色流程执行任务",
+      "method": "POST",
+      "url": "http://localhost:3210/v2/run",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "flowspec": "workflows/reusable/pipeline-sys/v2-design/examples/${nodes.determine_executor.output.flow_id}.flowspec.json",
+        "inputs": {
+          "task_id": "${nodes.generate_taskpack.output.stdout ? JSON.parse(nodes.generate_taskpack.output.stdout).task_id : inputs.request_id}",
+          "title": "${inputs.title}",
+          "task_pack_path": "${nodes.generate_taskpack.output.stdout ? JSON.parse(nodes.generate_taskpack.output.stdout).task_pack_path : inputs.task_pack_path}",
+          "role": "${nodes.determine_executor.output.role}",
+          "task_type": "${nodes.determine_executor.output.task_type}"
+        },
+        "async": true
+      },
+      "timeout_ms": 30000,
+      "on_success": "notify_dispatched",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "notify_dispatched",
+      "type": "http",
+      "name": "通知已分发",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "任务已分发",
+        "msg": "request_id=${inputs.request_id}\ntitle=${inputs.title}\nrole=${nodes.determine_executor.output.role}\nstatus=DISPATCHED"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_taskpack_ready",
+      "type": "http",
+      "name": "通知 TaskPack 已就绪",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "TaskPack 已生成",
+        "msg": "request_id=${inputs.request_id}\ntitle=${inputs.title}\nstatus=READY\nauto_execute=false"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "入口处理失败",
+        "msg": "request_id=${inputs.request_id}\ntitle=${inputs.title}\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "check_existing_taskpack" },
+    { "from": "check_existing_taskpack", "to": "load_existing_taskpack", "condition": "has_taskpack" },
+    { "from": "check_existing_taskpack", "to": "analyze_request", "condition": "no_taskpack" },
+    { "from": "load_existing_taskpack", "to": "determine_executor" },
+    { "from": "analyze_request", "to": "generate_taskpack" },
+    { "from": "generate_taskpack", "to": "determine_executor" },
+    { "from": "determine_executor", "to": "check_auto_execute" },
+    { "from": "check_auto_execute", "to": "dispatch_to_executor", "condition": "auto" },
+    { "from": "check_auto_execute", "to": "notify_taskpack_ready", "condition": "manual" },
+    { "from": "dispatch_to_executor", "to": "notify_dispatched" }
+  ],
+
+  "settings": {
+    "timeout_ms": 600000,
+    "on_error": "notify"
+  }
+}
+

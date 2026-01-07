@@ -1,0 +1,195 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-execute",
+  "name": "L3 执行岗通用流程",
+  "version": "1.0.0",
+  "description": "L3 执行岗（程序员/脚本员/写手等）的通用任务执行流程",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "execute", "taskpack", "generic"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "role": {
+      "type": "string",
+      "required": false,
+      "default": "L3_engineer",
+      "description": "执行角色 (L3_engineer/L3_writer/L3_tester/L3_scripter/...)"
+    },
+    "task_type": {
+      "type": "string",
+      "required": false,
+      "default": "code",
+      "description": "任务类型 (code/doc/multimodal/browser-test)"
+    },
+    "complexity": {
+      "type": "string",
+      "required": false,
+      "default": "normal",
+      "description": "复杂度 (simple/normal/complex)"
+    },
+    "model_override": {
+      "type": "string",
+      "required": false,
+      "default": "auto",
+      "description": "模型覆盖"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数",
+      "expression": "({ task_id: inputs.task_id, role: inputs.role, task_type: inputs.task_type, task_pack_path: inputs.task_pack_path, started_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "description": "读取 TaskPack 文件内容",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "validate_taskpack",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "validate_taskpack",
+      "type": "condition",
+      "name": "验证 TaskPack",
+      "description": "检查 TaskPack 是否包含必要字段",
+      "expression": "nodes.load_taskpack.output.content && nodes.load_taskpack.output.content.length > 100",
+      "on_true": "execute",
+      "on_false": "notify_error"
+    },
+    {
+      "id": "execute",
+      "type": "shell",
+      "name": "执行任务",
+      "description": "调用 Cursor Agent 执行任务",
+      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"${inputs.task_type}\" --complexity \"${inputs.complexity}\" --model-override \"${inputs.model_override}\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "env": {
+        "CURSOR_ROLE": "${inputs.role}",
+        "CURSOR_HEADLESS": "1"
+      },
+      "timeout_ms": 3600000,
+      "retry": {
+        "max_attempts": 2,
+        "delay_ms": 10000,
+        "backoff": "fixed"
+      },
+      "on_success": "validate",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "validate",
+      "type": "shell",
+      "name": "验证产物",
+      "description": "运行 validate 检查代码质量",
+      "command": "npm run validate --if-present",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 600000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "description": "提交变更到仓库",
+      "command": "git add -A && git diff --cached --name-only && git commit -m \"${inputs.task_id}: ${inputs.title} [${inputs.role}]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "description": "发送任务完成通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "任务完成",
+        "msg": "task_id=${inputs.task_id}\nrole=${inputs.role}\nstatus=SUCCESS\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "description": "验证失败但任务完成",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "任务警告",
+        "msg": "task_id=${inputs.task_id}\nrole=${inputs.role}\nstatus=WARNING\ntitle=${inputs.title}\nnote=验证未通过"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "description": "发送任务失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "任务失败",
+        "msg": "task_id=${inputs.task_id}\nrole=${inputs.role}\nstatus=FAILED\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "validate_taskpack" },
+    { "from": "validate_taskpack", "to": "execute", "condition": "valid" },
+    { "from": "execute", "to": "validate" },
+    { "from": "validate", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 7200000,
+    "on_error": "notify"
+  }
+}
+

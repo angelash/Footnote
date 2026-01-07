@@ -828,6 +828,167 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    // ============================================
+    // 便捷入口端点：角色路由与快捷调用
+    // ============================================
+
+    const FLOWSPEC_BASE = "workflows/reusable/pipeline-sys/v2-design/examples";
+
+    // POST /intake - 制作人统一入口
+    if (req.method === "POST" && req.url === "/intake") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/pm-intake.flowspec.json`,
+          inputs: {
+            request_id: body.request_id || body.requestId || `REQ-${Date.now()}`,
+            title: body.title || "",
+            description: body.description || "",
+            requester: body.requester || "api",
+            priority: body.priority || "normal",
+            target_role: body.target_role || body.targetRole || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath || "",
+            auto_execute: body.auto_execute !== false
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-role - 通用角色路由
+    if (req.method === "POST" && req.url === "/run-role") {
+      const body = await readJsonBody(req);
+      const role = body.role || "L3_engineer";
+      
+      // 根据角色选择流程
+      let flowspec = `${FLOWSPEC_BASE}/l3-execute.flowspec.json`;
+      if (role.includes("writer")) flowspec = `${FLOWSPEC_BASE}/l3-writer.flowspec.json`;
+      else if (role.includes("tester")) flowspec = `${FLOWSPEC_BASE}/l3-tester.flowspec.json`;
+      
+      try {
+        const out = await handleV2Run({
+          flowspec,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            role: role,
+            task_type: body.task_type || body.taskType || "code",
+            complexity: body.complexity || "normal"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-engineer - 程序员便捷入口
+    if (req.method === "POST" && req.url === "/run-engineer") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-execute.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            role: "L3_engineer",
+            task_type: "code",
+            complexity: body.complexity || "normal"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-writer - 写手便捷入口
+    if (req.method === "POST" && req.url === "/run-writer") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-writer.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            complexity: body.complexity || "normal",
+            style_guide: body.style_guide || body.styleGuide || "design/01-narrative/对白词库 v1.md"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-tester - 测试员便捷入口
+    if (req.method === "POST" && req.url === "/run-tester") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-tester.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            test_type: body.test_type || body.testType || "unit",
+            requires_browser: body.requires_browser || body.requiresBrowser || false,
+            complexity: body.complexity || "normal"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /decompose - 组长拆解入口
+    if (req.method === "POST" && req.url === "/decompose") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/lead-decompose.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId || `TASK-${Date.now()}`,
+            title: body.title || "",
+            description: body.description || "",
+            lead_role: body.lead_role || body.leadRole || "L2_client_lead",
+            max_subtasks: body.max_subtasks || body.maxSubtasks || 5,
+            auto_dispatch: body.auto_dispatch || body.autoDispatch || false
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // GET /flows - 列出可用流程
+    if (req.method === "GET" && req.url === "/flows") {
+      return json(res, 200, {
+        ok: true,
+        flows: [
+          { id: "fixed-flow", name: "AI-Native Fixed Flow", endpoint: "/fixed-flow", description: "原有固定流程（配置化版本）" },
+          { id: "pm-intake", name: "制作人入口", endpoint: "/intake", description: "统一入口，自动分析需求并路由" },
+          { id: "l3-execute", name: "L3 执行岗通用", endpoint: "/run-role", description: "通用执行岗流程" },
+          { id: "l3-writer", name: "L3 写手", endpoint: "/run-writer", description: "文案/对白/剧情写作" },
+          { id: "l3-tester", name: "L3 测试员", endpoint: "/run-tester", description: "单元测试/E2E测试/浏览器测试" },
+          { id: "lead-decompose", name: "组长拆解", endpoint: "/decompose", description: "大任务拆分为子任务" }
+        ]
+      });
+    }
+
     return json(res, 404, { ok: false, error: "not_found" });
   } catch (e) {
     return json(res, 500, { ok: false, error: String(e?.message || e) });

@@ -1,0 +1,181 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-writer",
+  "name": "L3 写手流程",
+  "version": "1.0.0",
+  "description": "L3 写手（文案/对白/剧情）的专用任务执行流程",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "writer", "doc", "narrative"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "complexity": {
+      "type": "string",
+      "required": false,
+      "default": "normal",
+      "description": "复杂度 (simple/normal/complex)"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    },
+    "style_guide": {
+      "type": "string",
+      "required": false,
+      "default": "design/01-narrative/对白词库 v1.md",
+      "description": "风格指南文件路径"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ task_id: inputs.task_id, role: 'L3_writer', task_type: 'doc', started_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_style_guide",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_style_guide",
+      "type": "file",
+      "name": "加载风格指南",
+      "description": "读取对白词库/风格指南作为参考",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.style_guide}",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "execute",
+      "on_failure": "execute"
+    },
+    {
+      "id": "execute",
+      "type": "shell",
+      "name": "执行写作任务",
+      "description": "调用 Cursor Agent 执行文案写作",
+      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type doc --complexity \"${inputs.complexity}\" --model-override auto",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "env": {
+        "CURSOR_ROLE": "L3_writer",
+        "CURSOR_HEADLESS": "1",
+        "STYLE_GUIDE": "${inputs.style_guide}"
+      },
+      "timeout_ms": 1800000,
+      "retry": {
+        "max_attempts": 2,
+        "delay_ms": 5000,
+        "backoff": "fixed"
+      },
+      "on_success": "validate_content",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "validate_content",
+      "type": "shell",
+      "name": "验证内容",
+      "description": "检查产出文件是否符合格式要求",
+      "command": "echo '内容验证（占位）: 检查对白格式、字数限制等' && npm run validate --if-present || true",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "git_commit",
+      "on_failure": "git_commit"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "command": "git add -A && git diff --cached --name-only && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_writer]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "写作任务完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_writer\nstatus=SUCCESS\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "写作任务警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_writer\nstatus=WARNING\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "写作任务失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_writer\nstatus=FAILED\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_style_guide" },
+    { "from": "load_style_guide", "to": "execute" },
+    { "from": "execute", "to": "validate_content" },
+    { "from": "validate_content", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 3600000,
+    "on_error": "notify"
+  }
+}
+

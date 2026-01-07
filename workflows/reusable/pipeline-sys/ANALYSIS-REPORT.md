@@ -1,7 +1,7 @@
 # Pipeline-Sys 完整实现分析报告
 
 > 生成时间：2026-01-07
-> 分析版本：v1.0.0 / v2.2.0
+> 分析版本：v1.0.0 / v2.3.0
 
 ---
 
@@ -13,8 +13,29 @@
 | **v2** | ✅ **核心完成** | FlowSpec 配置化流程引擎 |
 | **v2.1** | ✅ **已完成** | WSL Runner v2 API 集成 |
 | **v2.2** | ✅ **已完成** | /fixed-flow 硬编码迁移到配置化 |
+| **v2.3** | ✅ **已完成** | 多角色流程 + 便捷入口端点 |
 
 **测试统计**：197 个单元测试全部通过 ✅
+
+### v2.3 变更说明 (2026-01-07)
+
+**新增功能**：多角色流程支持 + 便捷入口端点
+
+新增 5 个角色流程定义：
+- `l3-execute.flowspec.json` - L3 执行岗通用流程
+- `l3-writer.flowspec.json` - L3 写手流程（文案/对白）
+- `l3-tester.flowspec.json` - L3 测试员流程（单元/E2E/浏览器）
+- `pm-intake.flowspec.json` - 制作人统一入口（需求转 TaskPack）
+- `lead-decompose.flowspec.json` - 组长拆解流程（大任务拆分）
+
+新增 6 个便捷端点：
+- `POST /intake` - 制作人入口
+- `POST /run-role` - 通用角色路由
+- `POST /run-engineer` - 程序员便捷入口
+- `POST /run-writer` - 写手便捷入口
+- `POST /run-tester` - 测试员便捷入口
+- `POST /decompose` - 组长拆解入口
+- `GET /flows` - 列出可用流程
 
 ### v2.2 变更说明 (2026-01-07)
 
@@ -50,6 +71,15 @@
 │  │  • GET  /fixed-flow/status    • GET  /v2/run/status                 │   │
 │  │  • POST /fixed-flow/cancel    • POST /v2/run/cancel                 │   │
 │  │  • POST /fixed-flow/retry                                           │   │
+│  │                                                                      │   │
+│  │  便捷入口端点 (v2.3):                                                │   │
+│  │  • POST /intake       (制作人入口 → pm-intake.flowspec.json)        │   │
+│  │  • POST /run-role     (通用角色路由)                                │   │
+│  │  • POST /run-engineer (程序员 → l3-execute.flowspec.json)          │   │
+│  │  • POST /run-writer   (写手 → l3-writer.flowspec.json)             │   │
+│  │  • POST /run-tester   (测试员 → l3-tester.flowspec.json)           │   │
+│  │  • POST /decompose    (组长拆解 → lead-decompose.flowspec.json)    │   │
+│  │  • GET  /flows        (列出可用流程)                                │   │
 │  │                                                                      │   │
 │  │  lib/ v1 模块:                lib/v2/ v2 引擎:                        │   │
 │  │  ├── stages.mjs               ├── parser.mjs                        │   │

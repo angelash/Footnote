@@ -1,0 +1,231 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "lead-decompose",
+  "name": "组长拆解流程",
+  "version": "1.0.0",
+  "description": "L2 组长层任务拆解，把大任务分解为多个可执行的子任务",
+  "author": "Pipeline-Sys",
+  "tags": ["l2", "lead", "decompose", "planning"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "父任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "任务标题"
+    },
+    "description": {
+      "type": "string",
+      "required": true,
+      "description": "任务描述"
+    },
+    "lead_role": {
+      "type": "string",
+      "required": false,
+      "default": "L2_client_lead",
+      "description": "组长角色 (L2_client_lead/L2_ui_lead/L2_narrative_lead/...)"
+    },
+    "max_subtasks": {
+      "type": "number",
+      "required": false,
+      "default": 5,
+      "description": "最大子任务数量"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    },
+    "auto_dispatch": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "是否自动分发子任务"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "接收任务",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, lead_role: inputs.lead_role, started_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "analyze_scope"
+    },
+    {
+      "id": "analyze_scope",
+      "type": "transform",
+      "name": "分析任务范围",
+      "description": "判断任务涉及的模块和子任务",
+      "expression": "(() => { const desc = inputs.description.toLowerCase(); const modules = []; const subtasks = []; if (desc.includes('ui') || desc.includes('界面')) modules.push('ui'); if (desc.includes('系统') || desc.includes('功能')) modules.push('systems'); if (desc.includes('对白') || desc.includes('剧情')) modules.push('narrative'); if (desc.includes('测试')) modules.push('qa'); const estimatedSubtasks = Math.min(modules.length || 1, inputs.max_subtasks); return { modules, estimated_subtasks: estimatedSubtasks, complexity: estimatedSubtasks > 3 ? 'complex' : 'normal' }; })()",
+      "timeout_ms": 60000,
+      "on_success": "check_complexity"
+    },
+    {
+      "id": "check_complexity",
+      "type": "condition",
+      "name": "检查复杂度",
+      "description": "判断是否需要拆分为多个子任务",
+      "expression": "nodes.analyze_scope.output.estimated_subtasks > 1",
+      "on_true": "generate_subtasks",
+      "on_false": "generate_single_taskpack"
+    },
+    {
+      "id": "generate_subtasks",
+      "type": "shell",
+      "name": "生成子任务",
+      "description": "根据分析结果生成多个子任务 TaskPack",
+      "command": "node -e \"const fs = require('fs'); const path = require('path'); const parentId = '${inputs.task_id}'; const title = '${inputs.title}'.replace(/'/g, ''); const modules = ${JSON.stringify(nodes.analyze_scope.output.modules || ['general'])}; const ts = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15); const subtasks = modules.map((mod, i) => { const taskId = parentId + '-SUB' + (i+1); const fileName = taskId + '_' + mod + '.md'; const relPath = 'design/ai-native/03_taskpacks/' + fileName; const content = ['---', 'task_id: ' + taskId, 'parent_task: ' + parentId, 'title: \\\"' + title + ' - ' + mod + '\\\"', 'module: ' + mod, 'task_type: code', 'complexity: normal', '---', '', '# TASK-PACK: ' + taskId, '', '## 模块: ' + mod, '', '## 1. Outcome', '(由组长填写具体交付物)', '', '## 2. Allowed Inputs', '- [`dir`] `./`', '', '## 3. Deliverables', '- (待定)', '', '## 4. Constraints', '- 不得修改冻结目录', '', '## 5. Acceptance Checklist', '- [ ] 交付物落盘', ''].join('\\n'); fs.mkdirSync(path.dirname(relPath), { recursive: true }); fs.writeFileSync(relPath, content); return { task_id: taskId, module: mod, path: relPath }; }); console.log(JSON.stringify({ parent_id: parentId, subtasks }));\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "check_auto_dispatch",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "generate_single_taskpack",
+      "type": "shell",
+      "name": "生成单个 TaskPack",
+      "description": "任务简单，直接生成一个 TaskPack",
+      "command": "node -e \"const fs = require('fs'); const path = require('path'); const taskId = '${inputs.task_id}'; const title = '${inputs.title}'.replace(/'/g, ''); const desc = '${inputs.description}'.replace(/'/g, ''); const fileName = taskId + '_task.md'; const relPath = 'design/ai-native/03_taskpacks/' + fileName; const content = ['---', 'task_id: ' + taskId, 'title: \\\"' + title + '\\\"', 'task_type: code', 'complexity: normal', '---', '', '# TASK-PACK: ' + taskId, '', '## 1. Outcome', desc, '', '## 2. Allowed Inputs', '- [`dir`] `./`', '', '## 3. Deliverables', '- (由执行者确定)', '', '## 4. Constraints', '- 不得修改冻结目录', '', '## 5. Acceptance Checklist', '- [ ] 交付物落盘', ''].join('\\n'); fs.mkdirSync(path.dirname(relPath), { recursive: true }); fs.writeFileSync(relPath, content); console.log(JSON.stringify({ task_id: taskId, path: relPath, is_single: true }));\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "notify_ready",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "check_auto_dispatch",
+      "type": "condition",
+      "name": "检查是否自动分发",
+      "expression": "inputs.auto_dispatch === true",
+      "on_true": "dispatch_subtasks",
+      "on_false": "notify_subtasks_ready"
+    },
+    {
+      "id": "dispatch_subtasks",
+      "type": "loop",
+      "name": "分发子任务",
+      "description": "并行分发所有子任务",
+      "loopType": "forEach",
+      "items": "${JSON.parse(nodes.generate_subtasks.output.stdout).subtasks}",
+      "body": [
+        {
+          "id": "dispatch_single",
+          "type": "http",
+          "name": "分发单个子任务",
+          "method": "POST",
+          "url": "http://localhost:3210/v2/run",
+          "headers": { "Content-Type": "application/json" },
+          "body": {
+            "flowspec": "workflows/reusable/pipeline-sys/v2-design/examples/l3-execute.flowspec.json",
+            "inputs": {
+              "task_id": "${item.task_id}",
+              "title": "${inputs.title} - ${item.module}",
+              "task_pack_path": "${item.path}",
+              "role": "L3_engineer"
+            },
+            "async": true
+          },
+          "timeout_ms": 30000
+        }
+      ],
+      "on_success": "notify_dispatched",
+      "on_failure": "notify_partial_failure"
+    },
+    {
+      "id": "notify_subtasks_ready",
+      "type": "http",
+      "name": "通知子任务已就绪",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "子任务已生成",
+        "msg": "parent_task=${inputs.task_id}\ntitle=${inputs.title}\nlead=${inputs.lead_role}\nstatus=SUBTASKS_READY\nauto_dispatch=false"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_ready",
+      "type": "http",
+      "name": "通知 TaskPack 已就绪",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "TaskPack 已生成",
+        "msg": "task_id=${inputs.task_id}\ntitle=${inputs.title}\nstatus=READY"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_dispatched",
+      "type": "http",
+      "name": "通知已分发",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "子任务已分发",
+        "msg": "parent_task=${inputs.task_id}\ntitle=${inputs.title}\nstatus=DISPATCHED"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_partial_failure",
+      "type": "http",
+      "name": "通知部分失败",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "子任务分发部分失败",
+        "msg": "parent_task=${inputs.task_id}\ntitle=${inputs.title}\nstatus=PARTIAL_FAILURE"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "拆解任务失败",
+        "msg": "task_id=${inputs.task_id}\ntitle=${inputs.title}\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "analyze_scope" },
+    { "from": "analyze_scope", "to": "check_complexity" },
+    { "from": "check_complexity", "to": "generate_subtasks", "condition": "complex" },
+    { "from": "check_complexity", "to": "generate_single_taskpack", "condition": "simple" },
+    { "from": "generate_subtasks", "to": "check_auto_dispatch" },
+    { "from": "generate_single_taskpack", "to": "notify_ready" },
+    { "from": "check_auto_dispatch", "to": "dispatch_subtasks", "condition": "auto" },
+    { "from": "check_auto_dispatch", "to": "notify_subtasks_ready", "condition": "manual" },
+    { "from": "dispatch_subtasks", "to": "notify_dispatched" }
+  ],
+
+  "settings": {
+    "timeout_ms": 1800000,
+    "on_error": "notify"
+  }
+}
+

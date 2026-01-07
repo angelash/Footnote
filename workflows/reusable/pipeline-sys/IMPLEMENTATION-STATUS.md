@@ -1,7 +1,7 @@
 # Pipeline-Sys 实现状态报告
 
 > 更新时间：2026-01-07
-> 状态：**✅ v1 已完成 | ✅ v2 配置化完成**
+> 状态：**✅ v1 已完成 | ✅ v2 多角色流程完成**
 
 ---
 
@@ -28,8 +28,31 @@
 | **Phase 5** | 文档 | ✅ 完成 | - |
 | **v2.1** | WSL Runner 集成 | ✅ 完成 | 10 通过 |
 | **v2.2** | /fixed-flow 硬编码迁移 | ✅ 完成 | - |
+| **v2.3** | 多角色流程 + 便捷入口 | ✅ 完成 | - |
 
 **v2 总测试：197 个单元测试全部通过 ✅**
+
+### v2.3 变更记录 (2026-01-07)
+
+**新增功能**：多角色流程支持 + 便捷入口端点
+
+| 新增流程 | 文件 | 用途 |
+|----------|------|------|
+| **L3 执行岗通用** | `l3-execute.flowspec.json` | 通用程序员任务执行 |
+| **L3 写手** | `l3-writer.flowspec.json` | 文案/对白/剧情写作 |
+| **L3 测试员** | `l3-tester.flowspec.json` | 单元/E2E/浏览器测试 |
+| **制作人入口** | `pm-intake.flowspec.json` | 需求接收与自动路由 |
+| **组长拆解** | `lead-decompose.flowspec.json` | 大任务拆分为子任务 |
+
+| 新增端点 | 调用流程 | 说明 |
+|----------|----------|------|
+| `POST /intake` | pm-intake | 制作人统一入口 |
+| `POST /run-role` | 自动选择 | 根据 role 参数路由 |
+| `POST /run-engineer` | l3-execute | 程序员便捷入口 |
+| `POST /run-writer` | l3-writer | 写手便捷入口 |
+| `POST /run-tester` | l3-tester | 测试员便捷入口 |
+| `POST /decompose` | lead-decompose | 组长拆解入口 |
+| `GET /flows` | - | 列出所有可用流程 |
 
 ### v2.2 变更记录 (2026-01-07)
 

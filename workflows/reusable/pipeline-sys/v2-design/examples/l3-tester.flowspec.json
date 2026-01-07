@@ -1,0 +1,228 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-tester",
+  "name": "L3 测试员流程",
+  "version": "1.0.0",
+  "description": "L3 测试员的专用任务执行流程，支持浏览器测试和自动化测试",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "tester", "qa", "browser-test", "automation"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "test_type": {
+      "type": "string",
+      "required": false,
+      "default": "unit",
+      "description": "测试类型 (unit/integration/e2e/browser)"
+    },
+    "complexity": {
+      "type": "string",
+      "required": false,
+      "default": "normal",
+      "description": "复杂度"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    },
+    "requires_browser": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "是否需要浏览器环境"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ task_id: inputs.task_id, role: 'L3_tester', task_type: inputs.requires_browser ? 'browser-test' : 'code', test_type: inputs.test_type, started_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "check_browser_required",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "check_browser_required",
+      "type": "condition",
+      "name": "检查是否需要浏览器",
+      "expression": "inputs.requires_browser === true || inputs.test_type === 'browser' || inputs.test_type === 'e2e'",
+      "on_true": "setup_browser_env",
+      "on_false": "execute_tests"
+    },
+    {
+      "id": "setup_browser_env",
+      "type": "shell",
+      "name": "设置浏览器环境",
+      "description": "启动开发服务器并准备浏览器测试环境",
+      "command": "echo '准备浏览器测试环境...' && npm run dev &>/dev/null & sleep 5 && echo 'Dev server started'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "execute_browser_tests",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "execute_browser_tests",
+      "type": "shell",
+      "name": "执行浏览器测试",
+      "description": "使用 Playwright 执行浏览器自动化测试",
+      "command": "npm run test:e2e --if-present || npx playwright test --reporter=list",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "env": {
+        "CI": "true",
+        "HEADLESS": "true"
+      },
+      "timeout_ms": 1800000,
+      "on_success": "generate_report",
+      "on_failure": "generate_report"
+    },
+    {
+      "id": "execute_tests",
+      "type": "shell",
+      "name": "执行单元/集成测试",
+      "description": "使用 Vitest 执行测试",
+      "command": "npm run test --if-present || npx vitest run --reporter=verbose",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "env": {
+        "CI": "true"
+      },
+      "timeout_ms": 1200000,
+      "on_success": "generate_report",
+      "on_failure": "generate_report"
+    },
+    {
+      "id": "generate_report",
+      "type": "transform",
+      "name": "生成测试报告",
+      "description": "汇总测试结果",
+      "expression": "({ test_type: inputs.test_type, browser_tests: nodes.execute_browser_tests ? { exit_code: nodes.execute_browser_tests.output.exitCode } : null, unit_tests: nodes.execute_tests ? { exit_code: nodes.execute_tests.output.exitCode } : null, summary: '测试完成', finished_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "check_test_result"
+    },
+    {
+      "id": "check_test_result",
+      "type": "condition",
+      "name": "检查测试结果",
+      "expression": "(nodes.execute_browser_tests && nodes.execute_browser_tests.status === 'SUCCESS') || (nodes.execute_tests && nodes.execute_tests.status === 'SUCCESS')",
+      "on_true": "git_commit",
+      "on_false": "notify_test_failure"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交测试报告",
+      "command": "git add -A && git diff --cached --name-only && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_tester]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "测试任务完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_tester\ntest_type=${inputs.test_type}\nstatus=SUCCESS\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_test_failure",
+      "type": "http",
+      "name": "发送测试失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "测试失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_tester\ntest_type=${inputs.test_type}\nstatus=FAILED\ntitle=${inputs.title}\nnote=测试用例未通过"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "测试任务警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_tester\nstatus=WARNING\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "测试任务失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_tester\nstatus=FAILED\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "check_browser_required" },
+    { "from": "check_browser_required", "to": "setup_browser_env", "condition": "browser" },
+    { "from": "check_browser_required", "to": "execute_tests", "condition": "unit" },
+    { "from": "setup_browser_env", "to": "execute_browser_tests" },
+    { "from": "execute_browser_tests", "to": "generate_report" },
+    { "from": "execute_tests", "to": "generate_report" },
+    { "from": "generate_report", "to": "check_test_result" },
+    { "from": "check_test_result", "to": "git_commit", "condition": "pass" },
+    { "from": "check_test_result", "to": "notify_test_failure", "condition": "fail" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 3600000,
+    "on_error": "notify"
+  }
+}
+

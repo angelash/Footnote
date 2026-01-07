@@ -30,28 +30,28 @@
 
 ## 1.2 两阶段资源生产模式
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    资源生产两阶段模式                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  Phase 1: 白盒开发阶段                                          │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
-│  │ 策划/程序   │ ──▶ │ 白盒占位    │ ──▶ │ 功能验证    │       │
-│  │ 需求        │     │ 快速生成    │     │ 快速迭代    │       │
-│  └─────────────┘     └─────────────┘     └─────────────┘       │
-│        ↓                   ↓                   ↓                │
-│  l3-level-designer   whitebox-gen        测试验收              │
-│                                                                 │
-│  Phase 2: 正式资源阶段                                          │
-│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
-│  │ 美术需求    │ ──▶ │ AI 生图     │ ──▶ │ 后处理/     │       │
-│  │ 精确规格    │     │ (智绘)      │     │ 资源替换    │       │
-│  └─────────────┘     └─────────────┘     └─────────────┘       │
-│        ↓                   ↓                   ↓                │
-│  l3-*-artist         MCP Runner          AssetResolver         │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Phase1["Phase 1: 白盒开发阶段"]
+        A1[策划/程序需求] --> B1[白盒占位<br/>快速生成]
+        B1 --> C1[功能验证<br/>快速迭代]
+        A1 -.-> D1[l3-level-designer]
+        B1 -.-> D2[whitebox-gen]
+        C1 -.-> D3[测试验收]
+    end
+    
+    subgraph Phase2["Phase 2: 正式资源阶段"]
+        A2[美术需求<br/>精确规格] --> B2[AI 生图<br/>智绘]
+        B2 --> C2[后处理/<br/>资源替换]
+        A2 -.-> E1[l3-*-artist]
+        B2 -.-> E2[MCP Runner]
+        C2 -.-> E3[AssetResolver]
+    end
+    
+    Phase1 --> Phase2
+    
+    style Phase1 fill:#1a1a2e,stroke:#00fff0,color:#fff
+    style Phase2 fill:#2d1e1e,stroke:#ffd93d,color:#fff
 ```
 
 ### 资源模式配置
@@ -479,68 +479,119 @@
 
 ### 4.1 整体流程图
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         pm-intake (入口)                             │
-└───────────────────────────────┬─────────────────────────────────────┘
-                                │
-        ┌───────────────────────┼───────────────────────┐
-        │                       │                       │
-        ▼                       ▼                       ▼
-┌───────────────┐      ┌───────────────┐      ┌───────────────┐
-│ lead-decompose│      │ 直接执行岗    │      │ 白盒快速通道  │
-│ (通用组长拆解)│      │               │      │               │
-└───────┬───────┘      └───────────────┘      └───────────────┘
-        │                       │                       │
-   ┌────┴────┐           ┌──────┼──────┐         ┌──────┼──────┐
-   │         │           │      │      │         │      │      │
-   ▼         ▼           ▼      ▼      ▼         ▼      ▼      ▼
-┌─────┐  ┌─────┐      ┌────┐ ┌────┐ ┌────┐   ┌────┐ ┌────┐ ┌────┐
-│level│  │ art │      │exec│ │ui- │ │writ│   │wb- │ │wb- │ │wb- │
-│lead │  │lead │      │ute │ │eng │ │er  │   │scn │ │chr │ │obj │
-└──┬──┘  └──┬──┘      └────┘ └────┘ └────┘   └────┘ └────┘ └────┘
-   │        │
-┌──┴──┐  ┌──┴──────────────────────────┐
-│     │  │                              │
-▼     ▼  ▼          ▼          ▼       ▼
-┌────┐ ┌────┐   ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐
-│lvl │ │scri│   │ env- │  │ char-│  │ anim │  │ vfx- │
-│dsn │ │pter│   │artist│  │artist│  │ator  │  │artist│
-└────┘ └────┘   └──────┘  └──────┘  └──────┘  └──────┘
+```mermaid
+flowchart TB
+    INTAKE[pm-intake<br/>入口]
+    
+    INTAKE --> DECOMPOSE[lead-decompose<br/>通用组长拆解]
+    INTAKE --> DIRECT[直接执行岗]
+    INTAKE --> WHITEBOX[白盒快速通道]
+    
+    subgraph 组长拆解
+        DECOMPOSE --> LEVEL_LEAD[l2-level-lead<br/>关卡组长]
+        DECOMPOSE --> ART_LEAD[l2-art-lead<br/>美术组长]
+    end
+    
+    subgraph 策划执行
+        LEVEL_LEAD --> LEVEL_DSN[l3-level-designer<br/>场景策划]
+        LEVEL_LEAD --> SCRIPTER[l3-scripter<br/>脚本员]
+    end
+    
+    subgraph 美术执行
+        ART_LEAD --> ENV_ARTIST[l3-environment-artist<br/>场景美术]
+        ART_LEAD --> CHAR_ARTIST[l3-character-artist<br/>角色美术]
+        ART_LEAD --> ANIMATOR[l3-animator<br/>动画]
+        ART_LEAD --> VFX_ARTIST[l3-vfx-artist<br/>特效]
+    end
+    
+    subgraph 直接执行
+        DIRECT --> EXECUTE[l3-execute<br/>程序员]
+        DIRECT --> UI_ENG[l3-ui-engineer<br/>UI程序员]
+        DIRECT --> WRITER[l3-writer<br/>写手]
+        DIRECT --> TESTER[l3-tester<br/>测试员]
+    end
+    
+    subgraph 白盒占位
+        WHITEBOX --> WB_SCENE[whitebox-scene<br/>白盒场景]
+        WHITEBOX --> WB_CHAR[whitebox-character<br/>白盒角色]
+        WHITEBOX --> WB_OBJ[whitebox-object<br/>白盒物件]
+    end
+    
+    %% 白盒到正式资源的替换链
+    WB_SCENE -.->|替换| ENV_ARTIST
+    WB_CHAR -.->|替换| CHAR_ARTIST
+    WB_OBJ -.->|替换| ENV_ARTIST
+    
+    style INTAKE fill:#00fff0,stroke:#333,color:#000
+    style WHITEBOX fill:#ffd93d,stroke:#333,color:#000
+    style 白盒占位 fill:#2d2818,stroke:#ffd93d
 ```
 
-### 4.2 详细依赖
+### 4.2 详细依赖（树状图）
 
+```mermaid
+flowchart LR
+    subgraph 主流程
+        PM[pm-intake] --> LD[lead-decompose]
+        PM --> L3E[l3-execute]
+        PM --> L3U[l3-ui-engineer]
+        PM --> L3S[l3-scripter]
+        PM --> L3W[l3-writer]
+        PM --> L3T[l3-tester]
+    end
+    
+    subgraph 组长拆解
+        LD --> LL[l2-level-lead]
+        LD --> AL[l2-art-lead]
+        
+        LL --> LVL[l3-level-designer]
+        LL --> SCR[l3-scripter]
+        
+        AL --> ENV[l3-environment-artist]
+        AL --> CHR[l3-character-artist]
+        AL --> ANI[l3-animator]
+        AL --> VFX[l3-vfx-artist]
+    end
+    
+    subgraph 白盒快速通道
+        WB[whitebox-*] --> WBS[whitebox-scene]
+        WB --> WBC[whitebox-character]
+        WB --> WBO[whitebox-object]
+    end
+    
+    LVL -->|触发白盒| WBS
+    WBS -.->|后续替换| ENV
+    WBC -.->|后续替换| CHR
+    WBO -.->|后续替换| ENV
+    
+    style PM fill:#00fff0,color:#000
+    style WB fill:#ffd93d,color:#000
 ```
-pm-intake
-    │
-    ├── lead-decompose (通用拆解)
-    │       │
-    │       ├── l2-level-lead (关卡组长)
-    │       │       ├── l3-level-designer (场景策划) ──┐
-    │       │       └── l3-scripter (脚本员)          │
-    │       │                                         │
-    │       │   ┌─────────────────────────────────────┘
-    │       │   │  [白盒 → 正式资源替换链]
-    │       │   │
-    │       │   ▼
-    │       └── l2-art-lead (美术组长)
-    │               ├── l3-environment-artist (场景美术) → 替换白盒场景
-    │               ├── l3-character-artist (角色美术) → 替换白盒角色
-    │               ├── l3-animator (动画)
-    │               └── l3-vfx-artist (特效)
-    │
-    ├── l3-execute (通用程序员)
-    ├── l3-ui-engineer (UI程序员)
-    ├── l3-scripter (脚本员)
-    ├── l3-writer (写手)
-    └── l3-tester (测试员)
 
-白盒快速通道（Phase 1 开发优先使用）
-    │
-    ├── whitebox-scene (白盒场景) → 后续由 l3-environment-artist 替换
-    ├── whitebox-character (白盒角色) → 后续由 l3-character-artist 替换
-    └── whitebox-object (白盒物件) → 后续由 l3-environment-artist 替换
+### 4.3 白盒 → 正式资源替换链
+
+```mermaid
+sequenceDiagram
+    participant 策划 as l3-level-designer
+    participant 白盒 as whitebox-*
+    participant 验证 as 功能验证
+    participant 美术 as l3-*-artist
+    participant 解析 as AssetResolver
+    
+    策划->>白盒: 1. 创建 Zone 需求
+    白盒->>白盒: 2. 生成 Billboard 配置
+    白盒->>验证: 3. 运行时渲染占位
+    验证-->>策划: 4. 功能验收
+    
+    Note over 策划,验证: Phase 1 白盒开发完成
+    
+    策划->>美术: 5. 提交美术需求
+    美术->>美术: 6. AI 生图 (智绘)
+    美术->>解析: 7. 上传 PNG 资源
+    解析->>解析: 8. 更新资源注册表
+    解析-->>验证: 9. 自动替换白盒
+    
+    Note over 美术,解析: Phase 2 正式资源完成
 ```
 
 ---

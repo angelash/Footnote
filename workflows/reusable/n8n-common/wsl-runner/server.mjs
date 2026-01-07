@@ -858,15 +858,63 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
-    // POST /run-role - 通用角色路由
+    // POST /run-role - 通用角色路由（支持全部岗位）
     if (req.method === "POST" && req.url === "/run-role") {
       const body = await readJsonBody(req);
       const role = body.role || "L3_engineer";
       
-      // 根据角色选择流程
-      let flowspec = `${FLOWSPEC_BASE}/l3-execute.flowspec.json`;
-      if (role.includes("writer")) flowspec = `${FLOWSPEC_BASE}/l3-writer.flowspec.json`;
-      else if (role.includes("tester")) flowspec = `${FLOWSPEC_BASE}/l3-tester.flowspec.json`;
+      // 根据角色选择流程 - 完整映射表
+      const roleToFlowspec = {
+        // 通用程序
+        "L3_engineer": "l3-execute",
+        "L3_gameplay_engineer": "l3-execute",
+        // 专项程序
+        "L3_scripter": "l3-scripter",
+        "L3_ui_engineer": "l3-ui-engineer",
+        // 写手
+        "L3_writer": "l3-writer",
+        // 测试
+        "L3_tester": "l3-tester",
+        // 策划
+        "L3_level_designer": "l3-level-designer",
+        // 美术
+        "L3_environment_artist": "l3-environment-artist",
+        "L3_character_artist": "l3-character-artist",
+        "L3_animator": "l3-animator",
+        "L3_vfx_artist": "l3-vfx-artist",
+        // 组长
+        "L2_level_lead": "l2-level-lead",
+        "L2_art_lead": "l2-art-lead",
+        // 通用组长（使用 lead-decompose）
+        "L2_client_lead": "lead-decompose",
+        "L2_event_lead": "lead-decompose",
+        "L2_narrative_lead": "lead-decompose",
+        "L2_qa_lead": "lead-decompose",
+        "L2_systems_lead": "lead-decompose",
+        "L2_tools_lead": "lead-decompose",
+        "L2_ui_lead": "lead-decompose",
+        "L2_writing_lead": "lead-decompose",
+      };
+      
+      // 获取流程规格，默认使用 l3-execute
+      let flowspecName = roleToFlowspec[role];
+      if (!flowspecName) {
+        // 模糊匹配
+        if (role.includes("writer")) flowspecName = "l3-writer";
+        else if (role.includes("tester")) flowspecName = "l3-tester";
+        else if (role.includes("scripter")) flowspecName = "l3-scripter";
+        else if (role.includes("ui")) flowspecName = "l3-ui-engineer";
+        else if (role.includes("level") && role.includes("designer")) flowspecName = "l3-level-designer";
+        else if (role.includes("environment") || role.includes("scene") && role.includes("artist")) flowspecName = "l3-environment-artist";
+        else if (role.includes("character") && role.includes("artist")) flowspecName = "l3-character-artist";
+        else if (role.includes("animator") || role.includes("animation")) flowspecName = "l3-animator";
+        else if (role.includes("vfx") || role.includes("effect")) flowspecName = "l3-vfx-artist";
+        else if (role.includes("level") && role.includes("lead")) flowspecName = "l2-level-lead";
+        else if (role.includes("art") && role.includes("lead")) flowspecName = "l2-art-lead";
+        else if (role.includes("lead")) flowspecName = "lead-decompose";
+        else flowspecName = "l3-execute";
+      }
+      let flowspec = `${FLOWSPEC_BASE}/${flowspecName}.flowspec.json`;
       
       try {
         const out = await handleV2Run({
@@ -952,6 +1000,288 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    // === 白盒快速通道 ===
+    
+    // POST /whitebox/scene - 白盒场景占位
+    if (req.method === "POST" && req.url === "/whitebox/scene") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/whitebox-scene.flowspec.json`,
+          inputs: {
+            zone_id: body.zone_id || body.zoneId,
+            zone_name: body.zone_name || body.zoneName || body.title || "",
+            zone_type: body.zone_type || body.zoneType || "life",
+            chapter: body.chapter || "C0",
+            width: body.width || 750,
+            height: body.height || 1334,
+            project_root: body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /whitebox/character - 白盒角色占位
+    if (req.method === "POST" && req.url === "/whitebox/character") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/whitebox-character.flowspec.json`,
+          inputs: {
+            character_id: body.character_id || body.characterId,
+            character_name: body.character_name || body.characterName || body.title || "",
+            character_type: body.character_type || body.characterType || "npc",
+            color: body.color || "#00FFF0",
+            icon: body.icon || "👤",
+            project_root: body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /whitebox/object - 白盒物件占位
+    if (req.method === "POST" && req.url === "/whitebox/object") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/whitebox-object.flowspec.json`,
+          inputs: {
+            object_id: body.object_id || body.objectId,
+            object_name: body.object_name || body.objectName || body.title || "",
+            object_type: body.object_type || body.objectType || "interactable",
+            zone_id: body.zone_id || body.zoneId,
+            position_x: body.position_x || body.positionX || body.x || 375,
+            position_y: body.position_y || body.positionY || body.y || 667,
+            icon: body.icon || "📦",
+            project_root: body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // === 专项程序员便捷入口 ===
+
+    // POST /run-scripter - 脚本员便捷入口
+    if (req.method === "POST" && req.url === "/run-scripter") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-scripter.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            zone_id: body.zone_id || body.zoneId || "",
+            script_type: body.script_type || body.scriptType || "zone",
+            model_override: body.model_override || body.modelOverride || "auto"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-ui-engineer - UI程序员便捷入口
+    if (req.method === "POST" && req.url === "/run-ui-engineer") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-ui-engineer.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            ui_component: body.ui_component || body.uiComponent || "",
+            model_override: body.model_override || body.modelOverride || "auto"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // === 策划便捷入口 ===
+
+    // POST /run-level-designer - 场景策划便捷入口
+    if (req.method === "POST" && req.url === "/run-level-designer") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-level-designer.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            zone_id: body.zone_id || body.zoneId || "",
+            chapter: body.chapter || "",
+            model_override: body.model_override || body.modelOverride || "auto"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // === 组长便捷入口 ===
+
+    // POST /level-lead - 关卡组长便捷入口
+    if (req.method === "POST" && req.url === "/level-lead") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l2-level-lead.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            description: body.description || "",
+            chapter: body.chapter || "",
+            zones: body.zones || [],
+            auto_dispatch: body.auto_dispatch !== false
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /art-lead - 美术组长便捷入口
+    if (req.method === "POST" && req.url === "/art-lead") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l2-art-lead.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            description: body.description || "",
+            asset_types: body.asset_types || body.assetTypes || [],
+            auto_dispatch: body.auto_dispatch !== false
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // === 美术便捷入口（Windows MCP Runner 执行） ===
+
+    // POST /run-environment-artist - 场景美术便捷入口
+    if (req.method === "POST" && req.url === "/run-environment-artist") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-environment-artist.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            zone_id: body.zone_id || body.zoneId || "",
+            asset_type: body.asset_type || body.assetType || "background",
+            width: body.width || 750,
+            height: body.height || 1334
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-character-artist - 角色美术便捷入口
+    if (req.method === "POST" && req.url === "/run-character-artist") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-character-artist.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            character_id: body.character_id || body.characterId,
+            asset_type: body.asset_type || body.assetType || "portrait",
+            expressions: body.expressions || ["neutral", "happy", "sad", "angry", "surprised"]
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-animator - 动画便捷入口
+    if (req.method === "POST" && req.url === "/run-animator") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-animator.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            animation_type: body.animation_type || body.animationType || "character",
+            character_id: body.character_id || body.characterId || "",
+            animation_name: body.animation_name || body.animationName || "idle",
+            frame_count: body.frame_count || body.frameCount || 8,
+            frame_rate: body.frame_rate || body.frameRate || 12,
+            output_mode: body.output_mode || body.outputMode || "spritesheet"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /run-vfx-artist - 特效便捷入口
+    if (req.method === "POST" && req.url === "/run-vfx-artist") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-vfx-artist.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            vfx_type: body.vfx_type || body.vfxType || "particle",
+            vfx_name: body.vfx_name || body.vfxName || "effect",
+            frame_count: body.frame_count || body.frameCount || 16,
+            width: body.width || 256,
+            height: body.height || 256,
+            loop: body.loop !== false
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
     // POST /decompose - 组长拆解入口
     if (req.method === "POST" && req.url === "/decompose") {
       const body = await readJsonBody(req);
@@ -979,11 +1309,35 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, {
         ok: true,
         flows: [
+          // 入口流程
           { id: "fixed-flow", name: "AI-Native Fixed Flow", endpoint: "/fixed-flow", description: "原有固定流程（配置化版本）" },
           { id: "pm-intake", name: "制作人入口", endpoint: "/intake", description: "统一入口，自动分析需求并路由" },
-          { id: "l3-execute", name: "L3 执行岗通用", endpoint: "/run-role", description: "通用执行岗流程" },
+          { id: "run-role", name: "通用角色路由", endpoint: "/run-role", description: "根据 role 参数自动选择流程" },
+          
+          // 白盒快速通道（Phase 0）
+          { id: "whitebox-scene", name: "白盒场景", endpoint: "/whitebox/scene", description: "快速生成场景占位资源" },
+          { id: "whitebox-character", name: "白盒角色", endpoint: "/whitebox/character", description: "快速生成角色占位资源" },
+          { id: "whitebox-object", name: "白盒物件", endpoint: "/whitebox/object", description: "快速生成物件占位资源" },
+          
+          // 程序类（Phase 1）
+          { id: "l3-execute", name: "L3 程序员", endpoint: "/run-engineer", description: "通用程序员执行流程" },
+          { id: "l3-scripter", name: "L3 脚本员", endpoint: "/run-scripter", description: "Zone/Event/对白脚本编写" },
+          { id: "l3-ui-engineer", name: "L3 UI程序员", endpoint: "/run-ui-engineer", description: "UI界面/组件实现" },
           { id: "l3-writer", name: "L3 写手", endpoint: "/run-writer", description: "文案/对白/剧情写作" },
           { id: "l3-tester", name: "L3 测试员", endpoint: "/run-tester", description: "单元测试/E2E测试/浏览器测试" },
+          
+          // 策划类（Phase 2）
+          { id: "l2-level-lead", name: "关卡组长", endpoint: "/level-lead", description: "关卡任务拆解分发" },
+          { id: "l3-level-designer", name: "场景策划", endpoint: "/run-level-designer", description: "Zone布局/谜题/叙事节奏设计" },
+          
+          // 美术类（Phase 3, 需要 Windows MCP Runner）
+          { id: "l2-art-lead", name: "美术组长", endpoint: "/art-lead", description: "美术任务拆解分发" },
+          { id: "l3-environment-artist", name: "场景美术", endpoint: "/run-environment-artist", description: "场景背景/地图元素（PNG）" },
+          { id: "l3-character-artist", name: "角色美术", endpoint: "/run-character-artist", description: "角色立绘/表情差分（PNG）" },
+          { id: "l3-animator", name: "动画", endpoint: "/run-animator", description: "角色动画/过场动画（PNG序列）" },
+          { id: "l3-vfx-artist", name: "特效", endpoint: "/run-vfx-artist", description: "视觉特效/粒子效果（PNG）" },
+          
+          // 通用组长
           { id: "lead-decompose", name: "组长拆解", endpoint: "/decompose", description: "大任务拆分为子任务" }
         ]
       });

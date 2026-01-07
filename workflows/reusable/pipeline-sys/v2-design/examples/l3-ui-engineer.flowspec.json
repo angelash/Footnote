@@ -1,0 +1,212 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-ui-engineer",
+  "name": "L3 UI 程序员流程",
+  "version": "1.0.0",
+  "description": "L3 UI 程序员执行流程：实现 UI 界面、组件、交互逻辑。强制使用 ui.config.ts 中的常量。",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "ui", "engineer", "phaser", "typescript"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "ui_component": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "目标 UI 组件名称"
+    },
+    "model_override": {
+      "type": "string",
+      "required": false,
+      "default": "auto",
+      "description": "模型覆盖"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, ui_component: inputs.ui_component, started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "description": "读取 TaskPack 文件内容",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_ui_config",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_ui_config",
+      "type": "file",
+      "name": "加载 UI 配置",
+      "description": "读取 UI 常量配置文件作为参考",
+      "operation": "read",
+      "path": "${inputs.project_root}/src/config/ui.config.ts",
+      "timeout_ms": 30000,
+      "on_success": "load_art_bible",
+      "on_failure": "load_art_bible"
+    },
+    {
+      "id": "load_art_bible",
+      "type": "file",
+      "name": "加载美术总纲",
+      "description": "读取美术总纲作为设计参考",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/art_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "execute",
+      "on_failure": "execute"
+    },
+    {
+      "id": "execute",
+      "type": "shell",
+      "name": "执行 UI 开发",
+      "description": "调用 Cursor Agent 实现 UI",
+      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"code\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "env": {
+        "CURSOR_ROLE": "L3_ui_engineer",
+        "CURSOR_HEADLESS": "1",
+        "UI_COMPONENT": "${inputs.ui_component}"
+      },
+      "timeout_ms": 3600000,
+      "retry": {
+        "max_attempts": 2,
+        "delay_ms": 10000,
+        "backoff": "fixed"
+      },
+      "on_success": "validate_lint",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "validate_lint",
+      "type": "shell",
+      "name": "TypeScript 检查",
+      "description": "运行 TypeScript 类型检查和 ESLint",
+      "command": "npm run lint --if-present && npm run type-check --if-present",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "validate_ui_constants",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "validate_ui_constants",
+      "type": "shell",
+      "name": "检查 UI 常量使用",
+      "description": "确保使用 ui.config.ts 中的常量，禁止硬编码",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\n// 搜索新增/修改的 UI 文件\nconst uiFiles = [\n  'src/systems/ui',\n  'src/scenes'\n];\n\nlet violations = [];\nconst hardcodedPattern = /fontSize:\\s*['\\\"]\\d+px['\\\"]/g;\n\nuiFiles.forEach(dir => {\n  const fullPath = path.join('${inputs.project_root}', dir);\n  if (fs.existsSync(fullPath)) {\n    const files = fs.readdirSync(fullPath, { recursive: true })\n      .filter(f => f.endsWith('.ts'));\n    files.forEach(file => {\n      const content = fs.readFileSync(path.join(fullPath, file), 'utf-8');\n      const matches = content.match(hardcodedPattern);\n      if (matches) {\n        violations.push({ file, matches });\n      }\n    });\n  }\n});\n\nif (violations.length > 0) {\n  console.error('发现硬编码字体大小:');\n  violations.forEach(v => console.error('  -', v.file, ':', v.matches.join(', ')));\n  console.error('请使用 UI_FONT_SIZE 常量替代！');\n  process.exit(1);\n} else {\n  console.log('UI 常量检查通过');\n}\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "description": "提交 UI 变更",
+      "command": "git add -A && git diff --cached --name-only && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_ui_engineer]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "description": "发送任务完成通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "UI 任务完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_ui_engineer\ncomponent=${inputs.ui_component}\nstatus=SUCCESS\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "description": "验证失败但任务完成",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "UI 任务警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_ui_engineer\nstatus=WARNING\ntitle=${inputs.title}\nnote=验证未通过"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "description": "发送任务失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "UI 任务失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_ui_engineer\nstatus=FAILED\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_ui_config" },
+    { "from": "load_ui_config", "to": "load_art_bible" },
+    { "from": "load_art_bible", "to": "execute" },
+    { "from": "execute", "to": "validate_lint" },
+    { "from": "validate_lint", "to": "validate_ui_constants" },
+    { "from": "validate_ui_constants", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 7200000,
+    "on_error": "notify"
+  }
+}
+

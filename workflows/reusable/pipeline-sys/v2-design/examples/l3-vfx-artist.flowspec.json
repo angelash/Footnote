@@ -1,0 +1,251 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-vfx-artist",
+  "name": "L3 特效流程",
+  "version": "1.0.0",
+  "description": "L3 特效制作流程：制作视觉特效、粒子效果、转场效果。输出 PNG 序列帧。需要 Windows MCP Runner。",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "artist", "vfx", "effect", "particle", "transition", "png", "multimodal"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "vfx_type": {
+      "type": "string",
+      "required": false,
+      "default": "particle",
+      "description": "特效类型 (particle/transition/ability/environment/ui)"
+    },
+    "vfx_name": {
+      "type": "string",
+      "required": true,
+      "description": "特效名称（如 depth_perception/time_intervention/zone_transition）"
+    },
+    "frame_count": {
+      "type": "number",
+      "required": false,
+      "default": 16,
+      "description": "帧数"
+    },
+    "width": {
+      "type": "number",
+      "required": false,
+      "default": 256,
+      "description": "特效宽度 (px)"
+    },
+    "height": {
+      "type": "number",
+      "required": false,
+      "default": 256,
+      "description": "特效高度 (px)"
+    },
+    "loop": {
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "是否循环播放"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, vfx_type: inputs.vfx_type, vfx_name: inputs.vfx_name, frame_count: inputs.frame_count, dimensions: { width: inputs.width, height: inputs.height }, loop: inputs.loop, execution_runtime: 'windows', requires_mcp: true, output_format: 'PNG', started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_art_bible",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_art_bible",
+      "type": "file",
+      "name": "加载美术总纲",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/art_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_ability_spec",
+      "on_failure": "load_ability_spec"
+    },
+    {
+      "id": "load_ability_spec",
+      "type": "file",
+      "name": "加载能力系统规格",
+      "description": "读取能力系统规格获取特效需求",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/02_specs/systems/ability_system_spec.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "generate_vfx_prompts",
+      "on_failure": "generate_vfx_prompts"
+    },
+    {
+      "id": "generate_vfx_prompts",
+      "type": "transform",
+      "name": "生成特效提示词",
+      "description": "根据特效类型生成 AI 提示词",
+      "expression": "(function() { const vfxType = '${inputs.vfx_type}'; const vfxName = '${inputs.vfx_name}'; const frameCount = ${inputs.frame_count}; const vfxDescriptions = { 'depth_perception': 'glowing cyan aura, rippling effect, dimensional scanning, transparent overlay', 'depth_intervention': 'orange energy burst, reality distortion, structural change, scar effect', 'time_intervention': 'purple temporal ripple, time rewind effect, clock fragments, paradox shimmer', 'zone_transition': 'pixel dissolve, scene fade, dimensional gate, portal effect', 'particle_ambient': 'floating dust particles, soft glow, atmospheric effect' }; const basePrompt = 'pixel art visual effect, cyberpunk style, alpha channel, ' + (vfxDescriptions[vfxName] || 'magical effect, energy glow'); const keyframes = []; for (let i = 0; i < frameCount; i++) { const progress = (i / (frameCount - 1)) * 100; keyframes.push({ frame: i + 1, prompt: basePrompt + ', animation frame ' + (i + 1) + '/' + frameCount + ', ' + progress.toFixed(0) + '% progress' }); } return { vfx_type: vfxType, vfx_name: vfxName, keyframes, total_frames: frameCount }; })()",
+      "timeout_ms": 10000,
+      "on_success": "batch_generate_vfx_frames"
+    },
+    {
+      "id": "batch_generate_vfx_frames",
+      "type": "loop",
+      "name": "批量生成特效帧",
+      "for_each": "keyframe",
+      "in": "nodes.generate_vfx_prompts.output.keyframes",
+      "nodes": [
+        {
+          "id": "generate_single_vfx_frame",
+          "type": "shell",
+          "name": "生成单帧特效",
+          "command": "echo 'Generating VFX frame ${loop.keyframe.frame}/${inputs.frame_count}'\necho 'Effect: ${inputs.vfx_name}'\necho 'Size: ${inputs.width}x${inputs.height}'\necho 'Output: assets/images/vfx/${inputs.vfx_name}/frame_${loop.keyframe.frame}.png'\n# TODO: 实际调用 MCP 生成带透明通道的 PNG",
+          "cwd": "${inputs.project_root}",
+          "shell": "bash",
+          "timeout_ms": 120000
+        }
+      ],
+      "on_success": "create_spritesheet",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "create_spritesheet",
+      "type": "shell",
+      "name": "合成 Spritesheet",
+      "description": "将帧序列合成为带透明通道的 spritesheet",
+      "command": "echo 'Creating VFX spritesheet'\necho 'Effect: ${inputs.vfx_name}'\necho 'Frames: ${inputs.frame_count}'\necho 'Layout: ${inputs.frame_count}x1 grid'\necho 'Output: assets/images/spritesheets/vfx_${inputs.vfx_name}.png'\n# TODO: 使用 ImageMagick 合成保留透明通道\n# montage -background none frame_*.png -tile ${inputs.frame_count}x1 -geometry +0+0 spritesheet.png",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "generate_phaser_config",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "generate_phaser_config",
+      "type": "shell",
+      "name": "生成 Phaser 配置",
+      "description": "生成 Phaser 动画配置",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\nconst configDir = '${inputs.project_root}/src/data/vfx';\nif (!fs.existsSync(configDir)) fs.mkdirSync(configDir, { recursive: true });\n\nconst config = {\n  key: '${inputs.vfx_name}',\n  type: '${inputs.vfx_type}',\n  spritesheet: 'vfx_${inputs.vfx_name}',\n  frameConfig: {\n    frameWidth: ${inputs.width},\n    frameHeight: ${inputs.height},\n    endFrame: ${inputs.frame_count} - 1\n  },\n  animConfig: {\n    frameRate: 12,\n    repeat: ${inputs.loop} ? -1 : 0\n  },\n  meta: {\n    created_at: new Date().toISOString(),\n    asset_mode: 'production'\n  }\n};\n\nconst configPath = path.join(configDir, '${inputs.vfx_name}.json');\nfs.writeFileSync(configPath, JSON.stringify(config, null, 2));\nconsole.log('Phaser VFX config generated:', configPath);\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "update_asset_registry",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "update_asset_registry",
+      "type": "shell",
+      "name": "更新资源注册表",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = '${inputs.project_root}/src/data/asset-registry.json';\nlet registry = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : { backgrounds: {}, characters: {}, objects: {}, animations: {}, vfx: {} };\n\nregistry.vfx = registry.vfx || {};\nregistry.vfx['${inputs.vfx_name}'] = {\n  type: '${inputs.vfx_type}',\n  spritesheet: 'assets/images/spritesheets/vfx_${inputs.vfx_name}.png',\n  config: 'src/data/vfx/${inputs.vfx_name}.json',\n  frames: ${inputs.frame_count},\n  dimensions: { width: ${inputs.width}, height: ${inputs.height} },\n  loop: ${inputs.loop},\n  format: 'PNG',\n  asset_mode: 'production',\n  updated_at: new Date().toISOString()\n};\n\nfs.writeFileSync(path, JSON.stringify(registry, null, 2));\nconsole.log('Asset registry updated for VFX:', '${inputs.vfx_name}');\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "command": "git add assets/images/vfx/ assets/images/spritesheets/ src/data/vfx/ src/data/asset-registry.json && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_vfx_artist]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "特效任务完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_vfx_artist\nvfx=${inputs.vfx_name}\nframes=${inputs.frame_count}\nformat=PNG\nstatus=SUCCESS"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "特效任务警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_vfx_artist\nstatus=WARNING"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "特效任务失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_vfx_artist\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_art_bible" },
+    { "from": "load_art_bible", "to": "load_ability_spec" },
+    { "from": "load_ability_spec", "to": "generate_vfx_prompts" },
+    { "from": "generate_vfx_prompts", "to": "batch_generate_vfx_frames" },
+    { "from": "batch_generate_vfx_frames", "to": "create_spritesheet" },
+    { "from": "create_spritesheet", "to": "generate_phaser_config" },
+    { "from": "generate_phaser_config", "to": "update_asset_registry" },
+    { "from": "update_asset_registry", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 7200000,
+    "execution_runtime": "windows",
+    "requires_mcp": true,
+    "on_error": "notify"
+  }
+}
+

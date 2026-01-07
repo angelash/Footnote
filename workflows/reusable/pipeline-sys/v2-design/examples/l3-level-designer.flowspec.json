@@ -1,0 +1,261 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-level-designer",
+  "name": "L3 场景策划流程",
+  "version": "1.0.0",
+  "description": "L3 场景策划执行流程：设计 Zone 布局、谜题、事件触发点、叙事节奏",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "level", "designer", "zone", "puzzle", "narrative"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "zone_id": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "目标 Zone ID"
+    },
+    "chapter": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "所属章节"
+    },
+    "model_override": {
+      "type": "string",
+      "required": false,
+      "default": "auto",
+      "description": "模型覆盖"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, zone_id: inputs.zone_id, chapter: inputs.chapter, started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "description": "读取 TaskPack 文件内容",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_design_bible",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_design_bible",
+      "type": "file",
+      "name": "加载设计总纲",
+      "description": "读取设计总纲作为参考",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/design_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_worldview",
+      "on_failure": "load_worldview"
+    },
+    {
+      "id": "load_worldview",
+      "type": "file",
+      "name": "加载世界观",
+      "description": "读取世界观文档",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/01-narrative/世界观完整版 v3（v1基础合并v2迭代）.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_foreshadow",
+      "on_failure": "load_foreshadow"
+    },
+    {
+      "id": "load_foreshadow",
+      "type": "file",
+      "name": "加载伏笔索引",
+      "description": "读取伏笔索引以确保正确引用",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/01-narrative/伏笔索引 v2.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "execute",
+      "on_failure": "execute"
+    },
+    {
+      "id": "execute",
+      "type": "shell",
+      "name": "执行关卡设计",
+      "description": "调用 Cursor Agent 设计关卡",
+      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"doc\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "env": {
+        "CURSOR_ROLE": "L3_level_designer",
+        "CURSOR_HEADLESS": "1",
+        "ZONE_ID": "${inputs.zone_id}",
+        "CHAPTER": "${inputs.chapter}"
+      },
+      "timeout_ms": 3600000,
+      "retry": {
+        "max_attempts": 2,
+        "delay_ms": 10000,
+        "backoff": "fixed"
+      },
+      "on_success": "validate_foreshadow",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "validate_foreshadow",
+      "type": "shell",
+      "name": "检查伏笔使用",
+      "description": "验证伏笔编号是否正确引用",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\n// 读取伏笔索引\nconst foreshadowPath = '${inputs.project_root}/design/01-narrative/伏笔索引 v2.md';\nlet validForeshadows = [];\nif (fs.existsSync(foreshadowPath)) {\n  const content = fs.readFileSync(foreshadowPath, 'utf-8');\n  const matches = content.match(/F\\d{2}/g) || [];\n  validForeshadows = [...new Set(matches)];\n}\n\n// 检查设计文档中的伏笔引用\nconst designDir = '${inputs.project_root}/design/03-level/章节×区域叙事布置';\nlet errors = [];\n\nif (fs.existsSync(designDir)) {\n  const files = fs.readdirSync(designDir).filter(f => f.endsWith('.md'));\n  files.slice(-5).forEach(file => {\n    const content = fs.readFileSync(path.join(designDir, file), 'utf-8');\n    const refs = content.match(/F\\d{2}/g) || [];\n    refs.forEach(ref => {\n      if (!validForeshadows.includes(ref)) {\n        errors.push({ file, ref, error: '未知伏笔编号' });\n      }\n    });\n  });\n}\n\nif (errors.length > 0) {\n  console.error('发现无效伏笔引用:');\n  errors.forEach(e => console.error('  -', e.file, ':', e.ref));\n  console.error('有效伏笔编号:', validForeshadows.join(', '));\n  // 警告但不失败\n}\nconsole.log('伏笔检查完成，有效编号数量:', validForeshadows.length);\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "validate_narrative_flow",
+      "on_failure": "validate_narrative_flow"
+    },
+    {
+      "id": "validate_narrative_flow",
+      "type": "shell",
+      "name": "检查叙事流程",
+      "description": "验证叙事流程的完整性",
+      "command": "echo 'Narrative flow validation - placeholder for future implementation'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "trigger_whitebox",
+      "on_failure": "trigger_whitebox"
+    },
+    {
+      "id": "trigger_whitebox",
+      "type": "condition",
+      "name": "判断是否创建白盒",
+      "description": "如果有 zone_id，触发白盒场景创建",
+      "expression": "inputs.zone_id && inputs.zone_id.length > 0",
+      "on_true": "create_whitebox_scene",
+      "on_false": "git_commit"
+    },
+    {
+      "id": "create_whitebox_scene",
+      "type": "http",
+      "name": "创建白盒场景",
+      "description": "调用 whitebox-scene 流程创建占位",
+      "method": "POST",
+      "url": "http://localhost:3210/whitebox/scene",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "zone_id": "${inputs.zone_id}",
+        "zone_name": "${inputs.title}",
+        "chapter": "${inputs.chapter}",
+        "project_root": "${inputs.project_root}"
+      },
+      "timeout_ms": 60000,
+      "continueOnError": true,
+      "on_success": "git_commit",
+      "on_failure": "git_commit"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "description": "提交设计文档变更",
+      "command": "git add -A && git diff --cached --name-only && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_level_designer]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "关卡设计完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_level_designer\nzone_id=${inputs.zone_id}\nstatus=SUCCESS\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "关卡设计警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_level_designer\nstatus=WARNING"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "关卡设计失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_level_designer\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_design_bible" },
+    { "from": "load_design_bible", "to": "load_worldview" },
+    { "from": "load_worldview", "to": "load_foreshadow" },
+    { "from": "load_foreshadow", "to": "execute" },
+    { "from": "execute", "to": "validate_foreshadow" },
+    { "from": "validate_foreshadow", "to": "validate_narrative_flow" },
+    { "from": "validate_narrative_flow", "to": "trigger_whitebox" },
+    { "from": "trigger_whitebox", "to": "create_whitebox_scene", "condition": "true" },
+    { "from": "trigger_whitebox", "to": "git_commit", "condition": "false" },
+    { "from": "create_whitebox_scene", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 7200000,
+    "on_error": "notify"
+  }
+}
+

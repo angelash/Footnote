@@ -1,0 +1,232 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-scripter",
+  "name": "L3 脚本员流程",
+  "version": "1.0.0",
+  "description": "L3 脚本员执行流程：编写 Zone 脚本、Event 脚本、对白触发逻辑",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "scripter", "zone", "event", "dialogue"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "zone_id": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "目标 Zone ID (可选，从 TaskPack 推断)"
+    },
+    "script_type": {
+      "type": "string",
+      "required": false,
+      "default": "zone",
+      "description": "脚本类型 (zone/event/dialogue)"
+    },
+    "model_override": {
+      "type": "string",
+      "required": false,
+      "default": "auto",
+      "description": "模型覆盖"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, script_type: inputs.script_type, zone_id: inputs.zone_id, started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "description": "读取 TaskPack 文件内容",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_zone_spec",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_zone_spec",
+      "type": "file",
+      "name": "加载 Zone 规格",
+      "description": "读取目标 Zone 的叙事布置文档",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/03-level/章节×区域叙事布置/",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_event_spec",
+      "on_failure": "load_event_spec"
+    },
+    {
+      "id": "load_event_spec",
+      "type": "file",
+      "name": "加载事件系统规格",
+      "description": "读取事件系统设计规格",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/02_specs/systems/event_system_spec.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_dialogue_reference",
+      "on_failure": "load_dialogue_reference"
+    },
+    {
+      "id": "load_dialogue_reference",
+      "type": "file",
+      "name": "加载对白词库",
+      "description": "读取对白词库作为参考",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/01-narrative/对白词库 v1.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "execute",
+      "on_failure": "execute"
+    },
+    {
+      "id": "execute",
+      "type": "shell",
+      "name": "执行脚本编写",
+      "description": "调用 Cursor Agent 生成脚本",
+      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"code\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "env": {
+        "CURSOR_ROLE": "L3_scripter",
+        "CURSOR_HEADLESS": "1",
+        "SCRIPT_TYPE": "${inputs.script_type}"
+      },
+      "timeout_ms": 3600000,
+      "retry": {
+        "max_attempts": 2,
+        "delay_ms": 10000,
+        "backoff": "fixed"
+      },
+      "on_success": "validate_yaml",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "validate_yaml",
+      "type": "shell",
+      "name": "验证 YAML 格式",
+      "description": "检查生成的 YAML 文件格式",
+      "command": "find src/data -name '*.yaml' -newer /tmp/scripter_start_marker 2>/dev/null | head -20 | xargs -I{} node -e \"const yaml=require('yaml'); const fs=require('fs'); try { yaml.parse(fs.readFileSync('{}', 'utf-8')); console.log('Valid:', '{}'); } catch(e) { console.error('Invalid:', '{}', e.message); process.exit(1); }\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "validate_schema",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "validate_schema",
+      "type": "shell",
+      "name": "验证数据结构",
+      "description": "检查数据结构是否符合规范",
+      "command": "npm run validate:data --if-present || echo 'No schema validation configured'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "description": "提交脚本变更",
+      "command": "git add -A && git diff --cached --name-only && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_scripter]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "description": "发送任务完成通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "脚本任务完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_scripter\nscript_type=${inputs.script_type}\nstatus=SUCCESS\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "description": "验证失败但任务完成",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "脚本任务警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_scripter\nstatus=WARNING\ntitle=${inputs.title}\nnote=验证未通过"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "description": "发送任务失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "脚本任务失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_scripter\nstatus=FAILED\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_zone_spec" },
+    { "from": "load_zone_spec", "to": "load_event_spec" },
+    { "from": "load_event_spec", "to": "load_dialogue_reference" },
+    { "from": "load_dialogue_reference", "to": "execute" },
+    { "from": "execute", "to": "validate_yaml" },
+    { "from": "validate_yaml", "to": "validate_schema" },
+    { "from": "validate_schema", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 7200000,
+    "on_error": "notify"
+  }
+}
+

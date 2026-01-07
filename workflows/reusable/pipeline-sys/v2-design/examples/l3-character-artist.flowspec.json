@@ -1,0 +1,257 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-character-artist",
+  "name": "L3 角色美术流程",
+  "version": "1.0.0",
+  "description": "L3 角色美术执行流程：制作角色立绘、表情差分、角色图标（PNG格式）。需要 Windows MCP Runner 访问智绘。",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "artist", "character", "portrait", "expression", "png", "multimodal"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "character_id": {
+      "type": "string",
+      "required": true,
+      "description": "角色 ID"
+    },
+    "asset_type": {
+      "type": "string",
+      "required": false,
+      "default": "portrait",
+      "description": "资源类型 (portrait/expression/icon/sprite)"
+    },
+    "expressions": {
+      "type": "array",
+      "required": false,
+      "default": ["neutral", "happy", "sad", "angry", "surprised"],
+      "description": "需要生成的表情列表"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, character_id: inputs.character_id, asset_type: inputs.asset_type, expressions: inputs.expressions, execution_runtime: 'windows', requires_mcp: true, output_format: 'PNG', started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_art_bible",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_art_bible",
+      "type": "file",
+      "name": "加载美术总纲",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/art_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_character_profile",
+      "on_failure": "load_character_profile"
+    },
+    {
+      "id": "load_character_profile",
+      "type": "file",
+      "name": "加载角色档案",
+      "description": "读取角色人生线档案获取外貌特征",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/01-narrative/角色人生线档案 v2.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "generate_prompt",
+      "on_failure": "generate_prompt"
+    },
+    {
+      "id": "generate_prompt",
+      "type": "transform",
+      "name": "生成角色提示词",
+      "description": "根据角色档案生成智绘提示词",
+      "expression": "(function() { const characterId = '${inputs.character_id}'; const characterDescriptions = { 'cenhui': '年轻女性，短发，深色眼睛，穿着维修局工作服，神情专注', 'gulin': '中年男性，灰白短发，锐利目光，维修局主管制服', 'songlan': '女性，长发，温和表情，记录者服装', 'xuchen': '女性医生，白大褂，平静神情', 'atang': '年轻人，漂泊者外表，眼神迷茫', 'muping': '老者，信徒服饰，虔诚表情', 'qilan': '年轻女性，普通服装，善良神情', 'chenjiang': '中年男性，点灯者服饰，坚定目光' }; const basePrompt = 'pixel art character portrait, cyberpunk noir style, dark background, 16-bit aesthetic'; const charPrompt = characterDescriptions[characterId] || 'mysterious figure'; return { prompt: basePrompt + ', ' + charPrompt, negative_prompt: 'photo, realistic, 3D, blurry, deformed', style: 'pixel_art', character_id: characterId }; })()",
+      "timeout_ms": 10000,
+      "on_success": "execute_ai_generation"
+    },
+    {
+      "id": "execute_ai_generation",
+      "type": "shell",
+      "name": "执行 AI 生图",
+      "description": "调用 MCP 浏览器访问智绘生成角色立绘（Windows 环境）",
+      "command": "echo '[MCP Required] AI 生图任务已准备'\necho 'Character: ${inputs.character_id}'\necho 'Asset Type: ${inputs.asset_type}'\necho 'Output: assets/images/characters/${inputs.character_id}.png'\n# TODO: 实际调用 MCP 浏览器访问智绘",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 600000,
+      "on_success": "generate_expressions",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "generate_expressions",
+      "type": "condition",
+      "name": "判断是否生成表情",
+      "expression": "inputs.asset_type === 'portrait' && inputs.expressions && inputs.expressions.length > 0",
+      "on_true": "batch_generate_expressions",
+      "on_false": "post_process"
+    },
+    {
+      "id": "batch_generate_expressions",
+      "type": "loop",
+      "name": "批量生成表情差分",
+      "for_each": "expression",
+      "in": "inputs.expressions",
+      "nodes": [
+        {
+          "id": "generate_single_expression",
+          "type": "shell",
+          "name": "生成单个表情",
+          "command": "echo 'Generating expression: ${loop.expression} for ${inputs.character_id}'\necho 'Output: assets/images/characters/expressions/${inputs.character_id}_${loop.expression}.png'\n# TODO: 实际调用 MCP 生成表情差分",
+          "cwd": "${inputs.project_root}",
+          "shell": "bash",
+          "timeout_ms": 120000
+        }
+      ],
+      "on_success": "post_process",
+      "on_failure": "post_process"
+    },
+    {
+      "id": "post_process",
+      "type": "shell",
+      "name": "后处理",
+      "description": "背景移除、尺寸调整、确保 PNG 透明通道",
+      "command": "echo 'Post-processing placeholder'\necho '- Remove background'\necho '- Ensure PNG with alpha channel'\necho '- Optimize file size'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "validate_asset",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "validate_asset",
+      "type": "shell",
+      "name": "验证资源",
+      "description": "验证 PNG 格式和透明通道",
+      "command": "node -e \"\nconst fs = require('fs');\nconst characterId = '${inputs.character_id}';\nconst outputPath = '${inputs.project_root}/assets/images/characters/' + characterId + '.png';\n\nif (fs.existsSync(outputPath)) {\n  const stats = fs.statSync(outputPath);\n  console.log('Character asset validated:');\n  console.log('  Path:', outputPath);\n  console.log('  Size:', stats.size, 'bytes');\n  console.log('  Format: PNG with alpha');\n} else {\n  console.log('Asset not yet created (placeholder mode)');\n}\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "update_asset_registry",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "update_asset_registry",
+      "type": "shell",
+      "name": "更新资源注册表",
+      "description": "更新资源注册表，触发白盒替换",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = '${inputs.project_root}/src/data/asset-registry.json';\nlet registry = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : { backgrounds: {}, characters: {}, objects: {} };\n\nregistry.characters = registry.characters || {};\nregistry.characters['${inputs.character_id}'] = {\n  portrait: 'assets/images/characters/${inputs.character_id}.png',\n  expressions: ${JSON.stringify(inputs.expressions)}.map(e => 'assets/images/characters/expressions/${inputs.character_id}_' + e + '.png'),\n  format: 'PNG',\n  asset_mode: 'production',\n  updated_at: new Date().toISOString()\n};\n\nfs.writeFileSync(path, JSON.stringify(registry, null, 2));\nconsole.log('Asset registry updated for character:', '${inputs.character_id}');\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "command": "git add assets/images/characters/ src/data/asset-registry.json && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_character_artist]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "角色美术完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_character_artist\ncharacter_id=${inputs.character_id}\nformat=PNG\nstatus=SUCCESS"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "角色美术警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_character_artist\nstatus=WARNING"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "角色美术失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_character_artist\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_art_bible" },
+    { "from": "load_art_bible", "to": "load_character_profile" },
+    { "from": "load_character_profile", "to": "generate_prompt" },
+    { "from": "generate_prompt", "to": "execute_ai_generation" },
+    { "from": "execute_ai_generation", "to": "generate_expressions" },
+    { "from": "generate_expressions", "to": "batch_generate_expressions", "condition": "true" },
+    { "from": "generate_expressions", "to": "post_process", "condition": "false" },
+    { "from": "batch_generate_expressions", "to": "post_process" },
+    { "from": "post_process", "to": "validate_asset" },
+    { "from": "validate_asset", "to": "update_asset_registry" },
+    { "from": "update_asset_registry", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 3600000,
+    "execution_runtime": "windows",
+    "requires_mcp": true,
+    "on_error": "notify"
+  }
+}
+

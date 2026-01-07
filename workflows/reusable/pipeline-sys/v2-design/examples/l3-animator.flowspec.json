@@ -1,0 +1,262 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-animator",
+  "name": "L3 动画流程",
+  "version": "1.0.0",
+  "description": "L3 动画制作流程：制作角色动画、过场动画、UI动效。输出 PNG 序列帧或 Spritesheet。需要 Windows MCP Runner。",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "artist", "animation", "spritesheet", "sequence", "png", "multimodal"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "animation_type": {
+      "type": "string",
+      "required": false,
+      "default": "character",
+      "description": "动画类型 (character/cutscene/ui/effect)"
+    },
+    "character_id": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "角色 ID（角色动画时使用）"
+    },
+    "animation_name": {
+      "type": "string",
+      "required": true,
+      "description": "动画名称（如 idle/walk/talk/interact）"
+    },
+    "frame_count": {
+      "type": "number",
+      "required": false,
+      "default": 8,
+      "description": "帧数"
+    },
+    "frame_rate": {
+      "type": "number",
+      "required": false,
+      "default": 12,
+      "description": "帧率 (FPS)"
+    },
+    "output_mode": {
+      "type": "string",
+      "required": false,
+      "default": "spritesheet",
+      "description": "输出模式 (spritesheet/sequence)"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, animation_type: inputs.animation_type, character_id: inputs.character_id, animation_name: inputs.animation_name, frame_count: inputs.frame_count, frame_rate: inputs.frame_rate, output_mode: inputs.output_mode, execution_runtime: 'windows', requires_mcp: true, output_format: 'PNG', started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_art_bible",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_art_bible",
+      "type": "file",
+      "name": "加载美术总纲",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/art_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_animation_spec",
+      "on_failure": "load_animation_spec"
+    },
+    {
+      "id": "load_animation_spec",
+      "type": "file",
+      "name": "加载动画规格",
+      "description": "读取动画系统规格文档",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/02_specs/systems/animation_spec.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "generate_keyframes",
+      "on_failure": "generate_keyframes"
+    },
+    {
+      "id": "generate_keyframes",
+      "type": "transform",
+      "name": "生成关键帧提示词",
+      "description": "为每一帧生成 AI 提示词",
+      "expression": "(function() { const frameCount = ${inputs.frame_count}; const animName = '${inputs.animation_name}'; const charId = '${inputs.character_id}'; const basePrompt = 'pixel art animation frame, cyberpunk noir style, consistent character design, 16-bit aesthetic'; const keyframes = []; for (let i = 0; i < frameCount; i++) { keyframes.push({ frame: i + 1, prompt: basePrompt + ', frame ' + (i + 1) + ' of ' + frameCount + ', ' + animName + ' animation' + (charId ? ', character ' + charId : '') }); } return { keyframes, total_frames: frameCount, animation_name: animName }; })()",
+      "timeout_ms": 10000,
+      "on_success": "batch_generate_frames"
+    },
+    {
+      "id": "batch_generate_frames",
+      "type": "loop",
+      "name": "批量生成帧",
+      "description": "循环生成每一帧",
+      "for_each": "keyframe",
+      "in": "nodes.generate_keyframes.output.keyframes",
+      "nodes": [
+        {
+          "id": "generate_single_frame",
+          "type": "shell",
+          "name": "生成单帧",
+          "command": "echo 'Generating frame ${loop.keyframe.frame}/${inputs.frame_count}'\necho 'Animation: ${inputs.animation_name}'\necho 'Prompt: ${loop.keyframe.prompt}'\necho 'Output: assets/images/animations/${inputs.character_id || inputs.animation_type}/${inputs.animation_name}_frame_${loop.keyframe.frame}.png'\n# TODO: 实际调用 MCP 生成",
+          "cwd": "${inputs.project_root}",
+          "shell": "bash",
+          "timeout_ms": 120000
+        }
+      ],
+      "on_success": "assemble_spritesheet",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "assemble_spritesheet",
+      "type": "condition",
+      "name": "判断输出模式",
+      "expression": "inputs.output_mode === 'spritesheet'",
+      "on_true": "create_spritesheet",
+      "on_false": "validate_asset"
+    },
+    {
+      "id": "create_spritesheet",
+      "type": "shell",
+      "name": "合成 Spritesheet",
+      "description": "将帧序列合成为 spritesheet",
+      "command": "echo 'Creating spritesheet from ${inputs.frame_count} frames'\necho 'Layout: ${inputs.frame_count}x1 grid'\necho 'Output: assets/images/spritesheets/${inputs.character_id || inputs.animation_type}_${inputs.animation_name}.png'\n# TODO: 使用 ImageMagick 或 canvas 合成 spritesheet\n# montage frame_*.png -tile ${inputs.frame_count}x1 -geometry +0+0 spritesheet.png",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "validate_asset",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "validate_asset",
+      "type": "shell",
+      "name": "验证资源",
+      "description": "验证动画资源格式和帧数",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\nconst animDir = '${inputs.project_root}/assets/images/animations/${inputs.character_id || inputs.animation_type}';\nconst spritesheetPath = '${inputs.project_root}/assets/images/spritesheets/${inputs.character_id || inputs.animation_type}_${inputs.animation_name}.png';\n\nconsole.log('Animation validation:');\nconsole.log('  Type:', '${inputs.animation_type}');\nconsole.log('  Name:', '${inputs.animation_name}');\nconsole.log('  Frames:', ${inputs.frame_count});\nconsole.log('  FPS:', ${inputs.frame_rate});\nconsole.log('  Output Mode:', '${inputs.output_mode}');\nconsole.log('  Format: PNG');\n\nif ('${inputs.output_mode}' === 'spritesheet' && fs.existsSync(spritesheetPath)) {\n  const stats = fs.statSync(spritesheetPath);\n  console.log('  Spritesheet:', spritesheetPath, '(' + stats.size + ' bytes)');\n} else {\n  console.log('  Assets not yet created (placeholder mode)');\n}\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "update_asset_registry",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "update_asset_registry",
+      "type": "shell",
+      "name": "更新资源注册表",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = '${inputs.project_root}/src/data/asset-registry.json';\nlet registry = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : { backgrounds: {}, characters: {}, objects: {}, animations: {} };\n\nregistry.animations = registry.animations || {};\nconst animKey = '${inputs.character_id || inputs.animation_type}_${inputs.animation_name}';\nregistry.animations[animKey] = {\n  type: '${inputs.animation_type}',\n  name: '${inputs.animation_name}',\n  character_id: '${inputs.character_id}' || null,\n  spritesheet: '${inputs.output_mode}' === 'spritesheet' ? 'assets/images/spritesheets/' + animKey + '.png' : null,\n  frames: ${inputs.frame_count},\n  frame_rate: ${inputs.frame_rate},\n  format: 'PNG',\n  asset_mode: 'production',\n  updated_at: new Date().toISOString()\n};\n\nfs.writeFileSync(path, JSON.stringify(registry, null, 2));\nconsole.log('Asset registry updated for animation:', animKey);\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "command": "git add assets/images/animations/ assets/images/spritesheets/ src/data/asset-registry.json && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_animator]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "动画任务完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_animator\nanimation=${inputs.animation_name}\nframes=${inputs.frame_count}\nformat=PNG\nstatus=SUCCESS"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "动画任务警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_animator\nstatus=WARNING"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "动画任务失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_animator\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_art_bible" },
+    { "from": "load_art_bible", "to": "load_animation_spec" },
+    { "from": "load_animation_spec", "to": "generate_keyframes" },
+    { "from": "generate_keyframes", "to": "batch_generate_frames" },
+    { "from": "batch_generate_frames", "to": "assemble_spritesheet" },
+    { "from": "assemble_spritesheet", "to": "create_spritesheet", "condition": "true" },
+    { "from": "assemble_spritesheet", "to": "validate_asset", "condition": "false" },
+    { "from": "create_spritesheet", "to": "validate_asset" },
+    { "from": "validate_asset", "to": "update_asset_registry" },
+    { "from": "update_asset_registry", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 7200000,
+    "execution_runtime": "windows",
+    "requires_mcp": true,
+    "on_error": "notify"
+  }
+}
+

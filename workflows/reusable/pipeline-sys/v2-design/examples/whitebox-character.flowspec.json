@@ -1,0 +1,147 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "whitebox-character",
+  "name": "白盒角色占位流程",
+  "version": "1.0.0",
+  "description": "快速生成角色占位资源，用于对话和交互测试。生成 Billboard 配置，运行时由 BillboardFactory 渲染。",
+  "author": "Pipeline-Sys",
+  "tags": ["whitebox", "character", "placeholder", "phase1"],
+
+  "inputs": {
+    "character_id": {
+      "type": "string",
+      "required": true,
+      "description": "角色 ID (如 cenhui, gulin, songlan)"
+    },
+    "character_name": {
+      "type": "string",
+      "required": true,
+      "description": "角色显示名称"
+    },
+    "character_type": {
+      "type": "string",
+      "required": false,
+      "default": "npc",
+      "description": "角色类型 (protagonist/npc/system)"
+    },
+    "color": {
+      "type": "string",
+      "required": false,
+      "default": "#00FFF0",
+      "description": "角色标识色 (十六进制颜色)"
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "default": "👤",
+      "description": "角色图标 (emoji)"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数",
+      "expression": "({ character_id: inputs.character_id, character_name: inputs.character_name, character_type: inputs.character_type, color: inputs.color, icon: inputs.icon, created_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_character_profile"
+    },
+    {
+      "id": "load_character_profile",
+      "type": "file",
+      "name": "加载角色档案",
+      "description": "尝试加载角色档案获取更多信息",
+      "operation": "read",
+      "path": "${inputs.project_root}/src/data/characters/${inputs.character_id}.yaml",
+      "timeout_ms": 10000,
+      "continueOnError": true,
+      "on_success": "generate_billboard_config",
+      "on_failure": "generate_billboard_config"
+    },
+    {
+      "id": "generate_billboard_config",
+      "type": "file",
+      "name": "生成 Billboard 配置",
+      "description": "创建/更新角色的 Billboard 配置",
+      "operation": "write",
+      "path": "${inputs.project_root}/src/data/characters/${inputs.character_id}.yaml",
+      "content": "# 角色配置 - ${inputs.character_id}\n# 由 whitebox-character 流程自动生成\n# 创建时间: ${new Date().toISOString()}\n\ncharacter_id: \"${inputs.character_id}\"\ncharacter_name: \"${inputs.character_name}\"\ncharacter_type: \"${inputs.character_type}\"\n\n# 白盒配置\nwhitebox:\n  enabled: true\n  billboard:\n    type: \"character\"\n    icon: \"${inputs.icon}\"\n    color: \"${inputs.color}\"\n    name: \"${inputs.character_name}\"\n    style: \"${inputs.character_type}\"\n  portrait:\n    type: \"placeholder\"\n    color: \"${inputs.color}\"\n\n# 资源元数据\nmeta:\n  asset_mode: \"whitebox\"\n  created_by: \"whitebox-character-flow\"\n  production_ready: false\n  expressions: []\n",
+      "timeout_ms": 30000,
+      "on_success": "update_character_registry",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "update_character_registry",
+      "type": "shell",
+      "name": "更新角色注册表",
+      "description": "将角色添加到全局注册表",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = '${inputs.project_root}/src/data/character-registry.json';\nlet registry = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : { characters: {} };\nregistry.characters['${inputs.character_id}'] = {\n  name: '${inputs.character_name}',\n  type: '${inputs.character_type}',\n  color: '${inputs.color}',\n  icon: '${inputs.icon}',\n  asset_mode: 'whitebox',\n  updated_at: new Date().toISOString()\n};\nfs.writeFileSync(path, JSON.stringify(registry, null, 2));\nconsole.log('Registry updated for:', '${inputs.character_id}');\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "description": "提交白盒配置变更",
+      "command": "git add src/data/characters/${inputs.character_id}.yaml src/data/character-registry.json && git commit -m \"whitebox: 添加/更新角色占位 ${inputs.character_id}\" || echo 'No changes'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "notify",
+      "name": "成功通知",
+      "description": "发送白盒角色创建成功通知",
+      "channel": "console",
+      "level": "success",
+      "message": "白盒角色创建成功: ${inputs.character_id} (${inputs.character_name}) - 类型: ${inputs.character_type}"
+    },
+    {
+      "id": "notify_warning",
+      "type": "notify",
+      "name": "警告通知",
+      "description": "部分操作失败的警告",
+      "channel": "console",
+      "level": "warning",
+      "message": "白盒角色 ${inputs.character_id} 创建完成但有警告，请检查日志"
+    },
+    {
+      "id": "notify_error",
+      "type": "notify",
+      "name": "错误通知",
+      "description": "创建失败通知",
+      "channel": "console",
+      "level": "error",
+      "message": "白盒角色创建失败: ${inputs.character_id}"
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_character_profile" },
+    { "from": "load_character_profile", "to": "generate_billboard_config" },
+    { "from": "generate_billboard_config", "to": "update_character_registry" },
+    { "from": "update_character_registry", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 300000,
+    "on_error": "notify"
+  }
+}
+

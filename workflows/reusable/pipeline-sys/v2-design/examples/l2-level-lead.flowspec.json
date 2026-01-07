@@ -1,0 +1,222 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l2-level-lead",
+  "name": "L2 关卡组长流程",
+  "version": "1.0.0",
+  "description": "L2 关卡组长拆解流程：分析章节/Zone需求，拆分任务给场景策划和脚本员",
+  "author": "Pipeline-Sys",
+  "tags": ["l2", "lead", "level", "decompose", "dispatch"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "任务标题（章节/Zone 目标）"
+    },
+    "description": {
+      "type": "string",
+      "required": true,
+      "description": "任务描述（详细需求）"
+    },
+    "chapter": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "目标章节 (C0/C1/C2/C3/C4/C5/CF)"
+    },
+    "zones": {
+      "type": "array",
+      "required": false,
+      "default": [],
+      "description": "涉及的 Zone ID 列表"
+    },
+    "auto_dispatch": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "是否自动分发子任务"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, chapter: inputs.chapter, zones: inputs.zones, auto_dispatch: inputs.auto_dispatch, started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_design_bible"
+    },
+    {
+      "id": "load_design_bible",
+      "type": "file",
+      "name": "加载设计总纲",
+      "description": "读取设计总纲作为拆解参考",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/design_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_zone_list",
+      "on_failure": "load_zone_list"
+    },
+    {
+      "id": "load_zone_list",
+      "type": "shell",
+      "name": "加载 Zone 列表",
+      "description": "获取现有 Zone 配置列表",
+      "command": "ls -la src/data/zones/*.yaml 2>/dev/null | wc -l && ls src/data/zones/*.yaml 2>/dev/null || echo 'No zones found'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "analyze_scope",
+      "on_failure": "analyze_scope"
+    },
+    {
+      "id": "analyze_scope",
+      "type": "shell",
+      "name": "分析任务范围",
+      "description": "分析涉及的 Zone 数量和依赖关系",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\nconst chapter = '${inputs.chapter}';\nconst description = '${inputs.description}';\nconst existingZones = '${nodes.load_zone_list.output.stdout || ''}'.split('\\n').filter(f => f.endsWith('.yaml'));\n\n// 分析需要创建的 Zone\nconst zonesNeeded = [];\nconst zonesPattern = /[CcZz][0-9]+[-_]?[Zz]?[0-9]*/g;\nconst matches = description.match(zonesPattern) || [];\nmatches.forEach(m => zonesNeeded.push(m.toUpperCase().replace('_', '-')));\n\n// 确定任务拆分\nconst tasks = [];\nconst uniqueZones = [...new Set(zonesNeeded)];\n\nuniqueZones.forEach(zoneId => {\n  // 每个 Zone 需要: 1个策划任务 + 1个脚本任务\n  tasks.push({\n    type: 'level_design',\n    role: 'L3_level_designer',\n    zone_id: zoneId,\n    title: '设计 ' + zoneId + ' 场景布局',\n    priority: 1\n  });\n  tasks.push({\n    type: 'scripting',\n    role: 'L3_scripter',\n    zone_id: zoneId,\n    title: '编写 ' + zoneId + ' 脚本',\n    priority: 2,\n    depends_on: 'level_design_' + zoneId\n  });\n});\n\nconst result = {\n  chapter,\n  zones_needed: uniqueZones,\n  existing_zones: existingZones.length,\n  new_zones: uniqueZones.filter(z => !existingZones.some(e => e.includes(z))),\n  tasks: tasks,\n  total_tasks: tasks.length\n};\n\nconsole.log(JSON.stringify(result, null, 2));\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "generate_subtasks",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "generate_subtasks",
+      "type": "shell",
+      "name": "生成子任务 TaskPack",
+      "description": "为每个子任务生成 TaskPack 文件",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\nconst analysis = JSON.parse('${nodes.analyze_scope.output.stdout}');\nconst taskId = '${inputs.task_id}';\nconst parentTitle = '${inputs.title}';\nconst projectRoot = '${inputs.project_root}';\n\nconst taskpackDir = path.join(projectRoot, 'design/ai-native/03_taskpacks/generated');\nif (!fs.existsSync(taskpackDir)) fs.mkdirSync(taskpackDir, { recursive: true });\n\nconst generatedPacks = [];\n\nanalysis.tasks.forEach((task, idx) => {\n  const subTaskId = taskId + '-' + (idx + 1).toString().padStart(2, '0');\n  const packPath = path.join(taskpackDir, subTaskId + '.md');\n  \n  const content = '# TaskPack: ' + subTaskId + '\\n\\n' +\n    '## 基本信息\\n' +\n    '- **父任务**: ' + taskId + '\\n' +\n    '- **标题**: ' + task.title + '\\n' +\n    '- **角色**: ' + task.role + '\\n' +\n    '- **类型**: ' + task.type + '\\n' +\n    '- **Zone**: ' + task.zone_id + '\\n' +\n    '- **优先级**: P' + task.priority + '\\n\\n' +\n    '## 输入\\n' +\n    '- 父任务描述: ' + parentTitle + '\\n' +\n    '- Zone ID: ' + task.zone_id + '\\n\\n' +\n    '## 交付物\\n' +\n    (task.type === 'level_design' \n      ? '- Zone 叙事布置文档\\n- Zone 配置文件 (YAML)\\n' \n      : '- Zone 脚本文件 (YAML)\\n- 对白文件 (YAML)\\n') +\n    '\\n## 验收标准\\n' +\n    '- [ ] 文件格式正确\\n' +\n    '- [ ] 符合设计规范\\n' +\n    '- [ ] 通过 CI 检查\\n';\n  \n  fs.writeFileSync(packPath, content);\n  generatedPacks.push({ id: subTaskId, path: packPath, role: task.role, zone: task.zone_id });\n});\n\nconsole.log(JSON.stringify({ generated: generatedPacks, count: generatedPacks.length }));\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "decide_dispatch",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "decide_dispatch",
+      "type": "condition",
+      "name": "判断是否自动分发",
+      "description": "根据 auto_dispatch 参数决定是否自动分发",
+      "expression": "inputs.auto_dispatch === true",
+      "on_true": "dispatch_tasks",
+      "on_false": "git_commit"
+    },
+    {
+      "id": "dispatch_tasks",
+      "type": "loop",
+      "name": "分发子任务",
+      "description": "循环分发子任务到对应角色",
+      "for_each": "task",
+      "in": "JSON.parse('${nodes.generate_subtasks.output.stdout}').generated",
+      "nodes": [
+        {
+          "id": "dispatch_single",
+          "type": "http",
+          "name": "分发单个任务",
+          "description": "调用 /run-role 分发任务",
+          "method": "POST",
+          "url": "http://localhost:3210/run-role",
+          "headers": { "Content-Type": "application/json" },
+          "body": {
+            "project_root": "${inputs.project_root}",
+            "role": "${loop.task.role}",
+            "task_id": "${loop.task.id}",
+            "task_pack_path": "${loop.task.path}",
+            "async": true
+          },
+          "timeout_ms": 30000
+        }
+      ],
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "description": "提交生成的 TaskPack",
+      "command": "git add design/ai-native/03_taskpacks/generated/ && git commit -m \"${inputs.task_id}: 关卡组长拆解 - ${inputs.title}\" || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "description": "发送拆解完成通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "关卡拆解完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L2_level_lead\nstatus=SUCCESS\ntitle=${inputs.title}\nauto_dispatch=${inputs.auto_dispatch}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "关卡拆解警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L2_level_lead\nstatus=WARNING"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "关卡拆解失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L2_level_lead\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_design_bible" },
+    { "from": "load_design_bible", "to": "load_zone_list" },
+    { "from": "load_zone_list", "to": "analyze_scope" },
+    { "from": "analyze_scope", "to": "generate_subtasks" },
+    { "from": "generate_subtasks", "to": "decide_dispatch" },
+    { "from": "decide_dispatch", "to": "dispatch_tasks", "condition": "true" },
+    { "from": "decide_dispatch", "to": "git_commit", "condition": "false" },
+    { "from": "dispatch_tasks", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 600000,
+    "on_error": "notify"
+  }
+}
+

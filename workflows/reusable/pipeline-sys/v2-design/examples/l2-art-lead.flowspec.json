@@ -1,0 +1,212 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l2-art-lead",
+  "name": "L2 美术组长流程",
+  "version": "1.0.0",
+  "description": "L2 美术组长拆解流程：分析美术需求，拆分任务给场景美术/角色美术/动画/特效",
+  "author": "Pipeline-Sys",
+  "tags": ["l2", "lead", "art", "decompose", "dispatch"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": true,
+      "description": "任务标题（美术需求）"
+    },
+    "description": {
+      "type": "string",
+      "required": true,
+      "description": "任务描述（详细需求）"
+    },
+    "asset_types": {
+      "type": "array",
+      "required": false,
+      "default": [],
+      "description": "资源类型列表 (background/character/animation/vfx/tileset)"
+    },
+    "auto_dispatch": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "是否自动分发子任务"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, asset_types: inputs.asset_types, auto_dispatch: inputs.auto_dispatch, started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_art_bible"
+    },
+    {
+      "id": "load_art_bible",
+      "type": "file",
+      "name": "加载美术总纲",
+      "description": "读取美术总纲作为拆解参考",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/art_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_asset_tracking",
+      "on_failure": "load_asset_tracking"
+    },
+    {
+      "id": "load_asset_tracking",
+      "type": "file",
+      "name": "加载资源跟踪",
+      "description": "读取现有资源需求跟踪表",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/production/资产需求跟踪.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "analyze_scope",
+      "on_failure": "analyze_scope"
+    },
+    {
+      "id": "analyze_scope",
+      "type": "shell",
+      "name": "分析美术范围",
+      "description": "分析涉及的资源类型和数量",
+      "command": "node -e \"\nconst description = '${inputs.description}';\nconst assetTypes = ${JSON.stringify(inputs.asset_types || [])};\n\n// 关键词到资源类型的映射\nconst keywordMap = {\n  '背景': 'background', '场景': 'background', '地图': 'background',\n  '角色': 'character', '立绘': 'character', '表情': 'character', 'NPC': 'character',\n  '动画': 'animation', '序列帧': 'animation', '过场': 'animation',\n  '特效': 'vfx', '粒子': 'vfx', '转场': 'vfx',\n  '瓦片': 'tileset', 'tile': 'tileset'\n};\n\n// 分析描述中的资源需求\nconst detectedTypes = new Set(assetTypes);\nObject.entries(keywordMap).forEach(([keyword, type]) => {\n  if (description.includes(keyword)) detectedTypes.add(type);\n});\n\n// 角色到资源的映射\nconst roleMap = {\n  'background': 'L3_environment_artist',\n  'character': 'L3_character_artist',\n  'animation': 'L3_animator',\n  'vfx': 'L3_vfx_artist',\n  'tileset': 'L3_environment_artist'\n};\n\n// 生成任务列表\nconst tasks = [];\n[...detectedTypes].forEach((type, idx) => {\n  tasks.push({\n    type: type,\n    role: roleMap[type] || 'L3_environment_artist',\n    title: '制作 ' + type + ' 资源',\n    priority: type === 'background' ? 1 : (type === 'character' ? 2 : 3),\n    output_format: 'PNG'\n  });\n});\n\nconst result = {\n  detected_types: [...detectedTypes],\n  tasks: tasks,\n  total_tasks: tasks.length,\n  execution_runtime: 'windows',\n  requires_mcp: true\n};\n\nconsole.log(JSON.stringify(result, null, 2));\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "generate_subtasks",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "generate_subtasks",
+      "type": "shell",
+      "name": "生成子任务 TaskPack",
+      "description": "为每个美术子任务生成 TaskPack 文件",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\nconst analysis = JSON.parse('${nodes.analyze_scope.output.stdout}');\nconst taskId = '${inputs.task_id}';\nconst parentTitle = '${inputs.title}';\nconst projectRoot = '${inputs.project_root}';\n\nconst taskpackDir = path.join(projectRoot, 'design/ai-native/03_taskpacks/generated');\nif (!fs.existsSync(taskpackDir)) fs.mkdirSync(taskpackDir, { recursive: true });\n\nconst generatedPacks = [];\n\nanalysis.tasks.forEach((task, idx) => {\n  const subTaskId = taskId + '-art-' + (idx + 1).toString().padStart(2, '0');\n  const packPath = path.join(taskpackDir, subTaskId + '.md');\n  \n  const content = '# TaskPack: ' + subTaskId + '\\n\\n' +\n    '## 基本信息\\n' +\n    '- **父任务**: ' + taskId + '\\n' +\n    '- **标题**: ' + task.title + '\\n' +\n    '- **角色**: ' + task.role + '\\n' +\n    '- **类型**: ' + task.type + '\\n' +\n    '- **优先级**: P' + task.priority + '\\n' +\n    '- **输出格式**: ' + task.output_format + '\\n\\n' +\n    '## 执行环境\\n' +\n    '- **运行时**: Windows (MCP Runner)\\n' +\n    '- **需要 MCP**: 是（智绘 AI 生图）\\n\\n' +\n    '## 输入\\n' +\n    '- 父任务描述: ' + parentTitle + '\\n' +\n    '- Art Bible: design/ai-native/01_bibles/art_bible.md\\n' +\n    '- AI 生图指南: .cursor/rules/06-ai-art-generation.mdc\\n\\n' +\n    '## 交付物\\n' +\n    '- PNG 资源文件\\n' +\n    '- 资源配置更新\\n' +\n    '\\n## 验收标准\\n' +\n    '- [ ] PNG 格式正确\\n' +\n    '- [ ] 尺寸符合规范\\n' +\n    '- [ ] 风格与 Art Bible 一致\\n' +\n    '- [ ] 已更新资源注册表\\n';\n  \n  fs.writeFileSync(packPath, content);\n  generatedPacks.push({ id: subTaskId, path: packPath, role: task.role, type: task.type });\n});\n\nconsole.log(JSON.stringify({ generated: generatedPacks, count: generatedPacks.length }));\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "decide_dispatch",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "decide_dispatch",
+      "type": "condition",
+      "name": "判断是否自动分发",
+      "expression": "inputs.auto_dispatch === true",
+      "on_true": "dispatch_tasks",
+      "on_false": "git_commit"
+    },
+    {
+      "id": "dispatch_tasks",
+      "type": "loop",
+      "name": "分发子任务",
+      "description": "循环分发子任务到对应美术角色",
+      "for_each": "task",
+      "in": "JSON.parse('${nodes.generate_subtasks.output.stdout}').generated",
+      "nodes": [
+        {
+          "id": "dispatch_single",
+          "type": "http",
+          "name": "分发单个任务",
+          "method": "POST",
+          "url": "http://localhost:3210/run-role",
+          "headers": { "Content-Type": "application/json" },
+          "body": {
+            "project_root": "${inputs.project_root}",
+            "role": "${loop.task.role}",
+            "task_id": "${loop.task.id}",
+            "task_pack_path": "${loop.task.path}",
+            "async": true
+          },
+          "timeout_ms": 30000
+        }
+      ],
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "command": "git add design/ai-native/03_taskpacks/generated/ && git commit -m \"${inputs.task_id}: 美术组长拆解 - ${inputs.title}\" || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "美术拆解完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L2_art_lead\nstatus=SUCCESS\ntitle=${inputs.title}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "美术拆解警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L2_art_lead\nstatus=WARNING"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "美术拆解失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L2_art_lead\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_art_bible" },
+    { "from": "load_art_bible", "to": "load_asset_tracking" },
+    { "from": "load_asset_tracking", "to": "analyze_scope" },
+    { "from": "analyze_scope", "to": "generate_subtasks" },
+    { "from": "generate_subtasks", "to": "decide_dispatch" },
+    { "from": "decide_dispatch", "to": "dispatch_tasks", "condition": "true" },
+    { "from": "decide_dispatch", "to": "git_commit", "condition": "false" },
+    { "from": "dispatch_tasks", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 600000,
+    "on_error": "notify"
+  }
+}
+

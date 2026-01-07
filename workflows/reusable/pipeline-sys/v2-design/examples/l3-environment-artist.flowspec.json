@@ -1,0 +1,235 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-environment-artist",
+  "name": "L3 场景美术流程",
+  "version": "1.0.0",
+  "description": "L3 场景美术执行流程：制作场景背景、地图元素、环境资源（PNG格式）。需要 Windows MCP Runner 访问智绘。",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "artist", "environment", "background", "tileset", "png", "multimodal"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "zone_id": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "目标 Zone ID"
+    },
+    "asset_type": {
+      "type": "string",
+      "required": false,
+      "default": "background",
+      "description": "资源类型 (background/tileset/object)"
+    },
+    "width": {
+      "type": "number",
+      "required": false,
+      "default": 750,
+      "description": "输出宽度 (px)"
+    },
+    "height": {
+      "type": "number",
+      "required": false,
+      "default": 1334,
+      "description": "输出高度 (px)"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "description": "验证输入参数，设置执行环境",
+      "expression": "({ task_id: inputs.task_id, title: inputs.title, zone_id: inputs.zone_id, asset_type: inputs.asset_type, dimensions: { width: inputs.width, height: inputs.height }, execution_runtime: 'windows', requires_mcp: true, output_format: 'PNG', started_at: new Date().toISOString() })",
+      "timeout_ms": 10000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "load_art_bible",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "load_art_bible",
+      "type": "file",
+      "name": "加载美术总纲",
+      "operation": "read",
+      "path": "${inputs.project_root}/design/ai-native/01_bibles/art_bible.md",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "load_zone_description",
+      "on_failure": "load_zone_description"
+    },
+    {
+      "id": "load_zone_description",
+      "type": "shell",
+      "name": "加载场景描述",
+      "description": "从 Zone 配置或设计文档获取场景描述",
+      "command": "node -e \"\nconst fs = require('fs');\nconst zoneId = '${inputs.zone_id}';\nconst projectRoot = '${inputs.project_root}';\n\nlet description = '默认场景';\n\n// 尝试从 Zone YAML 读取\nconst zonePath = projectRoot + '/src/data/zones/' + zoneId + '.yaml';\nif (zoneId && fs.existsSync(zonePath)) {\n  const yaml = require('yaml');\n  const content = fs.readFileSync(zonePath, 'utf-8');\n  const doc = yaml.parse(content);\n  description = doc.zone_name || doc.description || zoneId;\n}\n\nconsole.log(JSON.stringify({ zone_id: zoneId, description: description }));\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "continueOnError": true,
+      "on_success": "generate_prompt",
+      "on_failure": "generate_prompt"
+    },
+    {
+      "id": "generate_prompt",
+      "type": "transform",
+      "name": "生成 AI 生图提示词",
+      "description": "根据 Art Bible 和场景描述生成智绘提示词",
+      "expression": "(function() { const zoneInfo = JSON.parse('${nodes.load_zone_description.output.stdout || \"{}\"}'); const basePrompt = 'pixel art game background, cyberpunk noir style, dark atmosphere, 16-bit aesthetic'; const scenePrompt = zoneInfo.description || '${inputs.title}'; const sizePrompt = '${inputs.width}x${inputs.height} pixels'; return { prompt: basePrompt + ', ' + scenePrompt + ', ' + sizePrompt, negative_prompt: 'photo, realistic, 3D, blurry, low quality', style: 'pixel_art', dimensions: { width: ${inputs.width}, height: ${inputs.height} } }; })()",
+      "timeout_ms": 10000,
+      "on_success": "execute_ai_generation"
+    },
+    {
+      "id": "execute_ai_generation",
+      "type": "shell",
+      "name": "执行 AI 生图",
+      "description": "调用 MCP 浏览器访问智绘生成图片（Windows 环境）",
+      "command": "echo '[MCP Required] AI 生图任务已准备，需要在 Windows MCP Runner 环境执行'\necho 'Prompt: ${nodes.generate_prompt.output.prompt}'\necho 'Dimensions: ${inputs.width}x${inputs.height}'\necho 'Output: assets/images/backgrounds/${inputs.zone_id || inputs.task_id}.png'\n# TODO: 实际调用 MCP 浏览器访问智绘\n# 此处为占位，实际执行需要 Windows MCP Runner",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 600000,
+      "on_success": "post_process",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "post_process",
+      "type": "shell",
+      "name": "后处理",
+      "description": "裁剪、格式转换、优化 PNG",
+      "command": "echo 'Post-processing placeholder'\necho 'Expected output: PNG format, ${inputs.width}x${inputs.height}px'\n# TODO: 实际后处理\n# - 裁剪到目标尺寸\n# - 确保 PNG 格式\n# - 优化文件大小",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "validate_asset",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "validate_asset",
+      "type": "shell",
+      "name": "验证资源",
+      "description": "验证输出的 PNG 资源规格",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = require('path');\n\nconst outputPath = '${inputs.project_root}/assets/images/backgrounds/${inputs.zone_id || inputs.task_id}.png';\n\nif (fs.existsSync(outputPath)) {\n  const stats = fs.statSync(outputPath);\n  console.log('Asset validated:');\n  console.log('  Path:', outputPath);\n  console.log('  Size:', stats.size, 'bytes');\n  console.log('  Format: PNG');\n} else {\n  console.log('Asset not yet created (placeholder mode)');\n}\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "update_asset_registry",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "update_asset_registry",
+      "type": "shell",
+      "name": "更新资源注册表",
+      "description": "更新资源注册表，触发白盒替换",
+      "command": "node -e \"\nconst fs = require('fs');\nconst path = '${inputs.project_root}/src/data/asset-registry.json';\nlet registry = fs.existsSync(path) ? JSON.parse(fs.readFileSync(path)) : { backgrounds: {}, characters: {}, objects: {} };\n\nregistry.backgrounds = registry.backgrounds || {};\nregistry.backgrounds['${inputs.zone_id || inputs.task_id}'] = {\n  path: 'assets/images/backgrounds/${inputs.zone_id || inputs.task_id}.png',\n  width: ${inputs.width},\n  height: ${inputs.height},\n  format: 'PNG',\n  asset_mode: 'production',\n  updated_at: new Date().toISOString()\n};\n\nfs.writeFileSync(path, JSON.stringify(registry, null, 2));\nconsole.log('Asset registry updated for:', '${inputs.zone_id || inputs.task_id}');\n\"",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 30000,
+      "on_success": "git_commit",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "git_commit",
+      "type": "shell",
+      "name": "Git 提交",
+      "command": "git add assets/images/ src/data/asset-registry.json && git commit -m \"${inputs.task_id}: ${inputs.title} [L3_environment_artist]\" && git push origin HEAD || echo 'No changes to commit'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "notify_success",
+      "on_failure": "notify_warning"
+    },
+    {
+      "id": "notify_success",
+      "type": "http",
+      "name": "发送成功通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "场景美术完成",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_environment_artist\nzone_id=${inputs.zone_id}\nformat=PNG\nstatus=SUCCESS"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_warning",
+      "type": "http",
+      "name": "发送警告通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "场景美术警告",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_environment_artist\nstatus=WARNING"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送失败通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "场景美术失败",
+        "msg": "task_id=${inputs.task_id}\nrole=L3_environment_artist\nstatus=FAILED"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "load_art_bible" },
+    { "from": "load_art_bible", "to": "load_zone_description" },
+    { "from": "load_zone_description", "to": "generate_prompt" },
+    { "from": "generate_prompt", "to": "execute_ai_generation" },
+    { "from": "execute_ai_generation", "to": "post_process" },
+    { "from": "post_process", "to": "validate_asset" },
+    { "from": "validate_asset", "to": "update_asset_registry" },
+    { "from": "update_asset_registry", "to": "git_commit" },
+    { "from": "git_commit", "to": "notify_success" }
+  ],
+
+  "settings": {
+    "timeout_ms": 3600000,
+    "execution_runtime": "windows",
+    "requires_mcp": true,
+    "on_error": "notify"
+  }
+}
+

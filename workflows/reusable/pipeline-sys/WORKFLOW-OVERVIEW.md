@@ -376,4 +376,51 @@ curl -X POST "http://localhost:3210/run-environment-artist" \
 - **实现状态**：`workflows/reusable/pipeline-sys/IMPLEMENTATION-STATUS.md`
 - **总体分析报告**：`workflows/reusable/pipeline-sys/ANALYSIS-REPORT.md`
 
+---
+
+## 11. Mermaid 提前检查：本地预览 / 预检脚本 / 严格预编译
+
+你遇到的这类问题，主要来自 **GitHub Mermaid 渲染器对某些字符非常敏感**（典型：ASCII 括号 `()`、尖括号 `<...>`、以及未加引号的复杂 label）。
+
+### 11.1 本地预览（最快）
+
+- **Cursor / VSCode Markdown Preview**：`Ctrl+Shift+V` 打开预览
+- **建议安装扩展**（任选其一即可）：
+  - `Markdown Preview Mermaid Support`
+  - `Mermaid Markdown Syntax Highlighting`
+  - `Mermaid Editor`
+
+> 注意：IDE 预览的 Mermaid 版本可能与 GitHub 不完全一致，但能提前发现绝大多数语法错误。
+
+### 11.2 预检脚本（推荐：轻量、可进 CI）
+
+仓库已提供一个“零依赖”的 Mermaid 预检脚本，会扫描 Markdown 中的 ```mermaid code fence，提前提示常见炸点并定位到文件行号：
+
+- 脚本：`workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs`
+
+用法（在仓库根目录运行）：
+
+```bash
+node workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs workflows/reusable/pipeline-sys
+```
+
+也可以在 `game/` 下直接跑 npm 脚本：
+
+```bash
+cd game
+npm run validate:mermaid
+```
+
+### 11.3 严格预编译（最严格，但更重）
+
+如果你希望“和 GitHub 一样严格”，可以启用 strict 模式：脚本会尝试调用 `@mermaid-js/mermaid-cli` 做渲染预编译（失败就直接报错）。
+
+```bash
+node workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs workflows/reusable/pipeline-sys --strict
+```
+
+说明：
+
+- strict 模式依赖 `npx @mermaid-js/mermaid-cli`（可能会下载 Chromium，比较重，适合 CI 或需要强保证时使用）
+
 

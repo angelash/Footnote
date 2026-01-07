@@ -121,6 +121,43 @@ workflows/project/logs/
 2. 关闭 node settings → 关闭 Result/Expression 覆层（Esc/X）  
 3. snapshot → 再进行下一步点击/输入  
 
+---
+
+## Mermaid 图表：本地预检与 GitHub 兼容性（推荐）
+
+> 项目级强制规则见：`.cursor/rules/00-project.mdc`（**所有图表都必须用 Mermaid**，并要求提交前预检）
+
+### 背景
+GitHub 的 Mermaid 渲染器对某些字符/写法非常敏感，常见现象是 PR/README 渲染时报 `Parse error`。典型炸点：
+- ASCII 括号：`()` 出现在节点 label 内（尤其是 `A[...(...)]` / `B[/...(...)/]`）
+- 尖括号：`<run_id>` 这类 `<...>`
+- 复杂 label 未加引号：建议统一使用 `A["..."]`
+
+### 规则内容（检查清单）
+- [ ] **提交前预检**：运行 Mermaid 预检脚本（零依赖，能定位到文件与 mermaid block 行号）
+  - `cd game && npm run validate:mermaid`
+  - 或：`node workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs workflows/reusable/pipeline-sys`
+- [ ] **严格预编译（可选）**：需要更接近 GitHub 行为时使用（较重，可能下载 Chromium）
+  - `node workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs workflows/reusable/pipeline-sys --strict`
+- [ ] **写法规范**：
+  - 节点 label 统一用引号包裹：`A["xxx"]`
+  - 避免 ASCII 括号 `()`，优先用中文括号 `（ ）` 或直接移除括号
+  - 避免 `<...>`，优先用 `{run_id}` / `run_id`
+  - 换行统一使用 `<br/>`
+
+### 示例
+❌ 不推荐（GitHub 常炸）：
+```mermaid
+flowchart TB
+  A --> B[/intake<br/>(pm-intake.flowspec.json)/]
+```
+
+✅ 推荐（更稳定）：
+```mermaid
+flowchart TB
+  A --> B["/intake<br/>pm-intake.flowspec.json"]
+```
+
 ## 粒度上限（超出必须拆分）
 
 | 工件类型 | 上限 | 处理方式 |

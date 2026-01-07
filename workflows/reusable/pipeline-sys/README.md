@@ -14,10 +14,10 @@ Pipeline-Sys 是一个自建的流程执行可视化系统，提供行为树展�
 
 ```mermaid
 flowchart LR
-    A[n8n<br/>(Webhook，可选入口)] -->|HTTP| B[WSL Runner<br/>(执行器，:3210)]
-    B -->|工件落盘| C[(File System<br/>automation_runs/<run_id>)]
-    C --> D[Console<br/>(Fastify + SSE，:3230)]
-    D --> E[UI<br/>(React + ReactFlow，:3231)]
+    A["n8n<br/>Webhook（可选入口）"] -->|HTTP| B["WSL Runner<br/>执行器 :3210"]
+    B -->|工件落盘| C["File System<br/>automation_runs/{run_id}"]
+    C --> D["Console<br/>Fastify + SSE :3230"]
+    D --> E["UI<br/>React + ReactFlow :3231"]
 ```
 
 ## 目录结构

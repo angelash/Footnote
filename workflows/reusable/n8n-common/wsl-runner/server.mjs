@@ -68,7 +68,7 @@ const PORT = Number(process.env.PORT || "3210");
 // 队列管理器实例（启动时初始化）
 let taskQueue = null;
 
-const DEFAULT_PROJECT_ROOT = "/home/shash/work/Footnote";
+const DEFAULT_PROJECT_ROOT = process.cwd();
 
 const AUTOMATION_RUNS_DIR = "workflows/project/logs/automation_runs";
 const LOCK_DIR = path.posix.join(AUTOMATION_RUNS_DIR, "_lock");

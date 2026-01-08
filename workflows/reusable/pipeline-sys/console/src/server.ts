@@ -10,6 +10,7 @@ import { registerRunsRoutes } from './routes/runs.js';
 import { registerEventsRoutes } from './routes/events.js';
 import { registerFileRoutes } from './routes/file.js';
 import { registerControlRoutes } from './routes/control.js';
+import { registerQueueRoutes } from './routes/queue.js';
 import { checkRunnerHealth } from './clients/runnerClient.js';
 
 /**
@@ -57,6 +58,7 @@ export async function createServer() {
   await registerEventsRoutes(app);
   await registerFileRoutes(app);
   await registerControlRoutes(app);
+  await registerQueueRoutes(app);
 
   // 全局错误处理
   app.setErrorHandler((error, request, reply) => {

@@ -60,9 +60,13 @@ import {
 
 // v2 引擎
 import { createFlowRunner, RunStatus } from "./lib/v2/index.mjs";
+import { TaskQueueManager, TaskStatus, QueueEventType } from "./lib/v2/task-queue.mjs";
 
 const HOST = process.env.HOST || "127.0.0.1";
 const PORT = Number(process.env.PORT || "3210");
+
+// 队列管理器实例（启动时初始化）
+let taskQueue = null;
 
 const DEFAULT_PROJECT_ROOT = "/home/shash/work/Footnote";
 
@@ -517,6 +521,104 @@ async function handleComposeTaskpack(body) {
 // ============================================
 
 /**
+ * 初始化任务队列管理器
+ */
+async function initTaskQueue(projectRoot) {
+  if (taskQueue) return taskQueue;
+  
+  taskQueue = new TaskQueueManager({
+    projectRoot,
+    executor: executeQueuedTask,
+    maxHistory: 100,
+    maxQueueSize: 1000,
+  });
+  
+  // 订阅队列事件用于日志
+  taskQueue.on('event', (event) => {
+    console.log(`[TaskQueue] ${event.type}:`, JSON.stringify(event).slice(0, 200));
+  });
+  
+  await taskQueue.init();
+  console.log('[TaskQueue] Initialized');
+  
+  return taskQueue;
+}
+
+/**
+ * 执行队列中的任务
+ * 这是 TaskQueueManager 的 executor 回调
+ */
+async function executeQueuedTask(task, options) {
+  const projectRoot = task.inputs?.project_root || DEFAULT_PROJECT_ROOT;
+  const flowspec = task.flowspec;
+  const inputs = task.inputs || {};
+  const runId = task.id;
+  
+  const runRelDir = path.posix.join(AUTOMATION_RUNS_DIR, runId);
+  const runAbsDir = safeResolveUnderProject(projectRoot, runRelDir);
+  
+  // 确保运行目录存在
+  await ensureDir(runAbsDir);
+  
+  // 解析 FlowSpec
+  let flowSpecObj;
+  const flowPath = safeResolveUnderProject(projectRoot, 
+    flowspec.startsWith('/') ? flowspec : `workflows/reusable/pipeline-sys/v2-design/examples/${flowspec}`
+  );
+  try {
+    const content = await fs.readFile(flowPath, "utf8");
+    flowSpecObj = JSON.parse(content);
+  } catch (e) {
+    return { ok: false, error: `Failed to load flowspec: ${e.message}` };
+  }
+  
+  // 创建工件写入器
+  const artifactWriter = async (name, data, opts = {}) => {
+    const absPath = path.posix.join(runAbsDir, name);
+    if (opts.raw) {
+      await writeText(absPath, data);
+    } else {
+      await writeJson(absPath, data);
+    }
+  };
+  
+  // 创建 FlowRunner（注入队列管理器）
+  const runner = createFlowRunner({
+    runId,
+    runDir: runAbsDir,
+    artifactWriter,
+    emitEvents: true,
+    queueManager: options.queueManager,
+    baseUrl: `http://${HOST}:${PORT}`,
+  });
+  
+  // 支持取消
+  if (options.signal) {
+    options.signal.addEventListener('abort', () => runner.cancel());
+  }
+  
+  try {
+    const result = await runner.run(flowSpecObj, inputs);
+    return {
+      ok: result.success,
+      run_id: runId,
+      status: result.status,
+      flow_id: result.flowId,
+      duration_ms: result.duration,
+      error: result.error,
+      output: result.output,
+      subtasks_count: runner.subtasks?.length || 0,
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      run_id: runId,
+      error: e.message,
+    };
+  }
+}
+
+/**
  * 处理 v2 流程执行请求
  * 
  * @param {Object} body 请求体
@@ -525,6 +627,7 @@ async function handleComposeTaskpack(body) {
  * @param {string} [body.run_id] - 自定义运行 ID
  * @param {string} [body.project_root] - 项目根目录
  * @param {boolean} [body.async] - 是否异步执行
+ * @param {boolean} [body.use_queue] - 是否使用队列（默认 false）
  * @returns {Promise<Object>} 执行结果
  */
 async function handleV2Run(body) {
@@ -533,9 +636,30 @@ async function handleV2Run(body) {
   const inputs = body.inputs || {};
   const customRunId = body.run_id || body.runId;
   const isAsync = body.async === true;
+  const useQueue = body.use_queue === true;
 
   if (!flowspec) {
     return { ok: false, error: "flowspec is required (JSON object or file path)" };
+  }
+
+  // 如果使用队列，入队而非直接执行
+  if (useQueue) {
+    await initTaskQueue(projectRoot);
+    const task = await taskQueue.enqueue({
+      id: customRunId,
+      flowspec: typeof flowspec === 'string' ? flowspec : 'inline-spec',
+      inputs: { ...inputs, project_root: projectRoot, _flowspec_inline: typeof flowspec !== 'string' ? flowspec : undefined },
+      priority: body.priority || 10,
+      parent_id: body.parent_id,
+    });
+    
+    return {
+      ok: true,
+      run_id: task.id,
+      status: 'queued',
+      message: 'Task queued for execution',
+      queue_position: taskQueue.state.tasks.findIndex(t => t.id === task.id),
+    };
   }
 
   // 生成或使用自定义 run_id
@@ -571,12 +695,17 @@ async function handleV2Run(body) {
     }
   };
 
+  // 初始化队列管理器（用于子任务分发）
+  await initTaskQueue(projectRoot);
+
   // 创建 FlowRunner
   const runner = createFlowRunner({
     runId,
     runDir: runAbsDir,
     artifactWriter,
     emitEvents: true,
+    queueManager: taskQueue,
+    baseUrl: `http://${HOST}:${PORT}`,
   });
 
   // 执行函数
@@ -592,6 +721,7 @@ async function handleV2Run(body) {
         error: result.error,
         output: result.output,
         logs_dir: runRelDir,
+        subtasks_count: runner.subtasks?.length || 0,
       };
     } catch (e) {
       return {
@@ -1304,6 +1434,184 @@ const server = http.createServer(async (req, res) => {
       }
     }
 
+    // ============================================
+    // 队列管理 API
+    // ============================================
+
+    // GET /queue - 获取队列状态
+    if (req.method === "GET" && req.url === "/queue") {
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const status = taskQueue.getStatus();
+        return json(res, 200, { ok: true, ...status });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // GET /queue/history - 获取队列历史
+    if (req.method === "GET" && req.url?.startsWith("/queue/history")) {
+      const q = getQueryParams(req.url);
+      const limit = parseInt(q.limit || '20', 10);
+      const offset = parseInt(q.offset || '0', 10);
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const history = taskQueue.getHistory(limit, offset);
+        return json(res, 200, { 
+          ok: true, 
+          history,
+          total: taskQueue.state.history.length,
+          limit,
+          offset
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /queue/pause - 暂停队列
+    if (req.method === "POST" && req.url === "/queue/pause") {
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        await taskQueue.pause();
+        return json(res, 200, { 
+          ok: true, 
+          paused: true, 
+          message: "Queue paused. Current task will complete, new tasks won't start."
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /queue/resume - 恢复队列
+    if (req.method === "POST" && req.url === "/queue/resume") {
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        await taskQueue.resume();
+        return json(res, 200, { 
+          ok: true, 
+          paused: false, 
+          message: "Queue resumed. Pending tasks will start processing."
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /queue/clear - 清空待执行队列
+    if (req.method === "POST" && req.url === "/queue/clear") {
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const count = await taskQueue.clear();
+        return json(res, 200, { 
+          ok: true, 
+          cleared_count: count,
+          message: `Cleared ${count} queued tasks.`
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // GET /queue/:task_id - 获取任务详情
+    if (req.method === "GET" && req.url?.match(/^\/queue\/[^/]+$/)) {
+      const taskId = req.url.split('/')[2];
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const task = taskQueue.getTask(taskId);
+        if (!task) {
+          return json(res, 404, { ok: false, error: "Task not found" });
+        }
+        return json(res, 200, { ok: true, task });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // DELETE /queue/:task_id - 取消/移除任务
+    if (req.method === "DELETE" && req.url?.match(/^\/queue\/[^/]+$/)) {
+      const taskId = req.url.split('/')[2];
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const cancelled = await taskQueue.cancel(taskId);
+        if (!cancelled) {
+          return json(res, 404, { ok: false, error: "Task not found or already completed" });
+        }
+        return json(res, 200, { 
+          ok: true, 
+          task_id: taskId, 
+          message: "Task cancelled"
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /queue/:task_id/retry - 重试失败任务
+    if (req.method === "POST" && req.url?.match(/^\/queue\/[^/]+\/retry$/)) {
+      const taskId = req.url.split('/')[2];
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const newTask = await taskQueue.retry(taskId);
+        if (!newTask) {
+          return json(res, 404, { ok: false, error: "Task not found or not in failed/cancelled state" });
+        }
+        return json(res, 200, { 
+          ok: true, 
+          original_task_id: taskId,
+          new_task_id: newTask.id,
+          message: "Task queued for retry"
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /queue/:task_id/priority - 调整优先级
+    if (req.method === "POST" && req.url?.match(/^\/queue\/[^/]+\/priority$/)) {
+      const taskId = req.url.split('/')[2];
+      const body = await readJsonBody(req);
+      const priority = body.priority;
+      
+      if (typeof priority !== 'number') {
+        return json(res, 400, { ok: false, error: "priority (number) is required" });
+      }
+      
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const updated = await taskQueue.setPriority(taskId, priority);
+        if (!updated) {
+          return json(res, 404, { ok: false, error: "Task not found in queue" });
+        }
+        return json(res, 200, { 
+          ok: true, 
+          task_id: taskId,
+          priority,
+          message: "Priority updated"
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // GET /queue/:task_id/subtasks - 获取子任务列表
+    if (req.method === "GET" && req.url?.match(/^\/queue\/[^/]+\/subtasks$/)) {
+      const taskId = req.url.split('/')[2];
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const subtasks = taskQueue.getSubtasks(taskId);
+        return json(res, 200, { 
+          ok: true, 
+          parent_id: taskId,
+          count: subtasks.length,
+          subtasks
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
     // GET /flows - 列出可用流程
     if (req.method === "GET" && req.url === "/flows") {
       return json(res, 200, {
@@ -1339,6 +1647,18 @@ const server = http.createServer(async (req, res) => {
           
           // 通用组长
           { id: "lead-decompose", name: "组长拆解", endpoint: "/decompose", description: "大任务拆分为子任务" }
+        ],
+        queue_endpoints: [
+          { method: "GET", endpoint: "/queue", description: "获取队列状态" },
+          { method: "GET", endpoint: "/queue/history", description: "获取历史记录（支持 limit/offset）" },
+          { method: "POST", endpoint: "/queue/pause", description: "暂停队列" },
+          { method: "POST", endpoint: "/queue/resume", description: "恢复队列" },
+          { method: "POST", endpoint: "/queue/clear", description: "清空待执行队列" },
+          { method: "GET", endpoint: "/queue/:task_id", description: "获取任务详情" },
+          { method: "DELETE", endpoint: "/queue/:task_id", description: "取消/移除任务" },
+          { method: "POST", endpoint: "/queue/:task_id/retry", description: "重试失败任务" },
+          { method: "POST", endpoint: "/queue/:task_id/priority", description: "调整优先级" },
+          { method: "GET", endpoint: "/queue/:task_id/subtasks", description: "获取子任务列表" }
         ]
       });
     }

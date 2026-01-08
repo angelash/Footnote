@@ -1,7 +1,46 @@
-## Pipeline-Sys 工作流总览（最新实现：v2 FlowSpec + 多岗位流程）
+## Pipeline-Sys 工作流总览（最新实现：v2.4 队列编排 + 可视化干涉）
 
-> 更新时间：2026-01-07  
-> 适用范围：当前仓库实现（WSL Runner `server.mjs` + v2 FlowRunner + FlowSpec 示例集 + Pipeline-Sys Console/UI 可视化）
+> 更新时间：2026-01-08  
+> 适用范围：当前仓库实现（WSL Runner `server.mjs` + v2 FlowRunner + TaskQueueManager + FlowSpec 示例集 + Pipeline-Sys Console/UI 可视化）
+
+### 🆕 v2.4 新增：任务队列编排
+
+粗粒度任务（如 `/intake`）现在可以**自动拆解并按队列轮转执行所有子任务**：
+
+```mermaid
+flowchart LR
+    A["/intake<br/>粗粒度任务"] --> B["lead-decompose<br/>拆解为子任务"]
+    B --> C["TaskQueueManager<br/>入队"]
+    C --> D["串行执行<br/>子任务 1"]
+    D --> E["串行执行<br/>子任务 2"]
+    E --> F["..."]
+    F --> G["完成"]
+    
+    subgraph 可视化干涉
+        H["UI: /queue<br/>查看队列"]
+        I["暂停/恢复"]
+        J["取消/重试"]
+        K["调整优先级"]
+    end
+    
+    C -.-> H
+    H -.-> I
+    H -.-> J
+    H -.-> K
+```
+
+**队列管理端点**（WSL Runner :3210）：
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/queue` | GET | 获取队列状态 |
+| `/queue/pause` | POST | 暂停队列 |
+| `/queue/resume` | POST | 恢复队列 |
+| `/queue/clear` | POST | 清空待执行 |
+| `/queue/:taskId` | DELETE | 取消任务 |
+| `/queue/:taskId/retry` | POST | 重试失败 |
+| `/queue/:taskId/priority` | POST | 调整优先级 |
+
+**UI 入口**：`http://localhost:3231/queue`
 
 ---
 

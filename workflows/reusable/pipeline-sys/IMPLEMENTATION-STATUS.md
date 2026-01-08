@@ -1,7 +1,7 @@
 # Pipeline-Sys 实现状态报告
 
-> 更新时间：2026-01-07
-> 状态：**✅ v1 已完成 | ✅ v2 多角色流程完成**
+> 更新时间：2026-01-08
+> 状态：**✅ v1 已完成 | ✅ v2 多角色流程完成 | ✅ v2.4 队列编排完成**
 
 ---
 
@@ -29,8 +29,40 @@
 | **v2.1** | WSL Runner 集成 | ✅ 完成 | 10 通过 |
 | **v2.2** | /fixed-flow 硬编码迁移 | ✅ 完成 | - |
 | **v2.3** | 多角色流程 + 便捷入口 | ✅ 完成 | - |
+| **v2.4** | 队列编排 + 可视化干涉 | ✅ 完成 | - |
 
 **v2 总测试：197 个单元测试全部通过 ✅**
+
+### v2.4 变更记录 (2026-01-08)
+
+**新增功能**：任务队列编排 + 可视化干涉
+
+| 新增模块 | 文件 | 用途 |
+|----------|------|------|
+| **TaskQueueManager** | `lib/v2/task-queue.mjs` | 任务队列管理器（串行执行/状态跟踪/持久化） |
+| **Loop Body Executor** | `flow-runner.mjs` 扩展 | 循环体真正执行 + 子任务分发 |
+| **Queue Routes** | `console/src/routes/queue.ts` | Console 队列 API 代理 |
+| **QueuePanel** | `ui/src/components/Queue/` | 队列可视化面板 |
+| **QueuePage** | `ui/src/pages/QueuePage.tsx` | 队列管理页面 |
+
+| 新增端点 | 方法 | 说明 |
+|----------|------|------|
+| `/queue` | GET | 获取队列状态（paused, current, queue, history_count） |
+| `/queue/history` | GET | 获取历史记录（支持 limit/offset 分页） |
+| `/queue/pause` | POST | 暂停队列（当前任务继续，新任务不启动） |
+| `/queue/resume` | POST | 恢复队列 |
+| `/queue/clear` | POST | 清空待执行队列 |
+| `/queue/:taskId` | GET | 获取任务详情 |
+| `/queue/:taskId` | DELETE | 取消/移除任务 |
+| `/queue/:taskId/retry` | POST | 重试失败任务 |
+| `/queue/:taskId/priority` | POST | 调整优先级 |
+| `/queue/:taskId/subtasks` | GET | 获取子任务列表 |
+
+**关键能力**：
+- **自动轮转**：粗粒度任务（如 `/intake`）拆解后，子任务自动按队列串行执行
+- **可视化**：实时查看队列状态、当前任务、子任务进度
+- **干涉能力**：暂停队列、取消任务、重试失败任务、调整优先级
+- **持久化**：队列状态持久化到 `workflows/project/logs/queue.json`，重启恢复
 
 ### v2.3 变更记录 (2026-01-07)
 
@@ -321,10 +353,26 @@ npx vitest run --config vitest.config.mjs
 - [x] `/v2/run` API 端点
 - [x] E2E 测试
 
-### v2.2 待完成
+### v2.2 ✅ 已完成
+- [x] `/fixed-flow` 硬编码迁移到配置化
+
+### v2.3 ✅ 已完成
+- [x] 多角色流程（程序员/写手/测试员/策划/美术）
+- [x] 便捷入口端点（`/intake`, `/run-role`, `/run-*`）
+- [x] 白盒资产流程（`/whitebox/*`）
+- [x] 组长拆解流程
+
+### v2.4 ✅ 已完成
+- [x] TaskQueueManager 队列管理器
+- [x] Loop body 真正执行 + 子任务分发
+- [x] 队列管理 API（10 个端点）
+- [x] 队列可视化 UI（QueuePanel + QueuePage）
+- [x] 队列状态持久化和恢复
+
+### v2.5 待完成
 - [ ] 流程文件热加载
 - [ ] 流程版本管理
-- [ ] 流程编辑器 UI
+- [ ] 流程编辑器 UI（节点参数编辑）
 
 ### v3 计划
 - [ ] 分布式执行
@@ -333,5 +381,5 @@ npx vitest run --config vitest.config.mjs
 
 ---
 
-*报告生成：2026-01-07*
-*版本：v1.0.0 / v2.1.0*
+*报告生成：2026-01-08*
+*版本：v1.0.0 / v2.4.0*

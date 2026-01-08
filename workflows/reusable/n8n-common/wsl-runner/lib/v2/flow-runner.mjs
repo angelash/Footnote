@@ -10,6 +10,7 @@
  * - 处理控制流（条件、并行、循环）
  * - 生成运行工件（graph.json, events.ndjson, status.json）
  * - 支持取消、超时、重试
+ * - 支持 loop body 执行和子任务分发
  * 
  * @module lib/v2/flow-runner
  */
@@ -17,7 +18,7 @@
 import { EventEmitter } from 'node:events';
 import { parseFlowSpec, ParseError } from './parser.mjs';
 import { ExecutionContext, createContextFromFlow } from './context.mjs';
-import { interpolate, interpolateDeep } from './expression.mjs';
+import { interpolate, interpolateDeep, evaluate } from './expression.mjs';
 import { getExecutor, hasExecutor } from './executors/index.mjs';
 
 /**
@@ -142,6 +143,8 @@ function getNodeSuccessors(node) {
  * @property {number} [defaultTimeout] - 默认节点超时（毫秒）
  * @property {boolean} [emitEvents] - 是否发出事件
  * @property {Function} [artifactWriter] - 工件写入器
+ * @property {TaskQueueManager} [queueManager] - 任务队列管理器（用于子任务分发）
+ * @property {string} [baseUrl] - 基础 URL（用于子任务分发）
  */
 
 /**
@@ -159,6 +162,8 @@ export class FlowRunner extends EventEmitter {
     this.defaultTimeout = config.defaultTimeout || 30 * 60 * 1000; // 30分钟
     this.emitEvents = config.emitEvents !== false;
     this.artifactWriter = config.artifactWriter || null;
+    this.queueManager = config.queueManager || null;
+    this.baseUrl = config.baseUrl || 'http://localhost:3210';
 
     // 运行状态
     this.status = RunStatus.PENDING;
@@ -177,6 +182,9 @@ export class FlowRunner extends EventEmitter {
     
     // 节点状态缓存
     this.nodeResults = new Map();
+    
+    // 子任务列表
+    this.subtasks = [];
   }
 
   /**
@@ -354,14 +362,22 @@ export class FlowRunner extends EventEmitter {
       // 计算超时
       const timeout = node.timeout_ms || this.defaultTimeout;
 
+      // 执行选项
+      const execOptions = {
+        signal: this.abortController.signal,
+        timeout,
+      };
+
+      // 如果是 loop 节点，注入 body 执行器
+      if (node.type === 'loop') {
+        resolvedConfig.executor = this._createLoopBodyExecutor();
+      }
+
       // 执行节点
       result = await executor.run(
         { ...node, config: resolvedConfig },
         this.context,
-        {
-          signal: this.abortController.signal,
-          timeout,
-        }
+        execOptions
       );
 
       // 更新节点状态
@@ -403,6 +419,162 @@ export class FlowRunner extends EventEmitter {
 
     // 处理后续节点
     await this._handleNodeCompletion(node, result);
+  }
+
+  /**
+   * 创建 loop body 执行器
+   * 用于在循环中执行 body 节点，并将异步 HTTP 调用分发为子任务
+   */
+  _createLoopBodyExecutor() {
+    return async (bodyNodes, context, options) => {
+      const results = [];
+      
+      for (const bodyNode of bodyNodes) {
+        if (this.cancelled || options.signal?.aborted) {
+          break;
+        }
+        
+        // 解析节点配置
+        const resolvedNode = typeof bodyNode === 'string' 
+          ? { id: bodyNode, type: 'ref' } 
+          : bodyNode;
+        
+        // 获取实际配置（解析变量）
+        let nodeConfig;
+        try {
+          nodeConfig = interpolateDeep(resolvedNode, context.getSnapshot());
+        } catch {
+          nodeConfig = resolvedNode;
+        }
+        
+        // 判断是否为子任务分发调用
+        if (this._isSubtaskDispatch(nodeConfig)) {
+          // 入队为子任务
+          const subtask = await this._enqueueSubtask(nodeConfig, context);
+          results.push({
+            nodeId: nodeConfig.id,
+            type: 'subtask_dispatched',
+            subtask,
+          });
+        } else {
+          // 直接执行
+          const nodeResult = await this._executeBodyNode(nodeConfig, context, options);
+          results.push({
+            nodeId: nodeConfig.id,
+            type: 'executed',
+            result: nodeResult,
+          });
+        }
+      }
+      
+      return results;
+    };
+  }
+
+  /**
+   * 判断是否为子任务分发调用
+   * 检测 HTTP 节点是否调用内部 API 且标记为异步
+   */
+  _isSubtaskDispatch(nodeConfig) {
+    if (nodeConfig.type !== 'http') return false;
+    
+    const url = nodeConfig.url || '';
+    const isInternalCall = url.includes('localhost:3210') || 
+                           url.includes('127.0.0.1:3210') ||
+                           url.startsWith('/');
+    
+    // 如果是内部调用且有队列管理器，视为子任务分发
+    // 或者如果显式标记为 async: true
+    return isInternalCall && (this.queueManager || nodeConfig.async);
+  }
+
+  /**
+   * 入队子任务
+   */
+  async _enqueueSubtask(nodeConfig, context) {
+    // 从 HTTP 节点配置中提取子任务信息
+    const body = nodeConfig.body || {};
+    const url = nodeConfig.url || '';
+    
+    // 解析 flowspec 路径
+    let flowspec = body.flowspec;
+    if (!flowspec) {
+      // 从 URL 路径推断 flowspec
+      const urlPath = url.replace(/^https?:\/\/[^/]+/, '');
+      const endpointToFlowspec = {
+        '/run-engineer': 'l3-execute.flowspec.json',
+        '/run-writer': 'l3-writer.flowspec.json',
+        '/run-tester': 'l3-tester.flowspec.json',
+        '/run-scripter': 'l3-scripter.flowspec.json',
+        '/run-ui-engineer': 'l3-ui-engineer.flowspec.json',
+        '/run-level-designer': 'l3-level-designer.flowspec.json',
+        '/run-environment-artist': 'l3-environment-artist.flowspec.json',
+        '/run-character-artist': 'l3-character-artist.flowspec.json',
+        '/run-animator': 'l3-animator.flowspec.json',
+        '/run-vfx-artist': 'l3-vfx-artist.flowspec.json',
+      };
+      flowspec = endpointToFlowspec[urlPath] || 'l3-execute.flowspec.json';
+    }
+    
+    const inputs = body.inputs || body;
+    
+    const subtaskInfo = {
+      flowspec,
+      inputs,
+      priority: body.priority ?? 10,
+      parent_id: this.runId,
+    };
+    
+    // 如果有队列管理器，入队
+    if (this.queueManager) {
+      const queuedTask = await this.queueManager.enqueue(subtaskInfo);
+      this.subtasks.push(queuedTask);
+      
+      this._emitEvent('SUBTASK_DISPATCHED', {
+        parent_id: this.runId,
+        subtask: queuedTask,
+      });
+      
+      return queuedTask;
+    }
+    
+    // 没有队列管理器，记录但不执行
+    const mockTask = {
+      ...subtaskInfo,
+      id: `subtask-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      status: 'pending',
+      queued_at: new Date().toISOString(),
+    };
+    this.subtasks.push(mockTask);
+    
+    return mockTask;
+  }
+
+  /**
+   * 直接执行 body 节点
+   */
+  async _executeBodyNode(nodeConfig, context, options) {
+    const executor = getExecutor(nodeConfig.type);
+    if (!executor) {
+      return { ok: false, error: `No executor for type: ${nodeConfig.type}` };
+    }
+    
+    try {
+      const result = await executor.run(
+        { ...nodeConfig, config: nodeConfig },
+        context,
+        options
+      );
+      
+      // 将结果存入上下文
+      if (nodeConfig.id && result.ok) {
+        context.setNodeOutput(nodeConfig.id, result.output);
+      }
+      
+      return result;
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
   }
 
   /**
@@ -564,6 +736,7 @@ export class FlowRunner extends EventEmitter {
       finished_at: new Date(this.endTime).toISOString(),
       duration_ms: this.endTime - this.startTime,
       error: this.error,
+      subtasks_count: this.subtasks.length,
     });
 
     // 写入 events.ndjson
@@ -580,6 +753,15 @@ export class FlowRunner extends EventEmitter {
     // 更新 graph.json（带状态）
     const graph = this._buildGraph();
     await this.artifactWriter('graph.json', graph);
+
+    // 写入 subtasks.json（如果有子任务）
+    if (this.subtasks.length > 0) {
+      await this.artifactWriter('subtasks.json', {
+        parent_id: this.runId,
+        count: this.subtasks.length,
+        subtasks: this.subtasks,
+      });
+    }
   }
 
   /**

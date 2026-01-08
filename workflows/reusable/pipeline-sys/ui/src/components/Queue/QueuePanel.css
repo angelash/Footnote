@@ -1,0 +1,329 @@
+/**
+ * Queue Panel Styles
+ */
+
+.queue-panel {
+  background: var(--bg-secondary, #1a1a2e);
+  border-radius: 8px;
+  padding: 16px;
+  color: var(--text-primary, #eee);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.queue-panel.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #888);
+}
+
+/* Header */
+.queue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color, #333);
+}
+
+.queue-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.queue-controls {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-pause {
+  background: var(--color-warning, #f59e0b);
+  color: #000;
+}
+
+.btn-pause:hover:not(:disabled) {
+  background: var(--color-warning-dark, #d97706);
+}
+
+.btn-resume {
+  background: var(--color-success, #10b981);
+  color: #fff;
+}
+
+.btn-resume:hover:not(:disabled) {
+  background: var(--color-success-dark, #059669);
+}
+
+.btn-clear {
+  background: var(--color-danger, #ef4444);
+  color: #fff;
+}
+
+.btn-clear:hover:not(:disabled) {
+  background: var(--color-danger-dark, #dc2626);
+}
+
+.btn-sm {
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 3px;
+  background: var(--bg-tertiary, #252538);
+  color: var(--text-secondary, #aaa);
+  border: 1px solid var(--border-color, #444);
+  cursor: pointer;
+}
+
+.btn-sm:hover {
+  background: var(--bg-hover, #333);
+  color: var(--text-primary, #eee);
+}
+
+.btn-cancel {
+  background: var(--color-danger-light, #fee2e2);
+  color: var(--color-danger, #ef4444);
+  border-color: var(--color-danger, #ef4444);
+}
+
+.btn-cancel:hover {
+  background: var(--color-danger, #ef4444);
+  color: #fff;
+}
+
+.btn-retry {
+  background: var(--color-info-light, #e0f2fe);
+  color: var(--color-info, #0ea5e9);
+  border-color: var(--color-info, #0ea5e9);
+}
+
+.btn-retry:hover {
+  background: var(--color-info, #0ea5e9);
+  color: #fff;
+}
+
+/* Error */
+.queue-error {
+  background: var(--color-danger-light, #fee2e2);
+  color: var(--color-danger, #ef4444);
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+
+/* Sections */
+.queue-section {
+  margin-bottom: 16px;
+}
+
+.queue-section h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #888);
+}
+
+.queue-list,
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.no-task {
+  color: var(--text-secondary, #666);
+  font-size: 13px;
+  padding: 8px;
+  background: var(--bg-tertiary, #252538);
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Task Card */
+.queue-task-card {
+  background: var(--bg-tertiary, #252538);
+  border-radius: 6px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--border-color, #444);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.queue-task-card:hover {
+  background: var(--bg-hover, #2a2a40);
+}
+
+.queue-task-card.running {
+  border-left-color: var(--color-info, #0ea5e9);
+}
+
+.queue-task-card.queued {
+  border-left-color: var(--color-warning, #f59e0b);
+}
+
+.queue-task-card.completed {
+  border-left-color: var(--color-success, #10b981);
+}
+
+.queue-task-card.failed {
+  border-left-color: var(--color-danger, #ef4444);
+}
+
+.queue-task-card.cancelled {
+  border-left-color: var(--text-secondary, #666);
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary, #888);
+  cursor: pointer;
+  padding: 0;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+}
+
+.expand-btn:hover {
+  color: var(--text-primary, #eee);
+}
+
+.task-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-primary, #eee);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtask-badge {
+  background: var(--color-info-light, #e0f2fe);
+  color: var(--color-info, #0ea5e9);
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.task-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary, #888);
+}
+
+.flowspec {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.priority {
+  color: var(--color-warning, #f59e0b);
+  font-weight: 500;
+}
+
+.task-controls {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.task-error {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--color-danger, #ef4444);
+  background: var(--color-danger-light, rgba(239, 68, 68, 0.1));
+  padding: 4px 6px;
+  border-radius: 3px;
+}
+
+/* Subtasks */
+.subtasks-list {
+  margin-top: 8px;
+  padding-left: 20px;
+  border-left: 2px dashed var(--border-color, #444);
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 11px;
+}
+
+.subtask-id {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary, #aaa);
+}
+
+.subtask-flowspec {
+  color: var(--text-secondary, #666);
+}
+
+.no-subtasks {
+  color: var(--text-secondary, #666);
+  font-size: 11px;
+  padding: 4px 0;
+}
+
+.more-history {
+  color: var(--text-secondary, #666);
+  font-size: 11px;
+  text-align: center;
+  padding: 8px;
+}
+
+/* Current Task */
+.current-task {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}

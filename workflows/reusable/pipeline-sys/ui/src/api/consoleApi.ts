@@ -10,7 +10,7 @@ import type {
   IControlResponse,
 } from '../types/dto';
 
-const API_BASE = '/api';
+export const API_BASE = '/api';
 
 /**
  * 获取所有 run 列表

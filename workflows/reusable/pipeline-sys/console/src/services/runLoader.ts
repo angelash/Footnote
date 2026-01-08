@@ -92,11 +92,20 @@ interface IGraphNodeV2 {
 }
 
 /**
+ * V2 Graph 边（实际数据用 source/target）
+ */
+interface IGraphEdgeV2 {
+  source: string;
+  target: string;
+  label?: string;
+}
+
+/**
  * V2 Graph 格式
  */
 interface IGraphV2 {
   nodes: IGraphNodeV2[];
-  edges?: Array<{ from: string; to: string }>;
+  edges?: IGraphEdgeV2[];
 }
 
 /**
@@ -112,18 +121,18 @@ function isValidGraphV2(obj: unknown): obj is IGraphV2 {
  * 将 v2 graph 转换为 v1 兼容格式
  */
 function convertGraphV2ToV1(v2: IGraphV2, runId: string): IGraphV1 {
-  const nodes: IGraphV1['nodes'] = v2.nodes.map((n, idx) => ({
+  const nodes: IGraphV1['nodes'] = v2.nodes.map((n) => ({
     id: n.id,
     type: n.type as IGraphV1['nodes'][number]['type'],
-    label: n.name || n.id,
-    data: { status: n.status },
-    position: { x: 0, y: idx * 80 },
+    title: n.name || n.id,  // v1 用 title，v2 用 name
+    parent_id: null,
+    outputs: [],
   }));
   
+  // v2 edge 用 source/target，v1 用 from/to
   const edges: IGraphV1['edges'] = v2.edges?.map(e => ({
-    id: `${e.from}-${e.to}`,
-    source: e.from,
-    target: e.to,
+    from: e.source,
+    to: e.target,
   })) || [];
   
   return {

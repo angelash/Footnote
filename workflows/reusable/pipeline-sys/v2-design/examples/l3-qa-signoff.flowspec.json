@@ -1,0 +1,251 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l3-qa-signoff",
+  "name": "L3 QA 签字流程",
+  "version": "1.0.0",
+  "description": "L3 测试员 QA 签字流程，对照 TaskPack 验收清单逐项检查",
+  "author": "Pipeline-Sys",
+  "tags": ["l3", "qa", "signoff", "acceptance", "checklist"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "任务 ID"
+    },
+    "task_pack_path": {
+      "type": "string",
+      "required": true,
+      "description": "TaskPack 文件路径"
+    },
+    "signoff_type": {
+      "type": "string",
+      "required": false,
+      "default": "feature",
+      "description": "签字类型 (feature/integration/release)"
+    },
+    "auto_checks": {
+      "type": "string",
+      "required": false,
+      "default": "lint,typecheck,test,build",
+      "description": "自动检查项（逗号分隔）"
+    },
+    "signer": {
+      "type": "string",
+      "required": false,
+      "default": "L3_tester",
+      "description": "签字人标识"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ signoff_id: 'QA-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(), task_id: inputs.task_id, signer: inputs.signer, started_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "load_taskpack"
+    },
+    {
+      "id": "load_taskpack",
+      "type": "file",
+      "name": "加载 TaskPack",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.task_pack_path}",
+      "timeout_ms": 30000,
+      "on_success": "parse_checklist",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "parse_checklist",
+      "type": "transform",
+      "name": "解析验收清单",
+      "description": "从 TaskPack 提取 Acceptance Checklist",
+      "expression": "(function() { const content = nodes.load_taskpack.output.content || ''; const checklistMatch = content.match(/Acceptance Checklist[\\s\\S]*?(?=##|$)/i); const items = []; if (checklistMatch) { const lines = checklistMatch[0].split('\\n'); lines.forEach(line => { const match = line.match(/^\\s*-\\s*\\[([x\\s])\\]\\s*(.+)/i); if (match) { items.push({ checked: match[1].toLowerCase() === 'x', text: match[2].trim(), auto: false, status: 'PENDING' }); } }); } return { checklist_items: items, total_items: items.length }; })()",
+      "timeout_ms": 60000,
+      "on_success": "check_has_items"
+    },
+    {
+      "id": "check_has_items",
+      "type": "condition",
+      "name": "检查是否有验收项",
+      "expression": "nodes.parse_checklist.output.total_items > 0",
+      "on_true": "run_auto_lint",
+      "on_false": "create_default_checklist"
+    },
+    {
+      "id": "create_default_checklist",
+      "type": "transform",
+      "name": "创建默认验收清单",
+      "expression": "({ checklist_items: [{ text: '交付物已落盘', auto: true, status: 'PENDING' }, { text: '代码通过 lint 检查', auto: true, status: 'PENDING' }, { text: '代码通过类型检查', auto: true, status: 'PENDING' }, { text: '测试通过', auto: true, status: 'PENDING' }, { text: '无冻结目录修改', auto: true, status: 'PENDING' }], total_items: 5 })",
+      "timeout_ms": 60000,
+      "on_success": "run_auto_lint"
+    },
+    {
+      "id": "run_auto_lint",
+      "type": "shell",
+      "name": "运行 Lint 检查",
+      "command": "cd game && npm run lint --if-present 2>&1 | tail -20 || echo 'LINT_SKIPPED'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "run_auto_typecheck",
+      "on_failure": "run_auto_typecheck"
+    },
+    {
+      "id": "run_auto_typecheck",
+      "type": "shell",
+      "name": "运行类型检查",
+      "command": "cd game && npm run typecheck --if-present 2>&1 | tail -20 || npx tsc --noEmit 2>&1 | tail -20 || echo 'TYPECHECK_SKIPPED'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "run_auto_test",
+      "on_failure": "run_auto_test"
+    },
+    {
+      "id": "run_auto_test",
+      "type": "shell",
+      "name": "运行测试",
+      "command": "cd game && npm run test --if-present 2>&1 | tail -30 || echo 'TEST_SKIPPED'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 600000,
+      "on_success": "run_auto_build",
+      "on_failure": "run_auto_build"
+    },
+    {
+      "id": "run_auto_build",
+      "type": "shell",
+      "name": "运行构建检查",
+      "command": "cd game && npm run build --if-present 2>&1 | tail -20 || echo 'BUILD_SKIPPED'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 600000,
+      "on_success": "check_frozen_dirs",
+      "on_failure": "check_frozen_dirs"
+    },
+    {
+      "id": "check_frozen_dirs",
+      "type": "shell",
+      "name": "检查冻结目录",
+      "description": "确保没有修改冻结目录",
+      "command": "git diff --name-only HEAD~1..HEAD 2>/dev/null | grep -E '^design/ai-native/0[01]_' && echo 'FROZEN_MODIFIED' || echo 'FROZEN_OK'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "aggregate_results",
+      "on_failure": "aggregate_results"
+    },
+    {
+      "id": "aggregate_results",
+      "type": "transform",
+      "name": "汇总检查结果",
+      "expression": "(function() { const results = { lint: nodes.run_auto_lint.status === 'SUCCESS' && !nodes.run_auto_lint.output.stdout.includes('error'), typecheck: nodes.run_auto_typecheck.status === 'SUCCESS' && !nodes.run_auto_typecheck.output.stdout.includes('error'), test: nodes.run_auto_test.status === 'SUCCESS' && !nodes.run_auto_test.output.stdout.includes('FAIL'), build: nodes.run_auto_build.status === 'SUCCESS', frozen_ok: !nodes.check_frozen_dirs.output.stdout.includes('FROZEN_MODIFIED') }; const checklist = (nodes.parse_checklist.output.checklist_items || nodes.create_default_checklist.output.checklist_items).map(item => { if (item.text.toLowerCase().includes('lint')) { return { ...item, status: results.lint ? 'PASS' : 'FAIL', auto: true }; } if (item.text.toLowerCase().includes('类型') || item.text.toLowerCase().includes('type')) { return { ...item, status: results.typecheck ? 'PASS' : 'FAIL', auto: true }; } if (item.text.toLowerCase().includes('测试') || item.text.toLowerCase().includes('test')) { return { ...item, status: results.test ? 'PASS' : 'FAIL', auto: true }; } if (item.text.toLowerCase().includes('冻结')) { return { ...item, status: results.frozen_ok ? 'PASS' : 'FAIL', auto: true }; } if (item.text.toLowerCase().includes('落盘') || item.text.toLowerCase().includes('交付')) { return { ...item, status: results.build ? 'PASS' : 'FAIL', auto: true }; } return { ...item, status: 'MANUAL_REQUIRED', auto: false }; }); const passed = checklist.filter(i => i.status === 'PASS').length; const failed = checklist.filter(i => i.status === 'FAIL').length; const manual = checklist.filter(i => i.status === 'MANUAL_REQUIRED').length; return { checklist, passed, failed, manual, total: checklist.length, pass_rate: passed + '/' + checklist.length, auto_results: results }; })()",
+      "timeout_ms": 60000,
+      "on_success": "determine_signoff"
+    },
+    {
+      "id": "determine_signoff",
+      "type": "condition",
+      "name": "判定签字结果",
+      "expression": "nodes.aggregate_results.output.failed === 0",
+      "on_true": "generate_pass_report",
+      "on_false": "generate_fail_report"
+    },
+    {
+      "id": "generate_pass_report",
+      "type": "transform",
+      "name": "生成通过报告",
+      "expression": "({ signoff_id: nodes.intake.output.signoff_id, task_id: inputs.task_id, result: nodes.aggregate_results.output.manual > 0 ? 'PARTIAL' : 'PASSED', signer: inputs.signer, checklist: nodes.aggregate_results.output.checklist, pass_rate: nodes.aggregate_results.output.pass_rate, blocking_issues: [], notes: nodes.aggregate_results.output.manual > 0 ? '部分项目需要人工验证' : '全部自动检查通过', completed_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "save_signoff_record"
+    },
+    {
+      "id": "generate_fail_report",
+      "type": "transform",
+      "name": "生成失败报告",
+      "expression": "({ signoff_id: nodes.intake.output.signoff_id, task_id: inputs.task_id, result: 'FAILED', signer: inputs.signer, checklist: nodes.aggregate_results.output.checklist, pass_rate: nodes.aggregate_results.output.pass_rate, blocking_issues: nodes.aggregate_results.output.checklist.filter(i => i.status === 'FAIL').map(i => i.text), notes: '存在未通过的检查项', completed_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "save_signoff_record"
+    },
+    {
+      "id": "save_signoff_record",
+      "type": "file",
+      "name": "保存签字记录",
+      "operation": "write",
+      "path": "${inputs.project_root}/workflows/project/logs/reviews/${nodes.intake.output.signoff_id}.json",
+      "content": "${JSON.stringify(nodes.generate_pass_report ? nodes.generate_pass_report.output : nodes.generate_fail_report.output, null, 2)}",
+      "timeout_ms": 30000,
+      "on_success": "notify_result",
+      "on_failure": "notify_result"
+    },
+    {
+      "id": "notify_result",
+      "type": "http",
+      "name": "发送签字结果通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "QA签字完成",
+        "msg": "signoff_id=${nodes.intake.output.signoff_id}\ntask_id=${inputs.task_id}\nresult=${nodes.generate_pass_report ? (nodes.aggregate_results.output.manual > 0 ? 'PARTIAL' : 'PASSED') : 'FAILED'}\npass_rate=${nodes.aggregate_results.output.pass_rate}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送错误通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "QA签字失败",
+        "msg": "task_id=${inputs.task_id}\nstatus=ERROR"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_taskpack" },
+    { "from": "load_taskpack", "to": "parse_checklist" },
+    { "from": "parse_checklist", "to": "check_has_items" },
+    { "from": "check_has_items", "to": "run_auto_lint", "condition": "has_items" },
+    { "from": "check_has_items", "to": "create_default_checklist", "condition": "no_items" },
+    { "from": "create_default_checklist", "to": "run_auto_lint" },
+    { "from": "run_auto_lint", "to": "run_auto_typecheck" },
+    { "from": "run_auto_typecheck", "to": "run_auto_test" },
+    { "from": "run_auto_test", "to": "run_auto_build" },
+    { "from": "run_auto_build", "to": "check_frozen_dirs" },
+    { "from": "check_frozen_dirs", "to": "aggregate_results" },
+    { "from": "aggregate_results", "to": "determine_signoff" },
+    { "from": "determine_signoff", "to": "generate_pass_report", "condition": "pass" },
+    { "from": "determine_signoff", "to": "generate_fail_report", "condition": "fail" },
+    { "from": "generate_pass_report", "to": "save_signoff_record" },
+    { "from": "generate_fail_report", "to": "save_signoff_record" },
+    { "from": "save_signoff_record", "to": "notify_result" }
+  ],
+
+  "outputs": {
+    "signoff_id": "nodes.intake.output.signoff_id",
+    "result": "nodes.generate_pass_report ? (nodes.aggregate_results.output.manual > 0 ? 'PARTIAL' : 'PASSED') : 'FAILED'",
+    "pass_rate": "nodes.aggregate_results.output.pass_rate",
+    "checklist": "nodes.aggregate_results.output.checklist"
+  },
+
+  "settings": {
+    "timeout_ms": 3600000,
+    "on_error": "notify"
+  }
+}

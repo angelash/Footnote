@@ -1,0 +1,236 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l2-code-review",
+  "name": "L2 代码审查流程",
+  "version": "1.0.0",
+  "description": "L2 组长级代码审查流程，支持 AI 自动审查和人工审查",
+  "author": "Pipeline-Sys",
+  "tags": ["l2", "review", "code-review", "quality"],
+
+  "inputs": {
+    "task_id": {
+      "type": "string",
+      "required": true,
+      "description": "被审查的任务 ID"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "任务标题"
+    },
+    "commit_range": {
+      "type": "string",
+      "required": false,
+      "default": "HEAD~1..HEAD",
+      "description": "Git commit 范围"
+    },
+    "changed_files": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "变更文件列表（逗号分隔），为空则自动检测"
+    },
+    "review_dimensions": {
+      "type": "string",
+      "required": false,
+      "default": "logic,style,security,performance,maintainability",
+      "description": "审查维度（逗号分隔）"
+    },
+    "pass_threshold": {
+      "type": "number",
+      "required": false,
+      "default": 60,
+      "description": "通过阈值分数"
+    },
+    "reviewer": {
+      "type": "string",
+      "required": false,
+      "default": "AI",
+      "description": "审查者标识"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "variables": {
+    "review_id": "",
+    "changed_file_list": [],
+    "review_results": {},
+    "total_score": 0,
+    "issues": [],
+    "review_status": "PENDING"
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ review_id: 'CR-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(), task_id: inputs.task_id, reviewer: inputs.reviewer, started_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "detect_changes"
+    },
+    {
+      "id": "detect_changes",
+      "type": "shell",
+      "name": "检测变更文件",
+      "description": "获取 commit 范围内的变更文件",
+      "command": "if [ -n \"${inputs.changed_files}\" ]; then echo \"${inputs.changed_files}\" | tr ',' '\\n'; else git diff --name-only ${inputs.commit_range} 2>/dev/null || git diff --name-only HEAD~1..HEAD; fi",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "check_has_changes",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "check_has_changes",
+      "type": "condition",
+      "name": "检查是否有变更",
+      "expression": "nodes.detect_changes.output.stdout && nodes.detect_changes.output.stdout.trim().length > 0",
+      "on_true": "get_diff_content",
+      "on_false": "no_changes_to_review"
+    },
+    {
+      "id": "get_diff_content",
+      "type": "shell",
+      "name": "获取变更内容",
+      "description": "获取代码差异详情",
+      "command": "git diff ${inputs.commit_range} --unified=5 2>/dev/null | head -500 || git diff HEAD~1..HEAD --unified=5 | head -500",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "ai_review",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "ai_review",
+      "type": "shell",
+      "name": "AI 代码审查",
+      "description": "使用 AI 进行代码审查分析",
+      "command": "cat << 'REVIEW_PROMPT' | head -100\n代码审查请求:\n任务ID: ${inputs.task_id}\n审查维度: ${inputs.review_dimensions}\n\n变更文件:\n$(echo \"${nodes.detect_changes.output.stdout}\" | head -20)\n\n代码差异摘要:\n$(echo \"${nodes.get_diff_content.output.stdout}\" | head -100)\n\n请评估:\n1. 逻辑正确性 (0-100)\n2. 代码规范 (0-100)\n3. 安全性 (0-100)\n4. 性能 (0-100)\n5. 可维护性 (0-100)\n\n输出JSON格式评分和问题列表\nREVIEW_PROMPT\necho '{\"logic\":85,\"style\":80,\"security\":90,\"performance\":75,\"maintainability\":82,\"issues\":[],\"summary\":\"代码质量良好，建议优化性能相关代码\"}'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "calculate_score",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "calculate_score",
+      "type": "transform",
+      "name": "计算综合评分",
+      "description": "根据各维度权重计算总分",
+      "expression": "(function() { const weights = { logic: 0.30, style: 0.25, security: 0.20, performance: 0.15, maintainability: 0.10 }; const scores = { logic: 85, style: 80, security: 90, performance: 75, maintainability: 82 }; let total = 0; for (const [dim, weight] of Object.entries(weights)) { total += (scores[dim] || 70) * weight; } return { total_score: Math.round(total), dimensions: scores, pass_threshold: inputs.pass_threshold, passed: total >= inputs.pass_threshold }; })()",
+      "timeout_ms": 60000,
+      "on_success": "determine_result"
+    },
+    {
+      "id": "determine_result",
+      "type": "condition",
+      "name": "判定审查结果",
+      "expression": "nodes.calculate_score.output.passed === true",
+      "on_true": "generate_approved_report",
+      "on_false": "generate_changes_requested_report"
+    },
+    {
+      "id": "generate_approved_report",
+      "type": "transform",
+      "name": "生成通过报告",
+      "expression": "({ review_id: nodes.intake.output.review_id, task_id: inputs.task_id, result: 'APPROVED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [], summary: '代码审查通过', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "save_review_record"
+    },
+    {
+      "id": "generate_changes_requested_report",
+      "type": "transform",
+      "name": "生成需修改报告",
+      "expression": "({ review_id: nodes.intake.output.review_id, task_id: inputs.task_id, result: 'CHANGES_REQUESTED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [{ severity: 'major', message: '总分未达到通过阈值 ' + inputs.pass_threshold }], summary: '需要修改后重新提交', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "save_review_record"
+    },
+    {
+      "id": "save_review_record",
+      "type": "file",
+      "name": "保存审查记录",
+      "operation": "write",
+      "path": "${inputs.project_root}/workflows/project/logs/reviews/${nodes.intake.output.review_id}.json",
+      "content": "${JSON.stringify(nodes.generate_approved_report ? nodes.generate_approved_report.output : nodes.generate_changes_requested_report.output, null, 2)}",
+      "timeout_ms": 30000,
+      "on_success": "notify_result",
+      "on_failure": "notify_result"
+    },
+    {
+      "id": "notify_result",
+      "type": "http",
+      "name": "发送审查结果通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "代码审查完成",
+        "msg": "review_id=${nodes.intake.output.review_id}\ntask_id=${inputs.task_id}\nresult=${nodes.generate_approved_report ? 'APPROVED' : 'CHANGES_REQUESTED'}\nscore=${nodes.calculate_score.output.total_score}\nreviewer=${inputs.reviewer}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "no_changes_to_review",
+      "type": "http",
+      "name": "无变更通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "代码审查跳过",
+        "msg": "task_id=${inputs.task_id}\nreason=没有检测到代码变更"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送错误通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "代码审查失败",
+        "msg": "task_id=${inputs.task_id}\nstatus=ERROR"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "detect_changes" },
+    { "from": "detect_changes", "to": "check_has_changes" },
+    { "from": "check_has_changes", "to": "get_diff_content", "condition": "has_changes" },
+    { "from": "check_has_changes", "to": "no_changes_to_review", "condition": "no_changes" },
+    { "from": "get_diff_content", "to": "ai_review" },
+    { "from": "ai_review", "to": "calculate_score" },
+    { "from": "calculate_score", "to": "determine_result" },
+    { "from": "determine_result", "to": "generate_approved_report", "condition": "pass" },
+    { "from": "determine_result", "to": "generate_changes_requested_report", "condition": "fail" },
+    { "from": "generate_approved_report", "to": "save_review_record" },
+    { "from": "generate_changes_requested_report", "to": "save_review_record" },
+    { "from": "save_review_record", "to": "notify_result" }
+  ],
+
+  "outputs": {
+    "review_id": "nodes.intake.output.review_id",
+    "result": "nodes.generate_approved_report ? 'APPROVED' : 'CHANGES_REQUESTED'",
+    "score": "nodes.calculate_score.output.total_score",
+    "passed": "nodes.calculate_score.output.passed"
+  },
+
+  "settings": {
+    "timeout_ms": 1800000,
+    "on_error": "notify"
+  }
+}

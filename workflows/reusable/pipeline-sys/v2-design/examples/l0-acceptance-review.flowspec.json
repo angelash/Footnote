@@ -1,0 +1,222 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l0-acceptance-review",
+  "name": "L0 里程碑验收流程",
+  "version": "1.0.0",
+  "description": "L0 制作委员会级里程碑验收流程，汇总所有审查结果并生成综合验收报告",
+  "author": "Pipeline-Sys",
+  "tags": ["l0", "acceptance", "milestone", "review", "report"],
+
+  "inputs": {
+    "milestone_id": {
+      "type": "string",
+      "required": true,
+      "description": "里程碑 ID (如 M1-Alpha)"
+    },
+    "scope_chapters": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "验收范围-章节（逗号分隔，如 C0,C1）"
+    },
+    "scope_systems": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "验收范围-系统（逗号分隔，如 dialogue,inventory）"
+    },
+    "period_start": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "统计周期开始日期 (YYYY-MM-DD)"
+    },
+    "period_end": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "统计周期结束日期 (YYYY-MM-DD)"
+    },
+    "reviewer": {
+      "type": "string",
+      "required": false,
+      "default": "L0_producer",
+      "description": "验收人标识"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ acceptance_id: 'ACC-' + inputs.milestone_id + '-' + new Date().toISOString().slice(0,10).replace(/-/g,''), milestone_id: inputs.milestone_id, started_at: new Date().toISOString(), period: { start: inputs.period_start || new Date(Date.now() - 30*24*60*60*1000).toISOString().slice(0,10), end: inputs.period_end || new Date().toISOString().slice(0,10) } })",
+      "timeout_ms": 60000,
+      "on_success": "collect_reviews"
+    },
+    {
+      "id": "collect_reviews",
+      "type": "shell",
+      "name": "收集审查记录",
+      "description": "扫描 reviews 目录获取所有审查记录",
+      "command": "mkdir -p workflows/project/logs/reviews && find workflows/project/logs/reviews -name '*.json' -type f 2>/dev/null | head -100 | while read f; do cat \"$f\" 2>/dev/null; echo ','; done | sed 's/,$//' | sed 's/^/[/' | sed 's/$/]/' || echo '[]'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "parse_reviews",
+      "on_failure": "parse_reviews"
+    },
+    {
+      "id": "parse_reviews",
+      "type": "transform",
+      "name": "解析审查记录",
+      "expression": "(function() { try { const output = nodes.collect_reviews.output.stdout || '[]'; const reviews = JSON.parse(output.replace(/,\\s*,/g, ',').replace(/,\\s*]/g, ']')); return { reviews: reviews.filter(r => r && r.review_id), total: reviews.length }; } catch(e) { return { reviews: [], total: 0, error: e.message }; } })()",
+      "timeout_ms": 60000,
+      "on_success": "categorize_reviews"
+    },
+    {
+      "id": "categorize_reviews",
+      "type": "transform",
+      "name": "分类统计审查",
+      "expression": "(function() { const reviews = nodes.parse_reviews.output.reviews || []; const stats = { code_reviews: reviews.filter(r => r.review_id && r.review_id.startsWith('CR-')), design_reviews: reviews.filter(r => r.review_id && r.review_id.startsWith('DR-')), qa_signoffs: reviews.filter(r => r.review_id && r.review_id.startsWith('QA-')) }; const crPassed = stats.code_reviews.filter(r => r.result === 'APPROVED').length; const drPassed = stats.design_reviews.filter(r => r.result === 'APPROVED').length; const qaPassed = stats.qa_signoffs.filter(r => r.result === 'PASSED' || r.result === 'PARTIAL').length; return { code_review: { total: stats.code_reviews.length, passed: crPassed, failed: stats.code_reviews.length - crPassed, avg_score: stats.code_reviews.length > 0 ? Math.round(stats.code_reviews.reduce((s, r) => s + (r.score || 0), 0) / stats.code_reviews.length) : 0 }, design_review: { total: stats.design_reviews.length, passed: drPassed, failed: stats.design_reviews.length - drPassed, avg_score: stats.design_reviews.length > 0 ? Math.round(stats.design_reviews.reduce((s, r) => s + (r.score || 0), 0) / stats.design_reviews.length) : 0 }, qa_signoff: { total: stats.qa_signoffs.length, passed: qaPassed, failed: stats.qa_signoffs.length - qaPassed }, all_reviews: reviews }; })()",
+      "timeout_ms": 60000,
+      "on_success": "collect_tasks"
+    },
+    {
+      "id": "collect_tasks",
+      "type": "shell",
+      "name": "收集任务状态",
+      "description": "扫描 taskpacks 目录统计任务",
+      "command": "find design/ai-native/03_taskpacks -name '*.md' -type f 2>/dev/null | wc -l && find design/ai-native/03_taskpacks -name '*.md' -type f 2>/dev/null | head -50",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "collect_issues",
+      "on_failure": "collect_issues"
+    },
+    {
+      "id": "collect_issues",
+      "type": "shell",
+      "name": "收集问题列表",
+      "description": "从审查记录中提取所有问题",
+      "command": "grep -r 'FAIL\\|REJECTED\\|CHANGES_REQUESTED' workflows/project/logs/reviews/*.json 2>/dev/null | head -20 || echo 'NO_ISSUES'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "generate_summary",
+      "on_failure": "generate_summary"
+    },
+    {
+      "id": "generate_summary",
+      "type": "transform",
+      "name": "生成验收摘要",
+      "expression": "(function() { const stats = nodes.categorize_reviews.output; const taskCount = parseInt(nodes.collect_tasks.output.stdout.split('\\n')[0]) || 0; const hasBlockers = nodes.collect_issues.output.stdout.includes('REJECTED') || nodes.collect_issues.output.stdout.includes('FAIL'); const overallPassRate = (stats.code_review.total + stats.design_review.total + stats.qa_signoff.total) > 0 ? Math.round(((stats.code_review.passed + stats.design_review.passed + stats.qa_signoff.passed) / (stats.code_review.total + stats.design_review.total + stats.qa_signoff.total)) * 100) : 100; return { tasks_total: taskCount, code_review_pass_rate: stats.code_review.total > 0 ? Math.round((stats.code_review.passed / stats.code_review.total) * 100) + '%' : 'N/A', design_review_pass_rate: stats.design_review.total > 0 ? Math.round((stats.design_review.passed / stats.design_review.total) * 100) + '%' : 'N/A', qa_pass_rate: stats.qa_signoff.total > 0 ? Math.round((stats.qa_signoff.passed / stats.qa_signoff.total) * 100) + '%' : 'N/A', overall_pass_rate: overallPassRate + '%', avg_code_review_score: stats.code_review.avg_score, has_blockers: hasBlockers, details: stats }; })()",
+      "timeout_ms": 60000,
+      "on_success": "determine_decision"
+    },
+    {
+      "id": "determine_decision",
+      "type": "transform",
+      "name": "判定验收决策",
+      "expression": "(function() { const summary = nodes.generate_summary.output; const passRate = parseInt(summary.overall_pass_rate) || 0; if (summary.has_blockers) { return { decision: 'HOLD', reason: '存在阻塞问题需要先解决' }; } else if (passRate >= 90) { return { decision: 'PROCEED', reason: '验收通过，可以进入下一阶段' }; } else if (passRate >= 70) { return { decision: 'CONDITIONAL', reason: '有条件通过，需要跟踪问题修复' }; } else { return { decision: 'HOLD', reason: '通过率过低，建议暂停推进' }; } })()",
+      "timeout_ms": 60000,
+      "on_success": "generate_progress_report"
+    },
+    {
+      "id": "generate_progress_report",
+      "type": "transform",
+      "name": "生成进度报告",
+      "expression": "({ type: 'progress', milestone_id: inputs.milestone_id, period: nodes.intake.output.period, summary: nodes.generate_summary.output, highlights: ['审查体系运行正常', '代码质量整体良好'], concerns: nodes.generate_summary.output.has_blockers ? ['存在未解决的阻塞问题'] : [], next_steps: nodes.determine_decision.output.decision === 'PROCEED' ? ['启动下一里程碑'] : ['修复阻塞问题', '补充缺失的审查'] })",
+      "timeout_ms": 60000,
+      "on_success": "generate_issue_report"
+    },
+    {
+      "id": "generate_issue_report",
+      "type": "transform",
+      "name": "生成问题报告",
+      "expression": "(function() { const reviews = nodes.categorize_reviews.output.all_reviews || []; const blockers = reviews.filter(r => r.result === 'REJECTED' || (r.blocking_issues && r.blocking_issues.length > 0)); const warnings = reviews.filter(r => r.result === 'CHANGES_REQUESTED' || r.result === 'REVISION_REQUIRED'); return { type: 'issues', milestone_id: inputs.milestone_id, blockers: blockers.map(r => ({ id: r.review_id || r.signoff_id, task_id: r.task_id, issues: r.issues || r.blocking_issues || [] })), warnings: warnings.map(r => ({ id: r.review_id || r.signoff_id, task_id: r.task_id || r.doc_path, issues: r.issues || [] })), tech_debt: { todo_count: 0, fixme_count: 0, skip_test_count: 0 } }; })()",
+      "timeout_ms": 60000,
+      "on_success": "generate_final_report"
+    },
+    {
+      "id": "generate_final_report",
+      "type": "transform",
+      "name": "生成最终验收报告",
+      "expression": "({ acceptance_id: nodes.intake.output.acceptance_id, milestone_id: inputs.milestone_id, result: nodes.determine_decision.output.decision === 'PROCEED' ? 'ACCEPTED' : (nodes.determine_decision.output.decision === 'CONDITIONAL' ? 'CONDITIONAL' : 'REJECTED'), reviewer: inputs.reviewer, period: nodes.intake.output.period, summary: nodes.generate_summary.output, decision: nodes.determine_decision.output, progress_report: nodes.generate_progress_report.output, issue_report: nodes.generate_issue_report.output, recommendations: [nodes.determine_decision.output.reason], completed_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "save_acceptance_record"
+    },
+    {
+      "id": "save_acceptance_record",
+      "type": "file",
+      "name": "保存验收记录",
+      "operation": "write",
+      "path": "${inputs.project_root}/workflows/project/logs/reviews/${nodes.intake.output.acceptance_id}.json",
+      "content": "${JSON.stringify(nodes.generate_final_report.output, null, 2)}",
+      "timeout_ms": 30000,
+      "on_success": "save_progress_report_md",
+      "on_failure": "notify_result"
+    },
+    {
+      "id": "save_progress_report_md",
+      "type": "shell",
+      "name": "生成 Markdown 进度报告",
+      "command": "cat << 'EOF' > \"workflows/project/logs/reports/${nodes.intake.output.acceptance_id}-progress.md\"\n# 进度报告 - ${inputs.milestone_id}\n> 生成时间: $(date '+%Y-%m-%d %H:%M:%S')\n\n## 总体进度\n- 任务总数: ${nodes.generate_summary.output.tasks_total}\n- 代码审查通过率: ${nodes.generate_summary.output.code_review_pass_rate}\n- 设计审查通过率: ${nodes.generate_summary.output.design_review_pass_rate}\n- QA签字通过率: ${nodes.generate_summary.output.qa_pass_rate}\n- 综合通过率: ${nodes.generate_summary.output.overall_pass_rate}\n- 平均代码审查分数: ${nodes.generate_summary.output.avg_code_review_score}\n\n## 决策建议\n- **决策**: ${nodes.determine_decision.output.decision}\n- **原因**: ${nodes.determine_decision.output.reason}\n\n## 下一步\n$(echo '${JSON.stringify(nodes.generate_progress_report.output.next_steps)}' | sed 's/\\[//' | sed 's/\\]//' | sed 's/\",\"/\\n- /g' | sed 's/\"//g' | sed 's/^/- /')\nEOF\nmkdir -p workflows/project/logs/reports",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "notify_result",
+      "on_failure": "notify_result"
+    },
+    {
+      "id": "notify_result",
+      "type": "http",
+      "name": "发送验收结果通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "里程碑验收完成",
+        "msg": "acceptance_id=${nodes.intake.output.acceptance_id}\nmilestone=${inputs.milestone_id}\nresult=${nodes.determine_decision.output.decision}\npass_rate=${nodes.generate_summary.output.overall_pass_rate}\nrecommendation=${nodes.determine_decision.output.reason}"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "collect_reviews" },
+    { "from": "collect_reviews", "to": "parse_reviews" },
+    { "from": "parse_reviews", "to": "categorize_reviews" },
+    { "from": "categorize_reviews", "to": "collect_tasks" },
+    { "from": "collect_tasks", "to": "collect_issues" },
+    { "from": "collect_issues", "to": "generate_summary" },
+    { "from": "generate_summary", "to": "determine_decision" },
+    { "from": "determine_decision", "to": "generate_progress_report" },
+    { "from": "generate_progress_report", "to": "generate_issue_report" },
+    { "from": "generate_issue_report", "to": "generate_final_report" },
+    { "from": "generate_final_report", "to": "save_acceptance_record" },
+    { "from": "save_acceptance_record", "to": "save_progress_report_md" },
+    { "from": "save_progress_report_md", "to": "notify_result" }
+  ],
+
+  "outputs": {
+    "acceptance_id": "nodes.intake.output.acceptance_id",
+    "result": "nodes.determine_decision.output.decision",
+    "summary": "nodes.generate_summary.output",
+    "decision": "nodes.determine_decision.output",
+    "progress_report": "nodes.generate_progress_report.output",
+    "issue_report": "nodes.generate_issue_report.output"
+  },
+
+  "settings": {
+    "timeout_ms": 1800000,
+    "on_error": "notify"
+  }
+}

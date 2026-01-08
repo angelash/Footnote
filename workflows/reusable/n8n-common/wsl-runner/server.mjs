@@ -1435,6 +1435,197 @@ const server = http.createServer(async (req, res) => {
     }
 
     // ============================================
+    // 审查系统 API
+    // ============================================
+
+    // POST /review/code - 代码审查
+    if (req.method === "POST" && req.url === "/review/code") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l2-code-review.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            title: body.title || "",
+            commit_range: body.commit_range || body.commitRange || "HEAD~1..HEAD",
+            changed_files: body.changed_files || body.changedFiles || "",
+            review_dimensions: body.review_dimensions || body.reviewDimensions || "logic,style,security,performance,maintainability",
+            pass_threshold: body.pass_threshold || body.passThreshold || 60,
+            reviewer: body.reviewer || "AI"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /review/design - 设计审查
+    if (req.method === "POST" && req.url === "/review/design") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l1-design-review.flowspec.json`,
+          inputs: {
+            doc_path: body.doc_path || body.docPath,
+            doc_type: body.doc_type || body.docType || "spec",
+            review_focus: body.review_focus || body.reviewFocus || "completeness,consistency,feasibility,clarity",
+            parent_doc_path: body.parent_doc_path || body.parentDocPath || "",
+            pass_threshold: body.pass_threshold || body.passThreshold || 70,
+            reviewer: body.reviewer || "AI"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /review/qa-signoff - QA签字
+    if (req.method === "POST" && req.url === "/review/qa-signoff") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l3-qa-signoff.flowspec.json`,
+          inputs: {
+            task_id: body.task_id || body.taskId,
+            task_pack_path: body.task_pack_path || body.taskPackPath,
+            signoff_type: body.signoff_type || body.signoffType || "feature",
+            auto_checks: body.auto_checks || body.autoChecks || "lint,typecheck,test,build",
+            signer: body.signer || "L3_tester"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /review/acceptance - 里程碑验收
+    if (req.method === "POST" && req.url === "/review/acceptance") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l0-acceptance-review.flowspec.json`,
+          inputs: {
+            milestone_id: body.milestone_id || body.milestoneId,
+            scope_chapters: body.scope_chapters || body.scopeChapters || "",
+            scope_systems: body.scope_systems || body.scopeSystems || "",
+            period_start: body.period_start || body.periodStart || "",
+            period_end: body.period_end || body.periodEnd || "",
+            reviewer: body.reviewer || "L0_producer"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // POST /audit/intake - 制作人总体审核入口
+    if (req.method === "POST" && req.url === "/audit/intake") {
+      const body = await readJsonBody(req);
+      try {
+        const out = await handleV2Run({
+          flowspec: `${FLOWSPEC_BASE}/l0-audit-intake.flowspec.json`,
+          inputs: {
+            audit_scope: body.audit_scope || body.auditScope || "all",
+            milestone_id: body.milestone_id || body.milestoneId || "",
+            chapter_ids: body.chapter_ids || body.chapterIds || "",
+            period_days: body.period_days || body.periodDays || 7,
+            include_code_review: body.include_code_review !== false,
+            include_design_review: body.include_design_review !== false,
+            include_qa_signoff: body.include_qa_signoff !== false,
+            auto_trigger_missing: body.auto_trigger_missing || body.autoTriggerMissing || false,
+            report_format: body.report_format || body.reportFormat || "markdown",
+            requester: body.requester || "L0_producer"
+          },
+          async: body.async !== false
+        });
+        return json(res, 200, out);
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // GET /reviews - 列出所有审查记录
+    if (req.method === "GET" && req.url?.startsWith("/reviews")) {
+      const q = getQueryParams(req.url);
+      const reviewType = q.type || "";
+      const limit = parseInt(q.limit || "50", 10);
+      const projectRoot = q.project_root || DEFAULT_PROJECT_ROOT;
+      
+      try {
+        const reviewsDir = path.posix.join(projectRoot, "workflows/project/logs/reviews");
+        await ensureDir(reviewsDir);
+        
+        const files = await fs.readdir(reviewsDir).catch(() => []);
+        let reviews = [];
+        
+        for (const file of files.slice(0, limit)) {
+          if (file.endsWith(".json")) {
+            try {
+              const content = await fs.readFile(path.posix.join(reviewsDir, file), "utf8");
+              const review = JSON.parse(content);
+              if (!reviewType || 
+                  (reviewType === "code" && review.review_id?.startsWith("CR-")) ||
+                  (reviewType === "design" && review.review_id?.startsWith("DR-")) ||
+                  (reviewType === "qa" && review.signoff_id?.startsWith("QA-")) ||
+                  (reviewType === "acceptance" && review.acceptance_id?.startsWith("ACC-"))) {
+                reviews.push(review);
+              }
+            } catch (e) { /* skip invalid files */ }
+          }
+        }
+        
+        return json(res, 200, { 
+          ok: true, 
+          reviews,
+          total: reviews.length,
+          filter: reviewType || "all"
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // GET /audits - 列出审核报告
+    if (req.method === "GET" && req.url?.startsWith("/audits")) {
+      const q = getQueryParams(req.url);
+      const limit = parseInt(q.limit || "20", 10);
+      const projectRoot = q.project_root || DEFAULT_PROJECT_ROOT;
+      
+      try {
+        const auditsDir = path.posix.join(projectRoot, "workflows/project/logs/audits");
+        await ensureDir(auditsDir);
+        
+        const files = await fs.readdir(auditsDir).catch(() => []);
+        let audits = [];
+        
+        for (const file of files.slice(0, limit)) {
+          if (file.endsWith(".json")) {
+            try {
+              const content = await fs.readFile(path.posix.join(auditsDir, file), "utf8");
+              audits.push(JSON.parse(content));
+            } catch (e) { /* skip invalid files */ }
+          }
+        }
+        
+        return json(res, 200, { 
+          ok: true, 
+          audits,
+          total: audits.length
+        });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
+      }
+    }
+
+    // ============================================
     // 队列管理 API
     // ============================================
 
@@ -1646,7 +1837,23 @@ const server = http.createServer(async (req, res) => {
           { id: "l3-vfx-artist", name: "特效", endpoint: "/run-vfx-artist", description: "视觉特效/粒子效果（PNG）" },
           
           // 通用组长
-          { id: "lead-decompose", name: "组长拆解", endpoint: "/decompose", description: "大任务拆分为子任务" }
+          { id: "lead-decompose", name: "组长拆解", endpoint: "/decompose", description: "大任务拆分为子任务" },
+          
+          // 审查系统
+          { id: "l2-code-review", name: "代码审查", endpoint: "/review/code", description: "L2 组长级代码审查" },
+          { id: "l1-design-review", name: "设计审查", endpoint: "/review/design", description: "L1 总监级设计审查" },
+          { id: "l3-qa-signoff", name: "QA签字", endpoint: "/review/qa-signoff", description: "L3 测试员验收签字" },
+          { id: "l0-acceptance-review", name: "里程碑验收", endpoint: "/review/acceptance", description: "L0 里程碑综合验收" },
+          { id: "l0-audit-intake", name: "总体审核", endpoint: "/audit/intake", description: "制作人一键审核入口" }
+        ],
+        review_endpoints: [
+          { method: "POST", endpoint: "/review/code", description: "发起代码审查" },
+          { method: "POST", endpoint: "/review/design", description: "发起设计审查" },
+          { method: "POST", endpoint: "/review/qa-signoff", description: "发起QA签字" },
+          { method: "POST", endpoint: "/review/acceptance", description: "发起里程碑验收" },
+          { method: "POST", endpoint: "/audit/intake", description: "制作人总体审核" },
+          { method: "GET", endpoint: "/reviews", description: "列出审查记录（支持 ?type=code|design|qa|acceptance）" },
+          { method: "GET", endpoint: "/audits", description: "列出审核报告" }
         ],
         queue_endpoints: [
           { method: "GET", endpoint: "/queue", description: "获取队列状态" },

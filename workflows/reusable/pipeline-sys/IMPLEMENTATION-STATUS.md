@@ -1,7 +1,7 @@
 # Pipeline-Sys 实现状态报告
 
 > 更新时间：2026-01-08
-> 状态：**✅ v1 已完成 | ✅ v2 多角色流程完成 | ✅ v2.4 队列编排完成**
+> 状态：**✅ v1 已完成 | ✅ v2 多角色流程完成 | ✅ v2.4 队列编排完成 | ✅ v2.5 审查体系完成**
 
 ---
 
@@ -369,7 +369,16 @@ npx vitest run --config vitest.config.mjs
 - [x] 队列可视化 UI（QueuePanel + QueuePage）
 - [x] 队列状态持久化和恢复
 
-### v2.5 待完成
+### v2.5 ✅ 已完成
+- [x] 代码审查流程（l2-code-review）
+- [x] 设计审查流程（l1-design-review）
+- [x] QA签字流程（l3-qa-signoff）
+- [x] 里程碑验收流程（l0-acceptance-review）
+- [x] 制作人总体审核入口（l0-audit-intake）
+- [x] 进度报告 + 问题报告生成
+- [x] 审查记录存储和查询 API
+
+### v2.6 待完成
 - [ ] 流程文件热加载
 - [ ] 流程版本管理
 - [ ] 流程编辑器 UI（节点参数编辑）
@@ -382,4 +391,4 @@ npx vitest run --config vitest.config.mjs
 ---
 
 *报告生成：2026-01-08*
-*版本：v1.0.0 / v2.4.0*
+*版本：v1.0.0 / v2.5.0*

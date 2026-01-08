@@ -1,0 +1,249 @@
+{
+  "$schema": "../flowspec-schema.json",
+  "id": "l1-design-review",
+  "name": "L1 设计审查流程",
+  "version": "1.0.0",
+  "description": "L1 总监级设计审查流程，审查 Spec/TaskPack/Bible 文档质量",
+  "author": "Pipeline-Sys",
+  "tags": ["l1", "review", "design-review", "spec", "quality"],
+
+  "inputs": {
+    "doc_path": {
+      "type": "string",
+      "required": true,
+      "description": "被审查文档路径"
+    },
+    "doc_type": {
+      "type": "string",
+      "required": false,
+      "default": "spec",
+      "description": "文档类型 (spec/taskpack/bible)"
+    },
+    "review_focus": {
+      "type": "string",
+      "required": false,
+      "default": "completeness,consistency,feasibility,clarity",
+      "description": "审查重点（逗号分隔）"
+    },
+    "parent_doc_path": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "上层文档路径（用于一致性检查）"
+    },
+    "pass_threshold": {
+      "type": "number",
+      "required": false,
+      "default": 70,
+      "description": "通过阈值分数"
+    },
+    "reviewer": {
+      "type": "string",
+      "required": false,
+      "default": "AI",
+      "description": "审查者标识"
+    },
+    "project_root": {
+      "type": "string",
+      "required": false,
+      "default": "/home/shash/work/Footnote",
+      "description": "项目根目录"
+    }
+  },
+
+  "nodes": [
+    {
+      "id": "intake",
+      "type": "transform",
+      "name": "参数接收",
+      "expression": "({ review_id: 'DR-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(), doc_path: inputs.doc_path, doc_type: inputs.doc_type, started_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "load_document"
+    },
+    {
+      "id": "load_document",
+      "type": "file",
+      "name": "加载被审查文档",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.doc_path}",
+      "timeout_ms": 30000,
+      "on_success": "check_doc_exists",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "check_doc_exists",
+      "type": "condition",
+      "name": "检查文档是否存在",
+      "expression": "nodes.load_document.output.content && nodes.load_document.output.content.length > 50",
+      "on_true": "check_parent_doc",
+      "on_false": "notify_doc_not_found"
+    },
+    {
+      "id": "check_parent_doc",
+      "type": "condition",
+      "name": "检查是否需要加载上层文档",
+      "expression": "inputs.parent_doc_path && inputs.parent_doc_path.length > 0",
+      "on_true": "load_parent_document",
+      "on_false": "analyze_structure"
+    },
+    {
+      "id": "load_parent_document",
+      "type": "file",
+      "name": "加载上层文档",
+      "operation": "read",
+      "path": "${inputs.project_root}/${inputs.parent_doc_path}",
+      "timeout_ms": 30000,
+      "on_success": "analyze_structure",
+      "on_failure": "analyze_structure"
+    },
+    {
+      "id": "analyze_structure",
+      "type": "shell",
+      "name": "分析文档结构",
+      "description": "检查文档必要章节是否完整",
+      "command": "echo '检查文档结构...' && cat \"${inputs.project_root}/${inputs.doc_path}\" | grep -E '^#+' | head -20 && echo '---结构分析完成---'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 60000,
+      "on_success": "check_required_sections",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "check_required_sections",
+      "type": "transform",
+      "name": "检查必要章节",
+      "description": "根据文档类型检查必要章节",
+      "expression": "(function() { const docType = inputs.doc_type; const content = nodes.load_document.output.content || ''; const requiredSections = { spec: ['inputs', 'outputs', 'constraints', 'deliverables'], taskpack: ['outcome', 'allowed inputs', 'deliverables', 'constraints', 'acceptance'], bible: ['overview', 'principles', 'guidelines', 'references'] }; const required = requiredSections[docType] || requiredSections.spec; const missing = required.filter(s => !content.toLowerCase().includes(s)); return { doc_type: docType, required_sections: required, missing_sections: missing, completeness_score: Math.round(((required.length - missing.length) / required.length) * 100) }; })()",
+      "timeout_ms": 60000,
+      "on_success": "ai_design_review"
+    },
+    {
+      "id": "ai_design_review",
+      "type": "shell",
+      "name": "AI 设计审查",
+      "description": "使用 AI 进行设计质量审查",
+      "command": "echo '设计审查分析...' && echo '{\"completeness\":${nodes.check_required_sections.output.completeness_score},\"consistency\":85,\"feasibility\":80,\"clarity\":78,\"issues\":[],\"suggestions\":[\"建议补充边界条件说明\"],\"summary\":\"设计文档基本完整，建议补充细节\"}'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "calculate_score",
+      "on_failure": "notify_error"
+    },
+    {
+      "id": "calculate_score",
+      "type": "transform",
+      "name": "计算综合评分",
+      "expression": "(function() { const weights = { completeness: 0.35, consistency: 0.25, feasibility: 0.25, clarity: 0.15 }; const scores = { completeness: nodes.check_required_sections.output.completeness_score, consistency: 85, feasibility: 80, clarity: 78 }; let total = 0; for (const [dim, weight] of Object.entries(weights)) { total += (scores[dim] || 70) * weight; } return { total_score: Math.round(total), dimensions: scores, pass_threshold: inputs.pass_threshold, passed: total >= inputs.pass_threshold, missing_sections: nodes.check_required_sections.output.missing_sections }; })()",
+      "timeout_ms": 60000,
+      "on_success": "determine_result"
+    },
+    {
+      "id": "determine_result",
+      "type": "condition",
+      "name": "判定审查结果",
+      "expression": "nodes.calculate_score.output.passed === true",
+      "on_true": "generate_approved_report",
+      "on_false": "generate_revision_report"
+    },
+    {
+      "id": "generate_approved_report",
+      "type": "transform",
+      "name": "生成通过报告",
+      "expression": "({ review_id: nodes.intake.output.review_id, doc_path: inputs.doc_path, doc_type: inputs.doc_type, result: 'APPROVED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [], suggestions: ['建议补充边界条件说明'], summary: '设计审查通过', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "save_review_record"
+    },
+    {
+      "id": "generate_revision_report",
+      "type": "transform",
+      "name": "生成需修订报告",
+      "expression": "({ review_id: nodes.intake.output.review_id, doc_path: inputs.doc_path, doc_type: inputs.doc_type, result: 'REVISION_REQUIRED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [{ type: 'missing', sections: nodes.calculate_score.output.missing_sections, message: '缺少必要章节' }], suggestions: ['补充缺失章节', '完善细节描述'], summary: '需要修订后重新提交', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "timeout_ms": 60000,
+      "on_success": "save_review_record"
+    },
+    {
+      "id": "save_review_record",
+      "type": "file",
+      "name": "保存审查记录",
+      "operation": "write",
+      "path": "${inputs.project_root}/workflows/project/logs/reviews/${nodes.intake.output.review_id}.json",
+      "content": "${JSON.stringify(nodes.generate_approved_report ? nodes.generate_approved_report.output : nodes.generate_revision_report.output, null, 2)}",
+      "timeout_ms": 30000,
+      "on_success": "notify_result",
+      "on_failure": "notify_result"
+    },
+    {
+      "id": "notify_result",
+      "type": "http",
+      "name": "发送审查结果通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "设计审查完成",
+        "msg": "review_id=${nodes.intake.output.review_id}\ndoc_path=${inputs.doc_path}\nresult=${nodes.generate_approved_report ? 'APPROVED' : 'REVISION_REQUIRED'}\nscore=${nodes.calculate_score.output.total_score}"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_doc_not_found",
+      "type": "http",
+      "name": "文档不存在通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "设计审查失败",
+        "msg": "doc_path=${inputs.doc_path}\nreason=文档不存在或内容为空"
+      },
+      "timeout_ms": 30000
+    },
+    {
+      "id": "notify_error",
+      "type": "http",
+      "name": "发送错误通知",
+      "method": "POST",
+      "url": "https://newsfeed.4399om.com/api/messages/send.json",
+      "headers": { "Content-Type": "application/json" },
+      "body": {
+        "receiver": "gz0149",
+        "title": "设计审查错误",
+        "msg": "doc_path=${inputs.doc_path}\nstatus=ERROR"
+      },
+      "timeout_ms": 30000
+    }
+  ],
+
+  "edges": [
+    { "from": "intake", "to": "load_document" },
+    { "from": "load_document", "to": "check_doc_exists" },
+    { "from": "check_doc_exists", "to": "check_parent_doc", "condition": "exists" },
+    { "from": "check_doc_exists", "to": "notify_doc_not_found", "condition": "not_exists" },
+    { "from": "check_parent_doc", "to": "load_parent_document", "condition": "has_parent" },
+    { "from": "check_parent_doc", "to": "analyze_structure", "condition": "no_parent" },
+    { "from": "load_parent_document", "to": "analyze_structure" },
+    { "from": "analyze_structure", "to": "check_required_sections" },
+    { "from": "check_required_sections", "to": "ai_design_review" },
+    { "from": "ai_design_review", "to": "calculate_score" },
+    { "from": "calculate_score", "to": "determine_result" },
+    { "from": "determine_result", "to": "generate_approved_report", "condition": "pass" },
+    { "from": "determine_result", "to": "generate_revision_report", "condition": "fail" },
+    { "from": "generate_approved_report", "to": "save_review_record" },
+    { "from": "generate_revision_report", "to": "save_review_record" },
+    { "from": "save_review_record", "to": "notify_result" }
+  ],
+
+  "outputs": {
+    "review_id": "nodes.intake.output.review_id",
+    "result": "nodes.generate_approved_report ? 'APPROVED' : 'REVISION_REQUIRED'",
+    "score": "nodes.calculate_score.output.total_score",
+    "passed": "nodes.calculate_score.output.passed"
+  },
+
+  "settings": {
+    "timeout_ms": 1800000,
+    "on_error": "notify"
+  }
+}

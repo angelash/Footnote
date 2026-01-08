@@ -182,7 +182,7 @@
       "name": "保存签字记录",
       "operation": "write",
       "path": "${inputs.project_root}/workflows/project/logs/reviews/${nodes.intake.output.signoff_id}.json",
-      "content": "${JSON.stringify(nodes.generate_pass_report ? nodes.generate_pass_report.output : nodes.generate_fail_report.output, null, 2)}",
+      "content": "${JSON.stringify(nodes.determine_signoff.output.condition === true ? nodes.generate_pass_report.output : nodes.generate_fail_report.output, null, 2)}",
       "timeout_ms": 30000,
       "on_success": "notify_result",
       "on_failure": "notify_result"
@@ -197,7 +197,7 @@
       "body": {
         "receiver": "gz0149",
         "title": "QA签字完成",
-        "msg": "signoff_id=${nodes.intake.output.signoff_id}\ntask_id=${inputs.task_id}\nresult=${nodes.generate_pass_report ? (nodes.aggregate_results.output.manual > 0 ? 'PARTIAL' : 'PASSED') : 'FAILED'}\npass_rate=${nodes.aggregate_results.output.pass_rate}"
+        "msg": "signoff_id=${nodes.intake.output.signoff_id}\ntask_id=${inputs.task_id}\nresult=${nodes.determine_signoff.output.condition === true ? (nodes.aggregate_results.output.manual > 0 ? 'PARTIAL' : 'PASSED') : 'FAILED'}\npass_rate=${nodes.aggregate_results.output.pass_rate}"
       },
       "timeout_ms": 30000
     },
@@ -239,7 +239,7 @@
 
   "outputs": {
     "signoff_id": "nodes.intake.output.signoff_id",
-    "result": "nodes.generate_pass_report ? (nodes.aggregate_results.output.manual > 0 ? 'PARTIAL' : 'PASSED') : 'FAILED'",
+    "result": "nodes.determine_signoff.output.condition === true ? (nodes.aggregate_results.output.manual > 0 ? 'PARTIAL' : 'PASSED') : 'FAILED'",
     "pass_rate": "nodes.aggregate_results.output.pass_rate",
     "checklist": "nodes.aggregate_results.output.checklist"
   },

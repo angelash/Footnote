@@ -158,7 +158,7 @@
       "name": "保存审查记录",
       "operation": "write",
       "path": "${inputs.project_root}/workflows/project/logs/reviews/${nodes.intake.output.review_id}.json",
-      "content": "${JSON.stringify(nodes.generate_approved_report ? nodes.generate_approved_report.output : nodes.generate_changes_requested_report.output, null, 2)}",
+      "content": "${JSON.stringify(nodes.determine_result.output.condition === true ? nodes.generate_approved_report.output : nodes.generate_changes_requested_report.output, null, 2)}",
       "timeout_ms": 30000,
       "on_success": "notify_result",
       "on_failure": "notify_result"
@@ -173,7 +173,7 @@
       "body": {
         "receiver": "gz0149",
         "title": "代码审查完成",
-        "msg": "review_id=${nodes.intake.output.review_id}\ntask_id=${inputs.task_id}\nresult=${nodes.generate_approved_report ? 'APPROVED' : 'CHANGES_REQUESTED'}\nscore=${nodes.calculate_score.output.total_score}\nreviewer=${inputs.reviewer}"
+        "msg": "review_id=${nodes.intake.output.review_id}\ntask_id=${inputs.task_id}\nresult=${nodes.determine_result.output.condition === true ? 'APPROVED' : 'CHANGES_REQUESTED'}\nscore=${nodes.calculate_score.output.total_score}\nreviewer=${inputs.reviewer}"
       },
       "timeout_ms": 30000
     },
@@ -224,7 +224,7 @@
 
   "outputs": {
     "review_id": "nodes.intake.output.review_id",
-    "result": "nodes.generate_approved_report ? 'APPROVED' : 'CHANGES_REQUESTED'",
+    "result": "nodes.determine_result.output.condition === true ? 'APPROVED' : 'CHANGES_REQUESTED'",
     "score": "nodes.calculate_score.output.total_score",
     "passed": "nodes.calculate_score.output.passed"
   },

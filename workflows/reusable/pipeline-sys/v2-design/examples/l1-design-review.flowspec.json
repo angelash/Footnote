@@ -167,7 +167,7 @@
       "name": "保存审查记录",
       "operation": "write",
       "path": "${inputs.project_root}/workflows/project/logs/reviews/${nodes.intake.output.review_id}.json",
-      "content": "${JSON.stringify(nodes.generate_approved_report ? nodes.generate_approved_report.output : nodes.generate_revision_report.output, null, 2)}",
+      "content": "${JSON.stringify(nodes.determine_result.output.condition === true ? nodes.generate_approved_report.output : nodes.generate_revision_report.output, null, 2)}",
       "timeout_ms": 30000,
       "on_success": "notify_result",
       "on_failure": "notify_result"
@@ -182,7 +182,7 @@
       "body": {
         "receiver": "gz0149",
         "title": "设计审查完成",
-        "msg": "review_id=${nodes.intake.output.review_id}\ndoc_path=${inputs.doc_path}\nresult=${nodes.generate_approved_report ? 'APPROVED' : 'REVISION_REQUIRED'}\nscore=${nodes.calculate_score.output.total_score}"
+        "msg": "review_id=${nodes.intake.output.review_id}\ndoc_path=${inputs.doc_path}\nresult=${nodes.determine_result.output.condition === true ? 'APPROVED' : 'REVISION_REQUIRED'}\nscore=${nodes.calculate_score.output.total_score}"
       },
       "timeout_ms": 30000
     },
@@ -237,7 +237,7 @@
 
   "outputs": {
     "review_id": "nodes.intake.output.review_id",
-    "result": "nodes.generate_approved_report ? 'APPROVED' : 'REVISION_REQUIRED'",
+    "result": "nodes.determine_result.output.condition === true ? 'APPROVED' : 'REVISION_REQUIRED'",
     "score": "nodes.calculate_score.output.total_score",
     "passed": "nodes.calculate_score.output.passed"
   },

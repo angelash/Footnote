@@ -97,4 +97,27 @@
 
 - `docs/02_specs/pipelines/factory_pipeline_spec.md`
 
+---
+
+## 6) 审查/审核体系（Review System）
+
+> 目标：回答“怎么做 Code Review / Design Review / QA Signoff / 里程碑验收，以及如何一键总体审核、落盘到哪里”。
+
+### 6.1 设计文档与执行指南
+
+- **审查体系设计文档**：`workflows/reusable/pipeline-sys/v2-design/REVIEW-SYSTEM-DESIGN.md`
+- **审查/审核体系执行指南**：`workflows/project/pipelines/pipelines/review_system_guide.md`
+
+### 6.2 Runner 端点（WSL Runner, 默认 3210）
+
+- `POST /review/code`：代码审查（落盘 `workflows/project/logs/reviews/CR-*.json`）
+- `POST /review/design`：设计审查（落盘 `workflows/project/logs/reviews/DR-*.json`）
+- `POST /review/qa-signoff`：QA 签字（落盘 `workflows/project/logs/reviews/QA-*.json`）
+- `POST /review/acceptance`：里程碑验收（落盘 `workflows/project/logs/reviews/ACC-*.json`）
+- `POST /audit/intake`：L0 总体审核入口（落盘 `workflows/project/logs/audits/AUDIT-*.*`）
+
+### 6.3 运行与审计日志（可追溯）
+
+- 每次调用会返回 `run_id`，运行细节在：`workflows/project/logs/automation_runs/{run_id}/`
+
 

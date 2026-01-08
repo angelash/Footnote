@@ -98,11 +98,16 @@ export async function checkRunnerHealth(): Promise<boolean> {
 /**
  * 閫氱敤 Runner Client - axios-like 鎺ュ彛
  */
+interface IErrorResponse {
+  error?: string;
+  [key: string]: unknown;
+}
+
 export const runnerClient = {
   async get(path: string): Promise<{ data: unknown }> {
     const url = `${config.runnerBaseUrl}${path}`;
     const response = await fetch(url, { method: 'GET' });
-    const data = await response.json();
+    const data = await response.json() as IErrorResponse;
     if (!response.ok) {
       const error = new Error(data.error || 'Request failed') as Error & { response?: { status: number; data: unknown } };
       error.response = { status: response.status, data };
@@ -118,7 +123,7 @@ export const runnerClient = {
       headers: { 'Content-Type': 'application/json' },
       body: body ? JSON.stringify(body) : undefined,
     });
-    const data = await response.json();
+    const data = await response.json() as IErrorResponse;
     if (!response.ok) {
       const error = new Error(data.error || 'Request failed') as Error & { response?: { status: number; data: unknown } };
       error.response = { status: response.status, data };
@@ -130,7 +135,7 @@ export const runnerClient = {
   async delete(path: string): Promise<{ data: unknown }> {
     const url = `${config.runnerBaseUrl}${path}`;
     const response = await fetch(url, { method: 'DELETE' });
-    const data = await response.json();
+    const data = await response.json() as IErrorResponse;
     if (!response.ok) {
       const error = new Error(data.error || 'Request failed') as Error & { response?: { status: number; data: unknown } };
       error.response = { status: response.status, data };

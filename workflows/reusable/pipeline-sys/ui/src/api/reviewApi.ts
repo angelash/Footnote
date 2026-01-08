@@ -168,7 +168,7 @@ export interface ReviewResponse {
  * 获取审查记录列表
  */
 export async function getReviews(type?: 'code' | 'design' | 'qa' | 'acceptance'): Promise<ReviewsResponse> {
-  const url = type ? `${API_BASE}/api/reviews?type=${type}` : `${API_BASE}/api/reviews`;
+  const url = type ? `${API_BASE}/reviews?type=${type}` : `${API_BASE}/reviews`;
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to fetch reviews: ${response.statusText}`);
@@ -180,7 +180,7 @@ export async function getReviews(type?: 'code' | 'design' | 'qa' | 'acceptance')
  * 获取审核报告列表
  */
 export async function getAudits(limit = 20): Promise<AuditsResponse> {
-  const response = await fetch(`${API_BASE}/api/audits?limit=${limit}`);
+  const response = await fetch(`${API_BASE}/audits?limit=${limit}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch audits: ${response.statusText}`);
   }
@@ -191,7 +191,7 @@ export async function getAudits(limit = 20): Promise<AuditsResponse> {
  * 发起代码审查
  */
 export async function startCodeReview(input: CodeReviewInput): Promise<ReviewResponse> {
-  const response = await fetch(`${API_BASE}/api/review/code`, {
+  const response = await fetch(`${API_BASE}/review/code`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -206,7 +206,7 @@ export async function startCodeReview(input: CodeReviewInput): Promise<ReviewRes
  * 发起设计审查
  */
 export async function startDesignReview(input: DesignReviewInput): Promise<ReviewResponse> {
-  const response = await fetch(`${API_BASE}/api/review/design`, {
+  const response = await fetch(`${API_BASE}/review/design`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -221,7 +221,7 @@ export async function startDesignReview(input: DesignReviewInput): Promise<Revie
  * 发起QA签字
  */
 export async function startQaSignoff(input: QaSignoffInput): Promise<ReviewResponse> {
-  const response = await fetch(`${API_BASE}/api/review/qa-signoff`, {
+  const response = await fetch(`${API_BASE}/review/qa-signoff`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -236,7 +236,7 @@ export async function startQaSignoff(input: QaSignoffInput): Promise<ReviewRespo
  * 发起里程碑验收
  */
 export async function startAcceptanceReview(input: AcceptanceReviewInput): Promise<ReviewResponse> {
-  const response = await fetch(`${API_BASE}/api/review/acceptance`, {
+  const response = await fetch(`${API_BASE}/review/acceptance`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -251,7 +251,7 @@ export async function startAcceptanceReview(input: AcceptanceReviewInput): Promi
  * 发起总体审核（制作人入口）
  */
 export async function startAuditIntake(input: AuditIntakeInput): Promise<ReviewResponse> {
-  const response = await fetch(`${API_BASE}/api/audit/intake`, {
+  const response = await fetch(`${API_BASE}/audit/intake`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),

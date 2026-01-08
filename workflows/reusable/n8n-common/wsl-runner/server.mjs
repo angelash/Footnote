@@ -1441,10 +1441,12 @@ const server = http.createServer(async (req, res) => {
     // POST /review/code - 代码审查
     if (req.method === "POST" && req.url === "/review/code") {
       const body = await readJsonBody(req);
+      const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
       try {
         const out = await handleV2Run({
           flowspec: `${FLOWSPEC_BASE}/l2-code-review.flowspec.json`,
           inputs: {
+            project_root: projectRoot,
             task_id: body.task_id || body.taskId,
             title: body.title || "",
             commit_range: body.commit_range || body.commitRange || "HEAD~1..HEAD",
@@ -1464,10 +1466,12 @@ const server = http.createServer(async (req, res) => {
     // POST /review/design - 设计审查
     if (req.method === "POST" && req.url === "/review/design") {
       const body = await readJsonBody(req);
+      const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
       try {
         const out = await handleV2Run({
           flowspec: `${FLOWSPEC_BASE}/l1-design-review.flowspec.json`,
           inputs: {
+            project_root: projectRoot,
             doc_path: body.doc_path || body.docPath,
             doc_type: body.doc_type || body.docType || "spec",
             review_focus: body.review_focus || body.reviewFocus || "completeness,consistency,feasibility,clarity",
@@ -1486,10 +1490,12 @@ const server = http.createServer(async (req, res) => {
     // POST /review/qa-signoff - QA签字
     if (req.method === "POST" && req.url === "/review/qa-signoff") {
       const body = await readJsonBody(req);
+      const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
       try {
         const out = await handleV2Run({
           flowspec: `${FLOWSPEC_BASE}/l3-qa-signoff.flowspec.json`,
           inputs: {
+            project_root: projectRoot,
             task_id: body.task_id || body.taskId,
             task_pack_path: body.task_pack_path || body.taskPackPath,
             signoff_type: body.signoff_type || body.signoffType || "feature",
@@ -1507,10 +1513,12 @@ const server = http.createServer(async (req, res) => {
     // POST /review/acceptance - 里程碑验收
     if (req.method === "POST" && req.url === "/review/acceptance") {
       const body = await readJsonBody(req);
+      const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
       try {
         const out = await handleV2Run({
           flowspec: `${FLOWSPEC_BASE}/l0-acceptance-review.flowspec.json`,
           inputs: {
+            project_root: projectRoot,
             milestone_id: body.milestone_id || body.milestoneId,
             scope_chapters: body.scope_chapters || body.scopeChapters || "",
             scope_systems: body.scope_systems || body.scopeSystems || "",
@@ -1529,10 +1537,12 @@ const server = http.createServer(async (req, res) => {
     // POST /audit/intake - 制作人总体审核入口
     if (req.method === "POST" && req.url === "/audit/intake") {
       const body = await readJsonBody(req);
+      const projectRoot = body.project_root || body.projectRoot || DEFAULT_PROJECT_ROOT;
       try {
         const out = await handleV2Run({
           flowspec: `${FLOWSPEC_BASE}/l0-audit-intake.flowspec.json`,
           inputs: {
+            project_root: projectRoot,
             audit_scope: body.audit_scope || body.auditScope || "all",
             milestone_id: body.milestone_id || body.milestoneId || "",
             chapter_ids: body.chapter_ids || body.chapterIds || "",

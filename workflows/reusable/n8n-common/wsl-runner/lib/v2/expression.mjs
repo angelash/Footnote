@@ -44,10 +44,11 @@ export class ExpressionError extends Error {
 
 /**
  * 禁止的标识符列表
+ * 注意：Function (大写) 构造函数被禁止，但 function 关键字声明是允许的
  */
 const FORBIDDEN_IDENTIFIERS = [
   'eval',
-  'Function',
+  // 'Function' 改为精确匹配，避免误禁 function 关键字
   'constructor',
   'prototype',
   '__proto__',
@@ -61,6 +62,13 @@ const FORBIDDEN_IDENTIFIERS = [
   'fetch',
   'XMLHttpRequest',
   'WebSocket',
+];
+
+/**
+ * 需要精确匹配的危险标识符（区分大小写）
+ */
+const FORBIDDEN_EXACT = [
+  'Function',  // Function 构造函数，但允许 function 关键字
 ];
 
 /**
@@ -83,9 +91,21 @@ export function validateExpression(expression) {
     throw new ExpressionError('Expression must be a string', String(expression));
   }
 
-  // 检查禁止的标识符
+  // 检查禁止的标识符（大小写不敏感）
   for (const forbidden of FORBIDDEN_IDENTIFIERS) {
     const pattern = new RegExp(`\\b${forbidden}\\b`, 'i');
+    if (pattern.test(expression)) {
+      throw new ExpressionError(
+        'Expression contains forbidden identifier',
+        expression,
+        `"${forbidden}" is not allowed`
+      );
+    }
+  }
+
+  // 检查精确匹配的禁止标识符（区分大小写）
+  for (const forbidden of FORBIDDEN_EXACT) {
+    const pattern = new RegExp(`\\b${forbidden}\\b`);  // 无 'i' 标志
     if (pattern.test(expression)) {
       throw new ExpressionError(
         'Expression contains forbidden identifier',

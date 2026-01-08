@@ -70,9 +70,8 @@
     },
     "project_root": {
       "type": "string",
-      "required": false,
-      "default": "/home/shash/work/Footnote",
-      "description": "项目根目录"
+      "required": true,
+      "description": "项目根目录（由调用方提供）"
     }
   },
 

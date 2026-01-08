@@ -1,0 +1,483 @@
+/* ReviewPanel 审查面板样式 */
+
+.review-panel {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 头部 */
+.review-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.review-panel-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #e2e8f0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-refresh {
+  padding: 8px 16px;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-refresh:hover {
+  background: #475569;
+}
+
+.btn-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  padding: 8px 16px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 8px 16px;
+  background: #475569;
+  border: none;
+  border-radius: 6px;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #64748b;
+}
+
+/* 统计卡片 */
+.review-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 32px;
+  font-weight: bold;
+  color: #e2e8f0;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.stat-passed .stat-value {
+  color: #22c55e;
+}
+
+.stat-pending .stat-value {
+  color: #f59e0b;
+}
+
+.stat-failed .stat-value {
+  color: #ef4444;
+}
+
+/* 标签页 */
+.review-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: #1e293b;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: #e2e8f0;
+}
+
+.tab.active {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+/* 筛选器 */
+.review-filters {
+  margin-bottom: 16px;
+}
+
+.review-filters select {
+  padding: 8px 12px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+/* 错误和加载状态 */
+.review-error {
+  padding: 16px;
+  background: #7f1d1d;
+  border-radius: 8px;
+  color: #fca5a5;
+  margin-bottom: 16px;
+}
+
+.review-loading {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #94a3b8;
+}
+
+.empty-state p {
+  margin-bottom: 16px;
+}
+
+/* 内容区域 */
+.review-content {
+  min-height: 400px;
+}
+
+.reviews-list,
+.audits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 审查记录卡片 */
+.review-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.review-card:hover {
+  border-color: #475569;
+}
+
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.review-type {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.review-result {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+}
+
+.review-card-body {
+  margin-bottom: 8px;
+}
+
+.review-id {
+  font-family: monospace;
+  font-size: 14px;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.review-meta {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.review-score {
+  font-size: 14px;
+  color: #e2e8f0;
+  margin-top: 8px;
+}
+
+.review-score strong {
+  color: #22c55e;
+  font-size: 18px;
+}
+
+.review-time {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+.review-summary {
+  font-size: 13px;
+  color: #94a3b8;
+  padding-top: 12px;
+  border-top: 1px solid #334155;
+}
+
+/* 审核报告卡片 */
+.audit-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.audit-card:hover {
+  border-color: #475569;
+}
+
+.audit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.audit-id {
+  font-family: monospace;
+  font-size: 14px;
+  color: #3b82f6;
+}
+
+.audit-status {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.audit-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric {
+  text-align: center;
+  padding: 12px;
+  background: #0f172a;
+  border-radius: 8px;
+}
+
+.metric-value {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  color: #e2e8f0;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.audit-decision {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #0f172a;
+  border-radius: 8px;
+  border-left: 3px solid;
+  margin-bottom: 12px;
+}
+
+.decision-label {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.decision-value {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.audit-period {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* 发起审查表单弹窗 */
+.review-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.review-form-modal {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.review-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #334155;
+}
+
+.review-form-header h3 {
+  margin: 0;
+  color: #e2e8f0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #e2e8f0;
+}
+
+.review-form {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.form-group .hint {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.form-error {
+  padding: 12px;
+  background: #7f1d1d;
+  border-radius: 6px;
+  color: #fca5a5;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .review-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .audit-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .review-panel-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+}

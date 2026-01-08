@@ -11,6 +11,8 @@ import { registerEventsRoutes } from './routes/events.js';
 import { registerFileRoutes } from './routes/file.js';
 import { registerControlRoutes } from './routes/control.js';
 import { registerQueueRoutes } from './routes/queue.js';
+import { registerReviewRoutes } from './routes/review.js';
+import { registerTaskRoutes } from './routes/task.js';
 import { checkRunnerHealth } from './clients/runnerClient.js';
 
 /**
@@ -59,6 +61,8 @@ export async function createServer() {
   await registerFileRoutes(app);
   await registerControlRoutes(app);
   await registerQueueRoutes(app);
+  await registerReviewRoutes(app);
+  await registerTaskRoutes(app);
 
   // 全局错误处理
   app.setErrorHandler((error, request, reply) => {

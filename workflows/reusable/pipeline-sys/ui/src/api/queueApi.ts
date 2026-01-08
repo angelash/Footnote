@@ -42,7 +42,7 @@ export interface HistoryResponse {
  * 获取队列状态
  */
 export async function getQueueStatus(): Promise<QueueStatus> {
-  const response = await fetch(`${API_BASE}/api/queue`);
+  const response = await fetch(`${API_BASE}/queue`);
   if (!response.ok) {
     throw new Error(`Failed to fetch queue status: ${response.statusText}`);
   }
@@ -53,7 +53,7 @@ export async function getQueueStatus(): Promise<QueueStatus> {
  * 获取队列历史
  */
 export async function getQueueHistory(limit = 20, offset = 0): Promise<HistoryResponse> {
-  const response = await fetch(`${API_BASE}/api/queue/history?limit=${limit}&offset=${offset}`);
+  const response = await fetch(`${API_BASE}/queue/history?limit=${limit}&offset=${offset}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch queue history: ${response.statusText}`);
   }
@@ -64,7 +64,7 @@ export async function getQueueHistory(limit = 20, offset = 0): Promise<HistoryRe
  * 暂停队列
  */
 export async function pauseQueue(): Promise<{ ok: boolean; message: string }> {
-  const response = await fetch(`${API_BASE}/api/queue/pause`, { method: 'POST' });
+  const response = await fetch(`${API_BASE}/queue/pause`, { method: 'POST' });
   if (!response.ok) {
     throw new Error(`Failed to pause queue: ${response.statusText}`);
   }
@@ -75,7 +75,7 @@ export async function pauseQueue(): Promise<{ ok: boolean; message: string }> {
  * 恢复队列
  */
 export async function resumeQueue(): Promise<{ ok: boolean; message: string }> {
-  const response = await fetch(`${API_BASE}/api/queue/resume`, { method: 'POST' });
+  const response = await fetch(`${API_BASE}/queue/resume`, { method: 'POST' });
   if (!response.ok) {
     throw new Error(`Failed to resume queue: ${response.statusText}`);
   }
@@ -86,7 +86,7 @@ export async function resumeQueue(): Promise<{ ok: boolean; message: string }> {
  * 清空队列
  */
 export async function clearQueue(): Promise<{ ok: boolean; cleared_count: number }> {
-  const response = await fetch(`${API_BASE}/api/queue/clear`, { method: 'POST' });
+  const response = await fetch(`${API_BASE}/queue/clear`, { method: 'POST' });
   if (!response.ok) {
     throw new Error(`Failed to clear queue: ${response.statusText}`);
   }
@@ -97,7 +97,7 @@ export async function clearQueue(): Promise<{ ok: boolean; cleared_count: number
  * 获取任务详情
  */
 export async function getTask(taskId: string): Promise<{ ok: boolean; task: QueuedTask }> {
-  const response = await fetch(`${API_BASE}/api/queue/${encodeURIComponent(taskId)}`);
+  const response = await fetch(`${API_BASE}/queue/${encodeURIComponent(taskId)}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch task: ${response.statusText}`);
   }
@@ -108,7 +108,7 @@ export async function getTask(taskId: string): Promise<{ ok: boolean; task: Queu
  * 取消任务
  */
 export async function cancelTask(taskId: string): Promise<{ ok: boolean; message: string }> {
-  const response = await fetch(`${API_BASE}/api/queue/${encodeURIComponent(taskId)}`, {
+  const response = await fetch(`${API_BASE}/queue/${encodeURIComponent(taskId)}`, {
     method: 'DELETE',
   });
   if (!response.ok) {
@@ -121,7 +121,7 @@ export async function cancelTask(taskId: string): Promise<{ ok: boolean; message
  * 重试任务
  */
 export async function retryTask(taskId: string): Promise<{ ok: boolean; new_task_id: string }> {
-  const response = await fetch(`${API_BASE}/api/queue/${encodeURIComponent(taskId)}/retry`, {
+  const response = await fetch(`${API_BASE}/queue/${encodeURIComponent(taskId)}/retry`, {
     method: 'POST',
   });
   if (!response.ok) {
@@ -137,7 +137,7 @@ export async function setTaskPriority(
   taskId: string,
   priority: number
 ): Promise<{ ok: boolean; message: string }> {
-  const response = await fetch(`${API_BASE}/api/queue/${encodeURIComponent(taskId)}/priority`, {
+  const response = await fetch(`${API_BASE}/queue/${encodeURIComponent(taskId)}/priority`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ priority }),
@@ -157,7 +157,7 @@ export async function getSubtasks(taskId: string): Promise<{
   count: number;
   subtasks: QueuedTask[];
 }> {
-  const response = await fetch(`${API_BASE}/api/queue/${encodeURIComponent(taskId)}/subtasks`);
+  const response = await fetch(`${API_BASE}/queue/${encodeURIComponent(taskId)}/subtasks`);
   if (!response.ok) {
     throw new Error(`Failed to fetch subtasks: ${response.statusText}`);
   }

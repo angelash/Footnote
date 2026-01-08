@@ -275,7 +275,7 @@ export const WHITEBOX_CONFIGS = [
  * 制作人统一入口 - 智能派单
  */
 export async function submitIntake(input: TaskSubmitInput): Promise<TaskResponse> {
-  const response = await fetch(`${API_BASE}/api/task/intake`, {
+  const response = await fetch(`${API_BASE}/task/intake`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -296,7 +296,7 @@ export async function submitIntake(input: TaskSubmitInput): Promise<TaskResponse
  * 通用角色任务提交
  */
 export async function submitRoleTask(role: RoleType, input: TaskSubmitInput): Promise<TaskResponse> {
-  const response = await fetch(`${API_BASE}/api/task/role`, {
+  const response = await fetch(`${API_BASE}/task/role`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -352,7 +352,7 @@ export async function submitWhitebox(
  * 任务分解（组长）
  */
 export async function submitDecompose(input: TaskSubmitInput): Promise<TaskResponse> {
-  const response = await fetch(`${API_BASE}/api/task/lead/decompose`, {
+  const response = await fetch(`${API_BASE}/task/lead/decompose`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

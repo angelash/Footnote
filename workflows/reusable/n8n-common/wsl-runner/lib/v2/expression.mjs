@@ -242,7 +242,18 @@ export function getNestedValue(obj, path) {
 }
 
 /**
+ * 检查表达式是否是简单属性访问（如 inputs.name, nodes.foo.output）
+ * @param {string} expr - 表达式字符串
+ * @returns {boolean}
+ */
+function isSimplePropertyAccess(expr) {
+  // 简单属性访问：只包含标识符和点操作符
+  return /^[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)*$/.test(expr);
+}
+
+/**
  * 替换模板字符串中的变量
+ * 支持简单属性访问（如 ${inputs.name}）和复杂表达式（如 ${JSON.stringify(...)}）
  * @param {string} template - 模板字符串
  * @param {Object} context - 上下文对象
  * @returns {string} 替换后的字符串
@@ -256,17 +267,35 @@ export function interpolate(template, context) {
     const trimmed = expr.trim();
     validateExpression(trimmed);
     
-    const value = getNestedValue(context, trimmed);
-    
-    if (value === undefined) {
-      return match; // 保留原始模板
+    // 对于简单属性访问，使用 getNestedValue（更快）
+    if (isSimplePropertyAccess(trimmed)) {
+      const value = getNestedValue(context, trimmed);
+      
+      if (value === undefined) {
+        return match; // 保留原始模板
+      }
+      
+      if (typeof value === 'object') {
+        return JSON.stringify(value);
+      }
+      
+      return String(value);
     }
     
-    if (typeof value === 'object') {
-      return JSON.stringify(value);
+    // 对于复杂表达式（如 JSON.stringify(...)），使用 evaluate
+    try {
+      const result = evaluate(trimmed, context);
+      if (result === undefined) {
+        return match;
+      }
+      if (typeof result === 'object') {
+        return JSON.stringify(result);
+      }
+      return String(result);
+    } catch (e) {
+      // 如果 evaluate 失败，保留原始模板
+      return match;
     }
-    
-    return String(value);
   });
 }
 

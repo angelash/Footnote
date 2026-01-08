@@ -40,16 +40,35 @@ export async function listRuns(): Promise<IRunListItem[]> {
     try {
       const stat = await fs.stat(statusPath);
       const content = await fs.readFile(statusPath, 'utf8');
-      const status = JSON.parse(content) as IStatusV1;
+      const rawStatus = JSON.parse(content) as Record<string, unknown>;
+      
+      // 兼容 v1 格式（ok/stage）和 v2 格式（status/flow_id）
+      let ok: boolean | string;
+      let stage: number | undefined;
+      
+      if ('status' in rawStatus) {
+        // v2 FlowRunner 格式
+        const v2Status = rawStatus.status as string;
+        ok = v2Status === 'SUCCESS' ? true : 
+             v2Status === 'FAILED' ? false : 
+             v2Status === 'RUNNING' ? 'RUNNING' : 'PENDING';
+        stage = v2Status === 'SUCCESS' ? 99 : 
+                v2Status === 'RUNNING' ? 50 : 0;
+      } else {
+        // v1 格式
+        const status = rawStatus as IStatusV1;
+        ok = status.ok;
+        stage = status.stage;
+      }
       
       runs.push({
         run_id: runId,
-        task_id: status.task_id || '',
-        ok: status.ok,
-        stage: status.stage,
-        current_node_id: status.current_node_id || '',
-        started_at: status.started_at,
-        updated_at: status.updated_at,
+        task_id: (rawStatus.task_id as string) || (rawStatus.flow_id as string) || '',
+        ok,
+        stage,
+        current_node_id: (rawStatus.current_node_id as string) || '',
+        started_at: rawStatus.started_at as string,
+        updated_at: (rawStatus.updated_at as string) || (rawStatus.finished_at as string),
         mtime: stat.mtimeMs,
       });
     } catch {

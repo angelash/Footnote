@@ -62,7 +62,8 @@ import {
 import { createFlowRunner, RunStatus } from "./lib/v2/index.mjs";
 import { TaskQueueManager, TaskStatus, QueueEventType } from "./lib/v2/task-queue.mjs";
 
-const HOST = process.env.HOST || "127.0.0.1";
+// 使用 0.0.0.0 允许 Windows 主机访问 WSL 中的服务
+const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || "3210");
 
 // 队列管理器实例（启动时初始化）

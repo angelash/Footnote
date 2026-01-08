@@ -42,7 +42,8 @@ export function loadConfig(): IConsoleConfig {
     host: process.env.PIPELINE_SYS_HOST || '127.0.0.1',
     port: parseInt(process.env.PIPELINE_SYS_PORT || '3230', 10),
     projectRoot: process.env.PROJECT_ROOT || getDefaultProjectRoot(),
-    runnerBaseUrl: process.env.RUNNER_BASE_URL || 'http://127.0.0.1:3210',
+    // 使用 localhost 而非 127.0.0.1，确保 Windows 能正确访问 WSL 中的服务
+    runnerBaseUrl: process.env.RUNNER_BASE_URL || 'http://localhost:3210',
     automationRunsDir: 'workflows/project/logs/automation_runs',
   };
 }

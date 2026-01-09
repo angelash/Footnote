@@ -43,20 +43,18 @@ export async function listRuns(): Promise<IRunListItem[]> {
       const rawStatus = JSON.parse(content) as Record<string, unknown>;
       
       // 兼容 v1 格式（ok/stage）和 v2 格式（status/flow_id）
-      let ok: boolean | string;
-      let stage: number | undefined;
+      let ok: boolean;
+      let stage: number;
       
       if ('status' in rawStatus) {
         // v2 FlowRunner 格式
         const v2Status = rawStatus.status as string;
-        ok = v2Status === 'SUCCESS' ? true : 
-             v2Status === 'FAILED' ? false : 
-             v2Status === 'RUNNING' ? 'RUNNING' : 'PENDING';
+        ok = v2Status === 'SUCCESS';
         stage = v2Status === 'SUCCESS' ? 99 : 
                 v2Status === 'RUNNING' ? 50 : 0;
       } else {
         // v1 格式
-        const status = rawStatus as IStatusV1;
+        const status = rawStatus as unknown as IStatusV1;
         ok = status.ok;
         stage = status.stage;
       }

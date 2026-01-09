@@ -22,7 +22,8 @@ vi.mock('../config', () => ({
   },
 }));
 
-import { listRuns, runExists, getRunDir } from '../services/runsIndex';
+import { listRuns, runExists, getRunDir } from '../services/runsIndex.js';
+import type { IRunListItem } from '../types/dto.js';
 
 describe('getRunDir', () => {
   it('should return correct run directory path', () => {
@@ -60,8 +61,8 @@ describe('listRuns', () => {
     const runs = await listRuns();
     
     // Should only include non-hidden runs
-    expect(runs.every(r => !r.run_id.startsWith('_'))).toBe(true);
-    expect(runs.every(r => !r.run_id.startsWith('.'))).toBe(true);
+    expect(runs.every((r: IRunListItem) => !r.run_id.startsWith('_'))).toBe(true);
+    expect(runs.every((r: IRunListItem) => !r.run_id.startsWith('.'))).toBe(true);
   });
 
   it('should sort by mtime descending', async () => {

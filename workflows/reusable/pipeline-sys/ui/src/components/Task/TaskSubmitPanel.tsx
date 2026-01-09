@@ -8,7 +8,6 @@ import {
   TaskCategory,
   TaskSubmitInput,
   RoleConfig,
-  ROLE_CONFIGS,
   WHITEBOX_CONFIGS,
   getCategoryLabel,
   getCategoryColor,
@@ -534,7 +533,7 @@ export const TaskSubmitPanel: React.FC<TaskSubmitPanelProps> = ({ onSuccess }) =
 
       {/* 进度指示 */}
       <div className="progress-steps">
-        <div className={`step ${step === 'category' ? 'active' : step !== 'category' ? 'done' : ''}`}>
+        <div className={`step ${step === 'category' ? 'active' : 'done'}`}>
           1. 选择类型
         </div>
         <div className={`step ${step === 'role' ? 'active' : step === 'form' ? 'done' : ''}`}>

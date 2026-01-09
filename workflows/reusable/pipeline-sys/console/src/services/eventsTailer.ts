@@ -154,9 +154,9 @@ export class EventsTailer extends EventEmitter {
 /**
  * 创建 SSE 响应生成器
  */
-export function createSseEventGenerator(tailer: EventsTailer): AsyncGenerator<string, void, unknown> {
+export function createSseEventGenerator(tailer: EventsTailer): AsyncGenerator<string, string, unknown> {
   const events: IEventV1[] = [];
-  let resolveNext: ((value: IteratorResult<string, void>) => void) | null = null;
+  let resolveNext: ((value: IteratorResult<string, string>) => void) | null = null;
   let done = false;
 
   tailer.on('event', (event: IEventV1) => {
@@ -172,14 +172,14 @@ export function createSseEventGenerator(tailer: EventsTailer): AsyncGenerator<st
   tailer.on('error', () => {
     done = true;
     if (resolveNext) {
-      resolveNext({ value: undefined as unknown as string, done: true });
+      resolveNext({ value: '', done: true });
     }
   });
 
   return {
-    async next(): Promise<IteratorResult<string, void>> {
+    async next(): Promise<IteratorResult<string, string>> {
       if (done) {
-        return { value: undefined as unknown as string, done: true };
+        return { value: '', done: true };
       }
       
       const event = events.shift();
@@ -191,15 +191,15 @@ export function createSseEventGenerator(tailer: EventsTailer): AsyncGenerator<st
         resolveNext = resolve;
       });
     },
-    async return(): Promise<IteratorResult<string, void>> {
+    async return(): Promise<IteratorResult<string, string>> {
       done = true;
       tailer.stop();
-      return { value: undefined as unknown as string, done: true };
+      return { value: '', done: true };
     },
-    throw(): Promise<IteratorResult<string, void>> {
+    throw(): Promise<IteratorResult<string, string>> {
       done = true;
       tailer.stop();
-      return Promise.resolve({ value: undefined as unknown as string, done: true });
+      return Promise.resolve({ value: '', done: true });
     },
     [Symbol.asyncIterator]() {
       return this;

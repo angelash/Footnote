@@ -17,6 +17,7 @@ import {
   getSubtasks,
 } from '../../api/queueApi';
 import { StatusBadge } from '../Common/StatusBadge';
+import { NodeStatus } from '../../types/dto';
 import './QueuePanel.css';
 
 interface QueuePanelProps {
@@ -155,13 +156,13 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
 
   // 渲染任务卡片
   const renderTaskCard = (task: QueuedTask, showControls = true) => {
-    const statusMap: Record<string, 'success' | 'error' | 'running' | 'pending' | 'cancelled'> = {
-      completed: 'success',
-      failed: 'error',
-      running: 'running',
-      queued: 'pending',
-      paused: 'pending',
-      cancelled: 'cancelled',
+    const statusMap: Record<string, NodeStatus> = {
+      completed: NodeStatus.SUCCESS,
+      failed: NodeStatus.FAILED,
+      running: NodeStatus.RUNNING,
+      queued: NodeStatus.PENDING,
+      paused: NodeStatus.PENDING,
+      cancelled: NodeStatus.CANCELLED,
     };
 
     const hasSubtasks = task.parent_id === null; // 只有父任务可能有子任务
@@ -186,7 +187,7 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
               </button>
             )}
             <span className="task-id">{task.id.slice(0, 20)}...</span>
-            <StatusBadge status={statusMap[task.status] || 'pending'} />
+            <StatusBadge status={statusMap[task.status] || NodeStatus.PENDING} />
             {task.parent_id && <span className="subtask-badge">子任务</span>}
           </div>
           <div className="task-meta">

@@ -51,6 +51,11 @@ function convertV2ToV1(v2: IStatusV2): IStatusV1 {
     ok: v2.status === 'SUCCESS',
     started_at: v2.started_at,
     updated_at: v2.finished_at || v2.started_at,
+    repo: {
+      root: '',
+      branch: 'unknown',
+      head: 'unknown',
+    },
   };
 }
 
@@ -209,11 +214,12 @@ function convertNodeRunsV2ToV1(v2: INodeRunsV2, runId: string): INodeRunsSnapsho
   for (const [nodeId, nodeData] of Object.entries(v2)) {
     nodes[nodeId] = {
       status: nodeData.status as INodeRunsSnapshotV1['nodes'][string]['status'],
-      output: nodeData.output,
-      error: nodeData.error,
+      attempt: 1,
       started_at: new Date().toISOString(),
-      finished_at: new Date().toISOString(),
-      duration_ms: nodeData.duration || 0,
+      ended_at: new Date().toISOString(),
+      elapsed_ms: nodeData.duration || 0,
+      last_error: nodeData.error || null,
+      outputs: [],
     };
   }
   

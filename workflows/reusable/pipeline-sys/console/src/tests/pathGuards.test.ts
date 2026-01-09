@@ -8,7 +8,7 @@ import {
   safeResolveUnderRun,
   isHiddenDir,
   normalizePath,
-} from '../services/pathGuards';
+} from '../services/pathGuards.js';
 
 describe('safeResolveUnderProject', () => {
   const projectRoot = '/home/user/project';

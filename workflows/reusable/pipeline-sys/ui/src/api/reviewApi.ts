@@ -20,7 +20,10 @@ export interface ReviewRecord {
   milestone_id?: string;
   result: 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED' | 'REVISION_REQUIRED' | 'PASSED' | 'PARTIAL' | 'FAILED' | 'PENDING';
   score?: number;
-  dimensions?: Record<string, { score: number; comments?: string }>;
+  // 兼容两种格式：
+  // - 新：{ logic: 85, style: 80 }
+  // - 旧：{ logic: { score: 85, comments: '...' } }
+  dimensions?: Record<string, number | { score: number; comments?: string }>;
   issues?: Array<{
     severity?: string;
     type?: string;
@@ -33,7 +36,10 @@ export interface ReviewRecord {
     text?: string;
     status: string;
     auto: boolean;
+    checked?: boolean;
   }>;
+  suggestions?: string[];
+  blocking_issues?: string[];
   reviewer?: string;
   signer?: string;
   completed_at?: string;
@@ -46,6 +52,7 @@ export interface AuditReport {
   scope: string;
   requester: string;
   period: { start: string; end: string };
+  scan_summary?: unknown;
   progress_report: {
     type: string;
     status: 'HEALTHY' | 'WARNING' | 'CRITICAL';
@@ -98,6 +105,30 @@ export interface AuditsResponse {
   ok: boolean;
   audits: AuditReport[];
   total: number;
+}
+
+export interface ReviewDetailResponse {
+  ok: boolean;
+  id: string;
+  path: string;
+  record: ReviewRecord;
+  raw: string;
+}
+
+export interface AuditDetailResponse {
+  ok: boolean;
+  audit_id: string;
+  path: string;
+  audit: AuditReport;
+  raw: string;
+}
+
+export interface AuditMarkdownResponse {
+  ok: boolean;
+  audit_id: string;
+  kind: string;
+  path: string;
+  content: string;
 }
 
 // 发起审查的输入参数
@@ -185,6 +216,60 @@ export async function getAudits(limit = 20): Promise<AuditsResponse> {
     throw new Error(`Failed to fetch audits: ${response.statusText}`);
   }
   return response.json();
+}
+
+/**
+ * 获取单条审查记录详情（含 raw JSON）
+ */
+export async function getReviewDetail(id: string): Promise<ReviewDetailResponse> {
+  const response = await fetch(`${API_BASE}/reviews/${encodeURIComponent(id)}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch review detail: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return {
+    ok: Boolean(data?.ok),
+    id: String(data?.id || id),
+    path: String(data?.path || ''),
+    record: (data?.record || {}) as ReviewRecord,
+    raw: String(data?.raw || ''),
+  };
+}
+
+/**
+ * 获取单条审核报告详情（含 raw JSON）
+ */
+export async function getAuditDetail(auditId: string): Promise<AuditDetailResponse> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch audit detail: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return {
+    ok: Boolean(data?.ok),
+    audit_id: String(data?.audit_id || auditId),
+    path: String(data?.path || ''),
+    audit: (data?.audit || {}) as AuditReport,
+    raw: String(data?.raw || ''),
+  };
+}
+
+/**
+ * 获取审核报告 Markdown（progress / issues）
+ */
+export async function getAuditMarkdown(auditId: string, kind: 'progress' | 'issues'): Promise<AuditMarkdownResponse> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}/markdown?kind=${kind}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch audit markdown: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return {
+    ok: Boolean(data?.ok),
+    audit_id: String(data?.audit_id || auditId),
+    kind: String(data?.kind || kind),
+    path: String(data?.path || ''),
+    content: String(data?.content || ''),
+  };
 }
 
 /**

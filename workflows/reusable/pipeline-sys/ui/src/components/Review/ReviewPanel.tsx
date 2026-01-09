@@ -7,6 +7,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   getReviews,
   getAudits,
+  getReviewDetail,
+  getAuditDetail,
+  getAuditMarkdown,
   startCodeReview,
   startDesignReview,
   startQaSignoff,
@@ -298,9 +301,10 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
 
 interface ReviewCardProps {
   record: ReviewRecord;
+  onOpenDetail: (record: ReviewRecord) => void;
 }
 
-const ReviewCard: React.FC<ReviewCardProps> = ({ record }) => {
+const ReviewCard: React.FC<ReviewCardProps> = ({ record, onOpenDetail }) => {
   const id = getReviewId(record);
   const type = getReviewType(record);
   const resultColor = getResultColor(record.result);
@@ -324,7 +328,15 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ record }) => {
   };
 
   return (
-    <div className="review-card">
+    <div
+      className="review-card clickable"
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpenDetail(record)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onOpenDetail(record);
+      }}
+    >
       <div className="review-card-header">
         <span className="review-type">
           {typeIcons[type]} {typeLabels[type]}
@@ -358,14 +370,23 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ record }) => {
 
 interface AuditCardProps {
   audit: AuditReport;
+  onOpenDetail: (audit: AuditReport) => void;
 }
 
-const AuditCard: React.FC<AuditCardProps> = ({ audit }) => {
+const AuditCard: React.FC<AuditCardProps> = ({ audit, onOpenDetail }) => {
   const statusColor = getStatusColor(audit.progress_report.status);
   const decisionColor = getDecisionColor(audit.recommendations.decision);
 
   return (
-    <div className="audit-card">
+    <div
+      className="audit-card clickable"
+      role="button"
+      tabIndex={0}
+      onClick={() => onOpenDetail(audit)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onOpenDetail(audit);
+      }}
+    >
       <div className="audit-card-header">
         <span className="audit-id">{audit.audit_id}</span>
         <span className="audit-status" style={{ backgroundColor: statusColor }}>
@@ -420,6 +441,8 @@ export const ReviewPanel: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'reviews' | 'audits'>('audits');
   const [startingFullAudit, setStartingFullAudit] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [selectedReview, setSelectedReview] = useState<ReviewRecord | null>(null);
+  const [selectedAudit, setSelectedAudit] = useState<AuditReport | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -480,6 +503,16 @@ export const ReviewPanel: React.FC = () => {
     } finally {
       setStartingFullAudit(false);
     }
+  };
+
+  const handleOpenReviewDetail = (record: ReviewRecord): void => {
+    setSelectedAudit(null);
+    setSelectedReview(record);
+  };
+
+  const handleOpenAuditDetail = (audit: AuditReport): void => {
+    setSelectedReview(null);
+    setSelectedAudit(audit);
   };
 
   return (
@@ -569,7 +602,9 @@ export const ReviewPanel: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                audits.map((audit) => <AuditCard key={audit.audit_id} audit={audit} />)
+                audits.map((audit) => (
+                  <AuditCard key={audit.audit_id} audit={audit} onOpenDetail={handleOpenAuditDetail} />
+                ))
               )}
             </div>
           )}
@@ -581,7 +616,9 @@ export const ReviewPanel: React.FC = () => {
                   <p>暂无审查记录</p>
                 </div>
               ) : (
-                reviews.map((review) => <ReviewCard key={getReviewId(review)} record={review} />)
+                reviews.map((review) => (
+                  <ReviewCard key={getReviewId(review)} record={review} onOpenDetail={handleOpenReviewDetail} />
+                ))
               )}
             </div>
           )}
@@ -590,8 +627,422 @@ export const ReviewPanel: React.FC = () => {
 
       {/* 发起审查表单 */}
       {showForm && <StartReviewForm onClose={() => setShowForm(false)} onSuccess={fetchData} />}
+
+      {/* 详情弹窗：审查记录 */}
+      {selectedReview && (
+        <ReviewDetailModal
+          record={selectedReview}
+          onClose={() => setSelectedReview(null)}
+        />
+      )}
+
+      {/* 详情弹窗：审核报告 */}
+      {selectedAudit && (
+        <AuditDetailModal
+          audit={selectedAudit}
+          onClose={() => setSelectedAudit(null)}
+        />
+      )}
     </div>
   );
 };
 
 export default ReviewPanel;
+
+// ============================================
+// 详情弹窗：审查记录
+// ============================================
+
+interface ReviewDetailModalProps {
+  record: ReviewRecord;
+  onClose: () => void;
+}
+
+const ReviewDetailModal: React.FC<ReviewDetailModalProps> = ({ record, onClose }) => {
+  const [tab, setTab] = useState<'overview' | 'json'>('overview');
+  const [loading, setLoading] = useState(false);
+  const [detail, setDetail] = useState<ReviewRecord>(record);
+  const [raw, setRaw] = useState<string>(JSON.stringify(record, null, 2));
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const run = async (): Promise<void> => {
+      setLoading(true);
+      setLoadError(null);
+      try {
+        const id = getReviewId(record);
+        const res = await getReviewDetail(id);
+        if (!mounted) return;
+        setDetail(res.record);
+        setRaw(res.raw || JSON.stringify(res.record, null, 2));
+      } catch (e) {
+        if (!mounted) return;
+        setLoadError(e instanceof Error ? e.message : String(e));
+        setDetail(record);
+        setRaw(JSON.stringify(record, null, 2));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    run();
+    return () => {
+      mounted = false;
+    };
+  }, [record]);
+
+  const id = getReviewId(detail);
+  const type = getReviewType(detail);
+  const resultColor = getResultColor(detail.result);
+
+  const renderDimensions = (): React.ReactNode => {
+    if (!detail.dimensions) return <div className="detail-empty">（无）</div>;
+    const entries = Object.entries(detail.dimensions);
+    if (!entries.length) return <div className="detail-empty">（无）</div>;
+    return (
+      <div className="detail-kv-grid">
+        {entries.map(([k, v]) => {
+          const score = typeof v === 'number' ? v : v?.score;
+          const comments = typeof v === 'object' && v && 'comments' in v ? (v as { comments?: string }).comments : undefined;
+          return (
+            <div key={k} className="detail-kv">
+              <div className="detail-k">{k}</div>
+              <div className="detail-v">
+                <strong>{score ?? '-'}</strong>
+                {comments ? <div className="detail-sub">{comments}</div> : null}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div className="detail-overlay" onClick={onClose}>
+      <div className="detail-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="detail-header">
+          <div className="detail-title">
+            <span className="detail-id">{id}</span>
+            <span className="detail-pill" style={{ backgroundColor: resultColor }}>
+              {detail.result}
+            </span>
+            <span className="detail-meta">类型: {type}</span>
+          </div>
+          <button className="close-btn" onClick={onClose}>×</button>
+        </div>
+
+        <div className="detail-tabs">
+          <button className={`tab ${tab === 'overview' ? 'active' : ''}`} onClick={() => setTab('overview')}>
+            概览
+          </button>
+          <button className={`tab ${tab === 'json' ? 'active' : ''}`} onClick={() => setTab('json')}>
+            原始 JSON
+          </button>
+        </div>
+
+        {loadError && <div className="detail-error">❌ {loadError}</div>}
+        {loading && <div className="detail-loading">加载中...</div>}
+
+        {!loading && tab === 'overview' && (
+          <div className="detail-body">
+            <div className="detail-section">
+              <div className="detail-section-title">基本信息</div>
+              <div className="detail-kv-grid">
+                {detail.task_id ? (
+                  <div className="detail-kv">
+                    <div className="detail-k">task_id</div>
+                    <div className="detail-v">{detail.task_id}</div>
+                  </div>
+                ) : null}
+                {detail.doc_path ? (
+                  <div className="detail-kv">
+                    <div className="detail-k">doc_path</div>
+                    <div className="detail-v">{detail.doc_path}</div>
+                  </div>
+                ) : null}
+                {detail.milestone_id ? (
+                  <div className="detail-kv">
+                    <div className="detail-k">milestone_id</div>
+                    <div className="detail-v">{detail.milestone_id}</div>
+                  </div>
+                ) : null}
+                {detail.score !== undefined ? (
+                  <div className="detail-kv">
+                    <div className="detail-k">score</div>
+                    <div className="detail-v"><strong>{detail.score}</strong>/100</div>
+                  </div>
+                ) : null}
+                {detail.reviewer ? (
+                  <div className="detail-kv">
+                    <div className="detail-k">reviewer</div>
+                    <div className="detail-v">{detail.reviewer}</div>
+                  </div>
+                ) : null}
+                {detail.signer ? (
+                  <div className="detail-kv">
+                    <div className="detail-k">signer</div>
+                    <div className="detail-v">{detail.signer}</div>
+                  </div>
+                ) : null}
+                {detail.completed_at ? (
+                  <div className="detail-kv">
+                    <div className="detail-k">completed_at</div>
+                    <div className="detail-v">{new Date(detail.completed_at).toLocaleString()}</div>
+                  </div>
+                ) : null}
+              </div>
+              {detail.summary ? <div className="detail-summary">{detail.summary}</div> : null}
+            </div>
+
+            <div className="detail-section">
+              <div className="detail-section-title">维度评分 / 备注</div>
+              {renderDimensions()}
+            </div>
+
+            <div className="detail-section">
+              <div className="detail-section-title">问题（issues）</div>
+              {detail.issues && detail.issues.length > 0 ? (
+                <ul className="detail-list">
+                  {detail.issues.map((it, idx) => (
+                    <li key={idx}>
+                      <div className="detail-list-title">{it.message}</div>
+                      <div className="detail-sub">
+                        {it.severity ? `severity=${it.severity} ` : ''}
+                        {it.type ? `type=${it.type} ` : ''}
+                        {it.file ? `file=${it.file} ` : ''}
+                        {typeof it.line === 'number' ? `line=${it.line}` : ''}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="detail-empty">（无）</div>
+              )}
+            </div>
+
+            {detail.suggestions && detail.suggestions.length > 0 ? (
+              <div className="detail-section">
+                <div className="detail-section-title">建议（suggestions）</div>
+                <ul className="detail-list">
+                  {detail.suggestions.map((s, idx) => (
+                    <li key={idx}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {detail.checklist && detail.checklist.length > 0 ? (
+              <div className="detail-section">
+                <div className="detail-section-title">清单（checklist）</div>
+                <ul className="detail-list">
+                  {detail.checklist.map((c, idx) => (
+                    <li key={idx}>
+                      <div className="detail-list-title">{c.text || c.item || '（未命名项）'}</div>
+                      <div className="detail-sub">
+                        status={c.status} auto={String(c.auto)}{typeof c.checked === 'boolean' ? ` checked=${String(c.checked)}` : ''}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        )}
+
+        {!loading && tab === 'json' && (
+          <div className="detail-body">
+            <pre className="detail-pre">{raw}</pre>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// 详情弹窗：审核报告
+// ============================================
+
+interface AuditDetailModalProps {
+  audit: AuditReport;
+  onClose: () => void;
+}
+
+const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) => {
+  const [tab, setTab] = useState<'overview' | 'progress' | 'issues' | 'json'>('overview');
+  const [loading, setLoading] = useState(false);
+  const [detail, setDetail] = useState<AuditReport>(audit);
+  const [raw, setRaw] = useState<string>(JSON.stringify(audit, null, 2));
+  const [progressMd, setProgressMd] = useState<string>('');
+  const [issuesMd, setIssuesMd] = useState<string>('');
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const run = async (): Promise<void> => {
+      setLoading(true);
+      setLoadError(null);
+      try {
+        const [auditRes, p, i] = await Promise.all([
+          getAuditDetail(audit.audit_id),
+          getAuditMarkdown(audit.audit_id, 'progress'),
+          getAuditMarkdown(audit.audit_id, 'issues'),
+        ]);
+        if (!mounted) return;
+        setDetail(auditRes.audit);
+        setRaw(auditRes.raw || JSON.stringify(auditRes.audit, null, 2));
+        setProgressMd(p.content || '');
+        setIssuesMd(i.content || '');
+      } catch (e) {
+        if (!mounted) return;
+        setLoadError(e instanceof Error ? e.message : String(e));
+        setDetail(audit);
+        setRaw(JSON.stringify(audit, null, 2));
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    run();
+    return () => {
+      mounted = false;
+    };
+  }, [audit]);
+
+  const statusColor = getStatusColor(detail.progress_report.status);
+  const decisionColor = getDecisionColor(detail.recommendations.decision);
+
+  return (
+    <div className="detail-overlay" onClick={onClose}>
+      <div className="detail-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="detail-header">
+          <div className="detail-title">
+            <span className="detail-id">{detail.audit_id}</span>
+            <span className="detail-pill" style={{ backgroundColor: statusColor }}>
+              {detail.progress_report.status}
+            </span>
+            <span className="detail-pill outline" style={{ borderColor: decisionColor, color: decisionColor }}>
+              {detail.recommendations.decision}
+            </span>
+          </div>
+          <button className="close-btn" onClick={onClose}>×</button>
+        </div>
+
+        <div className="detail-tabs">
+          <button className={`tab ${tab === 'overview' ? 'active' : ''}`} onClick={() => setTab('overview')}>
+            概览
+          </button>
+          <button className={`tab ${tab === 'progress' ? 'active' : ''}`} onClick={() => setTab('progress')}>
+            progress.md
+          </button>
+          <button className={`tab ${tab === 'issues' ? 'active' : ''}`} onClick={() => setTab('issues')}>
+            issues.md
+          </button>
+          <button className={`tab ${tab === 'json' ? 'active' : ''}`} onClick={() => setTab('json')}>
+            原始 JSON
+          </button>
+        </div>
+
+        {loadError && <div className="detail-error">❌ {loadError}</div>}
+        {loading && <div className="detail-loading">加载中...</div>}
+
+        {!loading && tab === 'overview' && (
+          <div className="detail-body">
+            <div className="detail-section">
+              <div className="detail-section-title">周期</div>
+              <div className="detail-sub">
+                {detail.period.start} ~ {detail.period.end}（requester={detail.requester} scope={detail.scope}）
+              </div>
+            </div>
+
+            <div className="detail-section">
+              <div className="detail-section-title">关键指标</div>
+              <div className="detail-kv-grid">
+                <div className="detail-kv">
+                  <div className="detail-k">overall_pass_rate</div>
+                  <div className="detail-v"><strong>{detail.progress_report.metrics.overall_pass_rate}</strong></div>
+                </div>
+                <div className="detail-kv">
+                  <div className="detail-k">reviews_completed</div>
+                  <div className="detail-v">{detail.progress_report.metrics.reviews_completed}</div>
+                </div>
+                <div className="detail-kv">
+                  <div className="detail-k">blockers</div>
+                  <div className="detail-v">{detail.issue_report.summary.blocker_count}</div>
+                </div>
+                <div className="detail-kv">
+                  <div className="detail-k">warnings</div>
+                  <div className="detail-v">{detail.issue_report.summary.warning_count}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="detail-section">
+              <div className="detail-section-title">建议 / 下一步</div>
+              <ul className="detail-list">
+                {(detail.recommendations.recommendations || []).map((s, idx) => (
+                  <li key={idx}>{s}</li>
+                ))}
+              </ul>
+              <div className="detail-sub">下一步：</div>
+              <ul className="detail-list">
+                {(detail.recommendations.next_steps || []).map((s, idx) => (
+                  <li key={idx}>{s}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="detail-section">
+              <div className="detail-section-title">问题清单（Blockers / Warnings）</div>
+              <div className="detail-sub">Blockers（{detail.issue_report.summary.blocker_count}）</div>
+              {detail.issue_report.blockers.length ? (
+                <ul className="detail-list">
+                  {detail.issue_report.blockers.slice(0, 50).map((b, idx) => (
+                    <li key={idx}>
+                      <div className="detail-list-title">{b.source} → {b.target}</div>
+                      <div className="detail-sub">issues={Array.isArray(b.issues) ? b.issues.length : 0}</div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="detail-empty">（无）</div>
+              )}
+
+              <div className="detail-sub">Warnings（{detail.issue_report.summary.warning_count}）</div>
+              {detail.issue_report.warnings.length ? (
+                <ul className="detail-list">
+                  {detail.issue_report.warnings.slice(0, 50).map((w, idx) => (
+                    <li key={idx}>
+                      <div className="detail-list-title">{w.source} → {w.target}</div>
+                      <div className="detail-sub">issues={Array.isArray(w.issues) ? w.issues.length : 0}</div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="detail-empty">（无）</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!loading && tab === 'progress' && (
+          <div className="detail-body">
+            <pre className="detail-pre">{progressMd || '（未找到 progress.md）'}</pre>
+          </div>
+        )}
+
+        {!loading && tab === 'issues' && (
+          <div className="detail-body">
+            <pre className="detail-pre">{issuesMd || '（未找到 issues.md）'}</pre>
+          </div>
+        )}
+
+        {!loading && tab === 'json' && (
+          <div className="detail-body">
+            <pre className="detail-pre">{raw}</pre>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};

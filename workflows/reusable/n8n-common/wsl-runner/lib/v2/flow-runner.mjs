@@ -95,12 +95,15 @@ function findEntryNodes(flowSpec) {
       const targets = Array.isArray(node.on_failure) ? node.on_failure : [node.on_failure];
       targets.forEach(t => targetNodes.add(t));
     }
-    if (node.onTrue) {
-      const targets = Array.isArray(node.onTrue) ? node.onTrue : [node.onTrue];
+    // condition: 兼容 onTrue/onFalse 与 on_true/on_false
+    const onTrue = node.onTrue ?? node.on_true;
+    const onFalse = node.onFalse ?? node.on_false;
+    if (onTrue) {
+      const targets = Array.isArray(onTrue) ? onTrue : [onTrue];
       targets.forEach(t => targetNodes.add(t));
     }
-    if (node.onFalse) {
-      const targets = Array.isArray(node.onFalse) ? node.onFalse : [node.onFalse];
+    if (onFalse) {
+      const targets = Array.isArray(onFalse) ? onFalse : [onFalse];
       targets.forEach(t => targetNodes.add(t));
     }
     if (node.depends_on) {
@@ -655,8 +658,9 @@ export class FlowRunner extends EventEmitter {
       config = { ...node.config };
       // 条件节点需要 onTrue/onFalse
       if (node.type === 'condition') {
-        config.onTrue = node.onTrue;
-        config.onFalse = node.onFalse;
+        // 兼容 flowspec 写法：onTrue/onFalse 或 on_true/on_false
+        config.onTrue = node.onTrue ?? node.on_true ?? config.onTrue ?? config.on_true;
+        config.onFalse = node.onFalse ?? node.on_false ?? config.onFalse ?? config.on_false;
       }
     } else {
       config = { ...node };
@@ -670,7 +674,11 @@ export class FlowRunner extends EventEmitter {
       delete config.timeout_ms;
       delete config.retry;
       delete config.onError;
-      // 注意：不删除 onTrue/onFalse，条件节点需要
+      // 注意：不删除 onTrue/onFalse，条件节点需要；同时兼容 on_true/on_false
+      if (node.type === 'condition') {
+        config.onTrue = config.onTrue ?? config.on_true;
+        config.onFalse = config.onFalse ?? config.on_false;
+      }
     }
 
     try {
@@ -814,16 +822,18 @@ export class FlowRunner extends EventEmitter {
 
       // 处理条件节点的显式分支
       if (node.type === 'condition') {
-        if (node.onTrue) {
-          const targets = this._normalizeNext(node.onTrue);
+        const onTrue = node.onTrue ?? node.on_true;
+        const onFalse = node.onFalse ?? node.on_false;
+        if (onTrue) {
+          const targets = this._normalizeNext(onTrue);
           for (const t of targets) {
             if (!edges.find(e => e.source === node.id && e.target === t)) {
               edges.push({ source: node.id, target: t, label: 'true' });
             }
           }
         }
-        if (node.onFalse) {
-          const targets = this._normalizeNext(node.onFalse);
+        if (onFalse) {
+          const targets = this._normalizeNext(onFalse);
           for (const t of targets) {
             if (!edges.find(e => e.source === node.id && e.target === t)) {
               edges.push({ source: node.id, target: t, label: 'false' });

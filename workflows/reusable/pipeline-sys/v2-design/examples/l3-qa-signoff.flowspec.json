@@ -78,7 +78,9 @@
       "name": "检查是否有验收项",
       "expression": "nodes.parse_checklist.output.total_items > 0",
       "on_true": "run_auto_lint",
-      "on_false": "create_default_checklist"
+      "on_false": "create_default_checklist",
+      "onTrue": "run_auto_lint",
+      "onFalse": "create_default_checklist"
     },
     {
       "id": "create_default_checklist",
@@ -92,7 +94,7 @@
       "id": "run_auto_lint",
       "type": "shell",
       "name": "运行 Lint 检查",
-      "command": "cd game && npm run lint --if-present 2>&1 | tail -20 || echo 'LINT_SKIPPED'",
+      "command": "if echo \"${inputs.auto_checks}\" | tr -d ' ' | grep -qi 'lint'; then cd game && npm run lint --if-present 2>&1 | tail -20 || echo 'LINT_SKIPPED'; else echo 'LINT_SKIPPED'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 300000,
@@ -103,7 +105,7 @@
       "id": "run_auto_typecheck",
       "type": "shell",
       "name": "运行类型检查",
-      "command": "cd game && npm run typecheck --if-present 2>&1 | tail -20 || npx tsc --noEmit 2>&1 | tail -20 || echo 'TYPECHECK_SKIPPED'",
+      "command": "if echo \"${inputs.auto_checks}\" | tr -d ' ' | grep -qi 'typecheck'; then cd game && npm run typecheck --if-present 2>&1 | tail -20 || npx tsc --noEmit 2>&1 | tail -20 || echo 'TYPECHECK_SKIPPED'; else echo 'TYPECHECK_SKIPPED'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 300000,
@@ -114,7 +116,7 @@
       "id": "run_auto_test",
       "type": "shell",
       "name": "运行测试",
-      "command": "cd game && npm run test --if-present 2>&1 | tail -30 || echo 'TEST_SKIPPED'",
+      "command": "if echo \"${inputs.auto_checks}\" | tr -d ' ' | grep -qi 'test'; then cd game && npm run test --if-present 2>&1 | tail -30 || echo 'TEST_SKIPPED'; else echo 'TEST_SKIPPED'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 600000,
@@ -125,7 +127,7 @@
       "id": "run_auto_build",
       "type": "shell",
       "name": "运行构建检查",
-      "command": "cd game && npm run build --if-present 2>&1 | tail -20 || echo 'BUILD_SKIPPED'",
+      "command": "if echo \"${inputs.auto_checks}\" | tr -d ' ' | grep -qi 'build'; then cd game && npm run build --if-present 2>&1 | tail -20 || echo 'BUILD_SKIPPED'; else echo 'BUILD_SKIPPED'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 600000,
@@ -158,7 +160,9 @@
       "name": "判定签字结果",
       "expression": "nodes.aggregate_results.output.failed === 0",
       "on_true": "generate_pass_report",
-      "on_false": "generate_fail_report"
+      "on_false": "generate_fail_report",
+      "onTrue": "generate_pass_report",
+      "onFalse": "generate_fail_report"
     },
     {
       "id": "generate_pass_report",

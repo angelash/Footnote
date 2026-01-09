@@ -132,12 +132,16 @@ $body = @{
   include_code_review = $true
   include_design_review = $true
   include_qa_signoff = $true
-  auto_trigger_missing = $false
+  # $false = 仅汇总（快速）
+  # $true  = 完整审核（会自动补齐缺失审查，耗时更久）
+  auto_trigger_missing = $true
   requester = "L0_producer"
 } | ConvertTo-Json
 
 Invoke-RestMethod -Method Post -Uri "http://localhost:3210/audit/intake" -ContentType "application/json" -Body $body
 ```
+
+> UI 入口：在 **审查中心** 点击 `⚡ 一键完整审核`，无需手填参数（默认 period_days=7，包含 Code/Design/QA）。
 
 ### 5.2 发起代码审查（L2）
 

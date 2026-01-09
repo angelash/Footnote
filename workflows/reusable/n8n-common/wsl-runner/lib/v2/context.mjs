@@ -477,7 +477,7 @@ export function createContextFromFlow(flow, inputValues = {}, options = {}) {
   for (const [name, param] of Object.entries(flow.inputs || {})) {
     if (name in inputValues) {
       validatedInputs[name] = inputValues[name];
-    } else if ('default' in param) {
+    } else if (param && typeof param === 'object' && 'default' in param) {
       validatedInputs[name] = param.default;
     } else if (param.required) {
       throw new Error(`Missing required input parameter: ${name}`);
@@ -487,8 +487,15 @@ export function createContextFromFlow(flow, inputValues = {}, options = {}) {
   // 初始化变量默认值
   const initialVariables = {};
   for (const [name, varDef] of Object.entries(flow.variables || {})) {
-    if ('default' in varDef) {
-      initialVariables[name] = varDef.default;
+    // 兼容两种写法：
+    // 1) 规范写法：{ type, default, ... }
+    // 2) 旧写法：直接写默认值（string/number/boolean/array/object）
+    if (varDef && typeof varDef === 'object' && !Array.isArray(varDef)) {
+      if ('default' in varDef) {
+        initialVariables[name] = varDef.default;
+      }
+    } else {
+      initialVariables[name] = varDef;
     }
   }
   

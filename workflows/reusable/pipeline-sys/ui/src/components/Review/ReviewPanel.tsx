@@ -49,6 +49,10 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
   const [taskPackPath, setTaskPackPath] = useState('');
   const [milestoneId, setMilestoneId] = useState('');
   const [periodDays, setPeriodDays] = useState(7);
+  const [autoTriggerMissing, setAutoTriggerMissing] = useState(true);
+  const [includeCodeReview, setIncludeCodeReview] = useState(true);
+  const [includeDesignReview, setIncludeDesignReview] = useState(true);
+  const [includeQaSignoff, setIncludeQaSignoff] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +96,10 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
           const input: AuditIntakeInput = {
             period_days: periodDays,
             audit_scope: 'all',
+            auto_trigger_missing: autoTriggerMissing,
+            include_code_review: includeCodeReview,
+            include_design_review: includeDesignReview,
+            include_qa_signoff: includeQaSignoff,
           };
           await startAuditIntake(input);
           break;
@@ -127,17 +135,61 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
           </div>
 
           {reviewType === 'audit' && (
-            <div className="form-group">
-              <label>统计周期（天）</label>
-              <input
-                type="number"
-                value={periodDays}
-                onChange={(e) => setPeriodDays(Number(e.target.value))}
-                min={1}
-                max={90}
-              />
-              <span className="hint">统计最近N天内的任务和审查</span>
-            </div>
+            <>
+              <div className="form-group">
+                <label>统计周期（天）</label>
+                <input
+                  type="number"
+                  value={periodDays}
+                  onChange={(e) => setPeriodDays(Number(e.target.value))}
+                  min={1}
+                  max={90}
+                />
+                <span className="hint">统计最近N天内的任务/提交/审查记录</span>
+              </div>
+
+              <div className="form-group">
+                <label>审核内容</label>
+                <div className="checkbox-group">
+                  <label className="checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={includeCodeReview}
+                      onChange={(e) => setIncludeCodeReview(e.target.checked)}
+                    />
+                    <span>📝 Code Review（代码审查）</span>
+                  </label>
+                  <label className="checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={includeDesignReview}
+                      onChange={(e) => setIncludeDesignReview(e.target.checked)}
+                    />
+                    <span>📐 Design Review（设计审查）</span>
+                  </label>
+                  <label className="checkbox-row">
+                    <input
+                      type="checkbox"
+                      checked={includeQaSignoff}
+                      onChange={(e) => setIncludeQaSignoff(e.target.checked)}
+                    />
+                    <span>✅ QA Signoff（会跑 lint/typecheck/test/build，耗时更久）</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>执行模式</label>
+                <label className="checkbox-row">
+                  <input
+                    type="checkbox"
+                    checked={autoTriggerMissing}
+                    onChange={(e) => setAutoTriggerMissing(e.target.checked)}
+                  />
+                  <span>自动补齐缺失审查（完整审核，可能耗时较久）</span>
+                </label>
+              </div>
+            </>
           )}
 
           {reviewType === 'code' && (
@@ -366,6 +418,8 @@ export const ReviewPanel: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'code' | 'design' | 'qa' | 'acceptance'>('all');
   const [activeTab, setActiveTab] = useState<'reviews' | 'audits'>('audits');
+  const [startingFullAudit, setStartingFullAudit] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -404,6 +458,30 @@ export const ReviewPanel: React.FC = () => {
     ).length,
   };
 
+  const handleStartFullAudit = async (): Promise<void> => {
+    setStartingFullAudit(true);
+    setError(null);
+    setNotice(null);
+    try {
+      await startAuditIntake({
+        audit_scope: 'all',
+        period_days: 7,
+        auto_trigger_missing: true,
+        include_code_review: true,
+        include_design_review: true,
+        include_qa_signoff: true,
+      });
+      setActiveTab('audits');
+      setNotice('已发起“一键完整审核”（后台执行中）。完成后会在“审核报告”列表出现新的 AUDIT 记录。');
+      // 主动刷新一次（后续还有 30s 定时刷新）
+      await fetchData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setStartingFullAudit(false);
+    }
+  };
+
   return (
     <div className="review-panel">
       {/* 头部 */}
@@ -412,6 +490,9 @@ export const ReviewPanel: React.FC = () => {
         <div className="header-actions">
           <button className="btn-refresh" onClick={fetchData} disabled={loading}>
             🔄 刷新
+          </button>
+          <button className="btn-primary btn-accent" onClick={handleStartFullAudit} disabled={startingFullAudit}>
+            {startingFullAudit ? '⏳ 审核启动中...' : '⚡ 一键完整审核'}
           </button>
           <button className="btn-primary" onClick={() => setShowForm(true)}>
             ➕ 发起审查
@@ -470,6 +551,7 @@ export const ReviewPanel: React.FC = () => {
 
       {/* 错误提示 */}
       {error && <div className="review-error">❌ {error}</div>}
+      {notice && <div className="review-notice">✅ {notice}</div>}
 
       {/* 加载中 */}
       {loading && <div className="review-loading">加载中...</div>}

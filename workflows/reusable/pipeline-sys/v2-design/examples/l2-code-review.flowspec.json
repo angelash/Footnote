@@ -93,7 +93,9 @@
       "name": "检查是否有变更",
       "expression": "nodes.detect_changes.output.stdout && nodes.detect_changes.output.stdout.trim().length > 0",
       "on_true": "get_diff_content",
-      "on_false": "no_changes_to_review"
+      "on_false": "no_changes_to_review",
+      "onTrue": "get_diff_content",
+      "onFalse": "no_changes_to_review"
     },
     {
       "id": "get_diff_content",
@@ -134,7 +136,9 @@
       "name": "判定审查结果",
       "expression": "nodes.calculate_score.output.passed === true",
       "on_true": "generate_approved_report",
-      "on_false": "generate_changes_requested_report"
+      "on_false": "generate_changes_requested_report",
+      "onTrue": "generate_approved_report",
+      "onFalse": "generate_changes_requested_report"
     },
     {
       "id": "generate_approved_report",

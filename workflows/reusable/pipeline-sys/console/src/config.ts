@@ -5,6 +5,7 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { spawnSync } from 'child_process';
 
 // 获取当前文件所在目录
 const __filename = fileURLToPath(import.meta.url);
@@ -35,15 +36,49 @@ export interface IConsoleConfig {
 }
 
 /**
+ * 在 Windows 上尝试自动探测 WSL2 IP（用于访问 WSL 内 Runner）
+ *
+ * 背景：部分机器关闭了 WSL localhostForwarding，导致 Windows 无法通过 localhost:3210 访问 WSL 服务。
+ * 这种情况下可以通过 WSL IP（如 172.x.x.x）访问。
+ */
+function detectWslIpOnWindows(): string | null {
+  if (process.platform !== 'win32') return null;
+
+  try {
+    const r = spawnSync(
+      'wsl',
+      ['-e', 'bash', '-lc', "hostname -I | tr -d '\\n' | cut -d' ' -f1"],
+      { encoding: 'utf8' }
+    );
+    const ip = String(r.stdout || '').trim();
+    if (!ip) return null;
+    if (!/^\d+\.\d+\.\d+\.\d+$/.test(ip)) return null;
+    return ip;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * 从环境变量加载配置
  */
 export function loadConfig(): IConsoleConfig {
+  const envRunnerBaseUrl = process.env.RUNNER_BASE_URL;
+  let runnerBaseUrl = envRunnerBaseUrl || 'http://localhost:3210';
+
+  // Windows 下优先使用 WSL IP（若可探测到），提升兼容性
+  if (!envRunnerBaseUrl && process.platform === 'win32') {
+    const wslIp = detectWslIpOnWindows();
+    if (wslIp) {
+      runnerBaseUrl = `http://${wslIp}:3210`;
+    }
+  }
+
   return {
     host: process.env.PIPELINE_SYS_HOST || '127.0.0.1',
     port: parseInt(process.env.PIPELINE_SYS_PORT || '3230', 10),
     projectRoot: process.env.PROJECT_ROOT || getDefaultProjectRoot(),
-    // 使用 localhost 而非 127.0.0.1，确保 Windows 能正确访问 WSL 中的服务
-    runnerBaseUrl: process.env.RUNNER_BASE_URL || 'http://localhost:3210',
+    runnerBaseUrl,
     automationRunsDir: 'workflows/project/logs/automation_runs',
   };
 }

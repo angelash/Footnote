@@ -76,7 +76,9 @@
       "name": "检查文档是否存在",
       "expression": "nodes.load_document.output.content && nodes.load_document.output.content.length > 50",
       "on_true": "check_parent_doc",
-      "on_false": "notify_doc_not_found"
+      "on_false": "notify_doc_not_found",
+      "onTrue": "check_parent_doc",
+      "onFalse": "notify_doc_not_found"
     },
     {
       "id": "check_parent_doc",
@@ -84,7 +86,9 @@
       "name": "检查是否需要加载上层文档",
       "expression": "inputs.parent_doc_path && inputs.parent_doc_path.length > 0",
       "on_true": "load_parent_document",
-      "on_false": "analyze_structure"
+      "on_false": "analyze_structure",
+      "onTrue": "load_parent_document",
+      "onFalse": "analyze_structure"
     },
     {
       "id": "load_parent_document",
@@ -143,7 +147,9 @@
       "name": "判定审查结果",
       "expression": "nodes.calculate_score.output.passed === true",
       "on_true": "generate_approved_report",
-      "on_false": "generate_revision_report"
+      "on_false": "generate_revision_report",
+      "onTrue": "generate_approved_report",
+      "onFalse": "generate_revision_report"
     },
     {
       "id": "generate_approved_report",

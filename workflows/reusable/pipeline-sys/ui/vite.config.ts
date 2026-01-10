@@ -11,6 +11,7 @@ export default defineConfig({
   },
   server: {
     port: 3231,
+    host: true, // 暴露到网络
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:3230',

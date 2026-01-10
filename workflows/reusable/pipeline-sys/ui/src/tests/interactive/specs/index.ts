@@ -7,6 +7,8 @@ export { TaskPageTests } from './02-task-page.spec';
 export { RunsPageTests } from './03-runs-page.spec';
 export { QueuePageTests } from './04-queue-page.spec';
 export { ReviewPageTests } from './05-review-page.spec';
+export { ApiTests } from './06-api.spec';
+export { ErrorHandlingTests } from './07-error-handling.spec';
 
 export const AllTestSuites = [
   'NavigationTests',
@@ -14,4 +16,6 @@ export const AllTestSuites = [
   'RunsPageTests',
   'QueuePageTests',
   'ReviewPageTests',
+  'ApiTests',
+  'ErrorHandlingTests',
 ];

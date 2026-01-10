@@ -227,4 +227,182 @@ describe('useRunStore', () => {
       expect(useRunStore.getState().eventsConnected).toBe(true);
     });
   });
+
+  describe('updateNodeFromEvent', () => {
+    beforeEach(() => {
+      // Set up a run with node runs for testing
+      useRunStore.getState().setCurrentRun('RUN-001', mockStatus, mockGraph, {
+        version: 'v1',
+        run_id: 'RUN-001',
+        updated_at: '2026-01-05T12:00:00Z',
+        nodes: {
+          'stage.intake': {
+            status: NodeStatus.PENDING,
+            attempt: 0,
+            started_at: null,
+            ended_at: null,
+            elapsed_ms: null,
+            last_error: null,
+            outputs: [],
+          },
+          'stage.execute': {
+            status: NodeStatus.PENDING,
+            attempt: 0,
+            started_at: null,
+            ended_at: null,
+            elapsed_ms: null,
+            last_error: null,
+            outputs: [],
+          },
+        },
+      });
+    });
+
+    it('should update node to RUNNING on NODE_STARTED event', () => {
+      const event: IEvent = {
+        ts: '2026-01-05T12:00:01Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_STARTED,
+        node_id: 'stage.intake',
+        seq: 2,
+        payload: { attempt: 1, timeout_ms: 300000 },
+      };
+
+      useRunStore.getState().updateNodeFromEvent(event);
+
+      const nodeRun = useRunStore.getState().currentNodeRuns?.nodes['stage.intake'];
+      expect(nodeRun?.status).toBe('RUNNING');
+      expect(nodeRun?.attempt).toBe(1);
+      expect(nodeRun?.started_at).toBe('2026-01-05T12:00:01Z');
+    });
+
+    it('should update node status on NODE_FINISHED event', () => {
+      // First start the node
+      useRunStore.getState().updateNodeFromEvent({
+        ts: '2026-01-05T12:00:01Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_STARTED,
+        node_id: 'stage.intake',
+        seq: 2,
+        payload: { attempt: 1 },
+      });
+
+      // Then finish the node
+      const finishEvent: IEvent = {
+        ts: '2026-01-05T12:00:05Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_FINISHED,
+        node_id: 'stage.intake',
+        seq: 3,
+        payload: { status: NodeStatus.SUCCESS, elapsed_ms: 4000 },
+      };
+
+      useRunStore.getState().updateNodeFromEvent(finishEvent);
+
+      const nodeRun = useRunStore.getState().currentNodeRuns?.nodes['stage.intake'];
+      expect(nodeRun?.status).toBe(NodeStatus.SUCCESS);
+      expect(nodeRun?.ended_at).toBe('2026-01-05T12:00:05Z');
+      expect(nodeRun?.elapsed_ms).toBe(4000);
+    });
+
+    it('should update node to TIMEOUT on NODE_TIMEOUT event', () => {
+      const timeoutEvent: IEvent = {
+        ts: '2026-01-05T12:05:00Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_TIMEOUT,
+        node_id: 'stage.execute',
+        seq: 10,
+        payload: { timeout_ms: 300000, elapsed_ms: 300100 },
+      };
+
+      useRunStore.getState().updateNodeFromEvent(timeoutEvent);
+
+      const nodeRun = useRunStore.getState().currentNodeRuns?.nodes['stage.execute'];
+      expect(nodeRun?.status).toBe('TIMEOUT');
+      expect(nodeRun?.ended_at).toBe('2026-01-05T12:05:00Z');
+    });
+
+    it('should create new node entry if node does not exist', () => {
+      const event: IEvent = {
+        ts: '2026-01-05T12:00:01Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_STARTED,
+        node_id: 'new.node',
+        seq: 5,
+        payload: { attempt: 1 },
+      };
+
+      useRunStore.getState().updateNodeFromEvent(event);
+
+      const nodeRun = useRunStore.getState().currentNodeRuns?.nodes['new.node'];
+      expect(nodeRun).toBeDefined();
+      expect(nodeRun?.status).toBe('RUNNING');
+    });
+
+    it('should not crash when currentNodeRuns is null', () => {
+      useRunStore.getState().clearCurrentRun();
+
+      const event: IEvent = {
+        ts: '2026-01-05T12:00:01Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_STARTED,
+        node_id: 'stage.intake',
+        seq: 2,
+        payload: { attempt: 1 },
+      };
+
+      // Should not throw
+      expect(() => {
+        useRunStore.getState().updateNodeFromEvent(event);
+      }).not.toThrow();
+    });
+
+    it('should not crash when node_id is empty', () => {
+      const event: IEvent = {
+        ts: '2026-01-05T12:00:00Z',
+        run_id: 'RUN-001',
+        type: EventType.RUN_STARTED,
+        node_id: '',
+        seq: 1,
+        payload: { task_id: 'TASK-001', project_root: '/project' },
+      };
+
+      // Should not throw
+      expect(() => {
+        useRunStore.getState().updateNodeFromEvent(event);
+      }).not.toThrow();
+    });
+
+    it('should set error on NODE_FINISHED with error', () => {
+      const event: IEvent = {
+        ts: '2026-01-05T12:00:05Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_FINISHED,
+        node_id: 'stage.intake',
+        seq: 3,
+        payload: { status: NodeStatus.FAILED, elapsed_ms: 3000, error: 'Test failed' },
+      };
+
+      useRunStore.getState().updateNodeFromEvent(event);
+
+      const nodeRun = useRunStore.getState().currentNodeRuns?.nodes['stage.intake'];
+      expect(nodeRun?.status).toBe(NodeStatus.FAILED);
+      expect(nodeRun?.last_error).toBe('Test failed');
+    });
+
+    it('should update updated_at timestamp', () => {
+      const event: IEvent = {
+        ts: '2026-01-05T12:00:10Z',
+        run_id: 'RUN-001',
+        type: EventType.NODE_STARTED,
+        node_id: 'stage.intake',
+        seq: 2,
+        payload: { attempt: 1 },
+      };
+
+      useRunStore.getState().updateNodeFromEvent(event);
+
+      expect(useRunStore.getState().currentNodeRuns?.updated_at).toBe('2026-01-05T12:00:10Z');
+    });
+  });
 });

@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import path from 'node:path';
 import {
   safeResolveUnderProject,
   safeResolveUnderRun,
@@ -10,17 +11,20 @@ import {
   normalizePath,
 } from '../services/pathGuards.js';
 
+// 辅助函数：规范化路径以便跨平台比较
+const normalizeCrossPlatform = (p: string) => p.replace(/\\/g, '/');
+
 describe('safeResolveUnderProject', () => {
-  const projectRoot = '/home/user/project';
+  const projectRoot = path.resolve('/home/user/project');
 
   it('should resolve valid relative path', () => {
     const result = safeResolveUnderProject(projectRoot, 'src/index.ts');
-    expect(result).toBe('/home/user/project/src/index.ts');
+    expect(result).toBe(path.join(projectRoot, 'src', 'index.ts'));
   });
 
   it('should resolve nested path', () => {
     const result = safeResolveUnderProject(projectRoot, 'workflows/project/logs/automation_runs');
-    expect(result).toBe('/home/user/project/workflows/project/logs/automation_runs');
+    expect(result).toBe(path.join(projectRoot, 'workflows', 'project', 'logs', 'automation_runs'));
   });
 
   it('should throw for path traversal attempt', () => {
@@ -39,16 +43,16 @@ describe('safeResolveUnderProject', () => {
 });
 
 describe('safeResolveUnderRun', () => {
-  const runDir = '/home/user/project/workflows/project/logs/automation_runs/RUN-123';
+  const runDir = path.resolve('/home/user/project/workflows/project/logs/automation_runs/RUN-123');
 
   it('should resolve valid relative path', () => {
     const result = safeResolveUnderRun(runDir, 'status.json');
-    expect(result).toBe(`${runDir}/status.json`);
+    expect(result).toBe(path.join(runDir, 'status.json'));
   });
 
   it('should resolve nested path', () => {
     const result = safeResolveUnderRun(runDir, 'nodes/execute.plan.json');
-    expect(result).toBe(`${runDir}/nodes/execute.plan.json`);
+    expect(result).toBe(path.join(runDir, 'nodes', 'execute.plan.json'));
   });
 
   it('should throw for path traversal', () => {
@@ -76,15 +80,18 @@ describe('isHiddenDir', () => {
 
 describe('normalizePath', () => {
   it('should normalize paths with ..', () => {
-    expect(normalizePath('a/b/../c')).toBe('a/c');
+    const result = normalizePath('a/b/../c');
+    expect(normalizeCrossPlatform(result)).toBe('a/c');
   });
 
   it('should normalize paths with .', () => {
-    expect(normalizePath('a/./b/./c')).toBe('a/b/c');
+    const result = normalizePath('a/./b/./c');
+    expect(normalizeCrossPlatform(result)).toBe('a/b/c');
   });
 
   it('should normalize multiple slashes', () => {
-    expect(normalizePath('a//b///c')).toBe('a/b/c');
+    const result = normalizePath('a//b///c');
+    expect(normalizeCrossPlatform(result)).toBe('a/b/c');
   });
 });
 

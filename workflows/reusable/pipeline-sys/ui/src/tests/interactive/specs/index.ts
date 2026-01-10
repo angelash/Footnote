@@ -9,13 +9,15 @@ export { QueuePageTests } from './04-queue-page.spec';
 export { ReviewPageTests } from './05-review-page.spec';
 export { ApiTests } from './06-api.spec';
 export { ErrorHandlingTests } from './07-error-handling.spec';
+export { ReviewComprehensiveTests } from './08-review-comprehensive.spec';
 
 export const AllTestSuites = [
   'NavigationTests',
-  'TaskPageTests', 
+  'TaskPageTests',
   'RunsPageTests',
   'QueuePageTests',
   'ReviewPageTests',
   'ApiTests',
   'ErrorHandlingTests',
+  'ReviewComprehensiveTests',
 ];

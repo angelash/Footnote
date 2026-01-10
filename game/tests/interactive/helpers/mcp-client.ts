@@ -4,7 +4,7 @@
  * 提供与 user-chrome-devtools MCP 服务器交互的统一接口
  */
 
-import { MCP_SERVER, TestConfig } from '../config';
+import { TestConfig } from '../config';
 
 // 测试结果类型
 export interface TestResult {
@@ -31,7 +31,6 @@ export interface SnapshotElement {
  * 实际调用 MCP 工具需要通过 Cursor 的 CallMcpTool
  */
 export class MCPTestClient {
-  private server = MCP_SERVER;
   private lastSnapshot: SnapshotElement | null = null;
 
   /**
@@ -93,9 +92,9 @@ export class MCPTestClient {
   /**
    * 执行 JavaScript
    */
-  async evaluate<T>(script: string): Promise<T | null> {
+  async evaluate<T>(_script: string): Promise<T | null> {
     // 使用 MCP evaluate_script 工具
-    // CallMcpTool: evaluate_script { function: script }
+    // CallMcpTool: evaluate_script { function: _script }
     console.log(`[MCP] Evaluate script`);
     return null;
   }

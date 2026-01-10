@@ -12,10 +12,8 @@
 
 import { TestConfig, GameScripts } from '../config';
 import { GameHelpers } from '../helpers/game-helpers';
-import { createAssertions } from '../helpers/assertions';
 
-// MCP 服务器标识
-const MCP_SERVER = 'user-chrome-devtools';
+// MCP 服务器: user-chrome-devtools (供参考)
 
 /**
  * 测试套件：游戏启动和加载

@@ -14,7 +14,7 @@
 import { TestConfig, GameScripts } from '../config';
 import { GameHelpers, PlayerPosition } from '../helpers/game-helpers';
 
-const MCP_SERVER = 'user-chrome-devtools';
+// MCP 服务器: user-chrome-devtools (供参考)
 
 /**
  * 测试套件：移动控制

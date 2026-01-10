@@ -4,7 +4,9 @@
  * 用于交互测试的验证
  */
 
-import type { PlayerPosition, WorldStateSnapshot } from './game-helpers';
+import type { PlayerPosition } from './game-helpers';
+// WorldStateSnapshot 保留用于未来扩展
+export type { WorldStateSnapshot } from './game-helpers';
 
 // 断言结果
 export interface AssertionResult {

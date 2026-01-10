@@ -126,8 +126,11 @@ export class InteractiveTestRunner {
    * 为指定测试生成 MCP 工具调用序列
    */
   generateMCPScript(suiteKey: TestSuiteKey, testId: string): object[] {
-    const suite = TestSuites[suiteKey];
-    const test = suite.tests.find((t: { id: string }) => t.id === testId);
+    const suite = TestSuites[suiteKey] as { 
+      tests: { id: string; steps: Record<string, unknown>[] }[];
+      beforeAll?: Record<string, unknown>[];
+    };
+    const test = suite.tests.find((t) => t.id === testId);
 
     if (!test) {
       throw new Error(`Test ${testId} not found in suite ${suiteKey}`);

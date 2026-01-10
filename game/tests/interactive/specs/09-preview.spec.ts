@@ -17,7 +17,7 @@
 import { TestConfig, GameScripts } from '../config';
 import { GameHelpers } from '../helpers/game-helpers';
 
-const MCP_SERVER = 'user-chrome-devtools';
+// MCP 服务器: user-chrome-devtools (供参考)
 
 // 预览场景 URL
 const PREVIEW_URLS = {

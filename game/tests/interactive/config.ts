@@ -53,7 +53,7 @@ export const MCP_SERVER = 'user-chrome-devtools';
 export const GameScripts = {
   // 获取当前场景
   getCurrentScene: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return null;
     const scenes = game.scene.getScenes(true);
     return scenes.length > 0 ? scenes[0].scene.key : null;
@@ -61,7 +61,7 @@ export const GameScripts = {
 
   // 获取玩家位置
   getPlayerPosition: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return null;
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._player) return null;
@@ -70,7 +70,7 @@ export const GameScripts = {
 
   // 获取世界状态
   getWorldState: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return null;
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._worldState) return null;
@@ -79,7 +79,7 @@ export const GameScripts = {
 
   // 检查对话框是否显示
   isDialogueVisible: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return false;
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._dialogueUI) return false;
@@ -88,7 +88,7 @@ export const GameScripts = {
 
   // 获取物品栏内容
   getInventoryItems: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return [];
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._inventoryUI) return [];
@@ -97,7 +97,7 @@ export const GameScripts = {
 
   // 获取当前 Zone
   getCurrentZone: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return null;
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._narrativeEngine) return null;
@@ -106,7 +106,7 @@ export const GameScripts = {
 
   // 检查暂停菜单是否显示
   isPauseMenuVisible: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return false;
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._pauseMenu) return false;
@@ -115,7 +115,7 @@ export const GameScripts = {
 
   // 获取 R 值
   getRValue: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return null;
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._worldState) return null;
@@ -133,7 +133,7 @@ export const GameScripts = {
 
   // 获取能力状态
   getAbilityState: `() => {
-    const game = window.__PHASER_GAME__ || window.game;
+    const game = window.__GAME__ || window.__PHASER_GAME__ || window.game;
     if (!game) return null;
     const scene = game.scene.getScene('GameScene');
     if (!scene || !scene._abilitySystem) return null;

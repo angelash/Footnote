@@ -20,6 +20,9 @@ import {
   getResultColor,
   getStatusColor,
   getDecisionColor,
+  getGradeColor,
+  MODULE_NAMES,
+  CHAPTER_NAMES,
   ReviewRecord,
   AuditReport,
   CodeReviewInput,
@@ -376,6 +379,8 @@ interface AuditCardProps {
 const AuditCard: React.FC<AuditCardProps> = ({ audit, onOpenDetail }) => {
   const statusColor = getStatusColor(audit.progress_report.status);
   const decisionColor = getDecisionColor(audit.recommendations.decision);
+  const isV2 = audit.report_version === '2.0.0' || audit.progress || audit.score_grade;
+  const gradeColor = audit.score_grade ? getGradeColor(audit.score_grade) : '#6b7280';
 
   return (
     <div
@@ -392,25 +397,42 @@ const AuditCard: React.FC<AuditCardProps> = ({ audit, onOpenDetail }) => {
         <span className="audit-status" style={{ backgroundColor: statusColor }}>
           {audit.progress_report.status}
         </span>
+        {isV2 && audit.score_grade && (
+          <span className="audit-grade" style={{ backgroundColor: gradeColor }}>
+            {audit.score_grade}
+          </span>
+        )}
       </div>
 
       <div className="audit-metrics">
+        {/* v2 细化指标 */}
+        {isV2 && audit.total_score !== undefined && (
+          <div className="metric metric-highlight">
+            <span className="metric-value" style={{ color: gradeColor }}>{audit.total_score}</span>
+            <span className="metric-label">总分</span>
+          </div>
+        )}
+        {isV2 && audit.progress?.overall && (
+          <div className="metric">
+            <span className="metric-value">{audit.progress.overall.pct}</span>
+            <span className="metric-label">完成度</span>
+          </div>
+        )}
+        {/* v1 兼容指标 */}
         <div className="metric">
           <span className="metric-value">{audit.progress_report.metrics.overall_pass_rate}</span>
           <span className="metric-label">通过率</span>
         </div>
         <div className="metric">
-          <span className="metric-value">{audit.progress_report.metrics.reviews_completed}</span>
-          <span className="metric-label">审查数</span>
-        </div>
-        <div className="metric">
           <span className="metric-value">{audit.issue_report.summary.blocker_count}</span>
           <span className="metric-label">阻塞</span>
         </div>
-        <div className="metric">
-          <span className="metric-value">{audit.issue_report.summary.warning_count}</span>
-          <span className="metric-label">警告</span>
-        </div>
+        {isV2 && audit.work_items_summary && (
+          <div className="metric">
+            <span className="metric-value">{audit.work_items_summary.total}</span>
+            <span className="metric-label">工作项</span>
+          </div>
+        )}
       </div>
 
       <div className="audit-decision" style={{ borderColor: decisionColor }}>
@@ -422,6 +444,7 @@ const AuditCard: React.FC<AuditCardProps> = ({ audit, onOpenDetail }) => {
 
       <div className="audit-period">
         周期: {audit.period.start} ~ {audit.period.end}
+        {isV2 && <span className="audit-version">v2.0</span>}
       </div>
     </div>
   );
@@ -870,13 +893,15 @@ interface AuditDetailModalProps {
 }
 
 const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) => {
-  const [tab, setTab] = useState<'overview' | 'progress' | 'issues' | 'json'>('overview');
+  const [tab, setTab] = useState<'overview' | 'scores' | 'breakdown' | 'progress' | 'issues' | 'json'>('overview');
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<AuditReport>(audit);
   const [raw, setRaw] = useState<string>(JSON.stringify(audit, null, 2));
   const [progressMd, setProgressMd] = useState<string>('');
   const [issuesMd, setIssuesMd] = useState<string>('');
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  const isV2 = detail.report_version === '2.0.0' || detail.progress || detail.score_grade;
 
   useEffect(() => {
     let mounted = true;
@@ -911,10 +936,128 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
 
   const statusColor = getStatusColor(detail.progress_report.status);
   const decisionColor = getDecisionColor(detail.recommendations.decision);
+  const gradeColor = detail.score_grade ? getGradeColor(detail.score_grade) : '#6b7280';
+
+  // 渲染模块进度表格
+  const renderModuleProgress = () => {
+    if (!detail.progress?.by_module) return <div className="detail-empty">（无数据）</div>;
+    const entries = Object.entries(detail.progress.by_module).filter(([_, v]) => v.total > 0);
+    if (entries.length === 0) return <div className="detail-empty">（无数据）</div>;
+
+    return (
+      <table className="detail-table">
+        <thead>
+          <tr>
+            <th>模块</th>
+            <th>完成/总数</th>
+            <th>进度</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map(([key, stat]) => (
+            <tr key={key}>
+              <td>{MODULE_NAMES[key] || key}</td>
+              <td>{stat.done}/{stat.total}</td>
+              <td>
+                <span className="progress-bar-text">{stat.bar || ''}</span>
+                <span className="progress-pct">{stat.pct}</span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
+  // 渲染章节进度表格
+  const renderChapterProgress = () => {
+    if (!detail.progress?.by_chapter) return <div className="detail-empty">（无数据）</div>;
+    const entries = Object.entries(detail.progress.by_chapter).filter(([_, v]) => v.total > 0);
+    if (entries.length === 0) return <div className="detail-empty">（无数据）</div>;
+
+    return (
+      <table className="detail-table">
+        <thead>
+          <tr>
+            <th>章节</th>
+            <th>状态</th>
+            <th>完成度</th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map(([key, stat]) => {
+            const status = stat.done === stat.total ? '已完成' : (stat.in_progress && stat.in_progress > 0 ? '进行中' : '未开始');
+            return (
+              <tr key={key}>
+                <td>{CHAPTER_NAMES[key] || key}</td>
+                <td>{status}</td>
+                <td>{stat.pct}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  };
+
+  // 渲染评分详情
+  const renderScoreDetails = () => {
+    if (!detail.score_details || detail.score_details.length === 0) {
+      return <div className="detail-empty">（无评分数据）</div>;
+    }
+
+    return (
+      <div className="score-details">
+        <div className="score-summary">
+          <div className="score-total">
+            <span className="score-value" style={{ color: gradeColor }}>{detail.total_score || 0}</span>
+            <span className="score-label">/ 100</span>
+          </div>
+          <div className="score-grade-badge" style={{ backgroundColor: gradeColor }}>
+            {detail.score_grade || '-'}
+          </div>
+        </div>
+
+        <table className="detail-table">
+          <thead>
+            <tr>
+              <th>维度</th>
+              <th>权重</th>
+              <th>得分</th>
+              <th>扣分原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            {detail.score_details.map((sd, idx) => (
+              <tr key={idx}>
+                <td>{sd.dimension_name}</td>
+                <td>{Math.round(sd.weight * 100)}%</td>
+                <td>
+                  <strong>{sd.score}</strong>/{sd.max_score}
+                </td>
+                <td>
+                  {sd.deductions && sd.deductions.length > 0
+                    ? sd.deductions.map((d, i) => (
+                        <div key={i} className="deduction-item">
+                          <span className={`deduction-severity severity-${d.severity || 'info'}`}>
+                            {d.severity || 'info'}
+                          </span>
+                          {d.reason} (-{d.points})
+                        </div>
+                      ))
+                    : '无扣分'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   return (
     <div className="detail-overlay" onClick={onClose}>
-      <div className="detail-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="detail-modal detail-modal-wide" onClick={(e) => e.stopPropagation()}>
         <div className="detail-header">
           <div className="detail-title">
             <span className="detail-id">{detail.audit_id}</span>
@@ -924,6 +1067,11 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
             <span className="detail-pill outline" style={{ borderColor: decisionColor, color: decisionColor }}>
               {detail.recommendations.decision}
             </span>
+            {isV2 && detail.score_grade && (
+              <span className="detail-pill" style={{ backgroundColor: gradeColor }}>
+                {detail.score_grade} ({detail.total_score || 0}分)
+              </span>
+            )}
           </div>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
@@ -932,6 +1080,16 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
           <button className={`tab ${tab === 'overview' ? 'active' : ''}`} onClick={() => setTab('overview')}>
             概览
           </button>
+          {isV2 && (
+            <>
+              <button className={`tab ${tab === 'scores' ? 'active' : ''}`} onClick={() => setTab('scores')}>
+                📊 评分详情
+              </button>
+              <button className={`tab ${tab === 'breakdown' ? 'active' : ''}`} onClick={() => setTab('breakdown')}>
+                📈 进度统计
+              </button>
+            </>
+          )}
           <button className={`tab ${tab === 'progress' ? 'active' : ''}`} onClick={() => setTab('progress')}>
             progress.md
           </button>
@@ -952,12 +1110,38 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
               <div className="detail-section-title">周期</div>
               <div className="detail-sub">
                 {detail.period.start} ~ {detail.period.end}（requester={detail.requester} scope={detail.scope}）
+                {isV2 && <span className="version-badge">v2.0</span>}
               </div>
             </div>
+
+            {/* v2 细化指标 */}
+            {isV2 && detail.progress?.overall && (
+              <div className="detail-section">
+                <div className="detail-section-title">总体完成度</div>
+                <div className="overall-progress">
+                  <span className="progress-value">{detail.progress.overall.pct}</span>
+                  <span className="progress-bar-text">{detail.progress.overall.bar || ''}</span>
+                  <span className="progress-stats">
+                    ({detail.progress.overall.done}/{detail.progress.overall.total})
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="detail-section">
               <div className="detail-section-title">关键指标</div>
               <div className="detail-kv-grid">
+                {isV2 && detail.total_score !== undefined && (
+                  <div className="detail-kv">
+                    <div className="detail-k">总分/等级</div>
+                    <div className="detail-v">
+                      <strong style={{ color: gradeColor }}>{detail.total_score}</strong>
+                      <span className="grade-badge" style={{ backgroundColor: gradeColor }}>
+                        {detail.score_grade}
+                      </span>
+                    </div>
+                  </div>
+                )}
                 <div className="detail-kv">
                   <div className="detail-k">overall_pass_rate</div>
                   <div className="detail-v"><strong>{detail.progress_report.metrics.overall_pass_rate}</strong></div>
@@ -974,6 +1158,12 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                   <div className="detail-k">warnings</div>
                   <div className="detail-v">{detail.issue_report.summary.warning_count}</div>
                 </div>
+                {isV2 && detail.work_items_summary && (
+                  <div className="detail-kv">
+                    <div className="detail-k">work_items</div>
+                    <div className="detail-v">{detail.work_items_summary.total}</div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1022,6 +1212,46 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                 <div className="detail-empty">（无）</div>
               )}
             </div>
+          </div>
+        )}
+
+        {!loading && tab === 'scores' && isV2 && (
+          <div className="detail-body">
+            <div className="detail-section">
+              <div className="detail-section-title">细化评分</div>
+              {renderScoreDetails()}
+            </div>
+          </div>
+        )}
+
+        {!loading && tab === 'breakdown' && isV2 && (
+          <div className="detail-body">
+            <div className="detail-section">
+              <div className="detail-section-title">按模块进度</div>
+              {renderModuleProgress()}
+            </div>
+
+            <div className="detail-section">
+              <div className="detail-section-title">按章节进度</div>
+              {renderChapterProgress()}
+            </div>
+
+            {detail.progress?.by_priority && (
+              <div className="detail-section">
+                <div className="detail-section-title">按优先级</div>
+                <div className="priority-stats">
+                  {Object.entries(detail.progress.by_priority).map(([pri, stat]) => (
+                    stat.total > 0 && (
+                      <div key={pri} className="priority-item">
+                        <span className={`priority-badge priority-${pri.toLowerCase()}`}>{pri}</span>
+                        <span>{stat.done}/{stat.total}</span>
+                        <span>{stat.pct}</span>
+                      </div>
+                    )
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

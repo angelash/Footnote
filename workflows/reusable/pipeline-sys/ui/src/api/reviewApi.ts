@@ -46,13 +46,86 @@ export interface ReviewRecord {
   summary?: string;
 }
 
-// 审核报告
+// 进度统计项
+export interface ProgressItem {
+  total: number;
+  done: number;
+  in_progress?: number;
+  blocked?: number;
+  pct: string;
+  bar?: string;
+}
+
+// 多维度进度统计
+export interface ProgressBreakdown {
+  overall: ProgressItem;
+  by_module?: Record<string, ProgressItem>;
+  by_chapter?: Record<string, ProgressItem>;
+  by_system?: Record<string, ProgressItem>;
+  by_role?: Record<string, ProgressItem>;
+  by_priority?: Record<string, ProgressItem>;
+}
+
+// 扣分项
+export interface ScoreDeduction {
+  dimension?: string;
+  reason: string;
+  points: number;
+  severity?: 'blocker' | 'major' | 'minor' | 'info';
+  file?: string;
+  line?: number;
+}
+
+// 评分详情
+export interface ScoreDetail {
+  dimension: string;
+  dimension_name: string;
+  weight: number;
+  score: number;
+  max_score: number;
+  weighted_score: number;
+  deductions: ScoreDeduction[];
+}
+
+// 工作项
+export interface WorkItem {
+  id: string;
+  title: string;
+  source: 'bible' | 'spec' | 'taskpack' | 'dev_plan' | 'manual';
+  source_path: string;
+  source_line?: number;
+  module?: string;
+  chapter?: string;
+  system?: string;
+  priority?: 'P0' | 'P1' | 'P2';
+  status: 'pending' | 'in_progress' | 'done' | 'blocked' | 'cancelled';
+  completion_pct: number;
+  evidence?: string[];
+  notes?: string;
+}
+
+// 审核报告（支持 v1 和 v2 格式）
 export interface AuditReport {
   audit_id: string;
   scope: string;
   requester: string;
   period: { start: string; end: string };
+  report_version?: string;  // v2 新增
   scan_summary?: unknown;
+
+  // ===== v2 细化数据 =====
+  progress?: ProgressBreakdown;  // v2 多维度进度
+  work_items?: WorkItem[];  // v2 工作项清单
+  work_items_summary?: {
+    total: number;
+    by_status?: Record<string, number>;
+    by_source?: Record<string, number>;
+  };
+  total_score?: number;  // v2 总分
+  score_grade?: 'A' | 'B' | 'C' | 'D' | 'F';  // v2 评分等级
+  score_details?: ScoreDetail[];  // v2 评分详情
+
+  // ===== v1 兼容数据 =====
   progress_report: {
     type: string;
     status: 'HEALTHY' | 'WARNING' | 'CRITICAL';
@@ -90,6 +163,47 @@ export interface AuditReport {
     next_steps: string[];
   };
   completed_at: string;
+}
+
+// 模块中文名
+export const MODULE_NAMES: Record<string, string> = {
+  narrative: '叙事',
+  system: '系统',
+  ui: 'UI',
+  level: '关卡',
+  art: '美术',
+  qa: 'QA',
+  infra: '基础设施',
+  other: '其他',
+};
+
+// 章节中文名
+export const CHAPTER_NAMES: Record<string, string> = {
+  C0: '序章',
+  C1: '第一章',
+  C2: '第二章',
+  C3: '第三章',
+  C4: '第四章',
+  C5: '终章',
+  common: '通用',
+};
+
+// 评分等级颜色
+export function getGradeColor(grade: string): string {
+  switch (grade) {
+    case 'A':
+      return '#22c55e';
+    case 'B':
+      return '#84cc16';
+    case 'C':
+      return '#f59e0b';
+    case 'D':
+      return '#f97316';
+    case 'F':
+      return '#ef4444';
+    default:
+      return '#6b7280';
+  }
 }
 
 // 审查列表响应

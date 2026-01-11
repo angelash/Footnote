@@ -1,9 +1,9 @@
 {
   "$schema": "../flowspec-schema.json",
   "id": "l0-audit-intake",
-  "name": "L0 总体审核入口",
-  "version": "1.0.0",
-  "description": "制作人（L0）总体审核入口，一键发起全面审核，自动收集进度和问题",
+  "name": "L0 总体审核入口（细化版）",
+  "version": "2.0.0",
+  "description": "制作人（L0）总体审核入口，支持多维度进度统计、细化评分、工作项追踪",
   "author": "Pipeline-Sys",
   "tags": ["l0", "audit", "intake", "report", "producer"],
 
@@ -105,6 +105,18 @@
       "on_success": "check_need_reviews"
     },
     {
+      "id": "parse_requirements",
+      "type": "shell",
+      "name": "解析需求清单",
+      "description": "从 Bible/Spec 文档中解析结构化工作项清单",
+      "command": "node workflows/project/tools/review-system/parse-requirements.mjs --project-root='${inputs.project_root}' --output=json 2>/dev/null || echo '{\"ok\":false,\"items\":[],\"warnings\":[\"parse failed\"]}'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "check_need_reviews",
+      "on_failure": "check_need_reviews"
+    },
+    {
       "id": "check_need_reviews",
       "type": "condition",
       "name": "检查是否需要触发审查",
@@ -144,6 +156,33 @@
       "name": "汇总审查数据",
       "expression": "(function() { const output = nodes.collect_existing_reviews.output.stdout || ''; const parts = output.split('|||').filter(p => p.trim()); const raw = []; parts.forEach(p => { try { const obj = JSON.parse(p.trim()); if (obj && (obj.review_id || obj.signoff_id || obj.acceptance_id)) { raw.push(obj); } } catch(e) {} }); const includeCode = inputs.include_code_review !== false; const includeDesign = inputs.include_design_review !== false; const includeQa = inputs.include_qa_signoff !== false; const included = raw.filter(r => { const isCode = r.review_id && r.review_id.startsWith('CR-'); const isDesign = r.review_id && r.review_id.startsWith('DR-'); const isQa = r.signoff_id && r.signoff_id.startsWith('QA-'); return (includeCode && isCode) || (includeDesign && isDesign) || (includeQa && isQa); }); const crs = included.filter(r => r.review_id && r.review_id.startsWith('CR-')); const drs = included.filter(r => r.review_id && r.review_id.startsWith('DR-')); const qas = included.filter(r => r.signoff_id && r.signoff_id.startsWith('QA-')); return { include: { code_review: includeCode, design_review: includeDesign, qa_signoff: includeQa }, code_reviews: { count: crs.length, passed: crs.filter(r => r.result === 'APPROVED').length, avg_score: crs.length > 0 ? Math.round(crs.reduce((s, r) => s + (r.score || 0), 0) / crs.length) : 0 }, design_reviews: { count: drs.length, passed: drs.filter(r => r.result === 'APPROVED').length, avg_score: drs.length > 0 ? Math.round(drs.reduce((s, r) => s + (r.score || 0), 0) / drs.length) : 0 }, qa_signoffs: { count: qas.length, passed: qas.filter(r => r.result === 'PASSED' || r.result === 'PARTIAL').length }, all_reviews: included, all_reviews_raw: raw, included_count: included.length, raw_count: raw.length }; })()",
       "timeout_ms": 60000,
+      "on_success": "parse_work_items"
+    },
+    {
+      "id": "parse_work_items",
+      "type": "transform",
+      "name": "解析工作项清单",
+      "description": "从需求解析器输出中提取工作项",
+      "expression": "(function() { try { const stdout = nodes.parse_requirements?.output?.stdout || '{}'; const parsed = JSON.parse(stdout); return { ok: parsed.ok !== false, items: parsed.items || [], summary: parsed.summary || {}, warnings: parsed.warnings || [] }; } catch(e) { return { ok: false, items: [], summary: {}, warnings: ['JSON parse error: ' + e.message] }; } })()",
+      "timeout_ms": 60000,
+      "on_success": "calculate_progress_breakdown"
+    },
+    {
+      "id": "calculate_progress_breakdown",
+      "type": "transform",
+      "name": "计算多维度进度",
+      "description": "按模块、章节、系统、优先级统计完成度",
+      "expression": "(function() { const items = nodes.parse_work_items.output.items || []; const modules = ['narrative', 'system', 'ui', 'level', 'art', 'qa', 'infra', 'other']; const chapters = ['C0', 'C1', 'C2', 'C3', 'C4', 'C5', 'common']; const priorities = ['P0', 'P1', 'P2']; const initStat = () => ({ total: 0, done: 0, in_progress: 0, blocked: 0, pct: '0%' }); const breakdown = { overall: initStat(), by_module: {}, by_chapter: {}, by_priority: {} }; modules.forEach(m => breakdown.by_module[m] = initStat()); chapters.forEach(c => breakdown.by_chapter[c] = initStat()); priorities.forEach(p => breakdown.by_priority[p] = initStat()); items.forEach(item => { breakdown.overall.total++; if (item.status === 'done') breakdown.overall.done++; else if (item.status === 'in_progress') breakdown.overall.in_progress++; else if (item.status === 'blocked') breakdown.overall.blocked++; const mod = item.module || 'other'; if (breakdown.by_module[mod]) { breakdown.by_module[mod].total++; if (item.status === 'done') breakdown.by_module[mod].done++; else if (item.status === 'in_progress') breakdown.by_module[mod].in_progress++; else if (item.status === 'blocked') breakdown.by_module[mod].blocked++; } const chap = item.chapter || 'common'; if (breakdown.by_chapter[chap]) { breakdown.by_chapter[chap].total++; if (item.status === 'done') breakdown.by_chapter[chap].done++; else if (item.status === 'in_progress') breakdown.by_chapter[chap].in_progress++; else if (item.status === 'blocked') breakdown.by_chapter[chap].blocked++; } const pri = item.priority || 'P1'; if (breakdown.by_priority[pri]) { breakdown.by_priority[pri].total++; if (item.status === 'done') breakdown.by_priority[pri].done++; else if (item.status === 'in_progress') breakdown.by_priority[pri].in_progress++; else if (item.status === 'blocked') breakdown.by_priority[pri].blocked++; } }); const calcPct = (s) => { if (s.total === 0) return; const pct = Math.round((s.done / s.total) * 100); s.pct = pct + '%'; const filled = Math.round(pct / 10); s.bar = '[' + '='.repeat(filled) + '-'.repeat(10 - filled) + ']'; }; calcPct(breakdown.overall); Object.values(breakdown.by_module).forEach(calcPct); Object.values(breakdown.by_chapter).forEach(calcPct); Object.values(breakdown.by_priority).forEach(calcPct); return breakdown; })()",
+      "timeout_ms": 60000,
+      "on_success": "calculate_dimension_scores"
+    },
+    {
+      "id": "calculate_dimension_scores",
+      "type": "transform",
+      "name": "计算细化评分",
+      "description": "基于完成度和门禁结果计算各维度评分",
+      "expression": "(function() { const breakdown = nodes.calculate_progress_breakdown.output; const agg = nodes.aggregate_reviews.output; const scan = nodes.parse_scan_results.output; const scores = []; const deductions = []; let totalScore = 0; const weights = { completeness: 0.3, code_quality: 0.25, test_coverage: 0.2, doc_sync: 0.15, security: 0.1 }; const overallPct = parseInt(breakdown.overall.pct, 10) || 0; let completenessScore = 100; if (overallPct < 50) { const d = Math.round((50 - overallPct) * 0.5); completenessScore -= d; deductions.push({ dimension: '完整性', reason: '总体完成度过低 (' + overallPct + '%)', points: d, severity: 'major' }); } const p0 = breakdown.by_priority.P0 || { total: 0, done: 0 }; if (p0.total > 0 && p0.done < p0.total) { const d = Math.round((1 - p0.done / p0.total) * 30); completenessScore -= d; deductions.push({ dimension: '完整性', reason: 'P0任务未全部完成 (' + p0.done + '/' + p0.total + ')', points: d, severity: 'blocker' }); } if (breakdown.overall.blocked > 0) { const d = Math.min(breakdown.overall.blocked * 5, 20); completenessScore -= d; deductions.push({ dimension: '完整性', reason: '存在' + breakdown.overall.blocked + '个阻塞任务', points: d, severity: 'blocker' }); } scores.push({ dimension: 'completeness', dimension_name: '完整性', weight: weights.completeness, score: Math.max(0, completenessScore), max_score: 100, weighted_score: Math.max(0, completenessScore) * weights.completeness, deductions: deductions.filter(d => d.dimension === '完整性') }); let codeQualityScore = 85; if (agg.code_reviews.count === 0 && scan.pending.commits > 10) { codeQualityScore -= 15; deductions.push({ dimension: '代码规范性', reason: '无代码审查记录', points: 15, severity: 'major' }); } else if (agg.code_reviews.avg_score > 0 && agg.code_reviews.avg_score < 70) { const d = Math.round((70 - agg.code_reviews.avg_score) * 0.3); codeQualityScore -= d; deductions.push({ dimension: '代码规范性', reason: '代码审查均分较低 (' + agg.code_reviews.avg_score + ')', points: d, severity: 'minor' }); } scores.push({ dimension: 'code_quality', dimension_name: '代码规范性', weight: weights.code_quality, score: Math.max(0, codeQualityScore), max_score: 100, weighted_score: Math.max(0, codeQualityScore) * weights.code_quality, deductions: deductions.filter(d => d.dimension === '代码规范性') }); let testScore = 80; if (agg.qa_signoffs.count === 0) { testScore -= 20; deductions.push({ dimension: '测试覆盖', reason: '无QA签字记录', points: 20, severity: 'major' }); } scores.push({ dimension: 'test_coverage', dimension_name: '测试覆盖', weight: weights.test_coverage, score: Math.max(0, testScore), max_score: 100, weighted_score: Math.max(0, testScore) * weights.test_coverage, deductions: deductions.filter(d => d.dimension === '测试覆盖') }); let docScore = 85; if (agg.design_reviews.count === 0 && scan.pending.specs > 0) { docScore -= 15; deductions.push({ dimension: '文档同步', reason: '无设计审查记录', points: 15, severity: 'minor' }); } scores.push({ dimension: 'doc_sync', dimension_name: '文档同步', weight: weights.doc_sync, score: Math.max(0, docScore), max_score: 100, weighted_score: Math.max(0, docScore) * weights.doc_sync, deductions: deductions.filter(d => d.dimension === '文档同步') }); scores.push({ dimension: 'security', dimension_name: '安全性', weight: weights.security, score: 90, max_score: 100, weighted_score: 90 * weights.security, deductions: [] }); totalScore = Math.round(scores.reduce((s, d) => s + d.weighted_score, 0)); let grade = 'F'; if (totalScore >= 90) grade = 'A'; else if (totalScore >= 80) grade = 'B'; else if (totalScore >= 70) grade = 'C'; else if (totalScore >= 60) grade = 'D'; return { total_score: totalScore, grade, score_details: scores, all_deductions: deductions, summary: { blockers: deductions.filter(d => d.severity === 'blocker').length, majors: deductions.filter(d => d.severity === 'major').length, minors: deductions.filter(d => d.severity === 'minor').length } }; })()",
+      "timeout_ms": 60000,
       "on_success": "collect_issues"
     },
     {
@@ -181,8 +220,8 @@
     {
       "id": "save_audit_report",
       "type": "transform",
-      "name": "汇总最终报告",
-      "expression": "({ audit_id: nodes.intake.output.audit_id, scope: inputs.audit_scope, requester: inputs.requester, period: nodes.intake.output.period, scan_summary: nodes.parse_scan_results.output, progress_report: nodes.generate_progress_report.output, issue_report: nodes.generate_issue_report.output, recommendations: nodes.generate_recommendations.output, completed_at: new Date().toISOString() })",
+      "name": "汇总最终报告（细化版）",
+      "expression": "({ audit_id: nodes.intake.output.audit_id, scope: inputs.audit_scope, requester: inputs.requester, period: nodes.intake.output.period, report_version: '2.0.0', scan_summary: nodes.parse_scan_results.output, progress: nodes.calculate_progress_breakdown.output, work_items: nodes.parse_work_items.output.items, work_items_summary: { total: (nodes.parse_work_items.output.items || []).length, by_status: nodes.parse_work_items.output.summary?.by_status || {}, by_source: nodes.parse_work_items.output.summary?.by_source || {} }, total_score: nodes.calculate_dimension_scores.output.total_score, score_grade: nodes.calculate_dimension_scores.output.grade, score_details: nodes.calculate_dimension_scores.output.score_details, progress_report: nodes.generate_progress_report.output, issue_report: nodes.generate_issue_report.output, recommendations: nodes.generate_recommendations.output, completed_at: new Date().toISOString() })",
       "timeout_ms": 60000,
       "on_success": "write_audit_json"
     },
@@ -200,8 +239,8 @@
     {
       "id": "build_progress_md",
       "type": "transform",
-      "name": "构建进度报告 Markdown",
-      "expression": "(function() { const auditId = nodes.intake.output.audit_id; const period = nodes.intake.output.period; const now = new Date().toISOString(); const progress = nodes.generate_progress_report.output; const rec = nodes.generate_recommendations.output; const scan = nodes.parse_scan_results.output || { pending: { taskpacks: 0, specs: 0, commits: 0 }, existing_reviews: 0, samples: {} }; const samples = scan.samples || {}; const fmtList = (items, emptyText = '- （无）') => { const list = (items || []).map(s => String(s).trim()).filter(Boolean).slice(0, 20); if (!list.length) return emptyText; return list.map(s => '- ' + s).join('\\n'); }; const includeList = []; if (inputs.include_code_review !== false) includeList.push('Code Review'); if (inputs.include_design_review !== false) includeList.push('Design Review'); if (inputs.include_qa_signoff !== false) includeList.push('QA Signoff'); const includeText = includeList.length ? includeList.join(' / ') : '（无）'; const modeText = inputs.auto_trigger_missing === true ? '完整审核（自动补齐缺失审查）' : '仅汇总（不触发审查）'; const triggerOut = (nodes.trigger_batch_reviews && nodes.trigger_batch_reviews.output && nodes.trigger_batch_reviews.output.stdout) ? nodes.trigger_batch_reviews.output.stdout : ''; const getTrigInt = (key) => { const m = String(triggerOut || '').match(new RegExp('^' + key + '=(\\\\d+)\\\\s*$', 'm')); return m ? parseInt(m[1], 10) : 0; }; const triggeredCode = getTrigInt('code_review_triggered'); const triggeredDesign = getTrigInt('design_review_triggered'); const triggeredQa = getTrigInt('qa_signoff_triggered'); const triggerFailures = getTrigInt('auto_trigger_failures'); const md = [ '# 进度报告', '', `> 审核ID: ${auditId}`, `> 生成时间: ${now}`, `> 统计周期: ${period.start} ~ ${period.end}`, `> 执行模式: ${modeText}`, `> 审核内容: ${includeText}`, `> 自动触发统计: code=${triggeredCode}, design=${triggeredDesign}, qa=${triggeredQa}, failures=${triggerFailures}`, '', `## 总体状态: ${progress.status}`, '', '## 扫描摘要（本次审查覆盖范围）', '', '| 项目 | 数量 |', '|---|---|', `| TaskPacks | ${scan.pending.taskpacks} |`, `| Specs | ${scan.pending.specs} |`, `| Commits | ${scan.pending.commits} |`, `| Reviews | ${scan.existing_reviews} |`, '', '## 扫描到的对象（样例，最多20条）', '', '### TaskPacks', '', fmtList(samples.taskpacks), '', '### Specs', '', fmtList(samples.specs), '', '### Commits', '', fmtList(samples.commits), '', '### Reviews', '', fmtList(samples.reviews), '', '## 关键指标', '', '| 指标 | 数值 |', '|---|---|', `| 周期内任务数 | ${progress.metrics.tasks_in_period} |`, `| 周期内规格数 | ${progress.metrics.specs_in_period} |`, `| 周期内提交数 | ${progress.metrics.commits_in_period} |`, `| 完成审查数 | ${progress.metrics.reviews_completed} |`, `| 通过审查数 | ${progress.metrics.reviews_passed} |`, `| 综合通过率 | ${progress.metrics.overall_pass_rate} |`, `| 代码审查均分 | ${progress.metrics.code_review_avg_score} |`, `| 设计审查均分 | ${progress.metrics.design_review_avg_score} |`, '', '## 审查明细', '', '### 代码审查', `- 数量: ${progress.breakdown.code_review.count}`, `- 通过: ${progress.breakdown.code_review.passed}`, '', '### 设计审查', `- 数量: ${progress.breakdown.design_review.count}`, `- 通过: ${progress.breakdown.design_review.passed}`, '', '### QA签字', `- 数量: ${progress.breakdown.qa_signoff.count}`, `- 通过: ${progress.breakdown.qa_signoff.passed}`, '', '## 决策建议', '', `**决策**: ${rec.decision}`, '', '### 建议', fmtList(rec.recommendations), '', '### 下一步', fmtList(rec.next_steps), '' ].join('\\n'); return { content: md }; })()",
+      "name": "构建进度报告 Markdown（细化版）",
+      "expression": "(function() { const auditId = nodes.intake.output.audit_id; const period = nodes.intake.output.period; const now = new Date().toISOString(); const progress = nodes.generate_progress_report.output; const rec = nodes.generate_recommendations.output; const scan = nodes.parse_scan_results.output || { pending: { taskpacks: 0, specs: 0, commits: 0 }, existing_reviews: 0, samples: {} }; const samples = scan.samples || {}; const breakdown = nodes.calculate_progress_breakdown.output || {}; const scores = nodes.calculate_dimension_scores.output || {}; const fmtList = (items, emptyText = '- （无）') => { const list = (items || []).map(s => String(s).trim()).filter(Boolean).slice(0, 20); if (!list.length) return emptyText; return list.map(s => '- ' + s).join('\\n'); }; const includeList = []; if (inputs.include_code_review !== false) includeList.push('Code Review'); if (inputs.include_design_review !== false) includeList.push('Design Review'); if (inputs.include_qa_signoff !== false) includeList.push('QA Signoff'); const includeText = includeList.length ? includeList.join(' / ') : '（无）'; const modeText = inputs.auto_trigger_missing === true ? '完整审核（自动补齐缺失审查）' : '仅汇总（不触发审查）'; const moduleNames = { narrative: '叙事', system: '系统', ui: 'UI', level: '关卡', art: '美术', qa: 'QA', infra: '基础设施', other: '其他' }; const chapterNames = { C0: '序章', C1: '第一章', C2: '第二章', C3: '第三章', C4: '第四章', C5: '终章', common: '通用' }; const fmtModuleTable = () => { const rows = []; for (const [key, stat] of Object.entries(breakdown.by_module || {})) { if (stat.total > 0) { rows.push(`| ${moduleNames[key] || key} | ${stat.done}/${stat.total} | ${stat.bar || ''} ${stat.pct} |`); } } return rows.length ? rows.join('\\n') : '| - | - | - |'; }; const fmtChapterTable = () => { const rows = []; for (const [key, stat] of Object.entries(breakdown.by_chapter || {})) { if (stat.total > 0) { const status = stat.done === stat.total ? '已完成' : (stat.in_progress > 0 ? '进行中' : '未开始'); rows.push(`| ${chapterNames[key] || key} | ${status} | ${stat.pct} |`); } } return rows.length ? rows.join('\\n') : '| - | - | - |'; }; const fmtScoreTable = () => { const rows = []; for (const detail of (scores.score_details || [])) { const deductionText = detail.deductions.map(d => d.reason + '(-' + d.points + ')').join(', ') || '无'; rows.push(`| ${detail.dimension_name} | ${detail.score}/${detail.max_score} | ${deductionText} |`); } return rows.length ? rows.join('\\n') : '| - | - | - |'; }; const md = [ '# 进度报告（细化版）', '', `> 审核ID: ${auditId}`, `> 报告版本: 2.0.0`, `> 生成时间: ${now}`, `> 统计周期: ${period.start} ~ ${period.end}`, `> 执行模式: ${modeText}`, `> 审核内容: ${includeText}`, '', `## 总体完成度: ${breakdown.overall?.pct || '0%'}`, '', `**评分等级**: ${scores.grade || '-'} (${scores.total_score || 0}分)`, '', '## 按模块进度', '', '| 模块 | 完成/总数 | 进度 |', '|------|----------|------|', fmtModuleTable(), '', '## 按章节进度', '', '| 章节 | 状态 | 完成度 |', '|------|------|--------|', fmtChapterTable(), '', '## 细化评分', '', `**总分: ${scores.total_score || 0}/100**`, '', '| 维度 | 得分 | 扣分原因 |', '|------|------|---------|', fmtScoreTable(), '', '## 扫描摘要', '', '| 项目 | 数量 |', '|---|---|', `| TaskPacks | ${scan.pending.taskpacks} |`, `| Specs | ${scan.pending.specs} |`, `| Commits | ${scan.pending.commits} |`, `| Reviews | ${scan.existing_reviews} |`, `| 工作项 | ${breakdown.overall?.total || 0} |`, '', '## 审查明细', '', '### 代码审查', `- 数量: ${progress.breakdown.code_review.count}`, `- 通过: ${progress.breakdown.code_review.passed}`, `- 均分: ${progress.metrics.code_review_avg_score}`, '', '### 设计审查', `- 数量: ${progress.breakdown.design_review.count}`, `- 通过: ${progress.breakdown.design_review.passed}`, `- 均分: ${progress.metrics.design_review_avg_score}`, '', '### QA签字', `- 数量: ${progress.breakdown.qa_signoff.count}`, `- 通过: ${progress.breakdown.qa_signoff.passed}`, '', '## 决策建议', '', `**决策**: ${rec.decision}`, '', '### 建议', fmtList(rec.recommendations), '', '### 下一步', fmtList(rec.next_steps), '' ].join('\\n'); return { content: md }; })()",
       "timeout_ms": 60000,
       "on_success": "write_progress_md"
     },
@@ -254,12 +293,16 @@
   "edges": [
     { "from": "intake", "to": "scan_pending_items" },
     { "from": "scan_pending_items", "to": "parse_scan_results" },
-    { "from": "parse_scan_results", "to": "check_need_reviews" },
+    { "from": "parse_scan_results", "to": "parse_requirements" },
+    { "from": "parse_requirements", "to": "check_need_reviews" },
     { "from": "check_need_reviews", "to": "trigger_batch_reviews", "condition": "auto_trigger" },
     { "from": "check_need_reviews", "to": "collect_existing_reviews", "condition": "skip" },
     { "from": "trigger_batch_reviews", "to": "collect_existing_reviews" },
     { "from": "collect_existing_reviews", "to": "aggregate_reviews" },
-    { "from": "aggregate_reviews", "to": "collect_issues" },
+    { "from": "aggregate_reviews", "to": "parse_work_items" },
+    { "from": "parse_work_items", "to": "calculate_progress_breakdown" },
+    { "from": "calculate_progress_breakdown", "to": "calculate_dimension_scores" },
+    { "from": "calculate_dimension_scores", "to": "collect_issues" },
     { "from": "collect_issues", "to": "generate_progress_report" },
     { "from": "generate_progress_report", "to": "generate_issue_report" },
     { "from": "generate_issue_report", "to": "generate_recommendations" },
@@ -276,6 +319,11 @@
     "audit_id": "nodes.intake.output.audit_id",
     "status": "nodes.generate_progress_report.output.status",
     "decision": "nodes.generate_recommendations.output.decision",
+    "total_score": "nodes.calculate_dimension_scores.output.total_score",
+    "score_grade": "nodes.calculate_dimension_scores.output.grade",
+    "progress": "nodes.calculate_progress_breakdown.output",
+    "score_details": "nodes.calculate_dimension_scores.output.score_details",
+    "work_items_count": "nodes.parse_work_items.output.items.length",
     "progress_report": "nodes.generate_progress_report.output",
     "issue_report": "nodes.generate_issue_report.output",
     "recommendations": "nodes.generate_recommendations.output"

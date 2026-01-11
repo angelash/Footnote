@@ -102,7 +102,7 @@
       "name": "解析扫描结果",
       "expression": "(function() { const output = nodes.scan_pending_items.output.stdout || ''; const getInt = (key) => { const m = output.match(new RegExp('^' + key + '=(\\\\d+)\\\\s*$', 'm')); return m ? parseInt(m[1], 10) : 0; }; const getBlock = (start, end) => { const re = new RegExp(start + '\\\\n([\\\\s\\\\S]*?)\\\\n' + end); const m = output.match(re); if (!m) return []; return m[1].split('\\\\n').map(l => l.trim()).filter(Boolean); }; const taskpacks = getInt('TASKPACKS_COUNT'); const specs = getInt('SPECS_COUNT'); const commits = getInt('COMMITS_COUNT'); const reviews = getInt('REVIEWS_COUNT'); const samples = { taskpacks: getBlock('TASKPACKS_SAMPLE_BEGIN', 'TASKPACKS_SAMPLE_END'), specs: getBlock('SPECS_SAMPLE_BEGIN', 'SPECS_SAMPLE_END'), commits: getBlock('COMMITS_SAMPLE_BEGIN', 'COMMITS_SAMPLE_END'), reviews: getBlock('REVIEWS_SAMPLE_BEGIN', 'REVIEWS_SAMPLE_END') }; return { pending: { taskpacks, specs, commits }, existing_reviews: reviews, samples, needs_code_review: commits > reviews, needs_design_review: specs > 0, needs_qa_signoff: taskpacks > 0 }; })()",
       "timeout_ms": 60000,
-      "on_success": "check_need_reviews"
+      "on_success": "parse_requirements"
     },
     {
       "id": "parse_requirements",

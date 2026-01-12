@@ -69,6 +69,9 @@ const PORT = Number(process.env.PORT || "3210");
 // 队列管理器实例（启动时初始化）
 let taskQueue = null;
 
+// 异步任务追踪器（防止 Promise 被 GC）
+const runningAsyncTasks = new Map();
+
 const DEFAULT_PROJECT_ROOT = process.cwd();
 
 const AUTOMATION_RUNS_DIR = "workflows/project/logs/automation_runs";
@@ -737,9 +740,31 @@ async function handleV2Run(body) {
   // 同步或异步执行
   if (isAsync) {
     // 异步执行：立即返回，后台运行
-    executeFlow().catch(e => {
-      console.error(`[v2/run] async error for ${runId}:`, e);
+    console.log(`[v2/run] ${runId} starting async execution...`);
+    
+    // 使用 setImmediate 确保 Promise 在下一个事件循环中执行
+    const promise = new Promise((resolve) => {
+      setImmediate(async () => {
+        console.log(`[v2/run] ${runId} setImmediate callback triggered`);
+        try {
+          console.log(`[v2/run] ${runId} calling executeFlow()...`);
+          const result = await executeFlow();
+          console.log(`[v2/run] ${runId} executeFlow() completed:`, result?.status || 'unknown');
+          resolve(result);
+        } catch (e) {
+          console.error(`[v2/run] ${runId} async error:`, e.message, e.stack);
+          resolve({ ok: false, error: e.message });
+        } finally {
+          // 执行完成后从追踪器中移除
+          runningAsyncTasks.delete(runId);
+          console.log(`[v2/run] ${runId} removed from tracker (remaining: ${runningAsyncTasks.size})`);
+        }
+      });
     });
+
+    // 保持 Promise 引用，防止被 GC
+    runningAsyncTasks.set(runId, { promise, startedAt: Date.now() });
+    console.log(`[v2/run] ${runId} added to tracker (total: ${runningAsyncTasks.size})`);
 
     return {
       ok: true,
@@ -841,6 +866,19 @@ const server = http.createServer(async (req, res) => {
   try {
     if (req.method === "GET" && req.url === "/health") {
       return json(res, 200, { ok: true, service: "wsl-cursor-runner", pid: process.pid });
+    }
+
+    // GET /async-tasks - 查看运行中的异步任务
+    if (req.method === "GET" && req.url === "/async-tasks") {
+      const tasks = [];
+      for (const [runId, info] of runningAsyncTasks) {
+        tasks.push({
+          run_id: runId,
+          started_at: new Date(info.startedAt).toISOString(),
+          elapsed_ms: Date.now() - info.startedAt,
+        });
+      }
+      return json(res, 200, { ok: true, count: tasks.length, tasks });
     }
 
     if (req.method === "POST" && req.url === "/execute-task") {

@@ -1,0 +1,7 @@
+{
+  "audit_scope": "all",
+  "period_days": 1,
+  "include_code_review": false,
+  "include_design_review": false,
+  "project_root": "/mnt/f/workspace/github/Footnote"
+}

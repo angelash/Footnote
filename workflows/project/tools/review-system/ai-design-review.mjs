@@ -64,16 +64,11 @@ async function generatePrompt(docPath, docContent, docType) {
  * 调用 cursor-agent 执行分析
  */
 async function runCursorAgent(prompt, projectRoot) {
-  console.error('[ai-design-review] Calling cursor-agent...');
+  console.error('[ai-design-review] Calling cursor-agent via stdin...');
 
   return new Promise((resolve, reject) => {
     const proc = spawn(CONFIG.cursorAgent, [
-      '--print',
-      '--force',
-      '--approve-mcps',
-      '--output-format', 'text',
       '--model', CONFIG.model,
-      prompt,
     ], {
       cwd: projectRoot,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -86,6 +81,7 @@ async function runCursorAgent(prompt, projectRoot) {
     proc.stderr.on('data', (data) => { stderr += data.toString(); });
 
     proc.on('close', (code) => {
+      console.error(`[ai-design-review] cursor-agent exited with code ${code}`);
       resolve({ stdout, stderr, code });
     });
 
@@ -93,11 +89,16 @@ async function runCursorAgent(prompt, projectRoot) {
       reject(err);
     });
 
-    // 超时处理 (5分钟)
+    // 发送提示词到 stdin 并关闭
+    proc.stdin.write(prompt);
+    proc.stdin.end();
+
+    // 超时处理 (3分钟)
     setTimeout(() => {
+      console.error('[ai-design-review] cursor-agent timeout, killing...');
       proc.kill('SIGTERM');
-      reject(new Error('cursor-agent timeout'));
-    }, 300000);
+      resolve({ stdout, stderr: 'timeout', code: -1 });
+    }, 180000);
   });
 }
 

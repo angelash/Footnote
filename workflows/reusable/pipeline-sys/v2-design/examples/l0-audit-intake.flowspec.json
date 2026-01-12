@@ -2,8 +2,8 @@
   "$schema": "../flowspec-schema.json",
   "id": "l0-audit-intake",
   "name": "L0 总体审核入口（细化版）",
-  "version": "2.0.0",
-  "description": "制作人（L0）总体审核入口，支持多维度进度统计、细化评分、工作项追踪",
+  "version": "2.1.0",
+  "description": "制作人（L0）总体审核入口，支持多维度进度统计、细化评分、工作项追踪、AI智能分析（cursor-agent）",
   "author": "Pipeline-Sys",
   "tags": ["l0", "audit", "intake", "report", "producer"],
 
@@ -72,6 +72,18 @@
       "type": "string",
       "required": true,
       "description": "项目根目录（由调用方提供）"
+    },
+    "enable_ai_analysis": {
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "是否启用 AI 分析（使用 cursor-agent）"
+    },
+    "ai_model": {
+      "type": "string",
+      "required": false,
+      "default": "auto",
+      "description": "AI 分析使用的模型（auto/gpt-5.2/opus-4.5）"
     }
   },
 
@@ -156,6 +168,39 @@
       "name": "汇总审查数据",
       "expression": "(function() { const output = nodes.collect_existing_reviews.output.stdout || ''; const parts = output.split('|||').filter(p => p.trim()); const raw = []; parts.forEach(p => { try { const obj = JSON.parse(p.trim()); if (obj && (obj.review_id || obj.signoff_id || obj.acceptance_id)) { raw.push(obj); } } catch(e) {} }); const includeCode = inputs.include_code_review !== false; const includeDesign = inputs.include_design_review !== false; const includeQa = inputs.include_qa_signoff !== false; const included = raw.filter(r => { const isCode = r.review_id && r.review_id.startsWith('CR-'); const isDesign = r.review_id && r.review_id.startsWith('DR-'); const isQa = r.signoff_id && r.signoff_id.startsWith('QA-'); return (includeCode && isCode) || (includeDesign && isDesign) || (includeQa && isQa); }); const crs = included.filter(r => r.review_id && r.review_id.startsWith('CR-')); const drs = included.filter(r => r.review_id && r.review_id.startsWith('DR-')); const qas = included.filter(r => r.signoff_id && r.signoff_id.startsWith('QA-')); return { include: { code_review: includeCode, design_review: includeDesign, qa_signoff: includeQa }, code_reviews: { count: crs.length, passed: crs.filter(r => r.result === 'APPROVED').length, avg_score: crs.length > 0 ? Math.round(crs.reduce((s, r) => s + (r.score || 0), 0) / crs.length) : 0 }, design_reviews: { count: drs.length, passed: drs.filter(r => r.result === 'APPROVED').length, avg_score: drs.length > 0 ? Math.round(drs.reduce((s, r) => s + (r.score || 0), 0) / drs.length) : 0 }, qa_signoffs: { count: qas.length, passed: qas.filter(r => r.result === 'PASSED' || r.result === 'PARTIAL').length }, all_reviews: included, all_reviews_raw: raw, included_count: included.length, raw_count: raw.length }; })()",
       "timeout_ms": 60000,
+      "on_success": "ai_code_review"
+    },
+    {
+      "id": "ai_code_review",
+      "type": "shell",
+      "name": "AI 代码审查",
+      "description": "使用 cursor-agent 进行智能代码审查分析",
+      "command": "echo '[AI Code Review] Placeholder - cursor-agent integration pending' && echo '{\"review_id\":\"${nodes.intake.output.audit_id}-CODE\",\"result\":\"SKIPPED\",\"reason\":\"AI analysis placeholder\",\"note\":\"cursor-agent integration requires manual setup\"}'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 600000,
+      "on_success": "ai_design_review",
+      "on_failure": "ai_design_review"
+    },
+    {
+      "id": "ai_design_review",
+      "type": "shell",
+      "name": "AI 设计审查",
+      "description": "使用 cursor-agent 进行智能设计文档审查",
+      "command": "echo '[AI Design Review] Placeholder - cursor-agent integration pending' && echo '{\"review_id\":\"${nodes.intake.output.audit_id}-DESIGN\",\"result\":\"SKIPPED\",\"reason\":\"AI analysis placeholder\",\"note\":\"cursor-agent integration requires manual setup\"}'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 600000,
+      "on_success": "merge_ai_reviews",
+      "on_failure": "merge_ai_reviews"
+    },
+    {
+      "id": "merge_ai_reviews",
+      "type": "transform",
+      "name": "合并 AI 审查结果",
+      "description": "将 AI 审查结果合并到汇总数据中",
+      "expression": "(function() { const agg = nodes.aggregate_reviews.output; const aiCodeRaw = nodes.ai_code_review?.output?.stdout || '{}'; const aiDesignRaw = nodes.ai_design_review?.output?.stdout || '{}'; let aiCode = {}; let aiDesign = {}; try { aiCode = JSON.parse(aiCodeRaw.trim().split('\\n').pop() || '{}'); } catch(e) { aiCode = { result: 'PARSE_ERROR' }; } try { aiDesign = JSON.parse(aiDesignRaw.trim().split('\\n').pop() || '{}'); } catch(e) { aiDesign = { result: 'PARSE_ERROR' }; } const mergedReviews = [...(agg.all_reviews || [])]; if (aiCode.review_id && aiCode.result !== 'SKIPPED') { mergedReviews.push(aiCode); } if (aiDesign.review_id && aiDesign.result !== 'SKIPPED') { mergedReviews.push(aiDesign); } const crs = mergedReviews.filter(r => r.review_id && r.review_id.includes('CODE')); const drs = mergedReviews.filter(r => r.review_id && r.review_id.includes('DESIGN')); return { ...agg, ai_code_review: aiCode, ai_design_review: aiDesign, code_reviews: { count: crs.length, passed: crs.filter(r => r.result === 'APPROVED').length, avg_score: crs.length > 0 ? Math.round(crs.reduce((s, r) => s + (r.score || 0), 0) / crs.length) : agg.code_reviews.avg_score }, design_reviews: { count: drs.length, passed: drs.filter(r => r.result === 'APPROVED').length, avg_score: drs.length > 0 ? Math.round(drs.reduce((s, r) => s + (r.score || 0), 0) / drs.length) : agg.design_reviews.avg_score }, all_reviews: mergedReviews, has_ai_analysis: (aiCode.result && aiCode.result !== 'SKIPPED') || (aiDesign.result && aiDesign.result !== 'SKIPPED') }; })()",
+      "timeout_ms": 60000,
       "on_success": "parse_work_items"
     },
     {
@@ -181,7 +226,7 @@
       "type": "transform",
       "name": "计算细化评分",
       "description": "基于完成度和门禁结果计算各维度评分",
-      "expression": "(function() { const breakdown = nodes.calculate_progress_breakdown.output; const agg = nodes.aggregate_reviews.output; const scan = nodes.parse_scan_results.output; const scores = []; const deductions = []; let totalScore = 0; const weights = { completeness: 0.3, code_quality: 0.25, test_coverage: 0.2, doc_sync: 0.15, security: 0.1 }; const overallPct = parseInt(breakdown.overall.pct, 10) || 0; let completenessScore = 100; if (overallPct < 50) { const d = Math.round((50 - overallPct) * 0.5); completenessScore -= d; deductions.push({ dimension: '完整性', reason: '总体完成度过低 (' + overallPct + '%)', points: d, severity: 'major' }); } const p0 = breakdown.by_priority.P0 || { total: 0, done: 0 }; if (p0.total > 0 && p0.done < p0.total) { const d = Math.round((1 - p0.done / p0.total) * 30); completenessScore -= d; deductions.push({ dimension: '完整性', reason: 'P0任务未全部完成 (' + p0.done + '/' + p0.total + ')', points: d, severity: 'blocker' }); } if (breakdown.overall.blocked > 0) { const d = Math.min(breakdown.overall.blocked * 5, 20); completenessScore -= d; deductions.push({ dimension: '完整性', reason: '存在' + breakdown.overall.blocked + '个阻塞任务', points: d, severity: 'blocker' }); } scores.push({ dimension: 'completeness', dimension_name: '完整性', weight: weights.completeness, score: Math.max(0, completenessScore), max_score: 100, weighted_score: Math.max(0, completenessScore) * weights.completeness, deductions: deductions.filter(d => d.dimension === '完整性') }); let codeQualityScore = 85; if (agg.code_reviews.count === 0 && scan.pending.commits > 10) { codeQualityScore -= 15; deductions.push({ dimension: '代码规范性', reason: '无代码审查记录', points: 15, severity: 'major' }); } else if (agg.code_reviews.avg_score > 0 && agg.code_reviews.avg_score < 70) { const d = Math.round((70 - agg.code_reviews.avg_score) * 0.3); codeQualityScore -= d; deductions.push({ dimension: '代码规范性', reason: '代码审查均分较低 (' + agg.code_reviews.avg_score + ')', points: d, severity: 'minor' }); } scores.push({ dimension: 'code_quality', dimension_name: '代码规范性', weight: weights.code_quality, score: Math.max(0, codeQualityScore), max_score: 100, weighted_score: Math.max(0, codeQualityScore) * weights.code_quality, deductions: deductions.filter(d => d.dimension === '代码规范性') }); let testScore = 80; if (agg.qa_signoffs.count === 0) { testScore -= 20; deductions.push({ dimension: '测试覆盖', reason: '无QA签字记录', points: 20, severity: 'major' }); } scores.push({ dimension: 'test_coverage', dimension_name: '测试覆盖', weight: weights.test_coverage, score: Math.max(0, testScore), max_score: 100, weighted_score: Math.max(0, testScore) * weights.test_coverage, deductions: deductions.filter(d => d.dimension === '测试覆盖') }); let docScore = 85; if (agg.design_reviews.count === 0 && scan.pending.specs > 0) { docScore -= 15; deductions.push({ dimension: '文档同步', reason: '无设计审查记录', points: 15, severity: 'minor' }); } scores.push({ dimension: 'doc_sync', dimension_name: '文档同步', weight: weights.doc_sync, score: Math.max(0, docScore), max_score: 100, weighted_score: Math.max(0, docScore) * weights.doc_sync, deductions: deductions.filter(d => d.dimension === '文档同步') }); scores.push({ dimension: 'security', dimension_name: '安全性', weight: weights.security, score: 90, max_score: 100, weighted_score: 90 * weights.security, deductions: [] }); totalScore = Math.round(scores.reduce((s, d) => s + d.weighted_score, 0)); let grade = 'F'; if (totalScore >= 90) grade = 'A'; else if (totalScore >= 80) grade = 'B'; else if (totalScore >= 70) grade = 'C'; else if (totalScore >= 60) grade = 'D'; return { total_score: totalScore, grade, score_details: scores, all_deductions: deductions, summary: { blockers: deductions.filter(d => d.severity === 'blocker').length, majors: deductions.filter(d => d.severity === 'major').length, minors: deductions.filter(d => d.severity === 'minor').length } }; })()",
+      "expression": "(function() { const breakdown = nodes.calculate_progress_breakdown.output; const agg = nodes.merge_ai_reviews?.output || nodes.aggregate_reviews.output; const scan = nodes.parse_scan_results.output; const scores = []; const deductions = []; let totalScore = 0; const weights = { completeness: 0.3, code_quality: 0.25, test_coverage: 0.2, doc_sync: 0.15, security: 0.1 }; const overallPct = parseInt(breakdown.overall.pct, 10) || 0; let completenessScore = 100; if (overallPct < 50) { const d = Math.round((50 - overallPct) * 0.5); completenessScore -= d; deductions.push({ dimension: '完整性', reason: '总体完成度过低 (' + overallPct + '%)', points: d, severity: 'major' }); } const p0 = breakdown.by_priority.P0 || { total: 0, done: 0 }; if (p0.total > 0 && p0.done < p0.total) { const d = Math.round((1 - p0.done / p0.total) * 30); completenessScore -= d; deductions.push({ dimension: '完整性', reason: 'P0任务未全部完成 (' + p0.done + '/' + p0.total + ')', points: d, severity: 'blocker' }); } if (breakdown.overall.blocked > 0) { const d = Math.min(breakdown.overall.blocked * 5, 20); completenessScore -= d; deductions.push({ dimension: '完整性', reason: '存在' + breakdown.overall.blocked + '个阻塞任务', points: d, severity: 'blocker' }); } scores.push({ dimension: 'completeness', dimension_name: '完整性', weight: weights.completeness, score: Math.max(0, completenessScore), max_score: 100, weighted_score: Math.max(0, completenessScore) * weights.completeness, deductions: deductions.filter(d => d.dimension === '完整性') }); let codeQualityScore = 85; if (agg.code_reviews.count === 0 && scan.pending.commits > 10) { codeQualityScore -= 15; deductions.push({ dimension: '代码规范性', reason: '无代码审查记录', points: 15, severity: 'major' }); } else if (agg.code_reviews.avg_score > 0 && agg.code_reviews.avg_score < 70) { const d = Math.round((70 - agg.code_reviews.avg_score) * 0.3); codeQualityScore -= d; deductions.push({ dimension: '代码规范性', reason: '代码审查均分较低 (' + agg.code_reviews.avg_score + ')', points: d, severity: 'minor' }); } scores.push({ dimension: 'code_quality', dimension_name: '代码规范性', weight: weights.code_quality, score: Math.max(0, codeQualityScore), max_score: 100, weighted_score: Math.max(0, codeQualityScore) * weights.code_quality, deductions: deductions.filter(d => d.dimension === '代码规范性') }); let testScore = 80; if (agg.qa_signoffs.count === 0) { testScore -= 20; deductions.push({ dimension: '测试覆盖', reason: '无QA签字记录', points: 20, severity: 'major' }); } scores.push({ dimension: 'test_coverage', dimension_name: '测试覆盖', weight: weights.test_coverage, score: Math.max(0, testScore), max_score: 100, weighted_score: Math.max(0, testScore) * weights.test_coverage, deductions: deductions.filter(d => d.dimension === '测试覆盖') }); let docScore = 85; if (agg.design_reviews.count === 0 && scan.pending.specs > 0) { docScore -= 15; deductions.push({ dimension: '文档同步', reason: '无设计审查记录', points: 15, severity: 'minor' }); } scores.push({ dimension: 'doc_sync', dimension_name: '文档同步', weight: weights.doc_sync, score: Math.max(0, docScore), max_score: 100, weighted_score: Math.max(0, docScore) * weights.doc_sync, deductions: deductions.filter(d => d.dimension === '文档同步') }); scores.push({ dimension: 'security', dimension_name: '安全性', weight: weights.security, score: 90, max_score: 100, weighted_score: 90 * weights.security, deductions: [] }); totalScore = Math.round(scores.reduce((s, d) => s + d.weighted_score, 0)); let grade = 'F'; if (totalScore >= 90) grade = 'A'; else if (totalScore >= 80) grade = 'B'; else if (totalScore >= 70) grade = 'C'; else if (totalScore >= 60) grade = 'D'; return { total_score: totalScore, grade, score_details: scores, all_deductions: deductions, summary: { blockers: deductions.filter(d => d.severity === 'blocker').length, majors: deductions.filter(d => d.severity === 'major').length, minors: deductions.filter(d => d.severity === 'minor').length } }; })()",
       "timeout_ms": 60000,
       "on_success": "collect_issues"
     },
@@ -299,7 +344,10 @@
     { "from": "check_need_reviews", "to": "collect_existing_reviews", "condition": "skip" },
     { "from": "trigger_batch_reviews", "to": "collect_existing_reviews" },
     { "from": "collect_existing_reviews", "to": "aggregate_reviews" },
-    { "from": "aggregate_reviews", "to": "parse_work_items" },
+    { "from": "aggregate_reviews", "to": "ai_code_review" },
+    { "from": "ai_code_review", "to": "ai_design_review" },
+    { "from": "ai_design_review", "to": "merge_ai_reviews" },
+    { "from": "merge_ai_reviews", "to": "parse_work_items" },
     { "from": "parse_work_items", "to": "calculate_progress_breakdown" },
     { "from": "calculate_progress_breakdown", "to": "calculate_dimension_scores" },
     { "from": "calculate_dimension_scores", "to": "collect_issues" },

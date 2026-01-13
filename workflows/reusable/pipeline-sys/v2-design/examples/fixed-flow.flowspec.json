@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../flowspec-schema.json",
   "id": "fixed-flow",
   "name": "AI-Native Fixed Flow",
@@ -138,7 +138,7 @@
       "type": "shell",
       "name": "Cursor Agent 执行",
       "description": "调用 Cursor CLI 执行代码编辑任务",
-      "command": "TASKPACK_PATH=\"${inputs.task_pack_path}\"; if [ -z \"$TASKPACK_PATH\" ] && [ -n \"${nodes.execute.compose_taskpack.output.stdout}\" ]; then TASKPACK_PATH=$(echo \"${nodes.execute.compose_taskpack.output.stdout}\" | tr -d '\\n'); fi; bash workflows/project/n8n/run-cursor-task.sh --task-pack \"$TASKPACK_PATH\" --task-type \"${inputs.task_type}\" --complexity \"${inputs.complexity}\" --model-override \"${inputs.model_override}\"",
+      "command": "TASKPACK_PATH=\"${inputs.task_pack_path}\"; if [ -z \"$TASKPACK_PATH\" ] && [ -n \"${nodes.execute.compose_taskpack.output.stdout}\" ]; then TASKPACK_PATH=$(echo \"${nodes.execute.compose_taskpack.output.stdout}\" | tr -d '\\n'); fi; bash workflows/project/tools/run-cursor-task.sh --task-pack \"$TASKPACK_PATH\" --task-type \"${inputs.task_type}\" --complexity \"${inputs.complexity}\" --model-override \"${inputs.model_override}\"",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {

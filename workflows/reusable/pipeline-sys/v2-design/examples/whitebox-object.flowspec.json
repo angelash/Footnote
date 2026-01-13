@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../flowspec-schema.json",
   "id": "whitebox-object",
   "name": "白盒物件占位流程",

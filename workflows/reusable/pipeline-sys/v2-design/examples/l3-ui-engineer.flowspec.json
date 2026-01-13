@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../flowspec-schema.json",
   "id": "l3-ui-engineer",
   "name": "L3 UI 程序员流程",
@@ -93,7 +93,7 @@
       "type": "shell",
       "name": "执行 UI 开发",
       "description": "调用 Cursor Agent 实现 UI",
-      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"code\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
+      "command": "bash workflows/project/tools/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"code\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {

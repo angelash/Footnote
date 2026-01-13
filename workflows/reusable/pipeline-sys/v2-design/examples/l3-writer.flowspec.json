@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../flowspec-schema.json",
   "id": "l3-writer",
   "name": "L3 写手流程",
@@ -80,7 +80,7 @@
       "type": "shell",
       "name": "执行写作任务",
       "description": "调用 Cursor Agent 执行文案写作",
-      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type doc --complexity \"${inputs.complexity}\" --model-override auto",
+      "command": "bash workflows/project/tools/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type doc --complexity \"${inputs.complexity}\" --model-override auto",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {

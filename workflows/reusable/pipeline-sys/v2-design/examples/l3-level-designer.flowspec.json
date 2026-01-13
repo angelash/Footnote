@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../flowspec-schema.json",
   "id": "l3-level-designer",
   "name": "L3 场景策划流程",
@@ -112,7 +112,7 @@
       "type": "shell",
       "name": "执行关卡设计",
       "description": "调用 Cursor Agent 设计关卡",
-      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"doc\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
+      "command": "bash workflows/project/tools/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"doc\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {

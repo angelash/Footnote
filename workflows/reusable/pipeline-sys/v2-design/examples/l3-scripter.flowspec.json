@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../flowspec-schema.json",
   "id": "l3-scripter",
   "name": "L3 脚本员流程",
@@ -112,7 +112,7 @@
       "type": "shell",
       "name": "执行脚本编写",
       "description": "调用 Cursor Agent 生成脚本",
-      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"code\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
+      "command": "bash workflows/project/tools/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"code\" --complexity \"normal\" --model-override \"${inputs.model_override}\"",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {

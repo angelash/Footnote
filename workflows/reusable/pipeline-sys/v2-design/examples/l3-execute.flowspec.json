@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "../flowspec-schema.json",
   "id": "l3-execute",
   "name": "L3 执行岗通用流程",
@@ -91,7 +91,7 @@
       "type": "shell",
       "name": "执行任务",
       "description": "调用 Cursor Agent 执行任务",
-      "command": "bash workflows/project/n8n/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"${inputs.task_type}\" --complexity \"${inputs.complexity}\" --model-override \"${inputs.model_override}\"",
+      "command": "bash workflows/project/tools/run-cursor-task.sh --task-pack \"${inputs.task_pack_path}\" --task-type \"${inputs.task_type}\" --complexity \"${inputs.complexity}\" --model-override \"${inputs.model_override}\"",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {

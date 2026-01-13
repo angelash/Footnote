@@ -933,6 +933,86 @@
   margin-top: 8px;
 }
 
+/* 问题卡片列表 */
+.issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.issue-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.issue-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.issue-file {
+  font-family: monospace;
+  font-size: 12px;
+  color: #94a3b8;
+  background: #0f172a;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.issue-section {
+  font-size: 12px;
+  color: #94a3b8;
+  background: #0f172a;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.issue-description {
+  color: #e2e8f0;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.issue-suggestion {
+  background: #0f172a;
+  border-left: 3px solid #3b82f6;
+  padding: 8px 12px;
+  margin-top: 8px;
+  border-radius: 0 4px 4px 0;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.suggestion-label {
+  color: #3b82f6;
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+/* 建议和缺失元素样式 */
+.ai-review-recommendations,
+.ai-review-suggestions,
+.ai-review-missing,
+.ai-review-inconsistencies {
+  margin-top: 16px;
+}
+
+.warning-list li {
+  color: #fbbf24;
+}
+
+.error-list li {
+  color: #f87171;
+}
+
 .ai-review-header {
   display: flex;
   align-items: center;

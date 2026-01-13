@@ -1014,11 +1014,17 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
     );
   };
 
-  // 渲染 AI 审查详情
+  // 渲染 AI 审查详情（支持代码审查和设计审查的完整字段）
   const renderAiReview = (review: ReviewRecord | undefined, _title: string) => {
     if (!review) return <div className="detail-empty">（未执行）</div>;
     
     const resultColor = getResultColor(review.result);
+    // 扩展类型以支持设计审查特有字段
+    const extReview = review as ReviewRecord & {
+      recommendations?: string[];
+      missing_elements?: string[];
+      inconsistencies?: string[];
+    };
     
     return (
       <div className="ai-review-section">
@@ -1052,29 +1058,83 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
           </div>
         )}
 
+        {/* 发现问题 - 详细展示每个问题的描述和建议 */}
         {review.issues && review.issues.length > 0 && (
           <div className="ai-review-issues">
-            <div className="detail-sub">发现问题 ({review.issues.length})：</div>
-            <ul className="detail-list">
-              {review.issues.slice(0, 20).map((issue, idx) => (
-                <li key={idx}>
-                  <div className="detail-list-title">{issue.message}</div>
-                  <div className="detail-sub">
-                    {issue.severity && <span className={`severity-badge severity-${issue.severity}`}>{issue.severity}</span>}
-                    {issue.file && ` ${issue.file}`}
-                    {issue.line && `:${issue.line}`}
+            <div className="detail-section-title">🔍 发现问题 ({review.issues.length})</div>
+            <div className="issues-list">
+              {review.issues.map((issue, idx) => {
+                // 支持两种字段名: message 或 description
+                const issueAny = issue as typeof issue & { description?: string; section?: string; suggestion?: string };
+                const desc = issue.message || issueAny.description || '（无描述）';
+                const suggestion = issueAny.suggestion;
+                const section = issueAny.section;
+                
+                return (
+                  <div key={idx} className="issue-card">
+                    <div className="issue-header">
+                      {issue.severity && (
+                        <span className={`severity-badge severity-${issue.severity}`}>{issue.severity}</span>
+                      )}
+                      {issue.file && <span className="issue-file">{issue.file}{issue.line ? `:${issue.line}` : ''}</span>}
+                      {section && <span className="issue-section">{section}</span>}
+                    </div>
+                    <div className="issue-description">{desc}</div>
+                    {suggestion && (
+                      <div className="issue-suggestion">
+                        <span className="suggestion-label">💡 建议：</span>
+                        {suggestion}
+                      </div>
+                    )}
                   </div>
-                </li>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 改进建议（代码审查的 recommendations） */}
+        {extReview.recommendations && extReview.recommendations.length > 0 && (
+          <div className="ai-review-recommendations">
+            <div className="detail-section-title">📋 改进建议</div>
+            <ul className="detail-list">
+              {extReview.recommendations.map((s, idx) => (
+                <li key={idx}>{s}</li>
               ))}
             </ul>
           </div>
         )}
 
+        {/* 通用建议（设计审查的 suggestions） */}
         {review.suggestions && review.suggestions.length > 0 && (
           <div className="ai-review-suggestions">
-            <div className="detail-sub">改进建议：</div>
+            <div className="detail-section-title">📋 总体建议</div>
             <ul className="detail-list">
               {review.suggestions.map((s, idx) => (
+                <li key={idx}>{s}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 缺失元素（设计审查特有） */}
+        {extReview.missing_elements && extReview.missing_elements.length > 0 && (
+          <div className="ai-review-missing">
+            <div className="detail-section-title">⚠️ 缺失元素</div>
+            <ul className="detail-list warning-list">
+              {extReview.missing_elements.map((s, idx) => (
+                <li key={idx}>{s}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* 不一致项（设计审查特有） */}
+        {extReview.inconsistencies && extReview.inconsistencies.length > 0 && (
+          <div className="ai-review-inconsistencies">
+            <div className="detail-section-title">❌ 不一致项</div>
+            <ul className="detail-list error-list">
+              {extReview.inconsistencies.map((s, idx) => (
                 <li key={idx}>{s}</li>
               ))}
             </ul>

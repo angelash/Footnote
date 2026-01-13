@@ -924,6 +924,119 @@
   background: #3b82f6;
 }
 
+/* AI 审查区域 */
+.ai-review-section {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.ai-review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ai-review-result {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.ai-review-score {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.ai-review-summary {
+  padding: 12px;
+  background: #1e293b;
+  border-radius: 6px;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.ai-review-dimensions,
+.ai-review-issues,
+.ai-review-suggestions {
+  margin-top: 12px;
+}
+
+.ai-review-issues .detail-list-title {
+  color: #fbbf24;
+}
+
+.severity-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.severity-blocker,
+.severity-critical {
+  background: #ef4444;
+  color: white;
+}
+
+.severity-major,
+.severity-high {
+  background: #f97316;
+  color: white;
+}
+
+.severity-minor,
+.severity-medium {
+  background: #f59e0b;
+  color: white;
+}
+
+.severity-info,
+.severity-low {
+  background: #3b82f6;
+  color: white;
+}
+
+.tab-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: #22c55e;
+  color: white;
+  font-size: 10px;
+}
+
+.section-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.section-badge.success {
+  background: #22c55e20;
+  color: #22c55e;
+  border: 1px solid #22c55e40;
+}
+
+.section-badge.pending {
+  background: #f59e0b20;
+  color: #f59e0b;
+  border: 1px solid #f59e0b40;
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
   .review-stats {

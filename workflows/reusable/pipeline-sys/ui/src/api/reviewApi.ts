@@ -233,8 +233,27 @@ export interface AuditDetailResponse {
   ok: boolean;
   audit_id: string;
   path: string;
-  audit: AuditReport;
+  audit: AuditReport & {
+    _structure?: 'directory' | 'legacy';
+    _files?: string[];
+    _has_code_review?: boolean;
+    _has_design_review?: boolean;
+  };
   raw: string;
+}
+
+// 审核内审查记录响应（新目录结构）
+export interface AuditReviewsResponse {
+  ok: boolean;
+  audit_id: string;
+  reviews: {
+    code_review?: ReviewRecord;
+    design_review?: ReviewRecord;
+    qa_signoff?: ReviewRecord;
+  };
+  has_code_review: boolean;
+  has_design_review: boolean;
+  has_qa_signoff: boolean;
 }
 
 export interface AuditMarkdownResponse {
@@ -366,6 +385,17 @@ export async function getAuditDetail(auditId: string): Promise<AuditDetailRespon
     audit: (data?.audit || {}) as AuditReport,
     raw: String(data?.raw || ''),
   };
+}
+
+/**
+ * 获取审核内的审查记录（新目录结构）
+ */
+export async function getAuditReviews(auditId: string): Promise<AuditReviewsResponse> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}/reviews`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch audit reviews: ${response.statusText}`);
+  }
+  return response.json();
 }
 
 /**

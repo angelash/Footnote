@@ -2,8 +2,8 @@
   "$schema": "../flowspec-schema.json",
   "id": "l0-audit-intake",
   "name": "L0 总体审核入口（细化版）",
-  "version": "2.1.0",
-  "description": "制作人（L0）总体审核入口，支持多维度进度统计、细化评分、工作项追踪、AI智能分析（cursor-agent）",
+  "version": "2.2.0",
+  "description": "制作人（L0）总体审核入口，统一目录结构，支持多维度进度统计、细化评分、工作项追踪、AI智能分析",
   "author": "Pipeline-Sys",
   "tags": ["l0", "audit", "intake", "report", "producer"],
 
@@ -92,8 +92,18 @@
       "id": "intake",
       "type": "transform",
       "name": "参数接收",
-      "expression": "({ audit_id: 'AUDIT-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(), scope: inputs.audit_scope, started_at: new Date().toISOString(), period: { start: new Date(Date.now() - inputs.period_days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10), end: new Date().toISOString().slice(0, 10) } })",
+      "expression": "(function() { const audit_id = 'AUDIT-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.random().toString(36).slice(2,6).toUpperCase(); const audit_dir = 'workflows/project/logs/audits/' + audit_id; return { audit_id, audit_dir, scope: inputs.audit_scope, started_at: new Date().toISOString(), period: { start: new Date(Date.now() - inputs.period_days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10), end: new Date().toISOString().slice(0, 10) } }; })()",
       "timeout_ms": 60000,
+      "on_success": "create_audit_dir"
+    },
+    {
+      "id": "create_audit_dir",
+      "type": "shell",
+      "name": "创建审核目录",
+      "command": "mkdir -p '${inputs.project_root}/${nodes.intake.output.audit_dir}'",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 10000,
       "on_success": "scan_pending_items"
     },
     {
@@ -175,7 +185,7 @@
       "type": "shell",
       "name": "AI 代码审查",
       "description": "使用 cursor-agent 进行智能代码审查分析",
-      "command": "if [ '${inputs.include_code_review}' = 'true' ]; then node workflows/project/tools/review-system/ai-code-review.mjs --project-root='${inputs.project_root}' --commit-range='HEAD~${inputs.period_days}..HEAD' --task-id='${nodes.intake.output.audit_id}-CODE' --output='workflows/project/logs/reviews/${nodes.intake.output.audit_id}-CODE.json' 2>&1 || echo '{\"review_id\":\"SKIP\",\"result\":\"FAILED\",\"reason\":\"AI analysis error\"}'; else echo '{\"review_id\":\"SKIP\",\"result\":\"SKIPPED\",\"reason\":\"AI code review disabled\"}'; fi",
+      "command": "if [ '${inputs.include_code_review}' = 'true' ]; then node workflows/project/tools/review-system/ai-code-review.mjs --project-root='${inputs.project_root}' --commit-range='HEAD~${inputs.period_days}..HEAD' --task-id='${nodes.intake.output.audit_id}-CODE' --output='${nodes.intake.output.audit_dir}/code-review.json' 2>&1 || echo '{\"review_id\":\"SKIP\",\"result\":\"FAILED\",\"reason\":\"AI analysis error\"}'; else echo '{\"review_id\":\"SKIP\",\"result\":\"SKIPPED\",\"reason\":\"AI code review disabled\"}'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 600000,
@@ -187,7 +197,7 @@
       "type": "shell",
       "name": "AI 设计审查",
       "description": "使用 cursor-agent 进行智能设计文档审查",
-      "command": "if [ '${inputs.include_design_review}' = 'true' ]; then SPEC_FILE=$(find design/ai-native/02_specs -name '*.md' -type f 2>/dev/null | head -1); if [ -n \"$SPEC_FILE\" ]; then node workflows/project/tools/review-system/ai-design-review.mjs --project-root='${inputs.project_root}' --doc-path=\"$SPEC_FILE\" --task-id='${nodes.intake.output.audit_id}-DESIGN' --output='workflows/project/logs/reviews/${nodes.intake.output.audit_id}-DESIGN.json' 2>&1 || echo '{\"review_id\":\"SKIP\",\"result\":\"FAILED\",\"reason\":\"AI analysis error\"}'; else echo '{\"review_id\":\"SKIP\",\"result\":\"SKIPPED\",\"reason\":\"No spec files found\"}'; fi; else echo '{\"review_id\":\"SKIP\",\"result\":\"SKIPPED\",\"reason\":\"AI design review disabled\"}'; fi",
+      "command": "if [ '${inputs.include_design_review}' = 'true' ]; then SPEC_FILE=$(find design/ai-native/02_specs -name '*.md' -type f 2>/dev/null | head -1); if [ -n \"$SPEC_FILE\" ]; then node workflows/project/tools/review-system/ai-design-review.mjs --project-root='${inputs.project_root}' --doc-path=\"$SPEC_FILE\" --task-id='${nodes.intake.output.audit_id}-DESIGN' --output='${nodes.intake.output.audit_dir}/design-review.json' 2>&1 || echo '{\"review_id\":\"SKIP\",\"result\":\"FAILED\",\"reason\":\"AI analysis error\"}'; else echo '{\"review_id\":\"SKIP\",\"result\":\"SKIPPED\",\"reason\":\"No spec files found\"}'; fi; else echo '{\"review_id\":\"SKIP\",\"result\":\"SKIPPED\",\"reason\":\"AI design review disabled\"}'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 600000,
@@ -275,7 +285,7 @@
       "type": "file",
       "name": "保存审核报告JSON",
       "operation": "write",
-      "path": "${inputs.project_root}/workflows/project/logs/audits/${nodes.intake.output.audit_id}.json",
+      "path": "${inputs.project_root}/${nodes.intake.output.audit_dir}/summary.json",
       "content": "${JSON.stringify(nodes.save_audit_report.output, null, 2)}",
       "timeout_ms": 30000,
       "on_success": "build_progress_md",
@@ -294,7 +304,7 @@
       "type": "file",
       "name": "写入进度报告 Markdown",
       "operation": "write",
-      "path": "${inputs.project_root}/workflows/project/logs/audits/${nodes.intake.output.audit_id}-progress.md",
+      "path": "${inputs.project_root}/${nodes.intake.output.audit_dir}/progress.md",
       "content": "${nodes.build_progress_md.output.content}",
       "timeout_ms": 30000,
       "on_success": "build_issues_md",
@@ -313,7 +323,7 @@
       "type": "file",
       "name": "写入问题报告 Markdown",
       "operation": "write",
-      "path": "${inputs.project_root}/workflows/project/logs/audits/${nodes.intake.output.audit_id}-issues.md",
+      "path": "${inputs.project_root}/${nodes.intake.output.audit_dir}/issues.md",
       "content": "${nodes.build_issues_md.output.content}",
       "timeout_ms": 30000,
       "on_success": "notify_result",
@@ -329,14 +339,15 @@
       "body": {
         "receiver": "gz0149",
         "title": "总体审核完成",
-        "msg": "audit_id=${nodes.intake.output.audit_id}\nstatus=${nodes.generate_progress_report.output.status}\npass_rate=${nodes.generate_progress_report.output.metrics.overall_pass_rate}\nblockers=${nodes.generate_issue_report.output.summary.blocker_count}\nwarnings=${nodes.generate_issue_report.output.summary.warning_count}\ndecision=${nodes.generate_recommendations.output.decision}\nreports=workflows/project/logs/audits/"
+        "msg": "audit_id=${nodes.intake.output.audit_id}\nstatus=${nodes.generate_progress_report.output.status}\npass_rate=${nodes.generate_progress_report.output.metrics.overall_pass_rate}\nblockers=${nodes.generate_issue_report.output.summary.blocker_count}\nwarnings=${nodes.generate_issue_report.output.summary.warning_count}\ndecision=${nodes.generate_recommendations.output.decision}\nreports=${nodes.intake.output.audit_dir}/"
       },
       "timeout_ms": 30000
     }
   ],
 
   "edges": [
-    { "from": "intake", "to": "scan_pending_items" },
+    { "from": "intake", "to": "create_audit_dir" },
+    { "from": "create_audit_dir", "to": "scan_pending_items" },
     { "from": "scan_pending_items", "to": "parse_scan_results" },
     { "from": "parse_scan_results", "to": "parse_requirements" },
     { "from": "parse_requirements", "to": "check_need_reviews" },
@@ -365,6 +376,7 @@
 
   "outputs": {
     "audit_id": "nodes.intake.output.audit_id",
+    "audit_dir": "nodes.intake.output.audit_dir",
     "status": "nodes.generate_progress_report.output.status",
     "decision": "nodes.generate_recommendations.output.decision",
     "total_score": "nodes.calculate_dimension_scores.output.total_score",

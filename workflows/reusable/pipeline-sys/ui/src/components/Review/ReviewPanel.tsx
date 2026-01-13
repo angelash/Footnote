@@ -10,6 +10,7 @@ import {
   getReviewDetail,
   getAuditDetail,
   getAuditMarkdown,
+  getAuditReviews,
   startCodeReview,
   startDesignReview,
   startQaSignoff,
@@ -25,6 +26,7 @@ import {
   CHAPTER_NAMES,
   ReviewRecord,
   AuditReport,
+  AuditReviewsResponse,
   CodeReviewInput,
   DesignReviewInput,
   QaSignoffInput,
@@ -893,15 +895,17 @@ interface AuditDetailModalProps {
 }
 
 const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) => {
-  const [tab, setTab] = useState<'overview' | 'scores' | 'breakdown' | 'progress' | 'issues' | 'json'>('overview');
+  const [tab, setTab] = useState<'overview' | 'scores' | 'breakdown' | 'ai_reviews' | 'progress' | 'issues' | 'json'>('overview');
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<AuditReport>(audit);
   const [raw, setRaw] = useState<string>(JSON.stringify(audit, null, 2));
   const [progressMd, setProgressMd] = useState<string>('');
   const [issuesMd, setIssuesMd] = useState<string>('');
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [aiReviews, setAiReviews] = useState<AuditReviewsResponse | null>(null);
 
   const isV2 = detail.report_version === '2.0.0' || detail.progress || detail.score_grade;
+  const isNewStructure = (detail as any)._structure === 'directory';
 
   useEffect(() => {
     let mounted = true;
@@ -919,6 +923,16 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
         setRaw(auditRes.raw || JSON.stringify(auditRes.audit, null, 2));
         setProgressMd(p.content || '');
         setIssuesMd(i.content || '');
+
+        // 如果是新目录结构，获取 AI 审查记录
+        if (auditRes.audit._structure === 'directory') {
+          try {
+            const reviewsRes = await getAuditReviews(audit.audit_id);
+            if (mounted) setAiReviews(reviewsRes);
+          } catch {
+            // 忽略获取审查记录失败
+          }
+        }
       } catch (e) {
         if (!mounted) return;
         setLoadError(e instanceof Error ? e.message : String(e));
@@ -997,6 +1011,76 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
           })}
         </tbody>
       </table>
+    );
+  };
+
+  // 渲染 AI 审查详情
+  const renderAiReview = (review: ReviewRecord | undefined, _title: string) => {
+    if (!review) return <div className="detail-empty">（未执行）</div>;
+    
+    const resultColor = getResultColor(review.result);
+    
+    return (
+      <div className="ai-review-section">
+        <div className="ai-review-header">
+          <span className="ai-review-result" style={{ backgroundColor: resultColor }}>
+            {review.result}
+          </span>
+          {review.score !== undefined && (
+            <span className="ai-review-score">评分: {review.score}/100</span>
+          )}
+        </div>
+        
+        {review.summary && (
+          <div className="ai-review-summary">{review.summary}</div>
+        )}
+
+        {review.dimensions && Object.keys(review.dimensions).length > 0 && (
+          <div className="ai-review-dimensions">
+            <div className="detail-sub">维度评分：</div>
+            <div className="detail-kv-grid">
+              {Object.entries(review.dimensions).map(([k, v]) => {
+                const score = typeof v === 'number' ? v : v?.score;
+                return (
+                  <div key={k} className="detail-kv">
+                    <div className="detail-k">{k}</div>
+                    <div className="detail-v"><strong>{score ?? '-'}</strong></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {review.issues && review.issues.length > 0 && (
+          <div className="ai-review-issues">
+            <div className="detail-sub">发现问题 ({review.issues.length})：</div>
+            <ul className="detail-list">
+              {review.issues.slice(0, 20).map((issue, idx) => (
+                <li key={idx}>
+                  <div className="detail-list-title">{issue.message}</div>
+                  <div className="detail-sub">
+                    {issue.severity && <span className={`severity-badge severity-${issue.severity}`}>{issue.severity}</span>}
+                    {issue.file && ` ${issue.file}`}
+                    {issue.line && `:${issue.line}`}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {review.suggestions && review.suggestions.length > 0 && (
+          <div className="ai-review-suggestions">
+            <div className="detail-sub">改进建议：</div>
+            <ul className="detail-list">
+              {review.suggestions.map((s, idx) => (
+                <li key={idx}>{s}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -1089,6 +1173,14 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                 📈 进度统计
               </button>
             </>
+          )}
+          {(isNewStructure || aiReviews) && (
+            <button className={`tab ${tab === 'ai_reviews' ? 'active' : ''}`} onClick={() => setTab('ai_reviews')}>
+              🤖 AI 审查
+              {aiReviews && (aiReviews.has_code_review || aiReviews.has_design_review) && (
+                <span className="tab-badge">✓</span>
+              )}
+            </button>
           )}
           <button className={`tab ${tab === 'progress' ? 'active' : ''}`} onClick={() => setTab('progress')}>
             progress.md
@@ -1251,6 +1343,42 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                   ))}
                 </div>
               </div>
+            )}
+          </div>
+        )}
+
+        {!loading && tab === 'ai_reviews' && (
+          <div className="detail-body">
+            {!aiReviews ? (
+              <div className="detail-empty">（无 AI 审查数据，可能是旧版审核）</div>
+            ) : (
+              <>
+                <div className="detail-section">
+                  <div className="detail-section-title">
+                    📝 代码审查 (AI Code Review)
+                    {aiReviews.has_code_review && <span className="section-badge success">已完成</span>}
+                  </div>
+                  {renderAiReview(aiReviews.reviews.code_review, '代码审查')}
+                </div>
+
+                <div className="detail-section">
+                  <div className="detail-section-title">
+                    📐 设计审查 (AI Design Review)
+                    {aiReviews.has_design_review && <span className="section-badge success">已完成</span>}
+                  </div>
+                  {renderAiReview(aiReviews.reviews.design_review, '设计审查')}
+                </div>
+
+                {aiReviews.has_qa_signoff && (
+                  <div className="detail-section">
+                    <div className="detail-section-title">
+                      ✅ QA 签字 (QA Signoff)
+                      <span className="section-badge success">已完成</span>
+                    </div>
+                    {renderAiReview(aiReviews.reviews.qa_signoff, 'QA 签字')}
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

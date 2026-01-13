@@ -86,7 +86,7 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
     }
   });
 
-  // GET /api/audits - 获取审核报告列表
+  // GET /api/audits - 获取审核报告列表（支持新旧目录结构）
   app.get('/api/audits', async (request, reply) => {
     const { limit } = request.query as { limit?: string };
     const lim = Math.min(Math.max(parseInt(limit || '20', 10), 1), 200);
@@ -96,23 +96,40 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
       const absDir = safeResolveUnderProject(config.projectRoot, relDir);
       await fs.mkdir(absDir, { recursive: true });
 
-      const files = await fs.readdir(absDir).catch(() => []);
-      const jsonFiles = files.filter((f) => f.endsWith('.json'));
-
-      const withStat = await Promise.all(
-        jsonFiles.map(async (f) => {
-          const abs = path.join(absDir, f);
+      const entries = await fs.readdir(absDir, { withFileTypes: true }).catch(() => []);
+      
+      // 收集审核：目录（新结构）和 .json 文件（旧结构）
+      const auditEntries: Array<{ id: string; abs: string; isDir: boolean; mtime: number }> = [];
+      
+      for (const entry of entries) {
+        if (entry.isDirectory() && entry.name.startsWith('AUDIT-')) {
+          // 新结构：目录
+          const summaryPath = path.join(absDir, entry.name, 'summary.json');
+          const st = await fs.stat(summaryPath).catch(() => null);
+          if (st) {
+            auditEntries.push({ id: entry.name, abs: summaryPath, isDir: true, mtime: st.mtimeMs });
+          }
+        } else if (entry.isFile() && entry.name.endsWith('.json') && entry.name.startsWith('AUDIT-')) {
+          // 旧结构：直接 JSON 文件
+          const abs = path.join(absDir, entry.name);
           const st = await fs.stat(abs).catch(() => null);
-          return { f, abs, mtime: st?.mtimeMs || 0 };
-        })
-      );
-      withStat.sort((a, b) => b.mtime - a.mtime);
+          if (st) {
+            auditEntries.push({ id: entry.name.replace('.json', ''), abs, isDir: false, mtime: st.mtimeMs });
+          }
+        }
+      }
+
+      // 按时间倒序
+      auditEntries.sort((a, b) => b.mtime - a.mtime);
 
       const audits: unknown[] = [];
-      for (const it of withStat.slice(0, lim)) {
+      for (const it of auditEntries.slice(0, lim)) {
         try {
           const raw = await fs.readFile(it.abs, 'utf8');
-          audits.push(JSON.parse(raw));
+          const audit = JSON.parse(raw) as any;
+          // 标记结构类型便于 UI 判断
+          audit._structure = it.isDir ? 'directory' : 'legacy';
+          audits.push(audit);
         } catch {
           // ignore invalid
         }
@@ -150,7 +167,7 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
     }
   });
 
-  // GET /api/audits/:auditId - 读取单条审核报告 JSON（AUDIT）
+  // GET /api/audits/:auditId - 读取单条审核报告（支持新旧结构）
   app.get('/api/audits/:auditId', async (request, reply) => {
     const { auditId } = request.params as { auditId: string };
 
@@ -158,12 +175,40 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
       return reply.status(400).send({ ok: false, error: 'Invalid audit id' });
     }
 
-    const relPath = path.posix.join('workflows/project/logs/audits', `${auditId}.json`);
+    const baseDir = path.posix.join('workflows/project/logs/audits');
 
     try {
-      const absPath = safeResolveUnderProject(config.projectRoot, relPath);
-      const raw = await fs.readFile(absPath, 'utf8');
-      const audit = JSON.parse(raw) as unknown;
+      const absBaseDir = safeResolveUnderProject(config.projectRoot, baseDir);
+
+      // 尝试新结构：目录/summary.json
+      const newPath = path.join(absBaseDir, auditId, 'summary.json');
+      let raw: string | null = null;
+      let relPath: string;
+      let isDir = false;
+
+      try {
+        raw = await fs.readFile(newPath, 'utf8');
+        relPath = path.posix.join(baseDir, auditId, 'summary.json');
+        isDir = true;
+      } catch {
+        // 尝试旧结构：直接 .json 文件
+        const legacyPath = path.join(absBaseDir, `${auditId}.json`);
+        raw = await fs.readFile(legacyPath, 'utf8');
+        relPath = path.posix.join(baseDir, `${auditId}.json`);
+      }
+
+      const audit = JSON.parse(raw) as any;
+      audit._structure = isDir ? 'directory' : 'legacy';
+      
+      // 如果是新结构，检查包含的审查文件
+      if (isDir) {
+        const auditDirPath = path.join(absBaseDir, auditId);
+        const files = await fs.readdir(auditDirPath).catch(() => []);
+        audit._files = files;
+        audit._has_code_review = files.includes('code-review.json');
+        audit._has_design_review = files.includes('design-review.json');
+      }
+
       return reply.send({ ok: true, audit_id: auditId, path: relPath, audit, raw });
     } catch (error) {
       app.log.error(error, 'Failed to read audit report');
@@ -171,7 +216,57 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
     }
   });
 
-  // GET /api/audits/:auditId/markdown?kind=progress|issues - 读取审核报告 Markdown
+  // GET /api/audits/:auditId/reviews - 获取审核目录下的所有审查记录（新结构）
+  app.get('/api/audits/:auditId/reviews', async (request, reply) => {
+    const { auditId } = request.params as { auditId: string };
+
+    if (!auditId || !isSafeId(auditId)) {
+      return reply.status(400).send({ ok: false, error: 'Invalid audit id' });
+    }
+
+    const auditDir = path.posix.join('workflows/project/logs/audits', auditId);
+
+    try {
+      const absDir = safeResolveUnderProject(config.projectRoot, auditDir);
+      const files = await fs.readdir(absDir).catch(() => []);
+      
+      const reviews: Record<string, unknown> = {};
+      
+      // 读取各类审查文件
+      for (const file of files) {
+        if (file === 'code-review.json') {
+          try {
+            const raw = await fs.readFile(path.join(absDir, file), 'utf8');
+            reviews.code_review = JSON.parse(raw);
+          } catch { /* ignore */ }
+        } else if (file === 'design-review.json') {
+          try {
+            const raw = await fs.readFile(path.join(absDir, file), 'utf8');
+            reviews.design_review = JSON.parse(raw);
+          } catch { /* ignore */ }
+        } else if (file === 'qa-signoff.json') {
+          try {
+            const raw = await fs.readFile(path.join(absDir, file), 'utf8');
+            reviews.qa_signoff = JSON.parse(raw);
+          } catch { /* ignore */ }
+        }
+      }
+
+      return reply.send({
+        ok: true,
+        audit_id: auditId,
+        reviews,
+        has_code_review: !!reviews.code_review,
+        has_design_review: !!reviews.design_review,
+        has_qa_signoff: !!reviews.qa_signoff,
+      });
+    } catch (error) {
+      app.log.error(error, 'Failed to read audit reviews');
+      return reply.status(404).send({ ok: false, error: 'Audit directory not found' });
+    }
+  });
+
+  // GET /api/audits/:auditId/markdown?kind=progress|issues - 读取审核报告 Markdown（支持新旧结构）
   app.get('/api/audits/:auditId/markdown', async (request, reply) => {
     const { auditId } = request.params as { auditId: string };
     const { kind } = request.query as { kind?: string };
@@ -181,13 +276,27 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
     }
 
     const k = (kind || 'progress').toLowerCase();
-    const suffix = k === 'issues' ? '-issues.md' : '-progress.md';
-    const relPath = path.posix.join('workflows/project/logs/audits', `${auditId}${suffix}`);
+    const filename = k === 'issues' ? 'issues.md' : 'progress.md';
+    const baseDir = path.posix.join('workflows/project/logs/audits');
 
     try {
-      const absPath = safeResolveUnderProject(config.projectRoot, relPath);
-      const content = await fs.readFile(absPath, 'utf8');
-      // 这里返回 JSON（前端用 response.json() 解析），content 字段里是 Markdown 文本
+      const absBaseDir = safeResolveUnderProject(config.projectRoot, baseDir);
+      let content: string | null = null;
+      let relPath: string;
+
+      // 尝试新结构：目录/progress.md 或 目录/issues.md
+      const newPath = path.join(absBaseDir, auditId, filename);
+      try {
+        content = await fs.readFile(newPath, 'utf8');
+        relPath = path.posix.join(baseDir, auditId, filename);
+      } catch {
+        // 尝试旧结构
+        const legacySuffix = k === 'issues' ? '-issues.md' : '-progress.md';
+        const legacyPath = path.join(absBaseDir, `${auditId}${legacySuffix}`);
+        content = await fs.readFile(legacyPath, 'utf8');
+        relPath = path.posix.join(baseDir, `${auditId}${legacySuffix}`);
+      }
+
       return reply.send({ ok: true, audit_id: auditId, kind: k, path: relPath, content });
     } catch (error) {
       app.log.error(error, 'Failed to read audit markdown');

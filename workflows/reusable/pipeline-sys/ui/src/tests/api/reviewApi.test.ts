@@ -178,7 +178,7 @@ describe('Review API', () => {
         json: () => Promise.resolve({ ok: true, content: '# Issues' }),
       });
 
-      const result = await getAuditMarkdown('AUDIT-001', 'issues');
+      await getAuditMarkdown('AUDIT-001', 'issues');
 
       const url = mockFetch.mock.calls[0][0] as string;
       expect(url).toContain('kind=issues');

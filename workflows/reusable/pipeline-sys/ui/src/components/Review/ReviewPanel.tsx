@@ -1054,6 +1054,9 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
     file?: string;
     line?: number;
     section?: string;
+    description?: string;
+    suggestion?: string;
+    severity?: string;
   } | null>(null);
   const [annotationStatus, setAnnotationStatus] = useState<Annotation['status']>('dismissed');
   const [annotationReason, setAnnotationReason] = useState('');
@@ -1153,6 +1156,9 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                           file: issue.file,
                           line: issue.line,
                           section: section,
+                          description: desc,
+                          suggestion: suggestion,
+                          severity: issue.severity,
                         })}
                         title="添加标注"
                       >
@@ -1553,9 +1559,28 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                 <div className="form-group">
                   <label>目标问题</label>
                   <div className="annotation-target-info">
-                    {annotationTarget.file && <span>文件: {annotationTarget.file}</span>}
-                    {annotationTarget.line && <span>行: {annotationTarget.line}</span>}
-                    {annotationTarget.section && <span>章节: {annotationTarget.section}</span>}
+                    <div className="annotation-location">
+                      {annotationTarget.severity && (
+                        <span className={`severity-badge severity-${annotationTarget.severity}`}>
+                          {annotationTarget.severity}
+                        </span>
+                      )}
+                      {annotationTarget.file && <span className="location-file">{annotationTarget.file}</span>}
+                      {annotationTarget.line && <span className="location-line">:{annotationTarget.line}</span>}
+                      {annotationTarget.section && <span className="location-section">{annotationTarget.section}</span>}
+                    </div>
+                    {annotationTarget.description && (
+                      <div className="annotation-description">
+                        <strong>问题描述：</strong>
+                        <p>{annotationTarget.description}</p>
+                      </div>
+                    )}
+                    {annotationTarget.suggestion && (
+                      <div className="annotation-suggestion">
+                        <strong>💡 建议：</strong>
+                        <p>{annotationTarget.suggestion}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="form-group">

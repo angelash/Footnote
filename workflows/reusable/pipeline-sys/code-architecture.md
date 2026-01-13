@@ -100,7 +100,7 @@ workflows/reusable/pipeline-sys/
 
 ## 2. v1 Runner（WSL Runner）代码改造边界
 
-Runner 仍然是执行权威与唯一落盘者。Pipeline-Sys v1 不改 n8n，仅扩展 Runner：
+Runner 是执行权威与唯一落盘者，同时提供 HTTP 入口：
 
 ### 2.1 Runner 增加的 HTTP endpoints（v1）
 
@@ -292,7 +292,7 @@ Runner 改造点必须落到 `lib/*`，`server.mjs` 不允许继续膨胀。
 
 ## 6. v1 端到端数据流（固定）
 
-1. 触发执行：n8n → Runner `/fixed-flow`
+1. 触发执行：HTTP Client → Runner `/run-role` 或其他端点
 2. Runner 创建 `<run_id>/`，写入 `graph.json`、`status.json`、`node_runs.json`，并追加 `events.ndjson`
 3. Console 扫描 run 列表，UI 可见该 run
 4. UI 打开详情页，Console 返回工件快照

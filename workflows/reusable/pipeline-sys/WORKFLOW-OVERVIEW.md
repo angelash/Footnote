@@ -63,11 +63,10 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    A[n8n Webhook<br/>可选入口] -->|HTTP| B[WSL Runner<br/>:3210]
+    A[HTTP Client] -->|POST /run-role 等| B[WSL Runner<br/>:3210]
     B -->|v2 FlowRunner 执行 FlowSpec| C["File System<br/>automation_runs/{run_id}"]
     C --> D[Pipeline-Sys Console<br/>:3230]
     D -->|REST + SSE| E[Pipeline-Sys UI<br/>:3231]
-    B -.可直接调用.-> B
 
     style B fill:#1a1a2e,stroke:#00fff0,color:#fff
     style D fill:#202022,stroke:#ffd93d,color:#fff
@@ -239,7 +238,7 @@ flowchart TB
 
 ```mermaid
 sequenceDiagram
-    participant U as 调用方（你 / n8n）
+    participant U as HTTP Client
     participant R as WSL Runner :3210
     participant FS as FileSystem automation_runs
     participant C as Console :3230

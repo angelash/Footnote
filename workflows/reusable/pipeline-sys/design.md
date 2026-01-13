@@ -11,9 +11,9 @@
 
 ### 0.1 背景
 当前仓库已经落地：
-- `workflows/reusable/n8n-common/wsl-runner/server.mjs`：WSL 内 HTTP Runner（端口 `3210`），负责固定流程 `/fixed-flow` 执行与落盘审计
-- `workflows/project/n8n/fixed-flow-pipeline.json`：n8n 只做 Webhook 入口，转发到 `http://localhost:3210/fixed-flow`
-- 固定流程落盘根目录：`workflows/project/logs/automation_runs/<run_id>/`
+- `workflows/reusable/n8n-common/wsl-runner/server.mjs`：WSL 内 HTTP Runner（端口 `3210`），负责流程执行与落盘审计
+- 流程落盘根目录：`workflows/project/logs/automation_runs/<run_id>/`
+- 所有工作流触发直接调用 WSL Runner，无需额外中间层
 
 Pipeline-Sys 的 v1 目标是：在不推翻现有链路的前提下，把运行态变成“像 UE 行为树一样可观测”，并补齐取消、超时、重试、锁防僵尸等执行语义。
 
@@ -54,8 +54,7 @@ v3 支持多执行域、资源隔离、指标告警与权限治理。
 ## 2. v1 架构与边界
 
 ### 2.1 组件职责
-- **n8n（入口）**：只负责触发 Webhook，不承载编排状态
-- **WSL Runner（执行与落盘）**：唯一执行权威，负责写 run 工件目录，提供控制接口
+- **WSL Runner（执行与落盘）**：唯一执行权威，负责写 run 工件目录，提供控制接口和 HTTP 入口
 - **Pipeline-Sys Console（观测与控制面）**：读取 run 工件并展示，向 Runner 发起控制命令
 
 ### 2.2 运行域与路径

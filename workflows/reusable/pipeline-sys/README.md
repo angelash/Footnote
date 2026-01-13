@@ -14,11 +14,13 @@ Pipeline-Sys 是一个自建的流程执行可视化系统，提供行为树展�
 
 ```mermaid
 flowchart LR
-    A["n8n<br/>Webhook（可选入口）"] -->|HTTP| B["WSL Runner<br/>执行器 :3210"]
+    A["HTTP Client"] -->|POST /run-role 等| B["WSL Runner<br/>执行器 :3210"]
     B -->|工件落盘| C["File System<br/>automation_runs/{run_id}"]
     C --> D["Console<br/>Fastify + SSE :3230"]
     D --> E["UI<br/>React + ReactFlow :3231"]
 ```
+
+**统一入口**：所有工作流触发直接调用 WSL Runner (port 3210)，无需额外中间层。
 
 ## 目录结构
 

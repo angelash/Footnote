@@ -120,13 +120,13 @@ flowchart TB
 
 ## 5. 如何发起（Windows PowerShell 示例）
 
-> 注意：Runner 在 WSL 内执行，`project_root` 需要传 **WSL 路径**（例如 `/mnt/f/...`）。
+> 直接调用 WSL Runner (port 3210)，`project_root` 使用 Windows 路径格式。
 
 ### 5.1 发起总体审核（L0）
 
 ```powershell
 $body = @{
-  project_root = "/mnt/f/workspace/github/Footnote"
+  project_root = "F:/workspace/github/Footnote"
   audit_scope = "all"
   period_days = 7
   include_code_review = $true
@@ -147,7 +147,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:3210/audit/intake" -Conten
 
 ```powershell
 $body = @{
-  project_root = "/mnt/f/workspace/github/Footnote"
+  project_root = "F:/workspace/github/Footnote"
   task_id = "TASK-001"
   commit_range = "HEAD~3..HEAD"
   pass_threshold = 60
@@ -161,7 +161,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:3210/review/code" -Content
 
 ```powershell
 $body = @{
-  project_root = "/mnt/f/workspace/github/Footnote"
+  project_root = "F:/workspace/github/Footnote"
   doc_path = "design/ai-native/02_specs/ui_system_spec.md"
   doc_type = "spec"
   pass_threshold = 70
@@ -175,7 +175,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:3210/review/design" -Conte
 
 ```powershell
 $body = @{
-  project_root = "/mnt/f/workspace/github/Footnote"
+  project_root = "F:/workspace/github/Footnote"
   task_id = "TASK-001"
   task_pack_path = "design/ai-native/03_taskpacks/TASK-001_xxx.md"
   auto_checks = "lint,typecheck,test,build"
@@ -199,10 +199,9 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:3210/review/qa-signoff" -C
 这是旧版报告生成脚本把 bash 模板**原样写入**导致的（占位符未展开）。  
 本仓库已将报告生成改为**直接写入最终 Markdown 内容**（不依赖 bash 展开），若仍出现说明流程文件未更新或未被加载。
 
-### 6.3 Windows 路径怎么转换成 WSL 路径？
+### 6.3 路径格式说明
 
-- Windows：`f:\workspace\github\Footnote`
-- WSL：`/mnt/f/workspace/github/Footnote`
+统一使用 Windows 路径格式：`F:/workspace/github/Footnote`
 
 ---
 

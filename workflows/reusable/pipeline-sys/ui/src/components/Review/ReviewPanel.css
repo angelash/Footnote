@@ -1341,6 +1341,175 @@
   cursor: not-allowed;
 }
 
+/* 已标注列表样式 */
+.annotations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.annotation-item {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.annotation-item.status-dismissed {
+  border-left: 3px solid #6b7280;
+  opacity: 0.8;
+}
+
+.annotation-item.status-acknowledged {
+  border-left: 3px solid #f59e0b;
+}
+
+.annotation-item.status-fixed {
+  border-left: 3px solid #22c55e;
+}
+
+.annotation-item.status-wontfix {
+  border-left: 3px solid #ef4444;
+}
+
+.annotation-item.status-deferred {
+  border-left: 3px solid #8b5cf6;
+}
+
+.annotation-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.annotation-status-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.annotation-status-badge.dismissed {
+  background: #374151;
+  color: #9ca3af;
+}
+
+.annotation-status-badge.acknowledged {
+  background: #78350f;
+  color: #fbbf24;
+}
+
+.annotation-status-badge.fixed {
+  background: #14532d;
+  color: #4ade80;
+}
+
+.annotation-status-badge.wontfix {
+  background: #7f1d1d;
+  color: #f87171;
+}
+
+.annotation-status-badge.deferred {
+  background: #4c1d95;
+  color: #a78bfa;
+}
+
+.annotation-time {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.annotation-item-target {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-family: monospace;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.annotation-type {
+  background: #334155;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #94a3b8;
+}
+
+.annotation-file {
+  color: #60a5fa;
+}
+
+.annotation-line {
+  color: #94a3b8;
+}
+
+.annotation-item-desc {
+  color: #e2e8f0;
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.annotation-item-reason {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.annotation-item-comment {
+  font-size: 13px;
+  color: #a78bfa;
+  background: #1e1b4b;
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+/* 问题卡片上的已标注标记 */
+.issue-card.annotated {
+  opacity: 0.7;
+  border-left: 3px solid #6b7280;
+}
+
+.issue-annotated-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #374151;
+  color: #9ca3af;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-left: auto;
+}
+
+.issue-annotated-badge.dismissed {
+  background: #374151;
+  color: #9ca3af;
+}
+
+.issue-annotated-badge.acknowledged {
+  background: #78350f;
+  color: #fbbf24;
+}
+
+.issue-annotated-badge.fixed {
+  background: #14532d;
+  color: #4ade80;
+}
+
+.issue-annotated-badge.wontfix {
+  background: #7f1d1d;
+  color: #f87171;
+}
+
+.issue-annotated-badge.deferred {
+  background: #4c1d95;
+  color: #a78bfa;
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
   .review-stats {

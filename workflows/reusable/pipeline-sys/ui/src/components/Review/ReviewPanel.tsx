@@ -11,6 +11,7 @@ import {
   getAuditDetail,
   getAuditMarkdown,
   getAuditReviews,
+  getAnnotations,
   addAnnotation,
   getAuditProfiles,
   startCodeReview,
@@ -928,7 +929,7 @@ interface AuditDetailModalProps {
 }
 
 const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) => {
-  const [tab, setTab] = useState<'overview' | 'scores' | 'breakdown' | 'ai_reviews' | 'progress' | 'issues' | 'json'>('overview');
+  const [tab, setTab] = useState<'overview' | 'scores' | 'breakdown' | 'ai_reviews' | 'progress' | 'issues' | 'json' | 'annotations'>('overview');
   const [loading, setLoading] = useState(false);
   const [detail, setDetail] = useState<AuditReport>(audit);
   const [raw, setRaw] = useState<string>(JSON.stringify(audit, null, 2));
@@ -936,6 +937,7 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
   const [issuesMd, setIssuesMd] = useState<string>('');
   const [loadError, setLoadError] = useState<string | null>(null);
   const [aiReviews, setAiReviews] = useState<AuditReviewsResponse | null>(null);
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   const isV2 = detail.report_version === '2.0.0' || detail.progress || detail.score_grade;
   const isNewStructure = (detail as any)._structure === 'directory';
@@ -957,13 +959,19 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
         setProgressMd(p.content || '');
         setIssuesMd(i.content || '');
 
-        // 如果是新目录结构，获取 AI 审查记录
+        // 如果是新目录结构，获取 AI 审查记录和标注
         if (auditRes.audit._structure === 'directory') {
           try {
             const reviewsRes = await getAuditReviews(audit.audit_id);
             if (mounted) setAiReviews(reviewsRes);
           } catch {
             // 忽略获取审查记录失败
+          }
+          try {
+            const annRes = await getAnnotations(audit.audit_id);
+            if (mounted) setAnnotations(annRes.annotations || []);
+          } catch {
+            // 忽略获取标注失败
           }
         }
       } catch (e) {
@@ -1151,14 +1159,25 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                 const suggestion = issueAny.suggestion;
                 const section = issueAny.section;
                 
+                // 检查是否已标注
+                const existingAnnotation = annotations.find(
+                  ann => ann.target.review_type === reviewType && 
+                         ann.target.issue_index === idx
+                );
+
                 return (
-                  <div key={idx} className="issue-card">
+                  <div key={idx} className={`issue-card ${existingAnnotation ? 'annotated' : ''}`}>
                     <div className="issue-header">
                       {issue.severity && (
                         <span className={`severity-badge severity-${issue.severity}`}>{issue.severity}</span>
                       )}
                       {issue.file && <span className="issue-file">{issue.file}{issue.line ? `:${issue.line}` : ''}</span>}
                       {section && <span className="issue-section">{section}</span>}
+                      {existingAnnotation && (
+                        <span className={`issue-annotated-badge ${existingAnnotation.status}`}>
+                          ✓ {ANNOTATION_STATUSES.find(s => s.id === existingAnnotation.status)?.label || existingAnnotation.status}
+                        </span>
+                      )}
                       <button
                         className="annotate-btn"
                         onClick={() => setAnnotationTarget({
@@ -1171,9 +1190,9 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                           suggestion: suggestion,
                           severity: issue.severity,
                         })}
-                        title="添加标注"
+                        title={existingAnnotation ? "修改标注" : "添加标注"}
                       >
-                        🏷️
+                        {existingAnnotation ? '✏️' : '🏷️'}
                       </button>
                     </div>
                     <div className="issue-description">{desc}</div>
@@ -1348,6 +1367,11 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
           <button className={`tab ${tab === 'json' ? 'active' : ''}`} onClick={() => setTab('json')}>
             原始 JSON
           </button>
+          {annotations.length > 0 && (
+            <button className={`tab ${tab === 'annotations' ? 'active' : ''}`} onClick={() => setTab('annotations' as any)}>
+              📝 已标注 <span className="tab-badge">{annotations.length}</span>
+            </button>
+          )}
         </div>
 
         {loadError && <div className="detail-error">❌ {loadError}</div>}
@@ -1555,6 +1579,46 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
         {!loading && tab === 'json' && (
           <div className="detail-body">
             <pre className="detail-pre">{raw}</pre>
+          </div>
+        )}
+
+        {!loading && tab === 'annotations' && (
+          <div className="detail-body">
+            <h4>📝 已标注问题 ({annotations.length})</h4>
+            {annotations.length === 0 ? (
+              <div className="detail-empty">暂无标注</div>
+            ) : (
+              <div className="annotations-list">
+                {annotations.map((ann) => (
+                  <div key={ann.id} className={`annotation-item status-${ann.status}`}>
+                    <div className="annotation-item-header">
+                      <span className={`annotation-status-badge ${ann.status}`}>
+                        {ANNOTATION_STATUSES.find(s => s.id === ann.status)?.label || ann.status}
+                      </span>
+                      <span className="annotation-time">
+                        {new Date(ann.created_at).toLocaleString('zh-CN')}
+                      </span>
+                    </div>
+                    <div className="annotation-item-target">
+                      <span className="annotation-type">{ann.target.review_type}</span>
+                      {ann.target.file && <span className="annotation-file">{ann.target.file}</span>}
+                      {ann.target.line && <span className="annotation-line">:{ann.target.line}</span>}
+                    </div>
+                    {ann.target.description && (
+                      <div className="annotation-item-desc">{ann.target.description}</div>
+                    )}
+                    {ann.reason && (
+                      <div className="annotation-item-reason">
+                        原因: {ANNOTATION_REASONS.find(r => r.id === ann.reason)?.label || ann.reason}
+                      </div>
+                    )}
+                    {ann.comment && (
+                      <div className="annotation-item-comment">📝 {ann.comment}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

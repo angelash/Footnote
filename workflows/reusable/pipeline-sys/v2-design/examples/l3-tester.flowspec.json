@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l3-tester",
   "name": "L3 测试员流程",
   "version": "1.0.0",

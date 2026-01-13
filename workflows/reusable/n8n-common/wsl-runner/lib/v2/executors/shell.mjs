@@ -28,10 +28,14 @@ import { NodeExecutor, successResult, failureResult } from '../executor-base.mjs
 /**
  * Shell 配置映射
  */
+/**
+ * Shell 配置映射
+ * 使用绝对路径以确保在 WSL 环境中能正确找到 shell 可执行文件
+ */
 const SHELL_CONFIG = {
-  bash: { cmd: 'bash', args: ['-c'] },
-  sh: { cmd: 'sh', args: ['-c'] },
-  zsh: { cmd: 'zsh', args: ['-c'] },
+  bash: { cmd: '/usr/bin/bash', args: ['-c'] },
+  sh: { cmd: '/bin/sh', args: ['-c'] },
+  zsh: { cmd: '/usr/bin/zsh', args: ['-c'] },
   powershell: { cmd: 'powershell', args: ['-Command'] },
   cmd: { cmd: 'cmd', args: ['/c'] },
 };
@@ -71,7 +75,7 @@ export class ShellExecutor extends NodeExecutor {
       return failureResult(`Unsupported shell: ${shell}. Supported: ${Object.keys(SHELL_CONFIG).join(', ')}`);
     }
 
-    this.info(`Executing: ${command}`, { shell, cwd });
+    this.info(`Executing: ${command}`, { shell, cwd, shellCmd: shellConfig.cmd });
 
     return new Promise((resolve, reject) => {
       const stdout = [];

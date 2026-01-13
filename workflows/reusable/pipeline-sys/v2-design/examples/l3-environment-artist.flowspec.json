@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l3-environment-artist",
   "name": "L3 场景美术流程",
   "version": "1.0.0",

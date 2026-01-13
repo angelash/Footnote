@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l0-acceptance-review",
   "name": "L0 里程碑验收流程",
   "version": "1.0.0",

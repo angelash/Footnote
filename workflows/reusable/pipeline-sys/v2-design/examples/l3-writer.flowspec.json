@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l3-writer",
   "name": "L3 写手流程",
   "version": "1.0.0",

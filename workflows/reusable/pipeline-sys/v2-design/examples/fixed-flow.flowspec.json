@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "fixed-flow",
   "name": "AI-Native Fixed Flow",
   "version": "2.0.0",

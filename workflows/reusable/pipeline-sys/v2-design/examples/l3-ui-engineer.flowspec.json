@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l3-ui-engineer",
   "name": "L3 UI 程序员流程",
   "version": "1.0.0",

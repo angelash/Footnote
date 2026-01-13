@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l0-audit-intake",
   "name": "L0 总体审核入口（细化版）",
   "version": "2.3.0",

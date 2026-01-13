@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "lead-decompose",
   "name": "组长拆解流程",
   "version": "1.0.0",

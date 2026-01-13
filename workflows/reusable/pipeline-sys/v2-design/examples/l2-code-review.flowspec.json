@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l2-code-review",
   "name": "L2 代码审查流程",
   "version": "1.0.0",

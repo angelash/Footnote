@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "l2-art-lead",
   "name": "L2 美术组长流程",
   "version": "1.0.0",

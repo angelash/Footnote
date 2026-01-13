@@ -1,5 +1,5 @@
-﻿{
-  "$schema": "../flowspec-schema.json",
+{
+"$schema": "../flowspec-schema.json",
   "id": "whitebox-scene",
   "name": "白盒场景占位流程",
   "version": "1.0.0",

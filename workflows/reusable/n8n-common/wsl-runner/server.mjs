@@ -876,6 +876,24 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { ok: true, service: "wsl-cursor-runner", pid: process.pid });
     }
 
+    // GET /test-spawn - 测试 spawn 是否正常工作
+    if (req.method === "GET" && req.url === "/test-spawn") {
+      const testResult = await new Promise((resolve) => {
+        const testSpawn = spawn('/bin/sh', ['-c', 'echo hello']);
+        let stdout = '';
+        let stderr = '';
+        testSpawn.stdout.on('data', (d) => { stdout += d.toString(); });
+        testSpawn.stderr.on('data', (d) => { stderr += d.toString(); });
+        testSpawn.on('close', (code) => {
+          resolve({ ok: true, code, stdout: stdout.trim(), stderr: stderr.trim() });
+        });
+        testSpawn.on('error', (e) => {
+          resolve({ ok: false, error: e.message, code: e.code });
+        });
+      });
+      return json(res, 200, testResult);
+    }
+
     // GET /async-tasks - 查看运行中的异步任务
     if (req.method === "GET" && req.url === "/async-tasks") {
       const tasks = [];

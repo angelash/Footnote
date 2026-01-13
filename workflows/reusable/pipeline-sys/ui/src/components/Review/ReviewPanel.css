@@ -1117,6 +1117,23 @@
   border: 1px solid #f59e0b40;
 }
 
+.section-badge.skipped {
+  background: #6b728020;
+  color: #9ca3af;
+  border: 1px solid #6b728040;
+}
+
+/* 未包含的审查项 */
+.detail-empty.not-included {
+  color: #9ca3af;
+  font-style: italic;
+  padding: 16px;
+  text-align: center;
+  background: #1f1f2310;
+  border-radius: 8px;
+  border: 1px dashed #3f3f46;
+}
+
 /* 标注按钮 */
 .annotate-btn {
   background: transparent;

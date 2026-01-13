@@ -273,7 +273,8 @@ export interface Annotation {
     file?: string;
     line?: number;
     section?: string;
-    description_contains?: string;
+    description?: string;  // 问题描述（用于显示）
+    description_contains?: string;  // 描述匹配模式（用于过滤）
   };
   status: 'dismissed' | 'acknowledged' | 'fixed' | 'wontfix' | 'deferred';
   reason?: string;

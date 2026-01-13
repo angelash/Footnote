@@ -1,13 +1,11 @@
-/**
+﻿/**
  * ReviewPanel - 审查面板组件
  * 显示审查统计和操作按钮
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  getReviews,
   getAudits,
-  getReviewDetail,
   getAuditDetail,
   getAuditMarkdown,
   getAuditReviews,
@@ -21,8 +19,6 @@ import {
   startQaSignoff,
   startAcceptanceReview,
   startAuditIntake,
-  getReviewId,
-  getReviewType,
   getResultColor,
   getStatusColor,
   getDecisionColor,
@@ -337,75 +333,6 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
 };
 
 // ============================================
-// 子组件：审查记录卡片
-// ============================================
-
-interface ReviewCardProps {
-  record: ReviewRecord;
-  onOpenDetail: (record: ReviewRecord) => void;
-}
-
-const ReviewCard: React.FC<ReviewCardProps> = ({ record, onOpenDetail }) => {
-  const id = getReviewId(record);
-  const type = getReviewType(record);
-  const resultColor = getResultColor(record.result);
-
-  const typeLabels: Record<string, string> = {
-    code: '代码审查',
-    design: '设计审查',
-    qa: 'QA签字',
-    acceptance: '里程碑验收',
-    audit: '总体审核',
-    unknown: '未知',
-  };
-
-  const typeIcons: Record<string, string> = {
-    code: '📝',
-    design: '📐',
-    qa: '✅',
-    acceptance: '🏆',
-    audit: '🔍',
-    unknown: '❓',
-  };
-
-  return (
-    <div
-      className="review-card clickable"
-      role="button"
-      tabIndex={0}
-      onClick={() => onOpenDetail(record)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onOpenDetail(record);
-      }}
-    >
-      <div className="review-card-header">
-        <span className="review-type">
-          {typeIcons[type]} {typeLabels[type]}
-        </span>
-        <span className="review-result" style={{ backgroundColor: resultColor }}>
-          {record.result}
-        </span>
-      </div>
-      <div className="review-card-body">
-        <div className="review-id">{id}</div>
-        {record.task_id && <div className="review-meta">任务: {record.task_id}</div>}
-        {record.doc_path && <div className="review-meta">文档: {record.doc_path}</div>}
-        {record.milestone_id && <div className="review-meta">里程碑: {record.milestone_id}</div>}
-        {record.score !== undefined && (
-          <div className="review-score">
-            评分: <strong>{record.score}</strong>/100
-          </div>
-        )}
-        {record.completed_at && (
-          <div className="review-time">{new Date(record.completed_at).toLocaleString()}</div>
-        )}
-      </div>
-      {record.summary && <div className="review-summary">{record.summary}</div>}
-    </div>
-  );
-};
-
-// ============================================
 // 子组件：审核报告卡片
 // ============================================
 
@@ -493,34 +420,26 @@ const AuditCard: React.FC<AuditCardProps> = ({ audit, onOpenDetail }) => {
 // ============================================
 
 export const ReviewPanel: React.FC = () => {
-  const [reviews, setReviews] = useState<ReviewRecord[]>([]);
   const [audits, setAudits] = useState<AuditReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [filterType, setFilterType] = useState<'all' | 'code' | 'design' | 'qa' | 'acceptance'>('all');
-  const [activeTab, setActiveTab] = useState<'reviews' | 'audits'>('audits');
   const [startingFullAudit, setStartingFullAudit] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const [selectedReview, setSelectedReview] = useState<ReviewRecord | null>(null);
   const [selectedAudit, setSelectedAudit] = useState<AuditReport | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [reviewsRes, auditsRes] = await Promise.all([
-        getReviews(filterType === 'all' ? undefined : filterType),
-        getAudits(10),
-      ]);
-      setReviews(reviewsRes.reviews);
+      const auditsRes = await getAudits(10);
       setAudits(auditsRes.audits);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
     }
-  }, [filterType]);
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -528,18 +447,12 @@ export const ReviewPanel: React.FC = () => {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  // 统计
+  // 统计（基于审核报告）
   const stats = {
-    total: reviews.length,
-    passed: reviews.filter((r) => r.result === 'APPROVED' || r.result === 'PASSED').length,
-    pending: reviews.filter((r) => r.result === 'PENDING' || r.result === 'PARTIAL').length,
-    failed: reviews.filter(
-      (r) =>
-        r.result === 'REJECTED' ||
-        r.result === 'FAILED' ||
-        r.result === 'CHANGES_REQUESTED' ||
-        r.result === 'REVISION_REQUIRED'
-    ).length,
+    total: audits.length,
+    passed: audits.filter((a) => a.progress_report?.status === 'HEALTHY' || a.recommendations?.decision === 'PROCEED').length,
+    pending: audits.filter((a) => a.progress_report?.status === 'WARNING' || a.recommendations?.decision === 'PROCEED_WITH_CAUTION').length,
+    failed: audits.filter((a) => a.progress_report?.status === 'CRITICAL' || a.recommendations?.decision === 'HOLD').length,
   };
 
   const handleStartFullAudit = async (): Promise<void> => {
@@ -555,8 +468,7 @@ export const ReviewPanel: React.FC = () => {
         include_design_review: true,
         include_qa_signoff: true,
       });
-      setActiveTab('audits');
-      setNotice('已发起“一键完整审核”（后台执行中）。完成后会在“审核报告”列表出现新的 AUDIT 记录。');
+            setNotice('已发起“一键完整审核”（后台执行中）。完成后会在“审核报告”列表出现新的 AUDIT 记录。');
       // 主动刷新一次（后续还有 30s 定时刷新）
       await fetchData();
     } catch (err) {
@@ -566,13 +478,7 @@ export const ReviewPanel: React.FC = () => {
     }
   };
 
-  const handleOpenReviewDetail = (record: ReviewRecord): void => {
-    setSelectedAudit(null);
-    setSelectedReview(record);
-  };
-
   const handleOpenAuditDetail = (audit: AuditReport): void => {
-    setSelectedReview(null);
     setSelectedAudit(audit);
   };
 
@@ -614,34 +520,6 @@ export const ReviewPanel: React.FC = () => {
         </div>
       </div>
 
-      {/* 标签页 */}
-      <div className="review-tabs">
-        <button
-          className={`tab ${activeTab === 'audits' ? 'active' : ''}`}
-          onClick={() => setActiveTab('audits')}
-        >
-          📊 审核报告 ({audits.length})
-        </button>
-        <button
-          className={`tab ${activeTab === 'reviews' ? 'active' : ''}`}
-          onClick={() => setActiveTab('reviews')}
-        >
-          📋 审查记录 ({reviews.length})
-        </button>
-      </div>
-
-      {/* 筛选器（仅审查记录标签页） */}
-      {activeTab === 'reviews' && (
-        <div className="review-filters">
-          <select value={filterType} onChange={(e) => setFilterType(e.target.value as typeof filterType)}>
-            <option value="all">全部类型</option>
-            <option value="code">代码审查</option>
-            <option value="design">设计审查</option>
-            <option value="qa">QA签字</option>
-            <option value="acceptance">里程碑验收</option>
-          </select>
-        </div>
-      )}
 
       {/* 错误提示 */}
       {error && <div className="review-error">❌ {error}</div>}
@@ -653,49 +531,25 @@ export const ReviewPanel: React.FC = () => {
       {/* 内容区域 */}
       {!loading && (
         <div className="review-content">
-          {activeTab === 'audits' && (
-            <div className="audits-list">
-              {audits.length === 0 ? (
-                <div className="empty-state">
-                  <p>暂无审核报告</p>
-                  <button className="btn-primary" onClick={() => setShowForm(true)}>
-                    发起总体审核
-                  </button>
-                </div>
-              ) : (
-                audits.map((audit) => (
-                  <AuditCard key={audit.audit_id} audit={audit} onOpenDetail={handleOpenAuditDetail} />
-                ))
-              )}
-            </div>
-          )}
-
-          {activeTab === 'reviews' && (
-            <div className="reviews-list">
-              {reviews.length === 0 ? (
-                <div className="empty-state">
-                  <p>暂无审查记录</p>
-                </div>
-              ) : (
-                reviews.map((review) => (
-                  <ReviewCard key={getReviewId(review)} record={review} onOpenDetail={handleOpenReviewDetail} />
-                ))
-              )}
-            </div>
-          )}
+          <div className="audits-list">
+            {audits.length === 0 ? (
+              <div className="empty-state">
+                <p>暂无审核报告</p>
+                <button className="btn-primary" onClick={() => setShowForm(true)}>
+                  发起总体审核
+                </button>
+              </div>
+            ) : (
+              audits.map((audit) => (
+                <AuditCard key={audit.audit_id} audit={audit} onOpenDetail={handleOpenAuditDetail} />
+              ))
+            )}
+          </div>
         </div>
       )}
 
       {/* 发起审查表单 */}
       {showForm && <StartReviewForm onClose={() => setShowForm(false)} onSuccess={fetchData} />}
-
-      {/* 详情弹窗：审查记录 */}
-      {selectedReview && (
-        <ReviewDetailModal
-          record={selectedReview}
-          onClose={() => setSelectedReview(null)}
-        />
-      )}
 
       {/* 详情弹窗：审核报告 */}
       {selectedAudit && (
@@ -709,217 +563,6 @@ export const ReviewPanel: React.FC = () => {
 };
 
 export default ReviewPanel;
-
-// ============================================
-// 详情弹窗：审查记录
-// ============================================
-
-interface ReviewDetailModalProps {
-  record: ReviewRecord;
-  onClose: () => void;
-}
-
-const ReviewDetailModal: React.FC<ReviewDetailModalProps> = ({ record, onClose }) => {
-  const [tab, setTab] = useState<'overview' | 'json'>('overview');
-  const [loading, setLoading] = useState(false);
-  const [detail, setDetail] = useState<ReviewRecord>(record);
-  const [raw, setRaw] = useState<string>(JSON.stringify(record, null, 2));
-  const [loadError, setLoadError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let mounted = true;
-    const run = async (): Promise<void> => {
-      setLoading(true);
-      setLoadError(null);
-      try {
-        const id = getReviewId(record);
-        const res = await getReviewDetail(id);
-        if (!mounted) return;
-        setDetail(res.record);
-        setRaw(res.raw || JSON.stringify(res.record, null, 2));
-      } catch (e) {
-        if (!mounted) return;
-        setLoadError(e instanceof Error ? e.message : String(e));
-        setDetail(record);
-        setRaw(JSON.stringify(record, null, 2));
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-    run();
-    return () => {
-      mounted = false;
-    };
-  }, [record]);
-
-  const id = getReviewId(detail);
-  const type = getReviewType(detail);
-  const resultColor = getResultColor(detail.result);
-
-  const renderDimensions = (): React.ReactNode => {
-    if (!detail.dimensions) return <div className="detail-empty">（无）</div>;
-    const entries = Object.entries(detail.dimensions);
-    if (!entries.length) return <div className="detail-empty">（无）</div>;
-    return (
-      <div className="detail-kv-grid">
-        {entries.map(([k, v]) => {
-          const score = typeof v === 'number' ? v : v?.score;
-          const comments = typeof v === 'object' && v && 'comments' in v ? (v as { comments?: string }).comments : undefined;
-          return (
-            <div key={k} className="detail-kv">
-              <div className="detail-k">{k}</div>
-              <div className="detail-v">
-                <strong>{score ?? '-'}</strong>
-                {comments ? <div className="detail-sub">{comments}</div> : null}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  return (
-    <div className="detail-overlay" onClick={onClose}>
-      <div className="detail-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="detail-header">
-          <div className="detail-title">
-            <span className="detail-id">{id}</span>
-            <span className="detail-pill" style={{ backgroundColor: resultColor }}>
-              {detail.result}
-            </span>
-            <span className="detail-meta">类型: {type}</span>
-          </div>
-          <button className="close-btn" onClick={onClose}>×</button>
-        </div>
-
-        <div className="detail-tabs">
-          <button className={`tab ${tab === 'overview' ? 'active' : ''}`} onClick={() => setTab('overview')}>
-            概览
-          </button>
-          <button className={`tab ${tab === 'json' ? 'active' : ''}`} onClick={() => setTab('json')}>
-            原始 JSON
-          </button>
-        </div>
-
-        {loadError && <div className="detail-error">❌ {loadError}</div>}
-        {loading && <div className="detail-loading">加载中...</div>}
-
-        {!loading && tab === 'overview' && (
-          <div className="detail-body">
-            <div className="detail-section">
-              <div className="detail-section-title">基本信息</div>
-              <div className="detail-kv-grid">
-                {detail.task_id ? (
-                  <div className="detail-kv">
-                    <div className="detail-k">task_id</div>
-                    <div className="detail-v">{detail.task_id}</div>
-                  </div>
-                ) : null}
-                {detail.doc_path ? (
-                  <div className="detail-kv">
-                    <div className="detail-k">doc_path</div>
-                    <div className="detail-v">{detail.doc_path}</div>
-                  </div>
-                ) : null}
-                {detail.milestone_id ? (
-                  <div className="detail-kv">
-                    <div className="detail-k">milestone_id</div>
-                    <div className="detail-v">{detail.milestone_id}</div>
-                  </div>
-                ) : null}
-                {detail.score !== undefined ? (
-                  <div className="detail-kv">
-                    <div className="detail-k">score</div>
-                    <div className="detail-v"><strong>{detail.score}</strong>/100</div>
-                  </div>
-                ) : null}
-                {detail.reviewer ? (
-                  <div className="detail-kv">
-                    <div className="detail-k">reviewer</div>
-                    <div className="detail-v">{detail.reviewer}</div>
-                  </div>
-                ) : null}
-                {detail.signer ? (
-                  <div className="detail-kv">
-                    <div className="detail-k">signer</div>
-                    <div className="detail-v">{detail.signer}</div>
-                  </div>
-                ) : null}
-                {detail.completed_at ? (
-                  <div className="detail-kv">
-                    <div className="detail-k">completed_at</div>
-                    <div className="detail-v">{new Date(detail.completed_at).toLocaleString()}</div>
-                  </div>
-                ) : null}
-              </div>
-              {detail.summary ? <div className="detail-summary">{detail.summary}</div> : null}
-            </div>
-
-            <div className="detail-section">
-              <div className="detail-section-title">维度评分 / 备注</div>
-              {renderDimensions()}
-            </div>
-
-            <div className="detail-section">
-              <div className="detail-section-title">问题（issues）</div>
-              {detail.issues && detail.issues.length > 0 ? (
-                <ul className="detail-list">
-                  {detail.issues.map((it, idx) => (
-                    <li key={idx}>
-                      <div className="detail-list-title">{it.message}</div>
-                      <div className="detail-sub">
-                        {it.severity ? `severity=${it.severity} ` : ''}
-                        {it.type ? `type=${it.type} ` : ''}
-                        {it.file ? `file=${it.file} ` : ''}
-                        {typeof it.line === 'number' ? `line=${it.line}` : ''}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="detail-empty">（无）</div>
-              )}
-            </div>
-
-            {detail.suggestions && detail.suggestions.length > 0 ? (
-              <div className="detail-section">
-                <div className="detail-section-title">建议（suggestions）</div>
-                <ul className="detail-list">
-                  {detail.suggestions.map((s, idx) => (
-                    <li key={idx}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-
-            {detail.checklist && detail.checklist.length > 0 ? (
-              <div className="detail-section">
-                <div className="detail-section-title">清单（checklist）</div>
-                <ul className="detail-list">
-                  {detail.checklist.map((c, idx) => (
-                    <li key={idx}>
-                      <div className="detail-list-title">{c.text || c.item || '（未命名项）'}</div>
-                      <div className="detail-sub">
-                        status={c.status} auto={String(c.auto)}{typeof c.checked === 'boolean' ? ` checked=${String(c.checked)}` : ''}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
-        )}
-
-        {!loading && tab === 'json' && (
-          <div className="detail-body">
-            <pre className="detail-pre">{raw}</pre>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 // ============================================
 // 详情弹窗：审核报告
@@ -1151,8 +794,14 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
   };
 
   // 渲染 AI 审查详情（支持代码审查和设计审查的完整字段）
-  const renderAiReview = (review: ReviewRecord | undefined, reviewType: 'code' | 'design') => {
-    if (!review) return <div className="detail-empty">（未执行）</div>;
+  const renderAiReview = (review: ReviewRecord | undefined, reviewType: 'code' | 'design', wasIncluded: boolean = true) => {
+    if (!review) {
+      return (
+        <div className="detail-empty not-included">
+          {wasIncluded ? '（未执行）' : '⏭️ 本次审核未包含此项'}
+        </div>
+      );
+    }
     
     const resultColor = getResultColor(review.result);
     // 扩展类型以支持设计审查特有字段
@@ -1584,28 +1233,38 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                 <div className="detail-section">
                   <div className="detail-section-title">
                     📝 代码审查 (AI Code Review)
-                    {aiReviews.has_code_review && <span className="section-badge success">已完成</span>}
+                    {aiReviews.has_code_review ? (
+                      <span className="section-badge success">已完成</span>
+                    ) : (
+                      <span className="section-badge skipped">未包含</span>
+                    )}
                   </div>
-                  {renderAiReview(aiReviews.reviews.code_review, 'code')}
+                  {renderAiReview(aiReviews.reviews.code_review, 'code', aiReviews.has_code_review)}
                 </div>
 
                 <div className="detail-section">
                   <div className="detail-section-title">
                     📐 设计审查 (AI Design Review)
-                    {aiReviews.has_design_review && <span className="section-badge success">已完成</span>}
+                    {aiReviews.has_design_review ? (
+                      <span className="section-badge success">已完成</span>
+                    ) : (
+                      <span className="section-badge skipped">未包含</span>
+                    )}
                   </div>
-                  {renderAiReview(aiReviews.reviews.design_review, 'design')}
+                  {renderAiReview(aiReviews.reviews.design_review, 'design', aiReviews.has_design_review)}
                 </div>
 
-                {aiReviews.has_qa_signoff && (
-                  <div className="detail-section">
-                    <div className="detail-section-title">
-                      ✅ QA 签字 (QA Signoff)
+                <div className="detail-section">
+                  <div className="detail-section-title">
+                    ✅ QA 签字 (QA Signoff)
+                    {aiReviews.has_qa_signoff ? (
                       <span className="section-badge success">已完成</span>
-                    </div>
-                    {renderAiReview(aiReviews.reviews.qa_signoff, 'code')}
+                    ) : (
+                      <span className="section-badge skipped">未包含</span>
+                    )}
                   </div>
-                )}
+                  {renderAiReview(aiReviews.reviews.qa_signoff, 'code', aiReviews.has_qa_signoff)}
+                </div>
               </>
             )}
           </div>

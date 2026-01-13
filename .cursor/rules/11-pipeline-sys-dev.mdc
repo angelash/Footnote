@@ -1,0 +1,87 @@
+# Pipeline-Sys 开发规范
+
+glob: ["**/pipeline-sys/**/*.ts", "**/pipeline-sys/**/*.tsx", "**/pipeline-sys/**/*.css", "**/pipeline-sys/**/*.mjs"]
+
+## 核心原则
+
+> 修改代码后必须重启对应服务并验证可用性
+
+Pipeline-Sys 由多个服务组成，修改不同部分需要重启不同服务。
+
+## 修改-重启对照表（强制遵守）
+
+| 修改的文件 | 需要重启的服务 | 验证命令 |
+|-----------|---------------|---------|
+| ui/src/**/*.tsx | Vite Dev Server | curl localhost:3231 |
+| ui/src/**/*.css | Vite Dev Server | 同上 |
+| console/src/**/*.ts | Console 服务 | curl localhost:3230/api/reviews |
+| console/src/routes/*.ts | Console 服务（新路由必须重启） | 测试新 API |
+| 两者都改 | 两个都重启 | 两个都验证 |
+
+## 自动重启脚本
+
+### 重启 Console 服务
+```bash
+wsl -e bash -c "pkill -f 'tsx.*main.ts'; sleep 2; cd /mnt/f/workspace/github/Footnote/workflows/reusable/pipeline-sys/console; npm run dev"
+```
+
+### 重启 Vite Dev Server
+```bash
+wsl -e bash -c "pkill -f 'node.*vite'; sleep 2; cd /mnt/f/workspace/github/Footnote/workflows/reusable/pipeline-sys/ui; npm run dev"
+```
+
+### 验证服务可用性
+```bash
+# Console (期望 200)
+wsl -e bash -c "sleep 5; curl -s -o /dev/null -w '%{http_code}' http://localhost:3230/api/reviews"
+
+# UI (期望 200)
+wsl -e bash -c "sleep 5; curl -s -o /dev/null -w '%{http_code}' http://localhost:3231/"
+```
+
+## 修改后必做检查清单
+
+### 修改了 Console 后端代码
+- [ ] 重启 Console 服务
+- [ ] 等待 5 秒让服务启动
+- [ ] 验证 API 可用
+- [ ] 如果是新 API，测试新端点
+
+### 修改了 UI 前端代码
+- [ ] 检查终端是否有 vite hmr update 输出
+- [ ] 如果没有热更新，重启 Vite Dev Server
+- [ ] 验证 UI 可访问
+- [ ] 提示用户硬刷新浏览器 Ctrl+Shift+R
+
+### 两者都修改了
+- [ ] 先重启 Console
+- [ ] 验证 Console 正常
+- [ ] 再重启 Vite Dev Server
+- [ ] 验证 UI 正常
+- [ ] 提示用户刷新浏览器
+
+## 常见问题排查
+
+### API 返回 404 Route not found
+**原因**: Console 服务没有重启，新路由未加载
+**解决**: 重启 Console 服务
+
+### UI 修改后刷新无效
+**原因**: Vite HMR 失效或浏览器缓存
+**解决**: 重启 Vite Dev Server + 用户硬刷新
+
+### API 请求失败无错误提示
+**原因**: 前端错误处理不完善
+**解决**: 检查 catch 块是否正确显示错误
+
+## AI 执行规范
+
+1. **修改 Console 代码后**：必须在同一轮对话中重启并验证
+2. **修改 UI 代码后**：必须检查 HMR 或重启 Vite
+3. **验证失败时**：检查错误日志，不要让用户反复刷新
+4. **新增 API 时**：必须用 curl 测试一次确认可用
+
+---
+
+*规范版本: v1.0*
+*创建日期: 2026-01-13*

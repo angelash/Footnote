@@ -1287,9 +1287,24 @@
 .annotation-footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 12px;
   padding: 16px 20px;
   border-top: 1px solid #334155;
+}
+
+.annotation-message {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.annotation-message.success {
+  color: #22c55e;
+}
+
+.annotation-message.error {
+  color: #ef4444;
 }
 
 .annotation-footer .cancel-btn {

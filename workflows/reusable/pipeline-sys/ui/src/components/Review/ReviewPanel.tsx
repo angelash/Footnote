@@ -1064,21 +1064,32 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
   const [savingAnnotation, setSavingAnnotation] = useState(false);
 
   // 保存标注
+  const [annotationMessage, setAnnotationMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
   const handleSaveAnnotation = async () => {
     if (!annotationTarget) return;
     setSavingAnnotation(true);
+    setAnnotationMessage(null);
     try {
-      await addAnnotation(detail.audit_id, {
+      const result = await addAnnotation(detail.audit_id, {
         target: annotationTarget,
         status: annotationStatus,
         reason: annotationReason,
         comment: annotationComment,
       });
-      setAnnotationTarget(null);
-      // 重新加载数据
-      // (简化：暂不刷新，用户可手动刷新)
+      if (result.ok) {
+        setAnnotationMessage({ type: 'success', text: '✅ 标注已保存！' });
+        // 2秒后关闭弹窗
+        setTimeout(() => {
+          setAnnotationTarget(null);
+          setAnnotationMessage(null);
+        }, 1500);
+      } else {
+        setAnnotationMessage({ type: 'error', text: '❌ 保存失败，请重试' });
+      }
     } catch (e) {
       console.error('保存标注失败:', e);
+      setAnnotationMessage({ type: 'error', text: `❌ 保存失败: ${e instanceof Error ? e.message : '未知错误'}` });
     } finally {
       setSavingAnnotation(false);
     }
@@ -1611,7 +1622,12 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                 </div>
               </div>
               <div className="annotation-footer">
-                <button className="cancel-btn" onClick={() => setAnnotationTarget(null)}>取消</button>
+                {annotationMessage && (
+                  <span className={`annotation-message ${annotationMessage.type}`}>
+                    {annotationMessage.text}
+                  </span>
+                )}
+                <button className="cancel-btn" onClick={() => { setAnnotationTarget(null); setAnnotationMessage(null); }}>取消</button>
                 <button
                   className="save-btn"
                   onClick={handleSaveAnnotation}

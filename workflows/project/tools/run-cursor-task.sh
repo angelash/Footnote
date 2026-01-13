@@ -112,12 +112,16 @@ if [[ ${#DELIVERABLES[@]} -eq 0 ]]; then
   echo "[run-cursor-task] WARN: No deliverables parsed from task pack. Guardrail will only allow .cursor/* changes." >&2
 fi
 
-# Snapshot before
+# Snapshot before (with timeout to avoid hanging on slow WSL/Windows file systems)
 BEFORE_DIFF="$(mktemp)"
 AFTER_DIFF="$(mktemp)"
 trap 'rm -f "$BEFORE_DIFF" "$AFTER_DIFF"' EXIT
 
-git diff --name-only > "$BEFORE_DIFF" || true
+# Use timeout to prevent git from hanging indefinitely
+timeout 10s git diff --name-only > "$BEFORE_DIFF" 2>/dev/null || {
+  echo "[run-cursor-task] WARN: git diff timed out or failed, skipping pre-check" >&2
+  echo "" > "$BEFORE_DIFF"
+}
 
 # Handle chat ID for conversation history
 # If chat-id-file is provided, try to read existing chat ID
@@ -169,7 +173,11 @@ CURSOR_CMD+=("$PROMPT_CONTENT")
 AGENT_EXIT=$?
 set -e
 
-git diff --name-only > "$AFTER_DIFF" || true
+# Use timeout to prevent git from hanging
+timeout 10s git diff --name-only > "$AFTER_DIFF" 2>/dev/null || {
+  echo "[run-cursor-task] WARN: git diff (after) timed out or failed" >&2
+  echo "" > "$AFTER_DIFF"
+}
 
 # Compute changed files since before
 CHANGED_FILES="$(comm -13 <(sort "$BEFORE_DIFF") <(sort "$AFTER_DIFF") || true)"

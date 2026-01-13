@@ -406,7 +406,7 @@ async function handleExecuteTask(body) {
 
   const startedAt = Date.now();
   const agentArgs = [
-    "workflows/project/n8n/run-cursor-task.sh",
+    "workflows/project/tools/run-cursor-task.sh",
     "--task-pack",
     taskPackPath,
     "--prompt-file",

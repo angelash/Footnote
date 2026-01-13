@@ -94,10 +94,9 @@ EOF
 
 | Windows 路径 | WSL 路径 | 说明 |
 |-------------|---------|------|
-| `F:\workspace\github\Footnote` | `/mnt/f/workspace/github/Footnote` | ❌ 不要使用（Windows 挂载） |
-| - | `/mnt/f/workspace/github/Footnote` | ✅ 使用（WSL 文件系统） |
+| `F:\workspace\github\Footnote` | `/mnt/f/workspace/github/Footnote` | ✅ 当前使用（WSL 访问 Windows 文件系统） |
 
-**重要**: 项目必须在 WSL 文件系统中（`/home/...`），不能在 Windows 挂载点（`/mnt/...`）。
+**说明**: 本项目使用 WSL 挂载的 Windows 文件系统路径 (`/mnt/f/...`)。虽然 WSL 原生路径 (`/home/...`) 性能更好，但挂载路径可以方便地与 Windows 工具协作。
 
 ---
 

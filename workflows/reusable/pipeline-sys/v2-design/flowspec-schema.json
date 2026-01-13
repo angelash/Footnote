@@ -2,25 +2,33 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://pipeline-sys.local/flowspec/v2.0.0",
   "title": "FlowSpec v2.0.0",
-  "description": "Pipeline-Sys v2 流程定义语言（Domain Specific Language）",
+  "description": "Pipeline-Sys v2 流程定义语言（Domain Specific Language）- 支持扁平化节点格式",
   "type": "object",
   "required": ["version", "name", "nodes"],
-  "additionalProperties": false,
   "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema 引用路径"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "流程唯一标识符"
+    },
     "version": {
       "type": "string",
-      "pattern": "^2\\.[0-9]+\\.[0-9]+$",
-      "description": "FlowSpec 版本号，必须为 2.x.x"
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "FlowSpec 版本号"
     },
     "name": {
       "type": "string",
       "minLength": 1,
-      "maxLength": 100,
+      "maxLength": 200,
       "description": "流程名称"
     },
     "description": {
       "type": "string",
-      "maxLength": 500,
+      "maxLength": 1000,
       "description": "流程描述"
     },
     "author": {
@@ -49,9 +57,12 @@
     "outputs": {
       "type": "object",
       "additionalProperties": {
-        "$ref": "#/$defs/OutputParam"
+        "oneOf": [
+          { "type": "string" },
+          { "$ref": "#/$defs/OutputParam" }
+        ]
       },
-      "description": "流程输出参数定义"
+      "description": "流程输出参数定义（支持字符串表达式或对象格式）"
     },
     "nodes": {
       "type": "array",
@@ -72,6 +83,7 @@
       "$ref": "#/$defs/FlowSettings"
     }
   },
+  "additionalProperties": false,
   "$defs": {
     "Variable": {
       "type": "object",
@@ -142,7 +154,6 @@
     "Node": {
       "type": "object",
       "required": ["id", "type"],
-      "additionalProperties": false,
       "properties": {
         "id": {
           "type": "string",
@@ -180,7 +191,7 @@
         },
         "config": {
           "$ref": "#/$defs/NodeConfig",
-          "description": "节点类型特定配置"
+          "description": "节点类型特定配置（嵌套格式）"
         },
         "inputs": {
           "type": "object",
@@ -196,6 +207,11 @@
           "type": "integer",
           "minimum": 1000,
           "description": "超时时间（毫秒）"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "description": "超时时间（毫秒）- 扁平化格式"
         },
         "retry": {
           "$ref": "#/$defs/RetryConfig"
@@ -213,8 +229,93 @@
         "meta": {
           "type": "object",
           "description": "元数据（UI 位置、注释等）"
+        },
+        "expression": {
+          "type": "string",
+          "description": "表达式（transform/condition 节点扁平化格式）"
+        },
+        "command": {
+          "type": "string",
+          "description": "Shell 命令（shell 节点扁平化格式）"
+        },
+        "cwd": {
+          "type": "string",
+          "description": "工作目录（shell 节点扁平化格式）"
+        },
+        "shell": {
+          "type": "string",
+          "enum": ["bash", "sh", "zsh", "powershell", "cmd"],
+          "description": "Shell 类型（shell 节点扁平化格式）"
+        },
+        "env": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "环境变量"
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["read", "write", "append", "delete", "copy", "move", "exists", "list"],
+          "description": "文件操作类型（file 节点扁平化格式）"
+        },
+        "path": {
+          "type": "string",
+          "description": "文件路径（file 节点扁平化格式）"
+        },
+        "content": {
+          "type": "string",
+          "description": "文件内容（file 节点扁平化格式）"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"],
+          "description": "HTTP 方法（http 节点扁平化格式）"
+        },
+        "url": {
+          "type": "string",
+          "description": "HTTP URL（http 节点扁平化格式）"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "HTTP 请求头（http 节点扁平化格式）"
+        },
+        "body": {
+          "description": "HTTP 请求体（http 节点扁平化格式）"
+        },
+        "on_success": {
+          "type": "string",
+          "description": "成功后跳转节点ID（扁平化格式）"
+        },
+        "on_failure": {
+          "type": "string",
+          "description": "失败后跳转节点ID（扁平化格式）"
+        },
+        "on_true": {
+          "type": "string",
+          "description": "条件为真跳转节点ID（condition 节点扁平化格式）"
+        },
+        "on_false": {
+          "type": "string",
+          "description": "条件为假跳转节点ID（condition 节点扁平化格式）"
+        },
+        "onTrue": {
+          "type": "string",
+          "description": "条件为真跳转节点ID（condition 节点驼峰格式）"
+        },
+        "onFalse": {
+          "type": "string",
+          "description": "条件为假跳转节点ID（condition 节点驼峰格式）"
+        },
+        "onSuccess": {
+          "type": "string",
+          "description": "成功后跳转节点ID（驼峰格式）"
+        },
+        "onFailure": {
+          "type": "string",
+          "description": "失败后跳转节点ID（驼峰格式）"
         }
-      }
+      },
+      "additionalProperties": false
     },
     "NodeConfig": {
       "oneOf": [
@@ -596,6 +697,10 @@
           "type": "integer",
           "description": "全局超时时间（毫秒）"
         },
+        "timeout_ms": {
+          "type": "integer",
+          "description": "全局超时时间（毫秒）- 扁平化格式"
+        },
         "concurrency": {
           "type": "integer",
           "minimum": 1,
@@ -615,6 +720,10 @@
           "enum": ["debug", "info", "warn", "error"],
           "default": "info"
         },
+        "on_error": {
+          "type": "string",
+          "description": "错误处理方式（扁平化格式）"
+        },
         "hooks": {
           "type": "object",
           "properties": {
@@ -628,4 +737,3 @@
     }
   }
 }
-

@@ -1,0 +1,126 @@
+# 审查配置文件
+# 定义不同审查范围的配置（游戏产品、流程工具、全量等）
+
+# 默认路径映射（按目录自动归类）
+default_mappings:
+  game: ["game/**", "content/**"]
+  design: ["design/**"]
+  pipeline: ["workflows/**"]
+
+# 预定义审查配置
+profiles:
+  # 游戏产品审查
+  game-product:
+    name: "游戏产品审查"
+    description: "审查游戏代码、资源和内容"
+    include_paths:
+      - "game/src/**"
+      - "content/**"
+    exclude_paths:
+      - "game/src/tests/**"
+      - "game/node_modules/**"
+    design_docs:
+      - "design/ai-native/01_bibles/**"
+      - "design/ai-native/02_specs/**"
+    focus:
+      - narrative
+      - gameplay
+      - ui
+      - assets
+    commit_filter: "game/ content/"
+  
+  # 流程工具审查
+  pipeline-tools:
+    name: "流程工具审查"
+    description: "审查工作流、自动化脚本和控制台"
+    include_paths:
+      - "workflows/**"
+    exclude_paths:
+      - "workflows/project/logs/**"
+      - "workflows/**/node_modules/**"
+    design_docs:
+      - "workflows/reusable/pipeline-sys/v2-design/**"
+    focus:
+      - architecture
+      - reliability
+      - security
+      - maintainability
+    commit_filter: "workflows/"
+  
+  # 设计文档审查
+  design-docs:
+    name: "设计文档审查"
+    description: "审查设计文档的完整性和一致性"
+    include_paths:
+      - "design/**"
+    exclude_paths: []
+    design_docs:
+      - "design/ai-native/00_charter/**"
+      - "design/ai-native/01_bibles/**"
+    focus:
+      - completeness
+      - consistency
+      - feasibility
+      - clarity
+    commit_filter: "design/"
+  
+  # 全量审查（默认）
+  all:
+    name: "全量审查"
+    description: "审查整个项目"
+    include_paths:
+      - "**"
+    exclude_paths:
+      - "node_modules/**"
+      - "**/node_modules/**"
+      - "**/logs/**"
+      - "**/*.log"
+      - ".git/**"
+    design_docs:
+      - "design/ai-native/**"
+    focus:
+      - all
+    commit_filter: ""
+
+# 标注状态定义
+annotation_statuses:
+  dismissed:
+    label: "误报/不适用"
+    color: "#6b7280"
+    skip_on_reaudit: true
+  acknowledged:
+    label: "已知问题"
+    color: "#f59e0b"
+    skip_on_reaudit: false
+    affects_score: false
+  fixed:
+    label: "已修复"
+    color: "#22c55e"
+    skip_on_reaudit: false
+    verify_on_reaudit: true
+  wontfix:
+    label: "不修复"
+    color: "#ef4444"
+    skip_on_reaudit: true
+  deferred:
+    label: "延期处理"
+    color: "#3b82f6"
+    skip_on_reaudit: false
+    show_reminder: true
+
+# 标注原因选项
+annotation_reasons:
+  - id: false_positive
+    label: "误报"
+  - id: known_issue
+    label: "已知问题"
+  - id: by_design
+    label: "设计如此"
+  - id: low_priority
+    label: "优先级低"
+  - id: external_dependency
+    label: "外部依赖"
+  - id: temporary
+    label: "临时方案"
+  - id: other
+    label: "其他"

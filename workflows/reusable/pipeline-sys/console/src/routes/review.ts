@@ -305,6 +305,262 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
   });
 
   // ============================================
+  // 标注管理 API
+  // ============================================
+
+  // GET /api/audits/:auditId/annotations - 获取标注
+  app.get('/api/audits/:auditId/annotations', async (request, reply) => {
+    const { auditId } = request.params as { auditId: string };
+
+    if (!auditId || !isSafeId(auditId)) {
+      return reply.status(400).send({ ok: false, error: 'Invalid audit id' });
+    }
+
+    const annotationsPath = path.posix.join('workflows/project/logs/audits', auditId, 'annotations.json');
+
+    try {
+      const absPath = safeResolveUnderProject(config.projectRoot, annotationsPath);
+      const content = await fs.readFile(absPath, 'utf8');
+      const annotations = JSON.parse(content);
+      return reply.send({ ok: true, audit_id: auditId, ...annotations });
+    } catch {
+      // 没有标注文件，返回空数据
+      return reply.send({
+        ok: true,
+        audit_id: auditId,
+        annotations: [],
+        skip_rules: [],
+        created_at: null,
+        updated_at: null,
+      });
+    }
+  });
+
+  // POST /api/audits/:auditId/annotations - 添加标注
+  app.post('/api/audits/:auditId/annotations', async (request, reply) => {
+    const { auditId } = request.params as { auditId: string };
+    const body = request.body as {
+      target: { review_type: string; issue_index?: number; file?: string; line?: number; section?: string };
+      status: string;
+      reason?: string;
+      comment?: string;
+      action_ticket?: string;
+    };
+
+    if (!auditId || !isSafeId(auditId)) {
+      return reply.status(400).send({ ok: false, error: 'Invalid audit id' });
+    }
+
+    if (!body.target || !body.status) {
+      return reply.status(400).send({ ok: false, error: 'Missing required fields: target, status' });
+    }
+
+    const annotationsPath = path.posix.join('workflows/project/logs/audits', auditId, 'annotations.json');
+    const absPath = safeResolveUnderProject(config.projectRoot, annotationsPath);
+
+    try {
+      // 读取或创建标注文件
+      let data: { audit_id: string; annotations: any[]; skip_rules: any[]; created_at: string; updated_at: string };
+      try {
+        const content = await fs.readFile(absPath, 'utf8');
+        data = JSON.parse(content);
+      } catch {
+        data = {
+          audit_id: auditId,
+          annotations: [],
+          skip_rules: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+      }
+
+      // 生成新标注
+      const newAnnotation = {
+        id: `ann-${Date.now().toString(36)}`,
+        target: body.target,
+        status: body.status,
+        reason: body.reason || '',
+        comment: body.comment || '',
+        action_ticket: body.action_ticket,
+        annotator: 'user',
+        created_at: new Date().toISOString(),
+      };
+
+      data.annotations.push(newAnnotation);
+      data.updated_at = new Date().toISOString();
+
+      // 保存
+      await fs.writeFile(absPath, JSON.stringify(data, null, 2), 'utf8');
+
+      return reply.send({ ok: true, annotation: newAnnotation });
+    } catch (error) {
+      app.log.error(error, 'Failed to add annotation');
+      return reply.status(500).send({ ok: false, error: 'Failed to add annotation' });
+    }
+  });
+
+  // PUT /api/audits/:auditId/annotations/:annId - 更新标注
+  app.put('/api/audits/:auditId/annotations/:annId', async (request, reply) => {
+    const { auditId, annId } = request.params as { auditId: string; annId: string };
+    const body = request.body as {
+      status?: string;
+      reason?: string;
+      comment?: string;
+      action_ticket?: string;
+    };
+
+    if (!auditId || !isSafeId(auditId) || !annId) {
+      return reply.status(400).send({ ok: false, error: 'Invalid audit id or annotation id' });
+    }
+
+    const annotationsPath = path.posix.join('workflows/project/logs/audits', auditId, 'annotations.json');
+    const absPath = safeResolveUnderProject(config.projectRoot, annotationsPath);
+
+    try {
+      const content = await fs.readFile(absPath, 'utf8');
+      const data = JSON.parse(content);
+
+      const idx = data.annotations.findIndex((a: any) => a.id === annId);
+      if (idx === -1) {
+        return reply.status(404).send({ ok: false, error: 'Annotation not found' });
+      }
+
+      // 更新字段
+      if (body.status) data.annotations[idx].status = body.status;
+      if (body.reason !== undefined) data.annotations[idx].reason = body.reason;
+      if (body.comment !== undefined) data.annotations[idx].comment = body.comment;
+      if (body.action_ticket !== undefined) data.annotations[idx].action_ticket = body.action_ticket;
+      data.annotations[idx].updated_at = new Date().toISOString();
+      data.updated_at = new Date().toISOString();
+
+      await fs.writeFile(absPath, JSON.stringify(data, null, 2), 'utf8');
+
+      return reply.send({ ok: true, annotation: data.annotations[idx] });
+    } catch (error) {
+      app.log.error(error, 'Failed to update annotation');
+      return reply.status(500).send({ ok: false, error: 'Failed to update annotation' });
+    }
+  });
+
+  // DELETE /api/audits/:auditId/annotations/:annId - 删除标注
+  app.delete('/api/audits/:auditId/annotations/:annId', async (request, reply) => {
+    const { auditId, annId } = request.params as { auditId: string; annId: string };
+
+    if (!auditId || !isSafeId(auditId) || !annId) {
+      return reply.status(400).send({ ok: false, error: 'Invalid audit id or annotation id' });
+    }
+
+    const annotationsPath = path.posix.join('workflows/project/logs/audits', auditId, 'annotations.json');
+    const absPath = safeResolveUnderProject(config.projectRoot, annotationsPath);
+
+    try {
+      const content = await fs.readFile(absPath, 'utf8');
+      const data = JSON.parse(content);
+
+      const idx = data.annotations.findIndex((a: any) => a.id === annId);
+      if (idx === -1) {
+        return reply.status(404).send({ ok: false, error: 'Annotation not found' });
+      }
+
+      data.annotations.splice(idx, 1);
+      data.updated_at = new Date().toISOString();
+
+      await fs.writeFile(absPath, JSON.stringify(data, null, 2), 'utf8');
+
+      return reply.send({ ok: true, deleted: annId });
+    } catch (error) {
+      app.log.error(error, 'Failed to delete annotation');
+      return reply.status(500).send({ ok: false, error: 'Failed to delete annotation' });
+    }
+  });
+
+  // POST /api/audits/:auditId/skip-rules - 添加跳过规则
+  app.post('/api/audits/:auditId/skip-rules', async (request, reply) => {
+    const { auditId } = request.params as { auditId: string };
+    const body = request.body as {
+      pattern: { file?: string; description_contains?: string };
+      reason?: string;
+      expires_at?: string;
+    };
+
+    if (!auditId || !isSafeId(auditId)) {
+      return reply.status(400).send({ ok: false, error: 'Invalid audit id' });
+    }
+
+    if (!body.pattern) {
+      return reply.status(400).send({ ok: false, error: 'Missing required field: pattern' });
+    }
+
+    const annotationsPath = path.posix.join('workflows/project/logs/audits', auditId, 'annotations.json');
+    const absPath = safeResolveUnderProject(config.projectRoot, annotationsPath);
+
+    try {
+      let data: { audit_id: string; annotations: any[]; skip_rules: any[]; created_at: string; updated_at: string };
+      try {
+        const content = await fs.readFile(absPath, 'utf8');
+        data = JSON.parse(content);
+      } catch {
+        data = {
+          audit_id: auditId,
+          annotations: [],
+          skip_rules: [],
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+      }
+
+      const newRule = {
+        id: `skip-${Date.now().toString(36)}`,
+        pattern: body.pattern,
+        reason: body.reason || '',
+        created_at: new Date().toISOString(),
+        expires_at: body.expires_at,
+      };
+
+      data.skip_rules.push(newRule);
+      data.updated_at = new Date().toISOString();
+
+      await fs.writeFile(absPath, JSON.stringify(data, null, 2), 'utf8');
+
+      return reply.send({ ok: true, skip_rule: newRule });
+    } catch (error) {
+      app.log.error(error, 'Failed to add skip rule');
+      return reply.status(500).send({ ok: false, error: 'Failed to add skip rule' });
+    }
+  });
+
+  // GET /api/config/audit-profiles - 获取审查配置列表
+  app.get('/api/config/audit-profiles', async (_request, reply) => {
+    const configPath = path.posix.join('workflows/project/config/audit-profiles.yaml');
+
+    try {
+      const absPath = safeResolveUnderProject(config.projectRoot, configPath);
+      const content = await fs.readFile(absPath, 'utf8');
+      // 简单解析 YAML（只提取 profiles 名称）
+      const profileNames: string[] = [];
+      const lines = content.split('\n');
+      let inProfiles = false;
+      for (const line of lines) {
+        if (line.startsWith('profiles:')) {
+          inProfiles = true;
+          continue;
+        }
+        if (inProfiles && /^  [a-z-]+:/.test(line)) {
+          const name = line.trim().replace(':', '');
+          profileNames.push(name);
+        }
+        if (inProfiles && /^[a-z]/.test(line) && !line.startsWith('profiles:')) {
+          break;
+        }
+      }
+      return reply.send({ ok: true, profiles: profileNames });
+    } catch (error) {
+      app.log.error(error, 'Failed to read audit profiles');
+      return reply.send({ ok: true, profiles: ['all'] });
+    }
+  });
+
+  // ============================================
   // 发起审查
   // ============================================
 

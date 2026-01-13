@@ -264,6 +264,80 @@ export interface AuditMarkdownResponse {
   content: string;
 }
 
+// 标注类型
+export interface Annotation {
+  id: string;
+  target: {
+    review_type: 'code' | 'design';
+    issue_index?: number;
+    file?: string;
+    line?: number;
+    section?: string;
+    description_contains?: string;
+  };
+  status: 'dismissed' | 'acknowledged' | 'fixed' | 'wontfix' | 'deferred';
+  reason?: string;
+  comment?: string;
+  action_ticket?: string;
+  annotator: string;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface SkipRule {
+  id: string;
+  pattern: {
+    file?: string;
+    description_contains?: string;
+  };
+  reason?: string;
+  created_at: string;
+  expires_at?: string;
+}
+
+export interface AnnotationsResponse {
+  ok: boolean;
+  audit_id: string;
+  annotations: Annotation[];
+  skip_rules: SkipRule[];
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface AddAnnotationInput {
+  target: Annotation['target'];
+  status: Annotation['status'];
+  reason?: string;
+  comment?: string;
+  action_ticket?: string;
+}
+
+export interface AddSkipRuleInput {
+  pattern: SkipRule['pattern'];
+  reason?: string;
+  expires_at?: string;
+}
+
+// 标注状态选项
+export const ANNOTATION_STATUSES: Array<{ id: Annotation['status']; label: string; color: string }> = [
+  { id: 'dismissed', label: '误报/不适用', color: '#6b7280' },
+  { id: 'acknowledged', label: '已知问题', color: '#f59e0b' },
+  { id: 'fixed', label: '已修复', color: '#22c55e' },
+  { id: 'wontfix', label: '不修复', color: '#ef4444' },
+  { id: 'deferred', label: '延期处理', color: '#3b82f6' },
+];
+
+// 标注原因选项
+export const ANNOTATION_REASONS = [
+  { id: 'false_positive', label: '误报' },
+  { id: 'known_issue', label: '已知问题' },
+  { id: 'by_design', label: '设计如此' },
+  { id: 'low_priority', label: '优先级低' },
+  { id: 'external_dependency', label: '外部依赖' },
+  { id: 'temporary', label: '临时方案' },
+  { id: 'other', label: '其他' },
+];
+
 // 发起审查的输入参数
 export interface CodeReviewInput {
   task_id: string;
@@ -312,6 +386,7 @@ export interface AuditIntakeInput {
   auto_trigger_missing?: boolean;
   report_format?: 'markdown' | 'json' | 'html';
   requester?: string;
+  audit_profile?: string;
 }
 
 // 审查发起响应
@@ -414,6 +489,94 @@ export async function getAuditMarkdown(auditId: string, kind: 'progress' | 'issu
     path: String(data?.path || ''),
     content: String(data?.content || ''),
   };
+}
+
+// ============================================
+// 标注 API
+// ============================================
+
+/**
+ * 获取审核的标注
+ */
+export async function getAnnotations(auditId: string): Promise<AnnotationsResponse> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}/annotations`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch annotations: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * 添加标注
+ */
+export async function addAnnotation(auditId: string, input: AddAnnotationInput): Promise<{ ok: boolean; annotation: Annotation }> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}/annotations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to add annotation: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * 更新标注
+ */
+export async function updateAnnotation(
+  auditId: string,
+  annId: string,
+  updates: Partial<Pick<Annotation, 'status' | 'reason' | 'comment' | 'action_ticket'>>
+): Promise<{ ok: boolean; annotation: Annotation }> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}/annotations/${encodeURIComponent(annId)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to update annotation: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * 删除标注
+ */
+export async function deleteAnnotation(auditId: string, annId: string): Promise<{ ok: boolean; deleted: string }> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}/annotations/${encodeURIComponent(annId)}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to delete annotation: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * 添加跳过规则
+ */
+export async function addSkipRule(auditId: string, input: AddSkipRuleInput): Promise<{ ok: boolean; skip_rule: SkipRule }> {
+  const response = await fetch(`${API_BASE}/audits/${encodeURIComponent(auditId)}/skip-rules`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to add skip rule: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * 获取审查配置列表
+ */
+export async function getAuditProfiles(): Promise<{ ok: boolean; profiles: string[] }> {
+  const response = await fetch(`${API_BASE}/config/audit-profiles`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch audit profiles: ${response.statusText}`);
+  }
+  return response.json();
 }
 
 /**

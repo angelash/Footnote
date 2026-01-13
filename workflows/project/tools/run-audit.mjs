@@ -12,6 +12,7 @@
  *   --ai              启用 AI 代码审查和设计审查
  *   --period=N        审核周期（天数，默认 7）
  *   --scope=SCOPE     审核范围（all/milestone/chapter，默认 all）
+ *   --profile=NAME    审查配置（all/game-product/pipeline-tools/design-docs）
  *   --output=DIR      输出目录（默认 automation_runs）
  */
 
@@ -30,6 +31,7 @@ function parseArgs() {
     ai: false,
     period: 7,
     scope: 'all',
+    profile: 'all',
     output: join(projectRoot, 'workflows/project/logs/automation_runs'),
   };
 
@@ -40,6 +42,8 @@ function parseArgs() {
       options.period = parseInt(arg.split('=')[1], 10);
     } else if (arg.startsWith('--scope=')) {
       options.scope = arg.split('=')[1];
+    } else if (arg.startsWith('--profile=')) {
+      options.profile = arg.split('=')[1];
     } else if (arg.startsWith('--output=')) {
       options.output = arg.split('=')[1];
     } else if (arg === '--help' || arg === '-h') {
@@ -50,12 +54,15 @@ function parseArgs() {
   --ai              启用 AI 代码审查和设计审查
   --period=N        审核周期（天数，默认 7）
   --scope=SCOPE     审核范围（all/milestone/chapter，默认 all）
+  --profile=NAME    审查配置（all/game-product/pipeline-tools/design-docs，默认 all）
   --output=DIR      输出目录
 
 示例:
   node run-audit.mjs                    # 简单审核
   node run-audit.mjs --ai               # 带 AI 分析
   node run-audit.mjs --ai --period=30   # 30 天 AI 审核
+  node run-audit.mjs --profile=game-product     # 只审查游戏产品
+  node run-audit.mjs --profile=pipeline-tools   # 只审查流程工具
 `);
       process.exit(0);
     }
@@ -94,6 +101,7 @@ async function main() {
   console.log(`AI 分析:    ${options.ai ? '✓ 启用' : '✗ 禁用'}`);
   console.log(`审核周期:   ${options.period} 天`);
   console.log(`审核范围:   ${options.scope}`);
+  console.log(`审查配置:   ${options.profile}`);
   console.log(`输出目录:   ${runDir}`);
   console.log('');
 
@@ -146,6 +154,7 @@ async function main() {
     include_qa_signoff: false,
     auto_trigger_missing: false,
     requester: 'run-audit-cli',
+    audit_profile: options.profile,
   };
 
   console.log('─'.repeat(60));

@@ -3,19 +3,22 @@
  * ai-design-review.mjs - 使用 cursor-agent 进行 AI 设计审查
  * 
  * 功能：
+ * - 支持审查范围配置（profile）
+ * - 支持标注跳过已处理的问题
  * - 读取设计文档内容
  * - 生成审查提示词
  * - 调用 cursor-agent 执行分析
  * - 解析 AI 输出并保存结果
  * 
  * 用法：
- *   node ai-design-review.mjs --project-root=/path/to/project --doc-path=design/spec.md --output=/path/to/output.json
+ *   node ai-design-review.mjs --project-root=/path/to/project --doc-path=design/spec.md --output=/path/to/output.json --profile=game-product
  */
 
 import { promises as fs } from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getProfile, matchesProfile } from './profile-loader.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -159,6 +162,54 @@ function calculateTotalScore(scores) {
 }
 
 /**
+ * 加载历史标注
+ */
+async function loadAnnotations(projectRoot, auditId) {
+  if (!auditId) return { annotations: [], skip_rules: [] };
+  
+  const annotationsPath = path.join(projectRoot, 'workflows/project/logs/audits', auditId, 'annotations.json');
+  try {
+    const content = await fs.readFile(annotationsPath, 'utf8');
+    return JSON.parse(content);
+  } catch {
+    return { annotations: [], skip_rules: [] };
+  }
+}
+
+/**
+ * 过滤已标注的设计问题
+ */
+function filterAnnotatedIssues(issues, annotations) {
+  const { annotations: anns = [], skip_rules = [] } = annotations;
+  const filtered = [];
+  const skipped = [];
+  
+  for (const issue of issues) {
+    let shouldSkip = false;
+    let skipInfo = null;
+    
+    // 检查是否有 dismissed/wontfix 标注
+    for (const ann of anns) {
+      if ((ann.status === 'dismissed' || ann.status === 'wontfix') && ann.target?.review_type === 'design') {
+        if (ann.target.section === issue.section) {
+          shouldSkip = true;
+          skipInfo = { reason: ann.status, annotation_id: ann.id };
+          break;
+        }
+      }
+    }
+    
+    if (shouldSkip) {
+      skipped.push({ original_issue: issue, ...skipInfo });
+    } else {
+      filtered.push(issue);
+    }
+  }
+  
+  return { issues: filtered, skipped_issues: skipped };
+}
+
+/**
  * 主函数
  */
 async function main() {
@@ -174,6 +225,8 @@ async function main() {
   const docPath = getArg('doc-path', '');
   const outputPath = getArg('output', '');
   const taskId = getArg('task-id', `DR-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`);
+  const profileName = getArg('profile', 'all');
+  const previousAuditId = getArg('previous-audit', '');
 
   if (!docPath) {
     console.error('[ai-design-review] --doc-path is required');
@@ -183,6 +236,29 @@ async function main() {
   console.error(`[ai-design-review] Project: ${projectRoot}`);
   console.error(`[ai-design-review] Document: ${docPath}`);
   console.error(`[ai-design-review] Task ID: ${taskId}`);
+  console.error(`[ai-design-review] Profile: ${profileName}`);
+
+  // 0. 加载配置
+  const profile = await getProfile(profileName);
+  console.error(`[ai-design-review] Using profile: ${profile.name}`);
+  
+  // 检查文档是否在 profile 范围内
+  if (!matchesProfile(docPath, { include_paths: profile.design_docs || ['**'], exclude_paths: [] })) {
+    console.error(`[ai-design-review] Document not in profile scope, skipping`);
+    const result = {
+      review_id: taskId,
+      doc_path: docPath,
+      result: 'SKIPPED',
+      reason: `Document not in profile '${profileName}' scope`,
+      profile: profileName,
+      completed_at: new Date().toISOString(),
+    };
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  // 加载历史标注
+  const annotations = await loadAnnotations(projectRoot, previousAuditId);
 
   // 1. 读取文档
   const fullDocPath = path.join(projectRoot, docPath);
@@ -236,9 +312,19 @@ async function main() {
     };
   }
 
-  // 5. 构建最终结果
+  // 5. 过滤已标注的问题
+  const { issues: filteredIssues, skipped_issues } = filterAnnotatedIssues(
+    aiResult.issues || [],
+    annotations
+  );
+  
+  if (skipped_issues.length > 0) {
+    console.error(`[ai-design-review] Skipped ${skipped_issues.length} issues based on annotations`);
+  }
+
+  // 6. 构建最终结果
   const totalScore = calculateTotalScore(aiResult.scores || {});
-  const hasBlocker = aiResult.issues?.some(i => i.severity === 'blocker');
+  const hasBlocker = filteredIssues.some(i => i.severity === 'blocker');
   
   let resultStatus;
   if (hasBlocker) {
@@ -256,17 +342,19 @@ async function main() {
     result: resultStatus,
     score: totalScore,
     dimensions: aiResult.scores || {},
-    issues: aiResult.issues || [],
+    issues: filteredIssues,
+    skipped_issues: skipped_issues.length > 0 ? skipped_issues : undefined,
     missing_elements: aiResult.missing_elements || [],
     inconsistencies: aiResult.inconsistencies || [],
     suggestions: aiResult.recommendations || [],
     summary: aiResult.summary || '',
     reviewer: 'AI (cursor-agent)',
     model: CONFIG.model,
+    profile: profileName,
     completed_at: new Date().toISOString(),
   };
 
-  // 6. 输出结果
+  // 7. 输出结果
   const outputJson = JSON.stringify(result, null, 2);
 
   if (outputPath) {
@@ -279,7 +367,7 @@ async function main() {
 }
 
 // 导出
-export { generatePrompt, parseAIOutput, calculateTotalScore, inferDocType };
+export { generatePrompt, parseAIOutput, calculateTotalScore, inferDocType, loadAnnotations, filterAnnotatedIssues };
 
 // 运行
 main().catch(err => {

@@ -2,8 +2,8 @@
   "$schema": "../flowspec-schema.json",
   "id": "l0-audit-intake",
   "name": "L0 总体审核入口（细化版）",
-  "version": "2.2.0",
-  "description": "制作人（L0）总体审核入口，统一目录结构，支持多维度进度统计、细化评分、工作项追踪、AI智能分析",
+  "version": "2.3.0",
+  "description": "制作人（L0）总体审核入口，支持审查范围配置、人工标注、多维度进度统计、细化评分、AI智能分析",
   "author": "Pipeline-Sys",
   "tags": ["l0", "audit", "intake", "report", "producer"],
 
@@ -84,6 +84,24 @@
       "required": false,
       "default": "auto",
       "description": "AI 分析使用的模型（auto/gpt-5.2/opus-4.5）"
+    },
+    "audit_profile": {
+      "type": "string",
+      "required": false,
+      "default": "all",
+      "description": "审查配置 (game-product/pipeline-tools/design-docs/all/custom)"
+    },
+    "custom_include_paths": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "自定义包含路径（逗号分隔，profile=custom时使用）"
+    },
+    "custom_exclude_paths": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "自定义排除路径（逗号分隔）"
     }
   },
 

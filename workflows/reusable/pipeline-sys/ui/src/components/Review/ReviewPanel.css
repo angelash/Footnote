@@ -1117,6 +1117,162 @@
   border: 1px solid #f59e0b40;
 }
 
+/* 标注按钮 */
+.annotate-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+  margin-left: auto;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.annotate-btn:hover {
+  opacity: 1;
+  background: #334155;
+}
+
+/* 标注弹窗覆盖层 */
+.annotation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+}
+
+/* 标注弹窗 */
+.annotation-modal {
+  background: #1e293b;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  min-width: 400px;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.annotation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #334155;
+}
+
+.annotation-header h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #e2e8f0;
+}
+
+.annotation-body {
+  padding: 20px;
+}
+
+.annotation-body .form-group {
+  margin-bottom: 16px;
+}
+
+.annotation-body .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.annotation-body label {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.annotation-body select,
+.annotation-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 14px;
+}
+
+.annotation-body select:focus,
+.annotation-body textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.annotation-body textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.annotation-target-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+  padding: 8px;
+  background: #0f172a;
+  border-radius: 6px;
+}
+
+.annotation-target-info span {
+  background: #334155;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.annotation-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid #334155;
+}
+
+.annotation-footer .cancel-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.annotation-footer .cancel-btn:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+.annotation-footer .save-btn {
+  padding: 8px 16px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.annotation-footer .save-btn:hover {
+  background: #2563eb;
+}
+
+.annotation-footer .save-btn:disabled {
+  background: #334155;
+  cursor: not-allowed;
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
   .review-stats {
@@ -1152,5 +1308,10 @@
   .score-summary {
     flex-direction: column;
     text-align: center;
+  }
+
+  .annotation-modal {
+    min-width: 90vw;
+    max-width: 95vw;
   }
 }

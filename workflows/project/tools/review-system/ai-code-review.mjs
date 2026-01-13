@@ -3,19 +3,22 @@
  * ai-code-review.mjs - 使用 cursor-agent 进行 AI 代码审查
  * 
  * 功能：
+ * - 支持审查范围配置（profile）
+ * - 支持标注跳过已处理的问题
  * - 收集代码变更信息
  * - 生成审查提示词
  * - 调用 cursor-agent 执行分析
  * - 解析 AI 输出并保存结果
  * 
  * 用法：
- *   node ai-code-review.mjs --project-root=/path/to/project --commit-range="HEAD~5..HEAD" --output=/path/to/output.json
+ *   node ai-code-review.mjs --project-root=/path/to/project --commit-range="HEAD~5..HEAD" --output=/path/to/output.json --profile=game-product
  */
 
 import { promises as fs } from 'node:fs';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getProfile, filterFiles, getCommitFilter } from './profile-loader.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -59,15 +62,31 @@ async function exec(command, cwd) {
 }
 
 /**
- * 获取变更文件列表
+ * 获取变更文件列表（支持 profile 过滤）
  */
-async function getChangedFiles(projectRoot, commitRange) {
-  const result = await exec(`git diff --name-only ${commitRange}`, projectRoot);
+async function getChangedFiles(projectRoot, commitRange, profile = null) {
+  // 构建命令，可选添加路径过滤
+  let command = `git diff --name-only ${commitRange}`;
+  const commitFilter = profile ? getCommitFilter(profile) : '';
+  if (commitFilter) {
+    command += ` -- ${commitFilter}`;
+  }
+  
+  const result = await exec(command, projectRoot);
   if (result.code !== 0) {
     console.error('Failed to get changed files:', result.stderr);
     return [];
   }
-  return result.stdout.trim().split('\n').filter(Boolean).slice(0, CONFIG.maxFileCount);
+  
+  let files = result.stdout.trim().split('\n').filter(Boolean);
+  
+  // 应用 profile 路径过滤
+  if (profile) {
+    files = filterFiles(files, profile);
+    console.error(`[ai-code-review] Profile filter: ${files.length} files after filtering`);
+  }
+  
+  return files.slice(0, CONFIG.maxFileCount);
 }
 
 /**
@@ -197,6 +216,101 @@ function calculateTotalScore(scores) {
 }
 
 /**
+ * 加载历史标注
+ */
+async function loadAnnotations(projectRoot, auditId) {
+  if (!auditId) return { annotations: [], skip_rules: [] };
+  
+  // 尝试从审核目录加载标注
+  const annotationsPath = path.join(projectRoot, 'workflows/project/logs/audits', auditId, 'annotations.json');
+  try {
+    const content = await fs.readFile(annotationsPath, 'utf8');
+    return JSON.parse(content);
+  } catch {
+    // 没有标注文件
+    return { annotations: [], skip_rules: [] };
+  }
+}
+
+/**
+ * 检查问题是否应该跳过（基于标注）
+ */
+function shouldSkipIssue(issue, annotations) {
+  const { annotations: anns = [], skip_rules = [] } = annotations;
+  
+  // 检查是否有 dismissed/wontfix 标注
+  for (const ann of anns) {
+    if (ann.status === 'dismissed' || ann.status === 'wontfix') {
+      const target = ann.target || {};
+      // 匹配文件和行号
+      if (target.file === issue.file && target.line === issue.line) {
+        return { skip: true, reason: ann.status, annotation_id: ann.id };
+      }
+      // 匹配描述
+      if (target.description_contains && issue.description?.includes(target.description_contains)) {
+        return { skip: true, reason: ann.status, annotation_id: ann.id };
+      }
+    }
+  }
+  
+  // 检查跳过规则
+  for (const rule of skip_rules) {
+    if (rule.expires_at && new Date(rule.expires_at) < new Date()) continue;
+    
+    const pattern = rule.pattern || {};
+    let matches = true;
+    
+    if (pattern.file && !matchGlobPattern(issue.file, pattern.file)) {
+      matches = false;
+    }
+    if (pattern.description_contains && !issue.description?.includes(pattern.description_contains)) {
+      matches = false;
+    }
+    
+    if (matches) {
+      return { skip: true, reason: 'skip_rule', rule_id: rule.id };
+    }
+  }
+  
+  return { skip: false };
+}
+
+/**
+ * 简单的 glob 匹配
+ */
+function matchGlobPattern(str, pattern) {
+  const regex = pattern
+    .replace(/\./g, '\\.')
+    .replace(/\*\*/g, '.*')
+    .replace(/\*/g, '[^/]*');
+  return new RegExp(regex).test(str);
+}
+
+/**
+ * 过滤已标注的问题
+ */
+function filterAnnotatedIssues(issues, annotations) {
+  const filtered = [];
+  const skipped = [];
+  
+  for (const issue of issues) {
+    const skipResult = shouldSkipIssue(issue, annotations);
+    if (skipResult.skip) {
+      skipped.push({
+        original_issue: issue,
+        skip_reason: skipResult.reason,
+        annotation_id: skipResult.annotation_id,
+        rule_id: skipResult.rule_id,
+      });
+    } else {
+      filtered.push(issue);
+    }
+  }
+  
+  return { issues: filtered, skipped_issues: skipped };
+}
+
+/**
  * 主函数
  */
 async function main() {
@@ -212,21 +326,34 @@ async function main() {
   const commitRange = getArg('commit-range', 'HEAD~5..HEAD');
   const outputPath = getArg('output', '');
   const taskId = getArg('task-id', `CR-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`);
+  const profileName = getArg('profile', 'all');
+  const previousAuditId = getArg('previous-audit', '');
 
   console.error(`[ai-code-review] Project: ${projectRoot}`);
   console.error(`[ai-code-review] Commit range: ${commitRange}`);
   console.error(`[ai-code-review] Task ID: ${taskId}`);
+  console.error(`[ai-code-review] Profile: ${profileName}`);
 
-  // 1. 收集变更信息
+  // 0. 加载配置和历史标注
+  const profile = await getProfile(profileName);
+  console.error(`[ai-code-review] Using profile: ${profile.name}`);
+  
+  const annotations = await loadAnnotations(projectRoot, previousAuditId);
+  if (annotations.annotations?.length > 0 || annotations.skip_rules?.length > 0) {
+    console.error(`[ai-code-review] Loaded ${annotations.annotations?.length || 0} annotations, ${annotations.skip_rules?.length || 0} skip rules`);
+  }
+
+  // 1. 收集变更信息（应用 profile 过滤）
   console.error('[ai-code-review] Collecting changes...');
-  const changedFiles = await getChangedFiles(projectRoot, commitRange);
+  const changedFiles = await getChangedFiles(projectRoot, commitRange, profile);
   
   if (changedFiles.length === 0) {
-    console.error('[ai-code-review] No changes found');
+    console.error('[ai-code-review] No changes found (after profile filter)');
     const result = {
       review_id: taskId,
       result: 'SKIPPED',
-      reason: 'No changes in commit range',
+      reason: `No changes in commit range for profile '${profileName}'`,
+      profile: profileName,
       completed_at: new Date().toISOString(),
     };
     console.log(JSON.stringify(result, null, 2));
@@ -263,9 +390,19 @@ async function main() {
     };
   }
 
-  // 4. 构建最终结果
+  // 4. 过滤已标注的问题
+  const { issues: filteredIssues, skipped_issues } = filterAnnotatedIssues(
+    aiResult.issues || [],
+    annotations
+  );
+  
+  if (skipped_issues.length > 0) {
+    console.error(`[ai-code-review] Skipped ${skipped_issues.length} issues based on annotations`);
+  }
+
+  // 5. 构建最终结果
   const totalScore = calculateTotalScore(aiResult.scores || {});
-  const passed = totalScore >= 70 && !aiResult.issues?.some(i => i.severity === 'blocker');
+  const passed = totalScore >= 70 && !filteredIssues.some(i => i.severity === 'blocker');
 
   const result = {
     review_id: taskId,
@@ -273,17 +410,19 @@ async function main() {
     result: passed ? 'APPROVED' : 'CHANGES_REQUESTED',
     score: totalScore,
     dimensions: aiResult.scores || {},
-    issues: aiResult.issues || [],
+    issues: filteredIssues,
+    skipped_issues: skipped_issues.length > 0 ? skipped_issues : undefined,
     summary: aiResult.summary || '',
     recommendations: aiResult.recommendations || [],
     reviewer: 'AI (cursor-agent)',
     model: CONFIG.model,
+    profile: profileName,
     commit_range: commitRange,
     changed_files: changedFiles,
     completed_at: new Date().toISOString(),
   };
 
-  // 5. 输出结果
+  // 6. 输出结果
   const outputJson = JSON.stringify(result, null, 2);
 
   if (outputPath) {

@@ -11,6 +11,8 @@ import {
   getAuditDetail,
   getAuditMarkdown,
   getAuditReviews,
+  addAnnotation,
+  getAuditProfiles,
   startCodeReview,
   startDesignReview,
   startQaSignoff,
@@ -24,9 +26,12 @@ import {
   getGradeColor,
   MODULE_NAMES,
   CHAPTER_NAMES,
+  ANNOTATION_STATUSES,
+  ANNOTATION_REASONS,
   ReviewRecord,
   AuditReport,
   AuditReviewsResponse,
+  Annotation,
   CodeReviewInput,
   DesignReviewInput,
   QaSignoffInput,
@@ -48,6 +53,7 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
   const [reviewType, setReviewType] = useState<'code' | 'design' | 'qa' | 'acceptance' | 'audit'>('audit');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profiles, setProfiles] = useState<string[]>(['all']);
 
   // 表单字段
   const [taskId, setTaskId] = useState('');
@@ -61,6 +67,16 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
   const [includeCodeReview, setIncludeCodeReview] = useState(true);
   const [includeDesignReview, setIncludeDesignReview] = useState(true);
   const [includeQaSignoff, setIncludeQaSignoff] = useState(true);
+  const [auditProfile, setAuditProfile] = useState('all');
+
+  // 加载审查配置列表
+  useEffect(() => {
+    getAuditProfiles().then(res => {
+      if (res.ok && res.profiles.length > 0) {
+        setProfiles(res.profiles);
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,6 +124,7 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
             include_code_review: includeCodeReview,
             include_design_review: includeDesignReview,
             include_qa_signoff: includeQaSignoff,
+            audit_profile: auditProfile,
           };
           await startAuditIntake(input);
           break;
@@ -144,6 +161,22 @@ const StartReviewForm: React.FC<StartReviewFormProps> = ({ onClose, onSuccess })
 
           {reviewType === 'audit' && (
             <>
+              <div className="form-group">
+                <label>审查范围</label>
+                <select value={auditProfile} onChange={(e) => setAuditProfile(e.target.value)}>
+                  {profiles.map((p) => (
+                    <option key={p} value={p}>
+                      {p === 'all' && '全量审查'}
+                      {p === 'game-product' && '游戏产品'}
+                      {p === 'pipeline-tools' && '流程工具'}
+                      {p === 'design-docs' && '设计文档'}
+                      {!['all', 'game-product', 'pipeline-tools', 'design-docs'].includes(p) && p}
+                    </option>
+                  ))}
+                </select>
+                <span className="hint">选择审查范围配置</span>
+              </div>
+
               <div className="form-group">
                 <label>统计周期（天）</label>
                 <input
@@ -1014,8 +1047,42 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
     );
   };
 
+  // 标注弹窗状态
+  const [annotationTarget, setAnnotationTarget] = useState<{
+    review_type: 'code' | 'design';
+    issue_index: number;
+    file?: string;
+    line?: number;
+    section?: string;
+  } | null>(null);
+  const [annotationStatus, setAnnotationStatus] = useState<Annotation['status']>('dismissed');
+  const [annotationReason, setAnnotationReason] = useState('');
+  const [annotationComment, setAnnotationComment] = useState('');
+  const [savingAnnotation, setSavingAnnotation] = useState(false);
+
+  // 保存标注
+  const handleSaveAnnotation = async () => {
+    if (!annotationTarget) return;
+    setSavingAnnotation(true);
+    try {
+      await addAnnotation(detail.audit_id, {
+        target: annotationTarget,
+        status: annotationStatus,
+        reason: annotationReason,
+        comment: annotationComment,
+      });
+      setAnnotationTarget(null);
+      // 重新加载数据
+      // (简化：暂不刷新，用户可手动刷新)
+    } catch (e) {
+      console.error('保存标注失败:', e);
+    } finally {
+      setSavingAnnotation(false);
+    }
+  };
+
   // 渲染 AI 审查详情（支持代码审查和设计审查的完整字段）
-  const renderAiReview = (review: ReviewRecord | undefined, _title: string) => {
+  const renderAiReview = (review: ReviewRecord | undefined, reviewType: 'code' | 'design') => {
     if (!review) return <div className="detail-empty">（未执行）</div>;
     
     const resultColor = getResultColor(review.result);
@@ -1078,6 +1145,19 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                       )}
                       {issue.file && <span className="issue-file">{issue.file}{issue.line ? `:${issue.line}` : ''}</span>}
                       {section && <span className="issue-section">{section}</span>}
+                      <button
+                        className="annotate-btn"
+                        onClick={() => setAnnotationTarget({
+                          review_type: reviewType,
+                          issue_index: idx,
+                          file: issue.file,
+                          line: issue.line,
+                          section: section,
+                        })}
+                        title="添加标注"
+                      >
+                        🏷️
+                      </button>
                     </div>
                     <div className="issue-description">{desc}</div>
                     {suggestion && (
@@ -1418,7 +1498,7 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                     📝 代码审查 (AI Code Review)
                     {aiReviews.has_code_review && <span className="section-badge success">已完成</span>}
                   </div>
-                  {renderAiReview(aiReviews.reviews.code_review, '代码审查')}
+                  {renderAiReview(aiReviews.reviews.code_review, 'code')}
                 </div>
 
                 <div className="detail-section">
@@ -1426,7 +1506,7 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                     📐 设计审查 (AI Design Review)
                     {aiReviews.has_design_review && <span className="section-badge success">已完成</span>}
                   </div>
-                  {renderAiReview(aiReviews.reviews.design_review, '设计审查')}
+                  {renderAiReview(aiReviews.reviews.design_review, 'design')}
                 </div>
 
                 {aiReviews.has_qa_signoff && (
@@ -1435,7 +1515,7 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                       ✅ QA 签字 (QA Signoff)
                       <span className="section-badge success">已完成</span>
                     </div>
-                    {renderAiReview(aiReviews.reviews.qa_signoff, 'QA 签字')}
+                    {renderAiReview(aiReviews.reviews.qa_signoff, 'code')}
                   </div>
                 )}
               </>
@@ -1458,6 +1538,64 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
         {!loading && tab === 'json' && (
           <div className="detail-body">
             <pre className="detail-pre">{raw}</pre>
+          </div>
+        )}
+
+        {/* 标注弹窗 */}
+        {annotationTarget && (
+          <div className="annotation-overlay" onClick={() => setAnnotationTarget(null)}>
+            <div className="annotation-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="annotation-header">
+                <h4>添加标注</h4>
+                <button className="close-btn" onClick={() => setAnnotationTarget(null)}>×</button>
+              </div>
+              <div className="annotation-body">
+                <div className="form-group">
+                  <label>目标问题</label>
+                  <div className="annotation-target-info">
+                    {annotationTarget.file && <span>文件: {annotationTarget.file}</span>}
+                    {annotationTarget.line && <span>行: {annotationTarget.line}</span>}
+                    {annotationTarget.section && <span>章节: {annotationTarget.section}</span>}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>状态</label>
+                  <select value={annotationStatus} onChange={(e) => setAnnotationStatus(e.target.value as Annotation['status'])}>
+                    {ANNOTATION_STATUSES.map((s) => (
+                      <option key={s.id} value={s.id}>{s.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>原因</label>
+                  <select value={annotationReason} onChange={(e) => setAnnotationReason(e.target.value)}>
+                    <option value="">请选择...</option>
+                    {ANNOTATION_REASONS.map((r) => (
+                      <option key={r.id} value={r.id}>{r.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>备注</label>
+                  <textarea
+                    value={annotationComment}
+                    onChange={(e) => setAnnotationComment(e.target.value)}
+                    rows={3}
+                    placeholder="可选：添加详细说明..."
+                  />
+                </div>
+              </div>
+              <div className="annotation-footer">
+                <button className="cancel-btn" onClick={() => setAnnotationTarget(null)}>取消</button>
+                <button
+                  className="save-btn"
+                  onClick={handleSaveAnnotation}
+                  disabled={savingAnnotation}
+                >
+                  {savingAnnotation ? '保存中...' : '保存标注'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

@@ -1,10 +1,11 @@
 {
   "audit_scope": "all",
-  "period_days": 7,
-  "include_code_review": true,
-  "include_design_review": true,
+  "period_days": 1,
+  "include_code_review": false,
+  "include_design_review": false,
   "include_qa_signoff": false,
   "auto_trigger_missing": false,
   "project_root": "/mnt/f/workspace/github/Footnote",
-  "requester": "L0_producer"
+  "requester": "test",
+  "async": false
 }

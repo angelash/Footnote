@@ -741,26 +741,23 @@ async function handleV2Run(body) {
   if (isAsync) {
     // 异步执行：立即返回，后台运行
     console.log(`[v2/run] ${runId} starting async execution...`);
-    
-    // 使用 setImmediate 确保 Promise 在下一个事件循环中执行
-    const promise = new Promise((resolve) => {
-      setImmediate(async () => {
-        console.log(`[v2/run] ${runId} setImmediate callback triggered`);
-        try {
-          console.log(`[v2/run] ${runId} calling executeFlow()...`);
-          const result = await executeFlow();
-          console.log(`[v2/run] ${runId} executeFlow() completed:`, result?.status || 'unknown');
-          resolve(result);
-        } catch (e) {
-          console.error(`[v2/run] ${runId} async error:`, e.message, e.stack);
-          resolve({ ok: false, error: e.message });
-        } finally {
-          // 执行完成后从追踪器中移除
-          runningAsyncTasks.delete(runId);
-          console.log(`[v2/run] ${runId} removed from tracker (remaining: ${runningAsyncTasks.size})`);
-        }
-      });
-    });
+
+    // 直接启动异步执行（不用 setImmediate）
+    const promise = (async () => {
+      console.log(`[v2/run] ${runId} async function started`);
+      try {
+        const result = await executeFlow();
+        console.log(`[v2/run] ${runId} executeFlow() completed:`, result?.status || 'unknown');
+        return result;
+      } catch (e) {
+        console.error(`[v2/run] ${runId} async error:`, e.message, e.stack);
+        return { ok: false, error: e.message };
+      } finally {
+        // 执行完成后从追踪器中移除
+        runningAsyncTasks.delete(runId);
+        console.log(`[v2/run] ${runId} removed from tracker (remaining: ${runningAsyncTasks.size})`);
+      }
+    })();
 
     // 保持 Promise 引用，防止被 GC
     runningAsyncTasks.set(runId, { promise, startedAt: Date.now() });
@@ -861,6 +858,17 @@ function getQueryParams(url) {
     return {};
   }
 }
+
+// 全局错误处理 - 防止进程崩溃
+process.on('uncaughtException', (error) => {
+  console.error('[FATAL] Uncaught Exception:', error.message, error.stack);
+  // 不退出进程，继续运行
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[FATAL] Unhandled Rejection at:', promise, 'reason:', reason);
+  // 不退出进程，继续运行
+});
 
 const server = http.createServer(async (req, res) => {
   try {

@@ -6,5 +6,6 @@
   "include_qa_signoff": false,
   "auto_trigger_missing": false,
   "project_root": "/mnt/f/workspace/github/Footnote",
-  "requester": "L0_producer"
+  "requester": "L0_producer",
+  "async": false
 }

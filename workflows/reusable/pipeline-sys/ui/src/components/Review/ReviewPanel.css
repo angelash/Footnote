@@ -1378,9 +1378,40 @@
 
 .annotation-item-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   margin-bottom: 8px;
+}
+
+.annotation-item-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.annotation-edit-btn,
+.annotation-delete-btn {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.annotation-edit-btn:hover {
+  background: #334155;
+}
+
+.annotation-delete-btn:hover {
+  background: #7f1d1d;
+  border-color: #991b1b;
+}
+
+.annotation-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .annotation-status-badge {

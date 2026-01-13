@@ -13,6 +13,8 @@ import {
   getAuditReviews,
   getAnnotations,
   addAnnotation,
+  updateAnnotation,
+  deleteAnnotation,
   getAuditProfiles,
   startCodeReview,
   startDesignReview,
@@ -1066,30 +1068,50 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
     suggestion?: string;
     severity?: string;
   } | null>(null);
+  const [editingAnnotation, setEditingAnnotation] = useState<Annotation | null>(null); // 编辑模式
   const [annotationStatus, setAnnotationStatus] = useState<Annotation['status']>('dismissed');
   const [annotationReason, setAnnotationReason] = useState('');
   const [annotationComment, setAnnotationComment] = useState('');
   const [savingAnnotation, setSavingAnnotation] = useState(false);
+  const [deletingAnnotation, setDeletingAnnotation] = useState<string | null>(null);
 
   // 保存标注
   const [annotationMessage, setAnnotationMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   const handleSaveAnnotation = async () => {
-    if (!annotationTarget) return;
+    if (!annotationTarget && !editingAnnotation) return;
     setSavingAnnotation(true);
     setAnnotationMessage(null);
     try {
-      const result = await addAnnotation(detail.audit_id, {
-        target: annotationTarget,
-        status: annotationStatus,
-        reason: annotationReason,
-        comment: annotationComment,
-      });
+      let result;
+      if (editingAnnotation) {
+        // 编辑模式
+        result = await updateAnnotation(detail.audit_id, editingAnnotation.id, {
+          status: annotationStatus,
+          reason: annotationReason,
+          comment: annotationComment,
+        });
+      } else {
+        // 新建模式
+        result = await addAnnotation(detail.audit_id, {
+          target: annotationTarget!,
+          status: annotationStatus,
+          reason: annotationReason,
+          comment: annotationComment,
+        });
+      }
       if (result.ok) {
-        setAnnotationMessage({ type: 'success', text: '✅ 标注已保存！' });
-        // 2秒后关闭弹窗
+        setAnnotationMessage({ type: 'success', text: editingAnnotation ? '✅ 标注已更新！' : '✅ 标注已保存！' });
+        // 更新本地标注列表
+        if (editingAnnotation) {
+          setAnnotations(prev => prev.map(a => a.id === editingAnnotation.id ? result.annotation : a));
+        } else {
+          setAnnotations(prev => [...prev, result.annotation]);
+        }
+        // 1.5秒后关闭弹窗
         setTimeout(() => {
           setAnnotationTarget(null);
+          setEditingAnnotation(null);
           setAnnotationMessage(null);
         }, 1500);
       } else {
@@ -1101,6 +1123,31 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
     } finally {
       setSavingAnnotation(false);
     }
+  };
+
+  // 删除标注
+  const handleDeleteAnnotation = async (annId: string) => {
+    if (!confirm('确定要删除这条标注吗？')) return;
+    setDeletingAnnotation(annId);
+    try {
+      const result = await deleteAnnotation(detail.audit_id, annId);
+      if (result.ok) {
+        setAnnotations(prev => prev.filter(a => a.id !== annId));
+      }
+    } catch (e) {
+      console.error('删除标注失败:', e);
+      alert('删除失败: ' + (e instanceof Error ? e.message : '未知错误'));
+    } finally {
+      setDeletingAnnotation(null);
+    }
+  };
+
+  // 打开编辑弹窗
+  const handleEditAnnotation = (ann: Annotation) => {
+    setEditingAnnotation(ann);
+    setAnnotationStatus(ann.status);
+    setAnnotationReason(ann.reason || '');
+    setAnnotationComment(ann.comment || '');
   };
 
   // 渲染 AI 审查详情（支持代码审查和设计审查的完整字段）
@@ -1598,6 +1645,23 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                       <span className="annotation-time">
                         {new Date(ann.created_at).toLocaleString('zh-CN')}
                       </span>
+                      <div className="annotation-item-actions">
+                        <button
+                          className="annotation-edit-btn"
+                          onClick={() => handleEditAnnotation(ann)}
+                          title="编辑标注"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          className="annotation-delete-btn"
+                          onClick={() => handleDeleteAnnotation(ann.id)}
+                          disabled={deletingAnnotation === ann.id}
+                          title="删除标注"
+                        >
+                          {deletingAnnotation === ann.id ? '...' : '🗑️'}
+                        </button>
+                      </div>
                     </div>
                     <div className="annotation-item-target">
                       <span className="annotation-type">{ann.target.review_type}</span>
@@ -1623,39 +1687,57 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
         )}
 
         {/* 标注弹窗 */}
-        {annotationTarget && (
-          <div className="annotation-overlay" onClick={() => setAnnotationTarget(null)}>
+        {(annotationTarget || editingAnnotation) && (
+          <div className="annotation-overlay" onClick={() => { setAnnotationTarget(null); setEditingAnnotation(null); }}>
             <div className="annotation-modal" onClick={(e) => e.stopPropagation()}>
               <div className="annotation-header">
-                <h4>添加标注</h4>
-                <button className="close-btn" onClick={() => setAnnotationTarget(null)}>×</button>
+                <h4>{editingAnnotation ? '编辑标注' : '添加标注'}</h4>
+                <button className="close-btn" onClick={() => { setAnnotationTarget(null); setEditingAnnotation(null); }}>×</button>
               </div>
               <div className="annotation-body">
                 <div className="form-group">
                   <label>目标问题</label>
                   <div className="annotation-target-info">
-                    <div className="annotation-location">
-                      {annotationTarget.severity && (
-                        <span className={`severity-badge severity-${annotationTarget.severity}`}>
-                          {annotationTarget.severity}
-                        </span>
-                      )}
-                      {annotationTarget.file && <span className="location-file">{annotationTarget.file}</span>}
-                      {annotationTarget.line && <span className="location-line">:{annotationTarget.line}</span>}
-                      {annotationTarget.section && <span className="location-section">{annotationTarget.section}</span>}
-                    </div>
-                    {annotationTarget.description && (
-                      <div className="annotation-description">
-                        <strong>问题描述：</strong>
-                        <p>{annotationTarget.description}</p>
-                      </div>
-                    )}
-                    {annotationTarget.suggestion && (
-                      <div className="annotation-suggestion">
-                        <strong>💡 建议：</strong>
-                        <p>{annotationTarget.suggestion}</p>
-                      </div>
-                    )}
+                    {annotationTarget ? (
+                      <>
+                        <div className="annotation-location">
+                          {annotationTarget.severity && (
+                            <span className={`severity-badge severity-${annotationTarget.severity}`}>
+                              {annotationTarget.severity}
+                            </span>
+                          )}
+                          {annotationTarget.file && <span className="location-file">{annotationTarget.file}</span>}
+                          {annotationTarget.line && <span className="location-line">:{annotationTarget.line}</span>}
+                          {annotationTarget.section && <span className="location-section">{annotationTarget.section}</span>}
+                        </div>
+                        {annotationTarget.description && (
+                          <div className="annotation-description">
+                            <strong>问题描述：</strong>
+                            <p>{annotationTarget.description}</p>
+                          </div>
+                        )}
+                        {annotationTarget.suggestion && (
+                          <div className="annotation-suggestion">
+                            <strong>💡 建议：</strong>
+                            <p>{annotationTarget.suggestion}</p>
+                          </div>
+                        )}
+                      </>
+                    ) : editingAnnotation ? (
+                      <>
+                        <div className="annotation-location">
+                          <span className="annotation-type">{editingAnnotation.target.review_type}</span>
+                          {editingAnnotation.target.file && <span className="location-file">{editingAnnotation.target.file}</span>}
+                          {editingAnnotation.target.line && <span className="location-line">:{editingAnnotation.target.line}</span>}
+                        </div>
+                        {editingAnnotation.target.description && (
+                          <div className="annotation-description">
+                            <strong>问题描述：</strong>
+                            <p>{editingAnnotation.target.description}</p>
+                          </div>
+                        )}
+                      </>
+                    ) : null}
                   </div>
                 </div>
                 <div className="form-group">
@@ -1691,13 +1773,13 @@ const AuditDetailModal: React.FC<AuditDetailModalProps> = ({ audit, onClose }) =
                     {annotationMessage.text}
                   </span>
                 )}
-                <button className="cancel-btn" onClick={() => { setAnnotationTarget(null); setAnnotationMessage(null); }}>取消</button>
+                <button className="cancel-btn" onClick={() => { setAnnotationTarget(null); setEditingAnnotation(null); setAnnotationMessage(null); }}>取消</button>
                 <button
                   className="save-btn"
                   onClick={handleSaveAnnotation}
                   disabled={savingAnnotation}
                 >
-                  {savingAnnotation ? '保存中...' : '保存标注'}
+                  {savingAnnotation ? '保存中...' : (editingAnnotation ? '更新标注' : '保存标注')}
                 </button>
               </div>
             </div>

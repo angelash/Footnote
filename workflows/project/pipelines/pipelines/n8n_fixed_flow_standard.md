@@ -83,7 +83,7 @@ workflows/project/logs/automation_runs/<run_id>/
   "updated_at": "2026-01-04T12:02:30Z",
   "error": "validate failed: typecheck",
   "repo": {
-    "root": "/home/shash/work/Footnote",
+    "root": "F:/workspace/github/Footnote",
     "branch": "main",
     "head": "e8121b8"
   }
@@ -181,7 +181,7 @@ workflows/project/logs/automation_runs/_lock/
 - `task_type`（`doc|code|multimodal`，默认 `code`）
 - `complexity`（`normal|high|max`，默认 `normal`）
 - `model_override`（默认 `auto`）
-- `project_root`（默认 `/home/shash/work/Footnote`）
+- `project_root`（默认 `F:/workspace/github/Footnote`）
 - `resume_from_stage`（可选；当前仅用于跳过 preflight）
 
 ---

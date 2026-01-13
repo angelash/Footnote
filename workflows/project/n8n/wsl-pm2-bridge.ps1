@@ -9,7 +9,7 @@ param(
     [string]$Service = 'n8n-secondary'
 )
 
-$projectRoot = '/home/shash/work/Footnote'
+$projectRoot = '/mnt/f/workspace/github/Footnote'
 
 $wslCommand = switch ($Action) {
     'start'   { "pm2 start $Service" }

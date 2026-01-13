@@ -39,12 +39,12 @@
                                     ▼
                     ┌───────────────────────────────┐
                     │ Repo (WSL 工作副本)             │
-                    │ /home/shash/work/Footnote       │
+                    │ F:/workspace/github/Footnote       │
                     └───────────────────────────────┘
 ```
 
 ### 2.2 关键前提（强约束）
-- **执行副本在 WSL 文件系统**：从实例与 `cursor-agent` 默认以 `/home/shash/work/Footnote` 作为执行根目录（避免 `/mnt/*` 的性能与权限问题）。
+- **执行副本在 WSL 文件系统**：从实例与 `cursor-agent` 默认以 `F:/workspace/github/Footnote` 作为执行根目录（避免 `/mnt/*` 的性能与权限问题）。
 - **Task Pack 是“契约”**：执行者只读 Allowed Inputs、只写 Deliverables；冻结目录（`design/ai-native/00_charter/`、`design/ai-native/01_bibles/`）不可修改。
 - **主从不是“自动共享状态”**：除非显式配置共享 DB / 同步机制，否则主从实例的工作流与凭据互相独立。
 
@@ -194,7 +194,7 @@ Task Pack 必须包含：
 - `workflows/project/n8n/windows-mcp-runner-browser-test-workflow.json`（`POST /webhook/browser-test`）
 
 #### 6.4.3 最常见问题（落地级）
-- fixed-flow / status-query 都依赖 **n8n 在 WSL 内运行**（Exec 节点直接访问 WSL 文件系统）；`project_root` 必须是 WSL 路径（默认 `/home/shash/work/Footnote`）。
+- fixed-flow / status-query 都依赖 **n8n 在 WSL 内运行**（Exec 节点直接访问 WSL 文件系统）；`project_root` 必须是 WSL 路径（默认 `F:/workspace/github/Footnote`）。
 - `GET /webhook/status` 返回 `status_not_found`：通常是 `run_id` 不存在或 `project_root` 不对（找不到 `workflows/project/logs/automation_runs/<run_id>/status.json`）。
 - Windows 主实例若做脚本/REST 自动化：需要 `N8N_SECURE_COOKIE=false`（否则 http 下 Secure Cookie 不会保存，容易出现 Unauthorized）。
 

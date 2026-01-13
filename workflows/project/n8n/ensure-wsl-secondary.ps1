@@ -11,11 +11,11 @@
 # 依赖：
 # - Windows 可执行 wsl
 # - WSL 中已安装 pm2 与 n8n
-# - 仓库路径在 WSL 内存在（默认 /home/shash/work/Footnote）
+# - 仓库路径在 WSL 内存在（默认 /mnt/f/workspace/github/Footnote）
 
 param(
     [int]$Port = 5680,
-    [string]$ProjectRoot = "/home/shash/work/Footnote",
+    [string]$ProjectRoot = "/mnt/f/workspace/github/Footnote",
     [string]$ProcessName = "n8n-secondary",
     [string]$StartCommand = "pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary",
     [string]$Distro = "",

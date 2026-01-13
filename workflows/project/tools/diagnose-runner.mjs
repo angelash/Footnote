@@ -6,9 +6,12 @@
 
 import { createFlowRunner } from '../../reusable/n8n-common/wsl-runner/lib/v2/index.mjs';
 import { readFileSync, mkdirSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const projectRoot = '/mnt/f/workspace/github/Footnote';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+// 自动检测项目根目录（统一使用相对路径计算）
+const projectRoot = join(__dirname, '../../..').replace(/\\/g, '/');
 
 // 读取 FlowSpec
 const flowSpec = JSON.parse(readFileSync(

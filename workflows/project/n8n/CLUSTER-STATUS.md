@@ -41,28 +41,28 @@
 ### 查看状态
 ```bash
 # WSL
-wsl bash -c "cd /home/shash/work/Footnote && pm2 status"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 status"
 ```
 
 ### 查看日志
 ```bash
 # WSL
-wsl bash -c "cd /home/shash/work/Footnote && pm2 logs n8n-secondary"
-wsl bash -c "cd /home/shash/work/Footnote && pm2 logs wsl-cursor-runner"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 logs n8n-secondary"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 logs wsl-cursor-runner"
 ```
 
 ### 重启实例
 ```bash
 # WSL
-wsl bash -c "cd /home/shash/work/Footnote && pm2 restart n8n-secondary --update-env"
-wsl bash -c "cd /home/shash/work/Footnote && pm2 restart wsl-cursor-runner --update-env"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 restart n8n-secondary --update-env"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 restart wsl-cursor-runner --update-env"
 ```
 
 ### 停止实例
 ```bash
 # WSL
-wsl bash -c "cd /home/shash/work/Footnote && pm2 stop n8n-secondary"
-wsl bash -c "cd /home/shash/work/Footnote && pm2 stop wsl-cursor-runner"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 stop n8n-secondary"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 stop wsl-cursor-runner"
 ```
 
 ---

@@ -19,7 +19,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// Parse query parameters\nconst query = $input.first().json.query || {};\nconst runId = query.run_id || '';\nconst projectRoot = query.project_root || '/home/shash/work/Footnote';\n\nif (!runId) {\n  return { json: { ok: false, error: 'run_id is required' } };\n}\n\nreturn {\n  json: {\n    run_id: runId,\n    project_root: projectRoot,\n    status_path: `${projectRoot}/workflows/project/logs/automation_runs/${runId}/status.json`\n  }\n};"
+        "jsCode": "// Parse query parameters\nconst query = $input.first().json.query || {};\nconst runId = query.run_id || '';\nconst projectRoot = query.project_root || 'F:/workspace/github/Footnote';\n\nif (!runId) {\n  return { json: { ok: false, error: 'run_id is required' } };\n}\n\nreturn {\n  json: {\n    run_id: runId,\n    project_root: projectRoot,\n    status_path: `${projectRoot}/workflows/project/logs/automation_runs/${runId}/status.json`\n  }\n};"
       },
       "id": "parse-query",
       "name": "Parse Query",

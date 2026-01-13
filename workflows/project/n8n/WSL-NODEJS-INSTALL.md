@@ -93,7 +93,7 @@ wsl bash tools/n8n/install-wsl-nodejs.sh
 
 ```bash
 # 在 WSL 中
-cd /home/shash/work/Footnote
+cd /mnt/f/workspace/github/Footnote
 npm install -g pm2 n8n
 ```
 
@@ -107,7 +107,7 @@ n8n --version
 ### 3. 启动 n8n 从实例
 
 ```bash
-cd /home/shash/work/Footnote
+cd /mnt/f/workspace/github/Footnote
 N8N_PORT=5680 N8N_HOST=0.0.0.0 n8n start
 ```
 

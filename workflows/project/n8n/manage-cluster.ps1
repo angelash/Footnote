@@ -7,7 +7,7 @@ function Show-Status {
     pm2 status n8n-primary 2>&1
     
     Write-Host "`n[WSL] 从实例 (端口 5680):" -ForegroundColor Yellow
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 status n8n-secondary" 2>&1
+    wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 status n8n-secondary" 2>&1
     
     Write-Host "`n访问地址:" -ForegroundColor Green
     Write-Host "  主实例: http://localhost:5678" -ForegroundColor White
@@ -24,22 +24,22 @@ function Start-All {
     pm2 start n8n --name n8n-primary -- start
 
     # WSL 从实例：使用仓库内启动脚本（包含端口 5680 配置）
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 delete n8n-secondary 2>/dev/null"
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
+    wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 delete n8n-secondary 2>/dev/null"
+    wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
     Write-Host "完成！" -ForegroundColor Green
 }
 
 function Stop-All {
     Write-Host "停止所有实例..." -ForegroundColor Cyan
     pm2 stop n8n-primary
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 stop n8n-secondary"
+    wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 stop n8n-secondary"
     Write-Host "完成！" -ForegroundColor Green
 }
 
 function Restart-All {
     Write-Host "重启所有实例..." -ForegroundColor Cyan
     pm2 restart n8n-primary
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 restart n8n-secondary"
+    wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 restart n8n-secondary"
     Write-Host "完成！" -ForegroundColor Green
 }
 
@@ -53,7 +53,7 @@ function Show-Logs {
     
     if ($Instance -eq 'secondary' -or $Instance -eq 'all') {
         Write-Host "`n[WSL] 从实例日志:" -ForegroundColor Yellow
-        wsl bash -c "cd /home/shash/work/Footnote && pm2 logs n8n-secondary --lines 20 --nostream"
+        wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 logs n8n-secondary --lines 20 --nostream"
     }
 }
 

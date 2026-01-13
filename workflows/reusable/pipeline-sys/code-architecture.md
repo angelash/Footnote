@@ -202,7 +202,7 @@ Runner 改造点必须落到 `lib/*`，`server.mjs` 不允许继续膨胀。
 环境变量固定：
 - `PIPELINE_SYS_HOST`：默认 `127.0.0.1`
 - `PIPELINE_SYS_PORT`：默认 `3230`
-- `PROJECT_ROOT`：默认 `/home/shash/work/Footnote`
+- `PROJECT_ROOT`：默认 `F:/workspace/github/Footnote`
 - `RUNNER_BASE_URL`：默认 `http://127.0.0.1:3210`
 
 `PROJECT_ROOT` 是唯一真实的仓库根目录，Console 全部路径计算必须从此开始。

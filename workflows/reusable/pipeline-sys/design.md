@@ -59,7 +59,7 @@ v3 支持多执行域、资源隔离、指标告警与权限治理。
 - **Pipeline-Sys Console（观测与控制面）**：读取 run 工件并展示，向 Runner 发起控制命令
 
 ### 2.2 运行域与路径
-- **代码仓库工作副本**：`/home/shash/work/Footnote`（WSL 路径）
+- **代码仓库工作副本**：`F:/workspace/github/Footnote`（WSL 路径）
 - **全程落盘根目录**：`workflows/project/logs/automation_runs/`（相对 repo root）
 - **审计附加日志**：`workflows/project/logs/decisions_log.md`、`rollback_log.md`、`task_log.md`
 

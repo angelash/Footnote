@@ -158,7 +158,7 @@ Body: { "node_id": "execute.edit" }
 |------|--------|------|
 | `PIPELINE_SYS_HOST` | `127.0.0.1` | Console 监听地址 |
 | `PIPELINE_SYS_PORT` | `3230` | Console 端口 |
-| `PROJECT_ROOT` | `/home/shash/work/Footnote` | 项目根目录 |
+| `PROJECT_ROOT` | `F:/workspace/github/Footnote` | 项目根目录 |
 | `RUNNER_BASE_URL` | `http://127.0.0.1:3210` | Runner 地址 |
 
 ## 版本规划

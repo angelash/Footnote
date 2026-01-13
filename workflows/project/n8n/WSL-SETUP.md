@@ -4,7 +4,7 @@
 
 ### 1. WSL 环境
 - **用户**: `shash` (根据实际情况修改)
-- **项目路径**: `/home/shash/work/Footnote` (根据实际情况修改)
+- **项目路径**: `/mnt/f/workspace/github/Footnote` (根据实际情况修改)
 - **Cursor Agent**: `~/.local/bin/cursor-agent`
 
 ### 2. 项目位置确认
@@ -34,7 +34,7 @@ ls -la Footnote/
 
 | 参数 | 当前值 | 需要修改为 |
 |------|--------|-----------|
-| `project_root` | `/home/shash/work/Footnote` | **你的实际项目路径** |
+| `project_root` | `/mnt/f/workspace/github/Footnote` | **你的实际项目路径** |
 | `wsl_user` | `shash` | **你的 WSL 用户名** |
 
 ### 4. Cursor Agent 命令说明
@@ -42,7 +42,7 @@ ls -la Footnote/
 工作流使用以下命令执行任务：
 
 ```bash
-cd /home/shash/work/Footnote && \
+cd /mnt/f/workspace/github/Footnote && \
 ~/.local/bin/cursor-agent \
   --print \
   --force \
@@ -68,7 +68,7 @@ cd /home/shash/work/Footnote && \
 如果 n8n 在 Windows 中运行，需要在命令前加 `wsl`：
 
 ```bash
-wsl bash -c "cd /home/shash/work/Footnote && ~/.local/bin/cursor-agent --print --force --approve-mcps \"\$(cat .cursor/current_task_prompt.md)\""
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && ~/.local/bin/cursor-agent --print --force --approve-mcps \"\$(cat .cursor/current_task_prompt.md)\""
 ```
 
 ### 6. 测试命令
@@ -77,7 +77,7 @@ wsl bash -c "cd /home/shash/work/Footnote && ~/.local/bin/cursor-agent --print -
 
 ```bash
 # 1. 切换到项目目录
-cd /home/shash/work/Footnote
+cd /mnt/f/workspace/github/Footnote
 
 # 2. 创建测试提示文件
 cat > .cursor/current_task_prompt.md << 'EOF'
@@ -95,7 +95,7 @@ EOF
 | Windows 路径 | WSL 路径 | 说明 |
 |-------------|---------|------|
 | `F:\workspace\github\Footnote` | `/mnt/f/workspace/github/Footnote` | ❌ 不要使用（Windows 挂载） |
-| - | `/home/shash/work/Footnote` | ✅ 使用（WSL 文件系统） |
+| - | `/mnt/f/workspace/github/Footnote` | ✅ 使用（WSL 文件系统） |
 
 **重要**: 项目必须在 WSL 文件系统中（`/home/...`），不能在 Windows 挂载点（`/mnt/...`）。
 

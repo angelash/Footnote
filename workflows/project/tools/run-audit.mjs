@@ -22,7 +22,8 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const projectRoot = '/mnt/f/workspace/github/Footnote';
+// 自动检测项目根目录（统一使用相对路径计算，支持 Windows 和 WSL）
+const projectRoot = join(__dirname, '../../..').replace(/\\/g, '/');
 
 // 解析命令行参数
 function parseArgs() {

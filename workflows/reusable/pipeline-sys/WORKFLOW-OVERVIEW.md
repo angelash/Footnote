@@ -299,7 +299,7 @@ sequenceDiagram
 curl -X POST "http://localhost:3210/run-role" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_root": "/home/shash/work/Footnote",
+    "project_root": "F:/workspace/github/Footnote",
     "role": "L3_ui_engineer",
     "task_id": "TASK-UI-001",
     "task_pack_path": "design/ai-native/03_taskpacks/TASK-UI-001.md",
@@ -314,7 +314,7 @@ PowerShell（Windows）版本：
 
 ```powershell
 $body = @{
-  project_root   = "/home/shash/work/Footnote"
+  project_root   = "F:/workspace/github/Footnote"
   role           = "L3_ui_engineer"
   task_id        = "TASK-UI-001"
   task_pack_path = "design/ai-native/03_taskpacks/TASK-UI-001.md"
@@ -333,7 +333,7 @@ Invoke-RestMethod -Method Post -Uri "http://localhost:3210/run-role" -ContentTyp
 curl -X POST "http://localhost:3210/level-lead" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_root": "/home/shash/work/Footnote",
+    "project_root": "F:/workspace/github/Footnote",
     "task_id": "CH1-ZONES",
     "title": "C1 章节 Zone 设计与脚本",
     "description": "需要覆盖 C1-Z1/C1-Z2/C1-Z3：布局、谜题、事件触发、对白脚本",
@@ -351,7 +351,7 @@ curl -X POST "http://localhost:3210/level-lead" \
 curl -X POST "http://localhost:3210/whitebox/scene" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_root": "/home/shash/work/Footnote",
+    "project_root": "F:/workspace/github/Footnote",
     "zone_id": "C1-Z1",
     "zone_name": "维修局走廊",
     "zone_type": "municipal",
@@ -368,7 +368,7 @@ curl -X POST "http://localhost:3210/whitebox/scene" \
 curl -X POST "http://localhost:3210/whitebox/object" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_root": "/home/shash/work/Footnote",
+    "project_root": "F:/workspace/github/Footnote",
     "zone_id": "C1-Z1",
     "object_id": "OBJ_DOOR_01",
     "object_name": "门",
@@ -389,7 +389,7 @@ curl -X POST "http://localhost:3210/whitebox/object" \
 curl -X POST "http://localhost:3210/run-environment-artist" \
   -H "Content-Type: application/json" \
   -d '{
-    "project_root": "/home/shash/work/Footnote",
+    "project_root": "F:/workspace/github/Footnote",
     "task_id": "ART-BG-001",
     "title": "C1-Z1 背景 PNG",
     "task_pack_path": "design/ai-native/03_taskpacks/ART-BG-001.md",

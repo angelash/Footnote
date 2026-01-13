@@ -16,7 +16,7 @@ fi
 echo ""
 
 # 2. 检查项目路径（需要用户确认）
-PROJECT_ROOT="${1:-/home/shash/work/Footnote}"
+PROJECT_ROOT="${1:-/mnt/f/workspace/github/Footnote}"
 echo "2. 检查项目路径: $PROJECT_ROOT"
 if [ -d "$PROJECT_ROOT" ]; then
     echo "   ✓ 项目目录存在"

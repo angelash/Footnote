@@ -5,7 +5,7 @@ module.exports = {
       name: 'n8n-secondary',
       script: 'n8n',
       args: 'start',
-      cwd: '/home/shash/work/Footnote',
+      cwd: '/mnt/f/workspace/github/Footnote',
       env: {
         N8N_PORT: 5680,
         N8N_HOST: '0.0.0.0',

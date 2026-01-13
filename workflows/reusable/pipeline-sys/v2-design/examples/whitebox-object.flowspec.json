@@ -50,7 +50,7 @@
     "project_root": {
       "type": "string",
       "required": false,
-      "default": "/home/shash/work/Footnote",
+      "default": "F:/workspace/github/Footnote",
       "description": "项目根目录"
     }
   },

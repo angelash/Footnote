@@ -73,35 +73,35 @@ function Install-WSLDependencies {
     Write-Host "  在 WSL 中安装 PM2 和 n8n..." -ForegroundColor Cyan
     
     # 检查并安装 PM2
-    $pm2Script = "cd /home/shash/work/Footnote; which pm2"
+    $pm2Script = "cd /mnt/f/workspace/github/Footnote; which pm2"
     $pm2Check = wsl bash -c $pm2Script 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Host "  安装 PM2..." -ForegroundColor Cyan
-        $installPm2 = "cd /home/shash/work/Footnote; npm install -g pm2"
+        $installPm2 = "cd /mnt/f/workspace/github/Footnote; npm install -g pm2"
         wsl bash -c $installPm2 2>&1 | Out-Null
     } else {
         Write-Host "  ✓ PM2 已安装" -ForegroundColor Green
     }
     
     # 检查并安装 n8n
-    $n8nScript = "cd /home/shash/work/Footnote; which n8n"
+    $n8nScript = "cd /mnt/f/workspace/github/Footnote; which n8n"
     $n8nCheck = wsl bash -c $n8nScript 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Host "  安装 n8n..." -ForegroundColor Cyan
-        $installN8n = "cd /home/shash/work/Footnote; npm install -g n8n"
+        $installN8n = "cd /mnt/f/workspace/github/Footnote; npm install -g n8n"
         wsl bash -c $installN8n 2>&1 | Out-Null
     } else {
         Write-Host "  ✓ n8n 已安装" -ForegroundColor Green
     }
     
     # 验证安装
-    $pm2VersionScript = "cd /home/shash/work/Footnote; pm2 --version"
+    $pm2VersionScript = "cd /mnt/f/workspace/github/Footnote; pm2 --version"
     $pm2Version = wsl bash -c $pm2VersionScript 2>&1
     if ($pm2Version) {
         Write-Host "  ✓ PM2 版本: $pm2Version" -ForegroundColor Green
     }
     
-    $n8nVersionScript = "cd /home/shash/work/Footnote; n8n --version"
+    $n8nVersionScript = "cd /mnt/f/workspace/github/Footnote; n8n --version"
     $n8nVersion = wsl bash -c $n8nVersionScript 2>&1
     if ($n8nVersion) {
         Write-Host "  ✓ n8n 版本: $n8nVersion" -ForegroundColor Green
@@ -148,15 +148,15 @@ function Configure-PM2 {
     
     # WSL 从实例
     Write-Host "  配置 WSL 从实例..." -ForegroundColor Cyan
-    $wslDelete = "cd /home/shash/work/Footnote; pm2 delete n8n-secondary 2>&1"
+    $wslDelete = "cd /mnt/f/workspace/github/Footnote; pm2 delete n8n-secondary 2>&1"
     wsl bash -c $wslDelete | Out-Null
-    $wslStart = "cd /home/shash/work/Footnote; pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
+    $wslStart = "cd /mnt/f/workspace/github/Footnote; pm2 start workflows/project/n8n/start-n8n-secondary.sh --name n8n-secondary"
     wsl bash -c $wslStart
     Write-Host "  ✓ WSL 从实例已启动" -ForegroundColor Green
     
     # 保存配置
     pm2 save
-    $wslSave = "cd /home/shash/work/Footnote; pm2 save"
+    $wslSave = "cd /mnt/f/workspace/github/Footnote; pm2 save"
     wsl bash -c $wslSave
     
     Write-Host ""
@@ -177,7 +177,7 @@ function Verify-Deployment {
     }
     
     # 检查 WSL 从实例
-    $secondaryStatusScript = "cd /home/shash/work/Footnote; pm2 status n8n-secondary"
+    $secondaryStatusScript = "cd /mnt/f/workspace/github/Footnote; pm2 status n8n-secondary"
     $secondaryStatus = wsl bash -c $secondaryStatusScript 2>&1
     if ($secondaryStatus -match "online") {
         Write-Host "  ✓ WSL 从实例运行中 (端口 5680)" -ForegroundColor Green

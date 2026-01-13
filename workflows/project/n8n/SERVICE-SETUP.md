@@ -28,7 +28,7 @@ After=network.target
 [Service]
 Type=simple
 User=shash
-WorkingDirectory=/home/shash/work/Footnote
+WorkingDirectory=/mnt/f/workspace/github/Footnote
 Environment="NODE_ENV=production"
 Environment="N8N_BASIC_AUTH_ACTIVE=true"
 Environment="N8N_BASIC_AUTH_USER=admin@footnote.local"
@@ -148,7 +148,7 @@ pm2 restart n8n
 **重要**：如果 n8n 在 Windows 上运行，需要使用 `cursor-cli-task-workflow-windows.json`：
 
 - 文件读取使用 Windows 路径：`F:/workspace/github/Footnote`
-- 命令执行使用 WSL 路径：`/home/shash/work/Footnote`
+- 命令执行使用 WSL 路径：`/mnt/f/workspace/github/Footnote`
 - 所有命令前加 `wsl` 前缀
 
 #### WSL 环境（备选方案）
@@ -162,7 +162,7 @@ npm install -g pm2
 # 创建启动脚本
 cat > tools/n8n/start-n8n.sh << 'EOF'
 #!/bin/bash
-cd /home/shash/work/Footnote
+cd /mnt/f/workspace/github/Footnote
 n8n start
 EOF
 
@@ -230,7 +230,7 @@ EOF
 然后在服务配置中加载：
 
 ```ini
-EnvironmentFile=/home/shash/work/Footnote/.env.n8n
+EnvironmentFile=/mnt/f/workspace/github/Footnote/.env.n8n
 ```
 
 ---

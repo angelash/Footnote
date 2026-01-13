@@ -20,7 +20,7 @@ WSL 环境（从）
 │       ├── WSL 专用任务
 │       └── cursor-agent 集成
 │
-└── 项目: /home/shash/work/Footnote
+└── 项目: /mnt/f/workspace/github/Footnote
 ```
 
 ---
@@ -164,7 +164,7 @@ module.exports = {
       name: 'n8n-secondary',
       script: 'n8n',
       args: 'start',
-      cwd: '/home/shash/work/Footnote',
+      cwd: '/mnt/f/workspace/github/Footnote',
       env: {
         N8N_PORT: 5680,
         N8N_HOST: '0.0.0.0',
@@ -189,7 +189,7 @@ module.exports = {
 
 ```bash
 # 在 WSL 中
-cd /home/shash/work/Footnote
+cd /mnt/f/workspace/github/Footnote
 pm2 start ecosystem.config.wsl.cjs --only n8n-secondary
 pm2 save
 pm2 startup
@@ -223,7 +223,7 @@ $wslCommand = switch ($Action) {
     'logs'    { "pm2 logs $Service" }
 }
 
-wsl bash -c "cd /home/shash/work/Footnote && $wslCommand"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && $wslCommand"
 ```
 
 #### 使用方式
@@ -348,7 +348,7 @@ POST http://localhost:5680/webhook/execute-task
 pm2 monit
 
 # WSL
-wsl bash -c "cd /home/shash/work/Footnote && pm2 monit"
+wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 monit"
 ```
 
 ### 统一管理脚本
@@ -362,13 +362,13 @@ function Show-Status {
     pm2 status n8n-primary
     
     Write-Host "`nWSL 从实例:" -ForegroundColor Yellow
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 status n8n-secondary"
+    wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 status n8n-secondary"
 }
 
 function Restart-All {
     Write-Host "重启所有实例..." -ForegroundColor Cyan
     pm2 restart n8n-primary
-    wsl bash -c "cd /home/shash/work/Footnote && pm2 restart n8n-secondary"
+    wsl bash -c "cd /mnt/f/workspace/github/Footnote && pm2 restart n8n-secondary"
 }
 
 # 使用

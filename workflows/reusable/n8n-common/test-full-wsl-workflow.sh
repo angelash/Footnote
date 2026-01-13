@@ -3,7 +3,7 @@
 
 set -e
 
-PROJECT_ROOT="/home/shash/work/Footnote"
+PROJECT_ROOT="/mnt/f/workspace/github/Footnote"
 CURSOR_AGENT="$HOME/.local/bin/cursor-agent"
 
 echo "=== 完整 WSL 工作流测试 ==="

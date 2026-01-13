@@ -18,7 +18,7 @@ PM2 进程管理器可以保存进程列表，但默认不会在系统启动时�
 ### 步骤 1：确认当前状态
 
 ```bash
-cd /home/shash/work/Footnote
+cd /mnt/f/workspace/github/Footnote
 
 # 检查 PM2 进程状态
 pm2 list
@@ -69,7 +69,7 @@ sudo systemctl status pm2-shash.service
 ### 步骤 4：确保进程已保存
 
 ```bash
-cd /home/shash/work/Footnote
+cd /mnt/f/workspace/github/Footnote
 pm2 save
 ```
 
@@ -211,7 +211,7 @@ sudo journalctl -u pm2-shash.service -f
 
 - **配置日期**：2025-01-05
 - **配置用户**：shash
-- **WSL 路径**：/home/shash/work/Footnote
+- **WSL 路径**：/mnt/f/workspace/github/Footnote
 - **服务文件**：/etc/systemd/system/pm2-shash.service
 - **PM2 数据目录**：/home/shash/.pm2
 

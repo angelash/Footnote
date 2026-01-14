@@ -13,7 +13,6 @@
  */
 
 import Phaser from 'phaser';
-import { COLORS, TEXT_STYLES, CONSTANTS } from '@/config/game.config';
 
 // 预览类型
 export type PreviewType =
@@ -185,7 +184,7 @@ export class DevPreviewScene extends Phaser.Scene {
     topLine.fillRect(0, 0, width, 3);
   }
 
-  private createMenu(width: number, height: number): void {
+  private createMenu(width: number, _height: number): void {
     this.menuContainer = this.add.container(0, 0);
 
     const startY = 260;

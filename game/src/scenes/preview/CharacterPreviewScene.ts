@@ -35,7 +35,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
     super({ key: 'CharacterPreviewScene' });
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     // 统计

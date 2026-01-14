@@ -6,8 +6,7 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import { CHARACTERS, CharacterId, getPortraitKey } from '@/config/characters.config';
-import { CHARACTER_PORTRAITS } from '@/data/webpAssets';
+import { CharacterId, getPortraitKey } from '@/config/characters.config';
 
 // 示例对话数据
 interface IDialogueLine {
@@ -38,7 +37,7 @@ export class DialoguePreviewScene extends BasePreviewScene {
     super({ key: 'DialoguePreviewScene' });
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     const sequences = this.getSampleDialogues();

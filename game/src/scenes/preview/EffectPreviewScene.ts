@@ -88,7 +88,7 @@ export class EffectPreviewScene extends BasePreviewScene {
     this._animationConfigs.set('fx_drift', { frameCount: 12, frameRate: 10, repeat: -1 });
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     const categories = this.getEffectCategories();

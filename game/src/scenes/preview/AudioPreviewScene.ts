@@ -6,14 +6,7 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import {
-  BGM_CONFIGS,
-  SFX_CONFIGS,
-  AMBIENCE_CONFIGS,
-  IBgmConfig,
-  ISfxConfig,
-  IAmbienceConfig,
-} from '@/data/audioConfig';
+import { AMBIENCE_CONFIGS, BGM_CONFIGS, SFX_CONFIGS } from '@/data/audioConfig';
 
 interface IAudioCategory {
   name: string;
@@ -43,7 +36,7 @@ export class AudioPreviewScene extends BasePreviewScene {
     super({ key: 'AudioPreviewScene' });
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     const categories = this.getAudioCategories();

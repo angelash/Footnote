@@ -6,7 +6,6 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import { CONSTANTS } from '@/config/game.config';
 
 // 卡片类型配置
 const CARD_TYPE_CONFIG: Record<string, { name: string; color: string; icon: string }> = {
@@ -39,7 +38,7 @@ export class CardPreviewScene extends BasePreviewScene {
     super({ key: 'CardPreviewScene' });
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     // 获取示例卡片

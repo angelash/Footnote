@@ -9,7 +9,6 @@
  */
 
 import Phaser from 'phaser';
-import { COLORS, TEXT_STYLES } from '@/config/game.config';
 
 export abstract class BasePreviewScene extends Phaser.Scene {
   protected headerHeight = 160;
@@ -184,7 +183,7 @@ export abstract class BasePreviewScene extends Phaser.Scene {
       .setDepth(101);
   }
 
-  protected setupScrolling(height: number): void {
+  protected setupScrolling(_height: number): void {
     // 鼠标滚轮
     this.input.on(
       'wheel',

@@ -220,9 +220,9 @@ EOF
 }
 
 # 生成 prompt
-PROMPT="$(generate_prompt "$TYPE" "$INPUT")"
+PROMPT_RAW="$(generate_prompt "$TYPE" "$INPUT")"
 # 替换输入数据
-echo "$PROMPT" | sed "s|INPUT_DATA|$INPUT|g" > "$PROMPT_FILE"
+PROMPT="$(echo "$PROMPT_RAW" | sed "s|INPUT_DATA|$INPUT|g")"
 
 info "Running $TYPE analysis with model $MODEL"
 
@@ -253,8 +253,9 @@ if [[ "${USE_FALLBACK:-}" == "1" ]]; then
   exit 0
 fi
 
-# 调用 cursor-agent
-RESULT=$(timeout "${TIMEOUT_SECONDS}s" "$CURSOR_AGENT" chat --prompt-file "$PROMPT_FILE" --model "$MODEL" 2>/dev/null || echo "")
+# 调用 cursor-agent（必须使用 --print 才能获取输出，prompt 直接作为参数）
+info "Calling cursor-agent..."
+RESULT=$(timeout "${TIMEOUT_SECONDS}s" "$CURSOR_AGENT" --print --output-format text --model "$MODEL" "$PROMPT" 2>/dev/null || echo "")
 
 if [[ -z "$RESULT" ]]; then
   warn "cursor-agent returned empty result, using fallback"

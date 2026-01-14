@@ -41,10 +41,46 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -n "$TASK_PACK" ]] || die "--task-pack required"
-[[ -n "$PROMPT_FILE" ]] || die "--prompt-file required"
 [[ -f "$TASK_PACK" ]] || die "Task pack not found: $TASK_PACK"
-[[ -f "$PROMPT_FILE" ]] || die "Prompt file not found: $PROMPT_FILE"
 [[ -x "$CURSOR_AGENT" ]] || die "cursor-agent not executable: $CURSOR_AGENT"
+
+# 如果没有 prompt-file，从 task-pack 自动生成
+if [[ -z "$PROMPT_FILE" ]]; then
+  echo "[run-cursor-task] No prompt file provided, generating from task-pack..." >&2
+  PROMPT_FILE="$(mktemp --suffix=.md)"
+  GENERATED_PROMPT=1
+  
+  # 从 TaskPack 提取关键信息并生成 prompt
+  cat > "$PROMPT_FILE" << PROMPT_EOF
+你是一个高效的任务执行助手。请根据以下 TaskPack 执行任务。
+
+## TaskPack 内容
+
+$(cat "$TASK_PACK")
+
+## 执行要求
+
+1. 仔细阅读 TaskPack 中的所有章节
+2. 严格按照 Deliverables 列出的交付物进行交付
+3. 遵守 Constraints 中的所有约束
+4. 完成后确认 Acceptance Checklist 中的每一项
+
+请开始执行任务。
+PROMPT_EOF
+  
+  echo "[run-cursor-task] Generated prompt file: $PROMPT_FILE" >&2
+else
+  GENERATED_PROMPT=0
+  [[ -f "$PROMPT_FILE" ]] || die "Prompt file not found: $PROMPT_FILE"
+fi
+
+# 清理生成的临时文件
+cleanup_prompt() {
+  if [[ "${GENERATED_PROMPT:-0}" == "1" && -f "$PROMPT_FILE" ]]; then
+    rm -f "$PROMPT_FILE"
+  fi
+}
+trap cleanup_prompt EXIT
 
 select_model() {
   local taskType="$1"

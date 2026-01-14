@@ -12,7 +12,6 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import { COLORS, TEXT_STYLES } from '@/config/game.config';
 import { DialogueUI } from '@/systems/ui/DialogueUI';
 import { CardUI } from '@/systems/ui/CardUI';
 import { ToastManager } from '@/systems/ui/ToastManager';
@@ -56,7 +55,7 @@ export class UIPreviewScene extends BasePreviewScene {
     this._uiPreviewContainer.setVisible(false);
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     // 分两大类
@@ -899,7 +898,7 @@ export class UIPreviewScene extends BasePreviewScene {
   private _createComponentSection(
     title: string,
     y: number,
-    width: number
+    _width: number
   ): Phaser.GameObjects.Container {
     const container = this.add.container(30, y);
 
@@ -913,7 +912,7 @@ export class UIPreviewScene extends BasePreviewScene {
     return container;
   }
 
-  private _addButtonPreviews(container: Phaser.GameObjects.Container, width: number): void {
+  private _addButtonPreviews(container: Phaser.GameObjects.Container, _width: number): void {
     const buttons = [
       { name: '主按钮', fill: true, color: 0x00ffaa },
       { name: '次按钮', fill: false, color: 0x00ffaa },
@@ -947,7 +946,7 @@ export class UIPreviewScene extends BasePreviewScene {
     });
   }
 
-  private _addColorPreviews(container: Phaser.GameObjects.Container, width: number): void {
+  private _addColorPreviews(container: Phaser.GameObjects.Container, _width: number): void {
     const colors = [
       { name: 'Accent', color: 0x00ffaa },
       { name: 'Error', color: 0xff4444 },

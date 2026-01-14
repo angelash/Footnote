@@ -89,7 +89,7 @@ export class ScenePreviewScene extends BasePreviewScene {
     this._previewContainer.setVisible(false);
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
     const cardWidth = 320;
     const cardHeight = 260;

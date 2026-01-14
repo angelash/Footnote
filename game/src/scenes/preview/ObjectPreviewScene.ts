@@ -12,7 +12,7 @@ import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
 import { getSceneConfig, getAllZoneIds } from '@/data/scenes';
 import { assetResolver } from '@/systems/whitebox/AssetResolver';
-import type { ISceneObjectConfig, ISceneAction } from '@/types/scene';
+import type { ISceneObjectConfig } from '@/types/scene';
 
 // 物件分类
 type ObjectCategory = 'all' | 'interactive' | 'animated' | 'decoration';
@@ -75,7 +75,7 @@ export class ObjectPreviewScene extends BasePreviewScene {
     this._detailPanel.setVisible(false);
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     // 统计信息

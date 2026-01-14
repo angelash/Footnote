@@ -7,7 +7,6 @@
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
 import { ANIMATED_OBJECTS, IWebpSpritesheetAsset } from '@/data/webpAssets';
-import { getAnimatedObjects, IObjectInfo } from '@/config/objects.config';
 
 interface IAnimationItem {
   key: string;
@@ -28,7 +27,7 @@ export class AnimationPreviewScene extends BasePreviewScene {
     super({ key: 'AnimationPreviewScene' });
   }
 
-  protected createContent(width: number, height: number): void {
+  protected createContent(width: number, _height: number): void {
     let currentY = 30;
 
     // 获取动画列表

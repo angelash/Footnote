@@ -1,15 +1,16 @@
 /**
  * Queue Panel Component
  * 任务队列面板 - 显示队列状态、任务列表、干涉操作
+ * 
+ * 支持并行任务显示和领域分组
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import {
   QueuedTask,
-  AsyncTask,
+  TaskDomain,
   getQueueStatus,
   getQueueHistory,
-  getAsyncTasks,
   pauseQueue,
   resumeQueue,
   clearQueue,
@@ -17,6 +18,8 @@ import {
   retryTask,
   setTaskPriority,
   getSubtasks,
+  getDomainLabel,
+  getDomainColor,
 } from '../../api/queueApi';
 import { StatusBadge } from '../Common/StatusBadge';
 import { NodeStatus } from '../../types/dto';
@@ -28,9 +31,8 @@ interface QueuePanelProps {
 
 export function QueuePanel({ onTaskClick }: QueuePanelProps) {
   const [paused, setPaused] = useState(false);
-  const [current, setCurrent] = useState<string | null>(null);
+  const [runningTasks, setRunningTasks] = useState<QueuedTask[]>([]);
   const [queue, setQueue] = useState<QueuedTask[]>([]);
-  const [asyncTasks, setAsyncTasks] = useState<AsyncTask[]>([]);
   const [history, setHistory] = useState<QueuedTask[]>([]);
   const [historyTotal, setHistoryTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -43,8 +45,8 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
     try {
       const status = await getQueueStatus();
       setPaused(status.paused);
-      setCurrent(status.current);
-      setQueue(status.queue);
+      setRunningTasks(status.running_tasks || []);
+      setQueue(status.queue || []);
       setError(null);
     } catch (e) {
       setError((e as Error).message);
@@ -62,30 +64,19 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
     }
   }, []);
 
-  // 加载异步任务（非队列模式）
-  const loadAsyncTasks = useCallback(async () => {
-    try {
-      const data = await getAsyncTasks();
-      setAsyncTasks(data.tasks || []);
-    } catch (e) {
-      console.error('Failed to load async tasks:', e);
-    }
-  }, []);
-
   // 初始加载和定时刷新
   useEffect(() => {
     setLoading(true);
-    Promise.all([loadStatus(), loadHistory(), loadAsyncTasks()]).finally(() => setLoading(false));
+    Promise.all([loadStatus(), loadHistory()]).finally(() => setLoading(false));
 
     // 每 3 秒刷新
     const interval = setInterval(() => {
       loadStatus();
       loadHistory();
-      loadAsyncTasks();
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [loadStatus, loadHistory, loadAsyncTasks]);
+  }, [loadStatus, loadHistory]);
 
   // 暂停/恢复
   const handleTogglePause = async () => {
@@ -169,7 +160,7 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
   };
 
   // 渲染任务卡片
-  const renderTaskCard = (task: QueuedTask, showControls = true) => {
+  const renderTaskCard = (task: QueuedTask, showControls = true, isRunning = false) => {
     const statusMap: Record<string, NodeStatus> = {
       completed: NodeStatus.SUCCESS,
       failed: NodeStatus.FAILED,
@@ -184,7 +175,7 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
     return (
       <div
         key={task.id}
-        className={`queue-task-card ${task.status}`}
+        className={`queue-task-card ${task.status} ${isRunning ? 'running-highlight' : ''}`}
         onClick={() => onTaskClick?.(task.id)}
       >
         <div className="task-header">
@@ -203,6 +194,14 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
             <span className="task-id">{task.id.slice(0, 20)}...</span>
             <StatusBadge status={statusMap[task.status] || NodeStatus.PENDING} />
             {task.parent_id && <span className="subtask-badge">子任务</span>}
+            {task.domain && (
+              <span 
+                className="domain-badge" 
+                style={{ backgroundColor: getDomainColor(task.domain) }}
+              >
+                {getDomainLabel(task.domain)}
+              </span>
+            )}
           </div>
           <div className="task-meta">
             <span className="flowspec">{task.flowspec.split('/').pop()}</span>
@@ -236,6 +235,18 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
           </div>
         )}
 
+        {isRunning && (
+          <div className="task-controls">
+            <button
+              className="btn-sm btn-cancel"
+              onClick={(e) => handleCancel(task.id, e)}
+              title="取消运行中的任务"
+            >
+              ⏹ 停止
+            </button>
+          </div>
+        )}
+
         {(task.status === 'failed' || task.status === 'cancelled') && (
           <div className="task-controls">
             <button
@@ -258,7 +269,7 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
             ) : (
               subtasks[task.id].map((st) => (
                 <div key={st.id} className="subtask-item">
-                  <StatusBadge status={statusMap[st.status] || 'pending'} />
+                  <StatusBadge status={statusMap[st.status] || NodeStatus.PENDING} />
                   <span className="subtask-id">{st.id.slice(0, 15)}...</span>
                   <span className="subtask-flowspec">{st.flowspec.split('/').pop()}</span>
                 </div>
@@ -270,9 +281,32 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
     );
   };
 
+  // 按领域分组运行中的任务
+  const groupTasksByDomain = (tasks: QueuedTask[]) => {
+    const groups: Record<TaskDomain, QueuedTask[]> = {
+      design: [],
+      art: [],
+      code: [],
+      whitebox: [],
+      readonly: [],
+    };
+    
+    for (const task of tasks) {
+      const domain = task.domain || 'code';
+      if (groups[domain]) {
+        groups[domain].push(task);
+      }
+    }
+    
+    return groups;
+  };
+
   if (loading) {
     return <div className="queue-panel loading">加载中...</div>;
   }
+
+  const runningByDomain = groupTasksByDomain(runningTasks);
+  const hasRunningTasks = runningTasks.length > 0;
 
   return (
     <div className="queue-panel">
@@ -294,51 +328,38 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
 
       {error && <div className="queue-error">{error}</div>}
 
-      {/* 当前执行 */}
+      {/* 当前执行（支持多任务并行） */}
       <div className="queue-section">
-        <h4>▶ 当前执行 ({(current ? 1 : 0) + asyncTasks.length})</h4>
-        {/* 队列中正在执行的任务 */}
-        {current && (
-          <div className="current-task">
-            {queue.find((t) => t.id === current)
-              ? renderTaskCard(queue.find((t) => t.id === current)!, false)
-              : <div className="async-task-card running">
-                  <span className="task-id">{current.slice(0, 20)}...</span>
-                  <span className="status-badge running">执行中</span>
-                </div>}
+        <h4>▶ 当前执行 ({runningTasks.length})</h4>
+        {hasRunningTasks ? (
+          <div className="running-tasks-grid">
+            {Object.entries(runningByDomain).map(([domain, tasks]) => 
+              tasks.length > 0 && (
+                <div key={domain} className="domain-group">
+                  <div 
+                    className="domain-header"
+                    style={{ borderLeftColor: getDomainColor(domain as TaskDomain) }}
+                  >
+                    {getDomainLabel(domain as TaskDomain)} ({tasks.length})
+                  </div>
+                  {tasks.map((task) => renderTaskCard(task, false, true))}
+                </div>
+              )
+            )}
           </div>
-        )}
-        {/* 异步执行的任务（非队列模式） */}
-        {asyncTasks.map((task) => (
-          <div key={task.run_id} className="async-task-card running" onClick={() => onTaskClick?.(task.run_id)}>
-            <div className="task-header">
-              <div className="task-info">
-                <span className="task-id">{task.run_id.slice(0, 20)}...</span>
-                <StatusBadge status={NodeStatus.RUNNING} />
-                <span className="async-badge">异步</span>
-              </div>
-              <div className="task-meta">
-                <span className="elapsed">
-                  {Math.round(task.elapsed_ms / 1000)}s
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-        {/* 空闲状态 */}
-        {!current && asyncTasks.length === 0 && (
+        ) : (
           <div className="no-task">{paused ? '队列已暂停' : '空闲'}</div>
         )}
       </div>
 
       {/* 等待队列 */}
       <div className="queue-section">
-        <h4>📋 等待队列 ({queue.filter((t) => t.status === 'queued').length})</h4>
+        <h4>📋 等待队列 ({queue.length})</h4>
         <div className="queue-list">
-          {queue.filter((t) => t.status === 'queued').length === 0 ? (
+          {queue.length === 0 ? (
             <div className="no-task">暂无等待任务</div>
           ) : (
-            queue.filter((t) => t.status === 'queued').map((task) => renderTaskCard(task))
+            queue.map((task) => renderTaskCard(task))
           )}
         </div>
       </div>

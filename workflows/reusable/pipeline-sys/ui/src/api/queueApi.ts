@@ -5,12 +5,31 @@
 
 import { API_BASE } from './consoleApi';
 
+// 任务领域
+export type TaskDomain = 'design' | 'art' | 'code' | 'whitebox' | 'readonly';
+
+// 访问模式
+export type AccessMode = 'read' | 'write';
+
+// 调度器状态
+export interface SchedulerStatus {
+  running_by_domain: Record<TaskDomain, {
+    count: number;
+    max: number;
+    tasks: string[];
+  }>;
+  running_lock_keys: string[];
+  total_running: number;
+}
+
 // 队列状态
 export interface QueueStatus {
   ok: boolean;
   paused: boolean;
-  current: string | null;
-  queue: QueuedTask[];
+  running_tasks: QueuedTask[];   // 运行中的任务列表
+  running_count: number;          // 运行中的任务数
+  queue: QueuedTask[];            // 等待中的任务列表
+  scheduler: SchedulerStatus;     // 调度器状态
   history_count: number;
 }
 
@@ -22,6 +41,9 @@ export interface QueuedTask {
   priority: number;
   parent_id: string | null;
   status: 'queued' | 'running' | 'paused' | 'completed' | 'failed' | 'cancelled';
+  domain: TaskDomain;             // 任务领域
+  access_mode: AccessMode;        // 访问模式
+  lock_key?: string | null;       // 锁键
   queued_at: string;
   started_at?: string;
   finished_at?: string;
@@ -36,20 +58,6 @@ export interface HistoryResponse {
   total: number;
   limit: number;
   offset: number;
-}
-
-// 异步任务（非队列模式）
-export interface AsyncTask {
-  run_id: string;
-  started_at: string;
-  elapsed_ms: number;
-}
-
-// 异步任务响应
-export interface AsyncTasksResponse {
-  ok: boolean;
-  count: number;
-  tasks: AsyncTask[];
 }
 
 /**
@@ -178,14 +186,30 @@ export async function getSubtasks(taskId: string): Promise<{
   return response.json();
 }
 
-/**
- * 获取直接异步执行的任务（非队列模式）
- * 这些任务通过 async=true 但不使用 use_queue 参数执行
- */
-export async function getAsyncTasks(): Promise<AsyncTasksResponse> {
-  const response = await fetch(`${API_BASE}/async-tasks`);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch async tasks: ${response.statusText}`);
-  }
-  return response.json();
+// ============================================
+// 领域辅助函数
+// ============================================
+
+const DOMAIN_LABELS: Record<TaskDomain, string> = {
+  design: '📝 设计',
+  art: '🎨 美术',
+  code: '💻 程序',
+  whitebox: '📦 白盒',
+  readonly: '👁️ 只读',
+};
+
+const DOMAIN_COLORS: Record<TaskDomain, string> = {
+  design: '#8b5cf6',  // purple
+  art: '#ec4899',     // pink
+  code: '#3b82f6',    // blue
+  whitebox: '#6b7280', // gray
+  readonly: '#10b981', // green
+};
+
+export function getDomainLabel(domain: TaskDomain): string {
+  return DOMAIN_LABELS[domain] || domain;
+}
+
+export function getDomainColor(domain: TaskDomain): string {
+  return DOMAIN_COLORS[domain] || '#888';
 }

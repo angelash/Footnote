@@ -30,8 +30,11 @@ describe('Queue API', () => {
       const mockResponse = {
         ok: true,
         paused: false,
-        current: 'TASK-001',
-        queue: [{ id: 'TASK-002', status: 'queued' }],
+        running_tasks: [{ id: 'TASK-001', status: 'running', domain: 'code' }],
+        running_count: 1,
+        queue: [{ id: 'TASK-002', status: 'queued', domain: 'design' }],
+        scheduler: { running_by_domain: {}, running_lock_keys: [], total_running: 1 },
+        history_count: 10,
       };
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -42,7 +45,8 @@ describe('Queue API', () => {
 
       expect(mockFetch).toHaveBeenCalled();
       expect(result.paused).toBe(false);
-      expect(result.current).toBe('TASK-001');
+      expect(result.running_tasks).toHaveLength(1);
+      expect(result.running_count).toBe(1);
     });
 
     it('should throw error on failure', async () => {

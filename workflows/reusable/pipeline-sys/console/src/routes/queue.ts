@@ -143,7 +143,8 @@ export async function registerQueueRoutes(app: FastifyInstance): Promise<void> {
     }
   });
 
-  // GET /api/async-tasks - 获取直接异步执行的任务（非队列模式）
+  // GET /api/async-tasks - 获取运行中的任务（兼容旧版）
+  // 注意：此端点已废弃，建议使用 GET /api/queue 获取完整状态
   app.get('/api/async-tasks', async (request, reply) => {
     try {
       const response = await runnerClient.get('/async-tasks');

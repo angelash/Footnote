@@ -69,9 +69,6 @@ const PORT = Number(process.env.PORT || "3210");
 // 队列管理器实例（启动时初始化）
 let taskQueue = null;
 
-// 异步任务追踪器（防止 Promise 被 GC）
-const runningAsyncTasks = new Map();
-
 const DEFAULT_PROJECT_ROOT = process.cwd();
 
 const AUTOMATION_RUNS_DIR = "workflows/project/logs/automation_runs";
@@ -630,8 +627,11 @@ async function executeQueuedTask(task, options) {
  * @param {Object} [body.inputs] - 流程输入参数
  * @param {string} [body.run_id] - 自定义运行 ID
  * @param {string} [body.project_root] - 项目根目录
- * @param {boolean} [body.async] - 是否异步执行
- * @param {boolean} [body.use_queue] - 是否使用队列（默认 false）
+ * @param {boolean} [body.async] - 是否异步执行（队列模式下忽略）
+ * @param {boolean} [body.use_queue] - 是否使用队列（默认 true）
+ * @param {string} [body.domain] - 任务领域（design/art/code/whitebox/readonly）
+ * @param {string} [body.access_mode] - 访问模式（read/write）
+ * @param {string} [body.lock_key] - 锁键（用于同领域串行）
  * @returns {Promise<Object>} 执行结果
  */
 async function handleV2Run(body) {
@@ -639,8 +639,10 @@ async function handleV2Run(body) {
   const flowspec = body.flowspec;
   const inputs = body.inputs || {};
   const customRunId = body.run_id || body.runId;
-  const isAsync = body.async === true;
-  const useQueue = body.use_queue === true;
+  // 默认使用队列模式（除非显式设置为 false）
+  const useQueue = body.use_queue !== false;
+  // 仅当不使用队列时，async 参数才有效
+  const isAsync = !useQueue && body.async === true;
 
   if (!flowspec) {
     return { ok: false, error: "flowspec is required (JSON object or file path)" };
@@ -655,14 +657,23 @@ async function handleV2Run(body) {
       inputs: { ...inputs, project_root: projectRoot, _flowspec_inline: typeof flowspec !== 'string' ? flowspec : undefined },
       priority: body.priority || 10,
       parent_id: body.parent_id,
+      domain: body.domain,        // 可选，不传则自动推断
+      access_mode: body.access_mode,  // 可选，不传则自动推断
+      lock_key: body.lock_key,    // 可选，用于同领域串行
     });
+    
+    const status = taskQueue.getStatus();
+    const queuePosition = status.queue.findIndex(t => t.id === task.id);
     
     return {
       ok: true,
       run_id: task.id,
       status: 'queued',
+      domain: task.domain,
+      access_mode: task.access_mode,
       message: 'Task queued for execution',
-      queue_position: taskQueue.state.tasks.findIndex(t => t.id === task.id),
+      queue_position: queuePosition >= 0 ? queuePosition : null,
+      running_count: status.running_count,
     };
   }
 
@@ -737,43 +748,10 @@ async function handleV2Run(body) {
     }
   };
 
-  // 同步或异步执行
-  if (isAsync) {
-    // 异步执行：立即返回，后台运行
-    console.log(`[v2/run] ${runId} starting async execution...`);
-
-    // 直接启动异步执行（不用 setImmediate）
-    const promise = (async () => {
-      console.log(`[v2/run] ${runId} async function started`);
-      try {
-        const result = await executeFlow();
-        console.log(`[v2/run] ${runId} executeFlow() completed:`, result?.status || 'unknown');
-        return result;
-      } catch (e) {
-        console.error(`[v2/run] ${runId} async error:`, e.message, e.stack);
-        return { ok: false, error: e.message };
-      } finally {
-        // 执行完成后从追踪器中移除
-        runningAsyncTasks.delete(runId);
-        console.log(`[v2/run] ${runId} removed from tracker (remaining: ${runningAsyncTasks.size})`);
-      }
-    })();
-
-    // 保持 Promise 引用，防止被 GC
-    runningAsyncTasks.set(runId, { promise, startedAt: Date.now() });
-    console.log(`[v2/run] ${runId} added to tracker (total: ${runningAsyncTasks.size})`);
-
-    return {
-      ok: true,
-      run_id: runId,
-      flow_id: flowSpecObj.id,
-      logs_dir: runRelDir,
-      started_async: true,
-    };
-  } else {
-    // 同步执行：等待完成
-    return await executeFlow();
-  }
+  // 非队列模式：同步执行（阻塞直到完成）
+  // 注意：推荐使用队列模式（use_queue: true，默认），非队列模式仅用于调试
+  console.log(`[v2/run] ${runId} starting sync execution (non-queue mode)...`);
+  return await executeFlow();
 }
 
 // FlowSpec 路径（相对于项目根目录）
@@ -894,17 +872,23 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, testResult);
     }
 
-    // GET /async-tasks - 查看运行中的异步任务
+    // GET /async-tasks - 查看运行中的任务（从队列管理器获取）
+    // 注意：此端点已废弃，建议使用 GET /queue 获取完整状态
     if (req.method === "GET" && req.url === "/async-tasks") {
-      const tasks = [];
-      for (const [runId, info] of runningAsyncTasks) {
-        tasks.push({
-          run_id: runId,
-          started_at: new Date(info.startedAt).toISOString(),
-          elapsed_ms: Date.now() - info.startedAt,
-        });
+      try {
+        await initTaskQueue(DEFAULT_PROJECT_ROOT);
+        const status = taskQueue.getStatus();
+        const tasks = status.running_tasks.map(t => ({
+          run_id: t.id,
+          started_at: t.started_at,
+          elapsed_ms: t.started_at ? Date.now() - new Date(t.started_at).getTime() : 0,
+          domain: t.domain,
+          flowspec: t.flowspec,
+        }));
+        return json(res, 200, { ok: true, count: tasks.length, tasks });
+      } catch (e) {
+        return json(res, 500, { ok: false, error: String(e?.message || e) });
       }
-      return json(res, 200, { ok: true, count: tasks.length, tasks });
     }
 
     if (req.method === "POST" && req.url === "/execute-task") {

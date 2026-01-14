@@ -3,7 +3,7 @@
  * 
  * 任务队列管理器，实现：
  * - 任务入队/出队
- * - 串行执行（同一时间只执行一个任务）
+ * - 基于领域的并行执行
  * - 队列暂停/恢复
  * - 任务取消/重试
  * - 优先级调度
@@ -15,6 +15,14 @@
 import { EventEmitter } from 'node:events';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { 
+  ParallelScheduler, 
+  TaskDomain, 
+  AccessMode, 
+  inferDomainFromFlowspec,
+  inferRoleFromFlowspec,
+  inferAccessModeFromRole,
+} from './parallel-scheduler.mjs';
 
 /**
  * 任务状态
@@ -42,6 +50,9 @@ export const QueueEventType = {
   SUBTASK_DISPATCHED: 'SUBTASK_DISPATCHED',
 };
 
+// 重新导出领域和访问模式
+export { TaskDomain, AccessMode };
+
 /**
  * 生成任务 ID
  */
@@ -60,6 +71,9 @@ function generateTaskId() {
  * @property {number} priority - 优先级（越大越优先）
  * @property {string} [parent_id] - 父任务 ID
  * @property {string} status - 任务状态
+ * @property {string} domain - 任务领域
+ * @property {string} access_mode - 访问模式
+ * @property {string} [lock_key] - 锁键（用于同领域串行）
  * @property {string} queued_at - 入队时间
  * @property {string} [started_at] - 开始时间
  * @property {string} [finished_at] - 结束时间
@@ -71,7 +85,6 @@ function generateTaskId() {
  * 队列状态
  * @typedef {Object} QueueState
  * @property {boolean} paused - 队列是否暂停
- * @property {string|null} current - 当前执行的任务 ID
  * @property {QueuedTask[]} tasks - 任务列表
  * @property {QueuedTask[]} history - 历史记录
  */
@@ -87,6 +100,7 @@ export class TaskQueueManager extends EventEmitter {
    * @param {string} [options.queueFile] - 队列文件路径
    * @param {number} [options.maxHistory] - 最大历史记录数
    * @param {number} [options.maxQueueSize] - 最大队列长度
+   * @param {Object} [options.concurrency] - 并发配置
    */
   constructor(options = {}) {
     super();
@@ -101,19 +115,19 @@ export class TaskQueueManager extends EventEmitter {
     /** @type {QueueState} */
     this.state = {
       paused: false,
-      current: null,
       tasks: [],
       history: [],
     };
     
-    /** @type {Map<string, AbortController>} */
-    this.abortControllers = new Map();
+    // 并行调度器
+    this.scheduler = new ParallelScheduler(options.concurrency || {});
+    
+    // 运行中的任务
+    /** @type {Map<string, { task: QueuedTask, promise: Promise, abortController: AbortController }>} */
+    this.runningTasks = new Map();
     
     /** @type {boolean} */
     this.processing = false;
-    
-    /** @type {Promise<void>|null} */
-    this.processingPromise = null;
     
     // 锁文件路径
     this.lockFile = this.queueFile + '.lock';
@@ -140,8 +154,6 @@ export class TaskQueueManager extends EventEmitter {
         }
       });
       
-      this.state.current = null;
-      
       console.log(`[TaskQueue] Restored ${this.state.tasks.length} queued tasks`);
     } catch (err) {
       if (err.code !== 'ENOENT') {
@@ -162,12 +174,20 @@ export class TaskQueueManager extends EventEmitter {
    * @param {number} [taskConfig.priority] - 优先级
    * @param {string} [taskConfig.parent_id] - 父任务 ID
    * @param {string} [taskConfig.id] - 自定义任务 ID
+   * @param {string} [taskConfig.domain] - 任务领域
+   * @param {string} [taskConfig.access_mode] - 访问模式
+   * @param {string} [taskConfig.lock_key] - 锁键
    * @returns {Promise<QueuedTask>} 入队的任务
    */
   async enqueue(taskConfig) {
     if (this.state.tasks.length >= this.maxQueueSize) {
       throw new Error(`Queue is full (max ${this.maxQueueSize} tasks)`);
     }
+    
+    // 推断领域和访问模式
+    const role = inferRoleFromFlowspec(taskConfig.flowspec);
+    const inferredDomain = inferDomainFromFlowspec(taskConfig.flowspec);
+    const inferredAccessMode = role ? inferAccessModeFromRole(role) : AccessMode.WRITE;
     
     const task = {
       id: taskConfig.id || generateTaskId(),
@@ -176,6 +196,9 @@ export class TaskQueueManager extends EventEmitter {
       priority: taskConfig.priority ?? 10,
       parent_id: taskConfig.parent_id || null,
       status: TaskStatus.QUEUED,
+      domain: taskConfig.domain || inferredDomain,
+      access_mode: taskConfig.access_mode || inferredAccessMode,
+      lock_key: taskConfig.lock_key || null,
       queued_at: new Date().toISOString(),
     };
     
@@ -193,7 +216,10 @@ export class TaskQueueManager extends EventEmitter {
     // 发出事件
     this._emitEvent(QueueEventType.TASK_ADDED, { task });
     
-    console.log(`[TaskQueue] Task ${task.id} queued (priority: ${task.priority})`);
+    console.log(`[TaskQueue] Task ${task.id} queued (domain: ${task.domain}, priority: ${task.priority})`);
+    
+    // 触发处理
+    this._processNext();
     
     return task;
   }
@@ -203,19 +229,41 @@ export class TaskQueueManager extends EventEmitter {
    * @returns {Object} 队列状态
    */
   getStatus() {
+    // 获取运行中的任务列表
+    const runningTasks = [];
+    for (const [id, info] of this.runningTasks) {
+      runningTasks.push({
+        id: info.task.id,
+        flowspec: info.task.flowspec,
+        inputs: info.task.inputs,
+        priority: info.task.priority,
+        parent_id: info.task.parent_id,
+        status: info.task.status,
+        domain: info.task.domain,
+        access_mode: info.task.access_mode,
+        lock_key: info.task.lock_key,
+        queued_at: info.task.queued_at,
+        started_at: info.task.started_at,
+      });
+    }
+    
     return {
       paused: this.state.paused,
-      current: this.state.current,
-      queue: this.state.tasks.map(t => ({
+      running_tasks: runningTasks,
+      running_count: runningTasks.length,
+      queue: this.state.tasks.filter(t => t.status === TaskStatus.QUEUED).map(t => ({
         id: t.id,
         flowspec: t.flowspec,
         inputs: t.inputs,
         priority: t.priority,
         parent_id: t.parent_id,
         status: t.status,
+        domain: t.domain,
+        access_mode: t.access_mode,
+        lock_key: t.lock_key,
         queued_at: t.queued_at,
-        started_at: t.started_at,
       })),
+      scheduler: this.scheduler.getStatus(),
       history_count: this.state.history.length,
     };
   }
@@ -236,11 +284,15 @@ export class TaskQueueManager extends EventEmitter {
    * @returns {QueuedTask|null} 任务详情
    */
   getTask(taskId) {
-    // 先在队列中查找
+    // 先在运行中查找
+    const runningInfo = this.runningTasks.get(taskId);
+    if (runningInfo) return runningInfo.task;
+    
+    // 再在队列中查找
     let task = this.state.tasks.find(t => t.id === taskId);
     if (task) return task;
     
-    // 再在历史中查找
+    // 最后在历史中查找
     task = this.state.history.find(t => t.id === taskId);
     return task || null;
   }
@@ -252,6 +304,13 @@ export class TaskQueueManager extends EventEmitter {
    */
   getSubtasks(parentId) {
     const subtasks = [];
+    
+    // 从运行中查找
+    for (const [id, info] of this.runningTasks) {
+      if (info.task.parent_id === parentId) {
+        subtasks.push(info.task);
+      }
+    }
     
     // 从队列中查找
     subtasks.push(...this.state.tasks.filter(t => t.parent_id === parentId));
@@ -301,12 +360,10 @@ export class TaskQueueManager extends EventEmitter {
    * @returns {Promise<boolean>} 是否成功取消
    */
   async cancel(taskId) {
-    // 如果是当前运行的任务，发送取消信号
-    if (this.state.current === taskId) {
-      const controller = this.abortControllers.get(taskId);
-      if (controller) {
-        controller.abort();
-      }
+    // 如果是运行中的任务，发送取消信号
+    const runningInfo = this.runningTasks.get(taskId);
+    if (runningInfo) {
+      runningInfo.abortController.abort();
       // 等待任务结束（会被标记为 cancelled）
       return true;
     }
@@ -355,6 +412,9 @@ export class TaskQueueManager extends EventEmitter {
       inputs: originalTask.inputs,
       priority: originalTask.priority,
       parent_id: originalTask.parent_id,
+      domain: originalTask.domain,
+      access_mode: originalTask.access_mode,
+      lock_key: originalTask.lock_key,
     });
     
     console.log(`[TaskQueue] Task ${taskId} retry as ${newTask.id}`);
@@ -369,7 +429,7 @@ export class TaskQueueManager extends EventEmitter {
    * @returns {Promise<boolean>} 是否成功
    */
   async setPriority(taskId, priority) {
-    const index = this.state.tasks.findIndex(t => t.id === taskId);
+    const index = this.state.tasks.findIndex(t => t.id === taskId && t.status === TaskStatus.QUEUED);
     if (index === -1) return false;
     
     const task = this.state.tasks.splice(index, 1)[0];
@@ -426,84 +486,106 @@ export class TaskQueueManager extends EventEmitter {
   }
 
   /**
-   * 处理下一个任务
+   * 处理下一批任务（支持并行）
    */
   async _processNext() {
-    // 如果队列暂停或已在处理，跳过
-    if (this.state.paused || this.state.current) return;
+    // 如果队列暂停，跳过
+    if (this.state.paused) return;
     
-    // 获取下一个 queued 任务
-    const task = this.state.tasks.find(t => t.status === TaskStatus.QUEUED);
-    if (!task) return;
+    // 获取所有可以启动的任务
+    const queuedTasks = this.state.tasks.filter(t => t.status === TaskStatus.QUEUED);
     
+    for (const task of queuedTasks) {
+      // 检查是否可以启动
+      if (!this.scheduler.canStart(task)) {
+        continue;
+      }
+      
+      // 启动任务
+      this._startTask(task);
+    }
+  }
+
+  /**
+   * 启动单个任务
+   * @param {QueuedTask} task
+   */
+  async _startTask(task) {
     // 标记为运行中
     task.status = TaskStatus.RUNNING;
     task.started_at = new Date().toISOString();
-    this.state.current = task.id;
     
-    await this._persist();
-    
-    this._emitEvent(QueueEventType.TASK_STARTED, { task_id: task.id });
-    console.log(`[TaskQueue] Task ${task.id} started`);
-    
-    // 创建取消控制器
-    const abortController = new AbortController();
-    this.abortControllers.set(task.id, abortController);
-    
-    try {
-      // 执行任务
-      const result = await this.executor(task, {
-        signal: abortController.signal,
-        queueManager: this,
-      });
-      
-      // 检查是否被取消
-      if (abortController.signal.aborted) {
-        task.status = TaskStatus.CANCELLED;
-      } else {
-        task.status = result.ok ? TaskStatus.COMPLETED : TaskStatus.FAILED;
-        task.result = result;
-        if (!result.ok) {
-          task.error = result.error;
-        }
-      }
-      
-    } catch (err) {
-      task.status = err.name === 'AbortError' ? TaskStatus.CANCELLED : TaskStatus.FAILED;
-      task.error = err.message;
-    }
-    
-    // 清理
-    task.finished_at = new Date().toISOString();
-    this.abortControllers.delete(task.id);
-    this.state.current = null;
-    
-    // 从队列移除，加入历史
+    // 从队列移到运行中
     const taskIndex = this.state.tasks.findIndex(t => t.id === task.id);
     if (taskIndex !== -1) {
       this.state.tasks.splice(taskIndex, 1);
     }
-    this._addToHistory(task);
+    
+    // 标记调度器
+    this.scheduler.markRunning(task);
     
     await this._persist();
     
-    // 发出完成事件
-    const eventType = task.status === TaskStatus.COMPLETED 
-      ? QueueEventType.TASK_COMPLETED 
-      : task.status === TaskStatus.CANCELLED 
-        ? QueueEventType.TASK_CANCELLED 
-        : QueueEventType.TASK_FAILED;
+    this._emitEvent(QueueEventType.TASK_STARTED, { task_id: task.id });
+    console.log(`[TaskQueue] Task ${task.id} started (domain: ${task.domain})`);
     
-    this._emitEvent(eventType, { 
-      task_id: task.id, 
-      status: task.status,
-      error: task.error,
-    });
+    // 创建取消控制器
+    const abortController = new AbortController();
     
-    console.log(`[TaskQueue] Task ${task.id} ${task.status}`);
+    // 执行任务
+    const promise = (async () => {
+      try {
+        const result = await this.executor(task, {
+          signal: abortController.signal,
+          queueManager: this,
+        });
+        
+        // 检查是否被取消
+        if (abortController.signal.aborted) {
+          task.status = TaskStatus.CANCELLED;
+        } else {
+          task.status = result.ok ? TaskStatus.COMPLETED : TaskStatus.FAILED;
+          task.result = result;
+          if (!result.ok) {
+            task.error = result.error;
+          }
+        }
+      } catch (err) {
+        task.status = err.name === 'AbortError' ? TaskStatus.CANCELLED : TaskStatus.FAILED;
+        task.error = err.message;
+      }
+      
+      // 清理
+      task.finished_at = new Date().toISOString();
+      this.runningTasks.delete(task.id);
+      this.scheduler.markFinished(task);
+      
+      // 加入历史
+      this._addToHistory(task);
+      
+      await this._persist();
+      
+      // 发出完成事件
+      const eventType = task.status === TaskStatus.COMPLETED 
+        ? QueueEventType.TASK_COMPLETED 
+        : task.status === TaskStatus.CANCELLED 
+          ? QueueEventType.TASK_CANCELLED 
+          : QueueEventType.TASK_FAILED;
+      
+      this._emitEvent(eventType, { 
+        task_id: task.id, 
+        status: task.status,
+        error: task.error,
+      });
+      
+      console.log(`[TaskQueue] Task ${task.id} ${task.status}`);
+      
+      // 处理下一批
+      setImmediate(() => this._processNext());
+    })();
     
-    // 处理下一个
-    setImmediate(() => this._processNext());
+    // 记录运行中的任务
+    this.runningTasks.set(task.id, { task, promise, abortController });
   }
 
   /**
@@ -526,10 +608,15 @@ export class TaskQueueManager extends EventEmitter {
       // 确保目录存在
       await fs.mkdir(path.dirname(this.queueFile), { recursive: true });
       
-      // 写入状态
+      // 写入状态（包括运行中的任务）
+      const tasksToSave = [...this.state.tasks];
+      for (const [id, info] of this.runningTasks) {
+        tasksToSave.push(info.task);
+      }
+      
       const content = JSON.stringify({
         paused: this.state.paused,
-        tasks: this.state.tasks,
+        tasks: tasksToSave,
         history: this.state.history,
         updated_at: new Date().toISOString(),
       }, null, 2);
@@ -560,10 +647,14 @@ export class TaskQueueManager extends EventEmitter {
   async shutdown() {
     this.processing = false;
     
-    // 取消当前任务
-    if (this.state.current) {
-      await this.cancel(this.state.current);
+    // 取消所有运行中的任务
+    for (const [id, info] of this.runningTasks) {
+      info.abortController.abort();
     }
+    
+    // 等待所有任务结束
+    const promises = [...this.runningTasks.values()].map(info => info.promise);
+    await Promise.allSettled(promises);
     
     // 最终持久化
     await this._persist();

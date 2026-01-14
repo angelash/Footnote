@@ -52,6 +52,12 @@
       "required": false,
       "default": "/mnt/f/workspace/github/Footnote",
       "description": "项目根目录"
+    },
+    "skip_git": {
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "是否跳过 Git 提交（默认跳过，人工提交）"
     }
   },
 
@@ -85,8 +91,17 @@
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 30000,
-      "on_success": "git_commit",
+      "on_success": "check_skip_git",
       "on_failure": "notify_error"
+    },
+    {
+      "id": "check_skip_git",
+      "type": "condition",
+      "name": "检查是否跳过 Git",
+      "description": "根据 skip_git 参数决定是否执行 Git 提交",
+      "expression": "inputs.skip_git === true",
+      "on_true": "notify_success",
+      "on_false": "git_commit"
     },
     {
       "id": "git_commit",
@@ -132,7 +147,9 @@
   "edges": [
     { "from": "intake", "to": "check_zone_exists" },
     { "from": "check_zone_exists", "to": "add_object_to_zone" },
-    { "from": "add_object_to_zone", "to": "git_commit" },
+    { "from": "add_object_to_zone", "to": "check_skip_git" },
+    { "from": "check_skip_git", "to": "notify_success", "condition": "skip_git=true" },
+    { "from": "check_skip_git", "to": "git_commit", "condition": "skip_git=false" },
     { "from": "git_commit", "to": "notify_success" }
   ],
 

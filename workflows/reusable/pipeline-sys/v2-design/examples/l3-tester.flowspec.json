@@ -47,6 +47,12 @@
       "required": false,
       "default": false,
       "description": "是否需要浏览器环境"
+    },
+    "skip_git": {
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "是否跳过 Git 提交（默认跳过，人工提交）"
     }
   },
 
@@ -134,8 +140,17 @@
       "type": "condition",
       "name": "检查测试结果",
       "expression": "(nodes.execute_browser_tests && nodes.execute_browser_tests.status === 'SUCCESS') || (nodes.execute_tests && nodes.execute_tests.status === 'SUCCESS')",
-      "on_true": "git_commit",
+      "on_true": "check_skip_git",
       "on_false": "notify_test_failure"
+    },
+    {
+      "id": "check_skip_git",
+      "type": "condition",
+      "name": "检查是否跳过 Git",
+      "description": "根据 skip_git 参数决定是否执行 Git 提交",
+      "expression": "inputs.skip_git === true",
+      "on_true": "notify_success",
+      "on_false": "git_commit"
     },
     {
       "id": "git_commit",
@@ -215,8 +230,10 @@
     { "from": "execute_browser_tests", "to": "generate_report" },
     { "from": "execute_tests", "to": "generate_report" },
     { "from": "generate_report", "to": "check_test_result" },
-    { "from": "check_test_result", "to": "git_commit", "condition": "pass" },
+    { "from": "check_test_result", "to": "check_skip_git", "condition": "pass" },
     { "from": "check_test_result", "to": "notify_test_failure", "condition": "fail" },
+    { "from": "check_skip_git", "to": "notify_success", "condition": "skip_git=true" },
+    { "from": "check_skip_git", "to": "git_commit", "condition": "skip_git=false" },
     { "from": "git_commit", "to": "notify_success" }
   ],
 

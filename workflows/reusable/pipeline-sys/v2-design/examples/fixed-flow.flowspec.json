@@ -60,6 +60,12 @@
       "required": false,
       "default": "",
       "description": "任务预期结果描述"
+    },
+    "skip_git": {
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "是否跳过 Git 提交（默认跳过，人工提交）"
     }
   },
 
@@ -265,7 +271,16 @@
       "description": "标记流程成功完成",
       "expression": "({ ok: true, finished_at: new Date().toISOString() })",
       "timeout_ms": 300000,
-      "on_success": "stage.git"
+      "on_success": "check_skip_git"
+    },
+    {
+      "id": "check_skip_git",
+      "type": "condition",
+      "name": "检查是否跳过 Git",
+      "description": "根据 skip_git 参数决定是否执行 Git 提交",
+      "expression": "inputs.skip_git === true",
+      "on_true": "stage.notify_success",
+      "on_false": "stage.git"
     },
     {
       "id": "stage.git",
@@ -336,7 +351,9 @@
     { "from": "execute.lint", "to": "execute.test" },
     { "from": "execute.test", "to": "execute.summary" },
     { "from": "execute.summary", "to": "stage.done" },
-    { "from": "stage.done", "to": "stage.git" },
+    { "from": "stage.done", "to": "check_skip_git" },
+    { "from": "check_skip_git", "to": "stage.notify_success", "condition": "skip_git=true" },
+    { "from": "check_skip_git", "to": "stage.git", "condition": "skip_git=false" },
     { "from": "stage.git", "to": "stage.notify_success" }
   ],
 

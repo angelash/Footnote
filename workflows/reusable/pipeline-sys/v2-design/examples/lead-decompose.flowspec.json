@@ -56,15 +56,54 @@
       "name": "接收任务",
       "expression": "({ task_id: inputs.task_id, title: inputs.title, lead_role: inputs.lead_role, started_at: new Date().toISOString() })",
       "timeout_ms": 60000,
-      "on_success": "analyze_scope"
+      "on_success": "prepare_decompose_input"
+    },
+    {
+      "id": "prepare_decompose_input",
+      "type": "transform",
+      "name": "准备拆分输入",
+      "description": "构建 AI 任务拆分的输入数据",
+      "expression": "(() => { return JSON.stringify({ task_id: inputs.task_id, title: inputs.title, description: inputs.description, lead_role: inputs.lead_role, max_subtasks: inputs.max_subtasks, project_context: 'Footnote 游戏项目 - 叙事驱动2D系统策略冒险游戏' }); })()",
+      "timeout_ms": 30000,
+      "on_success": "ai_analyze_scope"
+    },
+    {
+      "id": "ai_analyze_scope",
+      "type": "shell",
+      "name": "AI 分析任务范围",
+      "description": "调用 cursor-agent 智能分析任务拆分",
+      "command": "bash workflows/project/tools/ai-analyze.sh --type task-decompose --input '${nodes.prepare_decompose_input.output}' --model gpt-5.2 --timeout 180",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 300000,
+      "on_success": "parse_decompose_result",
+      "on_failure": "fallback_analyze"
+    },
+    {
+      "id": "fallback_analyze",
+      "type": "transform",
+      "name": "降级分析",
+      "description": "AI 分析失败时使用关键词匹配",
+      "expression": "(() => { const desc = inputs.description.toLowerCase(); const modules = []; if (desc.includes('ui') || desc.includes('界面')) modules.push('ui'); if (desc.includes('系统') || desc.includes('功能')) modules.push('systems'); if (desc.includes('对白') || desc.includes('剧情')) modules.push('narrative'); if (desc.includes('测试')) modules.push('qa'); if (modules.length === 0) modules.push('general'); return { complexity: modules.length > 3 ? 'complex' : 'normal', estimated_hours: 4, modules: modules, subtasks: modules.map((m, i) => ({ id: 'SUB' + (i+1), title: inputs.title + ' - ' + m, description: '(由组长填写)', role: 'L3_engineer', priority: 'normal', estimated_hours: 2 })), dependencies: [], risks: ['使用降级分析，建议人工确认'], summary: '降级分析结果，建议人工复核' }; })()",
+      "timeout_ms": 30000,
+      "on_success": "check_complexity"
+    },
+    {
+      "id": "parse_decompose_result",
+      "type": "transform",
+      "name": "解析拆分结果",
+      "description": "解析 cursor-agent 返回的 JSON",
+      "expression": "(() => { try { const result = JSON.parse(nodes.ai_analyze_scope.output.stdout); return { complexity: result.complexity || 'normal', estimated_hours: result.estimated_hours || 4, modules: result.modules || ['general'], subtasks: result.subtasks || [], dependencies: result.dependencies || [], risks: result.risks || [], summary: result.summary || '分析完成' }; } catch(e) { return { complexity: 'normal', estimated_hours: 4, modules: ['general'], subtasks: [], dependencies: [], risks: ['解析失败'], summary: '解析 AI 结果失败' }; } })()",
+      "timeout_ms": 30000,
+      "on_success": "check_complexity"
     },
     {
       "id": "analyze_scope",
       "type": "transform",
-      "name": "分析任务范围",
-      "description": "判断任务涉及的模块和子任务",
-      "expression": "(() => { const desc = inputs.description.toLowerCase(); const modules = []; const subtasks = []; if (desc.includes('ui') || desc.includes('界面')) modules.push('ui'); if (desc.includes('系统') || desc.includes('功能')) modules.push('systems'); if (desc.includes('对白') || desc.includes('剧情')) modules.push('narrative'); if (desc.includes('测试')) modules.push('qa'); const estimatedSubtasks = Math.min(modules.length || 1, inputs.max_subtasks); return { modules, estimated_subtasks: estimatedSubtasks, complexity: estimatedSubtasks > 3 ? 'complex' : 'normal' }; })()",
-      "timeout_ms": 60000,
+      "name": "整合分析结果",
+      "description": "整合 AI 或 fallback 的分析结果",
+      "expression": "(() => { const result = nodes.parse_decompose_result ? nodes.parse_decompose_result.output : (nodes.fallback_analyze ? nodes.fallback_analyze.output : {}); return { modules: result.modules || ['general'], subtasks: result.subtasks || [], estimated_subtasks: (result.subtasks || []).length || result.modules.length || 1, complexity: result.complexity || 'normal', estimated_hours: result.estimated_hours || 4, dependencies: result.dependencies || [], risks: result.risks || [], summary: result.summary || '' }; })()",
+      "timeout_ms": 30000,
       "on_success": "check_complexity"
     },
     {
@@ -212,7 +251,12 @@
   ],
 
   "edges": [
-    { "from": "intake", "to": "analyze_scope" },
+    { "from": "intake", "to": "prepare_decompose_input" },
+    { "from": "prepare_decompose_input", "to": "ai_analyze_scope" },
+    { "from": "ai_analyze_scope", "to": "parse_decompose_result", "condition": "success" },
+    { "from": "ai_analyze_scope", "to": "fallback_analyze", "condition": "failure" },
+    { "from": "parse_decompose_result", "to": "analyze_scope" },
+    { "from": "fallback_analyze", "to": "analyze_scope" },
     { "from": "analyze_scope", "to": "check_complexity" },
     { "from": "check_complexity", "to": "generate_subtasks", "condition": "complex" },
     { "from": "check_complexity", "to": "generate_single_taskpack", "condition": "simple" },

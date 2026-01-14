@@ -113,31 +113,49 @@
       "on_failure": "notify_error"
     },
     {
-      "id": "check_required_sections",
+      "id": "prepare_design_input",
       "type": "transform",
-      "name": "检查必要章节",
-      "description": "根据文档类型检查必要章节",
-      "expression": "(function() { const docType = inputs.doc_type; const content = nodes.load_document.output.content || ''; const requiredSections = { spec: ['inputs', 'outputs', 'constraints', 'deliverables'], taskpack: ['outcome', 'allowed inputs', 'deliverables', 'constraints', 'acceptance'], bible: ['overview', 'principles', 'guidelines', 'references'] }; const required = requiredSections[docType] || requiredSections.spec; const missing = required.filter(s => !content.toLowerCase().includes(s)); return { doc_type: docType, required_sections: required, missing_sections: missing, completeness_score: Math.round(((required.length - missing.length) / required.length) * 100) }; })()",
-      "timeout_ms": 60000,
+      "name": "准备设计审查输入",
+      "description": "构建 AI 设计审查的输入数据",
+      "expression": "(() => { const content = nodes.load_document.output.content || ''; const parentContent = nodes.load_parent_document ? (nodes.load_parent_document.output.content || '') : ''; return JSON.stringify({ doc_path: inputs.doc_path, doc_type: inputs.doc_type, review_focus: inputs.review_focus, content_preview: content.slice(0, 5000), parent_content_preview: parentContent.slice(0, 2000), structure: (nodes.analyze_structure.output.stdout || '').slice(0, 1000) }); })()",
+      "timeout_ms": 30000,
       "on_success": "ai_design_review"
     },
     {
       "id": "ai_design_review",
       "type": "shell",
       "name": "AI 设计审查",
-      "description": "使用 AI 进行设计质量审查",
-      "command": "echo '设计审查分析...' && echo '{\"completeness\":${nodes.check_required_sections.output.completeness_score},\"consistency\":85,\"feasibility\":80,\"clarity\":78,\"issues\":[],\"suggestions\":[\"建议补充边界条件说明\"],\"summary\":\"设计文档基本完整，建议补充细节\"}'",
+      "description": "调用 cursor-agent 进行设计质量审查",
+      "command": "bash workflows/project/tools/ai-analyze.sh --type design-review --input '${nodes.prepare_design_input.output}' --model gpt-5.2 --timeout 180",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 300000,
-      "on_success": "calculate_score",
-      "on_failure": "notify_error"
+      "on_success": "parse_design_result",
+      "on_failure": "fallback_design_review"
+    },
+    {
+      "id": "fallback_design_review",
+      "type": "transform",
+      "name": "降级设计审查",
+      "description": "AI 审查失败时使用默认评分",
+      "expression": "({ completeness: 70, consistency: 70, feasibility: 70, clarity: 70, missing_sections: [], issues: [], suggestions: ['AI 审查失败，使用默认评分'], summary: '无法完成 AI 审查' })",
+      "timeout_ms": 30000,
+      "on_success": "calculate_score"
+    },
+    {
+      "id": "parse_design_result",
+      "type": "transform",
+      "name": "解析设计审查结果",
+      "description": "解析 cursor-agent 返回的 JSON",
+      "expression": "(() => { try { const result = JSON.parse(nodes.ai_design_review.output.stdout); return { completeness: result.completeness || 70, consistency: result.consistency || 70, feasibility: result.feasibility || 70, clarity: result.clarity || 70, missing_sections: result.missing_sections || [], issues: result.issues || [], suggestions: result.suggestions || [], summary: result.summary || '审查完成' }; } catch(e) { return { completeness: 70, consistency: 70, feasibility: 70, clarity: 70, missing_sections: [], issues: [], suggestions: ['解析失败'], summary: '解析 AI 结果失败' }; } })()",
+      "timeout_ms": 30000,
+      "on_success": "calculate_score"
     },
     {
       "id": "calculate_score",
       "type": "transform",
       "name": "计算综合评分",
-      "expression": "(function() { const weights = { completeness: 0.35, consistency: 0.25, feasibility: 0.25, clarity: 0.15 }; const scores = { completeness: nodes.check_required_sections.output.completeness_score, consistency: 85, feasibility: 80, clarity: 78 }; let total = 0; for (const [dim, weight] of Object.entries(weights)) { total += (scores[dim] || 70) * weight; } return { total_score: Math.round(total), dimensions: scores, pass_threshold: inputs.pass_threshold, passed: total >= inputs.pass_threshold, missing_sections: nodes.check_required_sections.output.missing_sections }; })()",
+      "expression": "(function() { const weights = { completeness: 0.35, consistency: 0.25, feasibility: 0.25, clarity: 0.15 }; const aiResult = nodes.parse_design_result ? nodes.parse_design_result.output : (nodes.fallback_design_review ? nodes.fallback_design_review.output : {}); const scores = { completeness: aiResult.completeness || 70, consistency: aiResult.consistency || 70, feasibility: aiResult.feasibility || 70, clarity: aiResult.clarity || 70 }; let total = 0; for (const [dim, weight] of Object.entries(weights)) { total += (scores[dim] || 70) * weight; } return { total_score: Math.round(total), dimensions: scores, issues: aiResult.issues || [], suggestions: aiResult.suggestions || [], summary: aiResult.summary || '', pass_threshold: inputs.pass_threshold, passed: total >= inputs.pass_threshold, missing_sections: aiResult.missing_sections || [] }; })()",
       "timeout_ms": 60000,
       "on_success": "determine_result"
     },
@@ -155,7 +173,7 @@
       "id": "generate_approved_report",
       "type": "transform",
       "name": "生成通过报告",
-      "expression": "({ review_id: nodes.intake.output.review_id, doc_path: inputs.doc_path, doc_type: inputs.doc_type, result: 'APPROVED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [], suggestions: ['建议补充边界条件说明'], summary: '设计审查通过', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "expression": "({ review_id: nodes.intake.output.review_id, doc_path: inputs.doc_path, doc_type: inputs.doc_type, result: 'APPROVED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: nodes.calculate_score.output.issues || [], suggestions: nodes.calculate_score.output.suggestions || [], summary: nodes.calculate_score.output.summary || '设计审查通过', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
       "timeout_ms": 60000,
       "on_success": "save_review_record"
     },
@@ -163,7 +181,7 @@
       "id": "generate_revision_report",
       "type": "transform",
       "name": "生成需修订报告",
-      "expression": "({ review_id: nodes.intake.output.review_id, doc_path: inputs.doc_path, doc_type: inputs.doc_type, result: 'REVISION_REQUIRED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [{ type: 'missing', sections: nodes.calculate_score.output.missing_sections, message: '缺少必要章节' }], suggestions: ['补充缺失章节', '完善细节描述'], summary: '需要修订后重新提交', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "expression": "({ review_id: nodes.intake.output.review_id, doc_path: inputs.doc_path, doc_type: inputs.doc_type, result: 'REVISION_REQUIRED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: nodes.calculate_score.output.issues.length > 0 ? nodes.calculate_score.output.issues : [{ type: 'missing', sections: nodes.calculate_score.output.missing_sections, message: '缺少必要章节或总分未达标' }], suggestions: nodes.calculate_score.output.suggestions || ['补充缺失章节', '完善细节描述'], summary: nodes.calculate_score.output.summary || '需要修订后重新提交', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
       "timeout_ms": 60000,
       "on_success": "save_review_record"
     },
@@ -230,9 +248,12 @@
     { "from": "check_parent_doc", "to": "load_parent_document", "condition": "has_parent" },
     { "from": "check_parent_doc", "to": "analyze_structure", "condition": "no_parent" },
     { "from": "load_parent_document", "to": "analyze_structure" },
-    { "from": "analyze_structure", "to": "check_required_sections" },
-    { "from": "check_required_sections", "to": "ai_design_review" },
-    { "from": "ai_design_review", "to": "calculate_score" },
+    { "from": "analyze_structure", "to": "prepare_design_input" },
+    { "from": "prepare_design_input", "to": "ai_design_review" },
+    { "from": "ai_design_review", "to": "parse_design_result", "condition": "success" },
+    { "from": "ai_design_review", "to": "fallback_design_review", "condition": "failure" },
+    { "from": "parse_design_result", "to": "calculate_score" },
+    { "from": "fallback_design_review", "to": "calculate_score" },
     { "from": "calculate_score", "to": "determine_result" },
     { "from": "determine_result", "to": "generate_approved_report", "condition": "pass" },
     { "from": "determine_result", "to": "generate_revision_report", "condition": "fail" },

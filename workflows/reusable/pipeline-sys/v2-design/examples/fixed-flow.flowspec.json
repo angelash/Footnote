@@ -105,11 +105,48 @@
       "on_failure": "stage.notify_error"
     },
     {
+      "id": "prepare_plan_input",
+      "type": "transform",
+      "name": "准备计划输入",
+      "description": "构建 AI 执行计划的输入数据",
+      "expression": "(() => { return JSON.stringify({ task_id: inputs.task_id, title: inputs.title, outcome: inputs.outcome || '', task_type: inputs.task_type, complexity: inputs.complexity, role: inputs.role, git_status: (nodes['stage.preflight'].output.stdout || '').slice(0, 500) }); })()",
+      "timeout_ms": 30000,
+      "on_success": "ai_generate_plan"
+    },
+    {
+      "id": "ai_generate_plan",
+      "type": "shell",
+      "name": "AI 生成执行计划",
+      "description": "调用 cursor-agent 生成智能执行计划",
+      "command": "bash workflows/project/tools/ai-analyze.sh --type plan-generate --input '${nodes.prepare_plan_input.output}' --model gpt-5.2 --timeout 60",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "parse_plan_result",
+      "on_failure": "fallback_plan"
+    },
+    {
+      "id": "fallback_plan",
+      "type": "transform",
+      "name": "降级执行计划",
+      "expression": "({ task_type: inputs.task_type || 'code', complexity: inputs.complexity || 'normal', estimated_duration_minutes: 60, steps: [], required_tools: ['cursor-agent'], potential_blockers: [], success_criteria: ['任务完成'], summary: '使用默认执行计划' })",
+      "timeout_ms": 30000,
+      "on_success": "execute.plan"
+    },
+    {
+      "id": "parse_plan_result",
+      "type": "transform",
+      "name": "解析计划结果",
+      "expression": "(() => { try { const result = JSON.parse(nodes.ai_generate_plan.output.stdout); return { task_type: result.task_type || inputs.task_type || 'code', complexity: result.complexity || inputs.complexity || 'normal', estimated_duration_minutes: result.estimated_duration_minutes || 60, steps: result.steps || [], required_tools: result.required_tools || [], potential_blockers: result.potential_blockers || [], success_criteria: result.success_criteria || [], summary: result.summary || '' }; } catch(e) { return { task_type: inputs.task_type || 'code', complexity: inputs.complexity || 'normal', estimated_duration_minutes: 60, steps: [], required_tools: [], potential_blockers: [], success_criteria: [], summary: '解析失败' }; } })()",
+      "timeout_ms": 30000,
+      "on_success": "execute.plan"
+    },
+    {
       "id": "execute.plan",
       "type": "transform",
-      "name": "生成执行计划",
-      "description": "根据输入参数生成执行计划",
-      "expression": "({ ok: true, planned_at: new Date().toISOString(), role: inputs.role, task_type: inputs.task_type, complexity: inputs.complexity, model_override: inputs.model_override, runner: 'wsl-runner-v2' })",
+      "name": "整合执行计划",
+      "description": "整合 AI 或 fallback 的执行计划",
+      "expression": "(() => { const plan = nodes.parse_plan_result ? nodes.parse_plan_result.output : (nodes.fallback_plan ? nodes.fallback_plan.output : {}); return { ok: true, planned_at: new Date().toISOString(), role: inputs.role, task_type: plan.task_type || inputs.task_type, complexity: plan.complexity || inputs.complexity, model_override: inputs.model_override, runner: 'wsl-runner-v2', ai_plan: plan }; })()",
       "timeout_ms": 300000,
       "on_success": "execute.taskpack"
     },
@@ -120,14 +157,51 @@
       "description": "检查是否提供了 TaskPack，否则生成",
       "expression": "inputs.task_pack_path && inputs.task_pack_path.length > 0",
       "on_true": "execute.edit",
-      "on_false": "execute.compose_taskpack"
+      "on_false": "prepare_taskpack_input"
     },
     {
-      "id": "execute.compose_taskpack",
+      "id": "prepare_taskpack_input",
+      "type": "transform",
+      "name": "准备 TaskPack 输入",
+      "description": "构建 AI TaskPack 生成的输入数据",
+      "expression": "(() => { return JSON.stringify({ task_id: inputs.task_id, title: inputs.title, outcome: inputs.outcome || '', task_type: inputs.task_type, complexity: inputs.complexity, role: inputs.role }); })()",
+      "timeout_ms": 30000,
+      "on_success": "ai_compose_taskpack"
+    },
+    {
+      "id": "ai_compose_taskpack",
       "type": "shell",
-      "name": "生成 TaskPack",
-      "description": "自动生成 TaskPack 文件",
-      "command": "node -e \"const fs = require('fs'); const path = require('path'); const taskId = '${inputs.task_id}'; const title = '${inputs.title}'.replace(/'/g, ''); const taskType = '${inputs.task_type}'; const complexity = '${inputs.complexity}'; const modelOverride = '${inputs.model_override}'; const outcome = '${inputs.outcome}'.replace(/'/g, ''); const fileName = taskId + '_task.md'; const relPath = 'design/ai-native/03_taskpacks/' + fileName; const content = ['---', 'task_id: ' + taskId, 'title: \\\"' + title + '\\\"', 'task_type: ' + taskType, 'complexity: ' + complexity, 'model_override: ' + modelOverride, 'execution_runtime: wsl', 'requires_mcp: false', '---', '', '# TASK-PACK: ' + taskId, '', '## 1. Outcome（可观察结果）', outcome || '-', '', '## 2. Allowed Inputs（允许引用的输入）', '- [`dir`] `./`', '', '## 3. Deliverables（必须交付物）', '- (由 AI 根据任务确定)', '', '## 4. Constraints（硬约束 / 禁止事项）', '- 不得修改冻结目录', '', '## 5. Acceptance Checklist（验收清单）', '- [ ] 交付物落盘', ''].join('\\n'); fs.mkdirSync(path.dirname(relPath), { recursive: true }); fs.writeFileSync(relPath, content); console.log(relPath);\"",
+      "name": "AI 生成 TaskPack",
+      "description": "调用 cursor-agent 生成详细 TaskPack",
+      "command": "bash workflows/project/tools/ai-analyze.sh --type taskpack-generate --input '${nodes.prepare_taskpack_input.output}' --model gpt-5.2 --timeout 60",
+      "cwd": "${inputs.project_root}",
+      "shell": "bash",
+      "timeout_ms": 120000,
+      "on_success": "parse_taskpack_result",
+      "on_failure": "fallback_compose_taskpack"
+    },
+    {
+      "id": "fallback_compose_taskpack",
+      "type": "transform",
+      "name": "降级 TaskPack 生成",
+      "expression": "(() => { return { task_id: inputs.task_id, title: inputs.title, task_type: inputs.task_type || 'code', complexity: inputs.complexity || 'normal', outcome: inputs.outcome || '-', allowed_inputs: ['./'], deliverables: ['待定'], constraints: ['不得修改冻结目录'], acceptance_checklist: ['交付物落盘'], recommended_role: inputs.role || 'L3_engineer', estimated_hours: 4 }; })()",
+      "timeout_ms": 30000,
+      "on_success": "write_taskpack"
+    },
+    {
+      "id": "parse_taskpack_result",
+      "type": "transform",
+      "name": "解析 TaskPack 结果",
+      "expression": "(() => { try { const result = JSON.parse(nodes.ai_compose_taskpack.output.stdout); return { task_id: result.task_id || inputs.task_id, title: result.title || inputs.title, task_type: result.task_type || inputs.task_type || 'code', complexity: result.complexity || inputs.complexity || 'normal', outcome: result.outcome || inputs.outcome || '-', allowed_inputs: result.allowed_inputs || ['./'], deliverables: result.deliverables || ['待定'], constraints: result.constraints || ['不得修改冻结目录'], acceptance_checklist: result.acceptance_checklist || ['交付物落盘'], recommended_role: result.recommended_role || inputs.role || 'L3_engineer', estimated_hours: result.estimated_hours || 4 }; } catch(e) { return { task_id: inputs.task_id, title: inputs.title, task_type: 'code', complexity: 'normal', outcome: '-', allowed_inputs: ['./'], deliverables: ['待定'], constraints: ['不得修改冻结目录'], acceptance_checklist: ['交付物落盘'], recommended_role: 'L3_engineer', estimated_hours: 4 }; } })()",
+      "timeout_ms": 30000,
+      "on_success": "write_taskpack"
+    },
+    {
+      "id": "write_taskpack",
+      "type": "shell",
+      "name": "写入 TaskPack",
+      "description": "将 AI 生成的 TaskPack 写入文件",
+      "command": "node -e \"const fs = require('fs'); const path = require('path'); const tp = ${JSON.stringify(nodes.parse_taskpack_result ? nodes.parse_taskpack_result.output : nodes.fallback_compose_taskpack.output)}; const fileName = tp.task_id + '_task.md'; const relPath = 'design/ai-native/03_taskpacks/' + fileName; const content = ['---', 'task_id: ' + tp.task_id, 'title: \\\"' + (tp.title || '').replace(/\\\"/g, '') + '\\\"', 'task_type: ' + tp.task_type, 'complexity: ' + tp.complexity, 'model_override: auto', 'execution_runtime: wsl', 'requires_mcp: false', '---', '', '# TASK-PACK: ' + tp.task_id, '', '## 1. Outcome', tp.outcome, '', '## 2. Allowed Inputs', tp.allowed_inputs.map(i => '- ' + i).join('\\n'), '', '## 3. Deliverables', tp.deliverables.map(d => '- ' + d).join('\\n'), '', '## 4. Constraints', tp.constraints.map(c => '- ' + c).join('\\n'), '', '## 5. Acceptance Checklist', tp.acceptance_checklist.map(a => '- [ ] ' + a).join('\\n'), ''].join('\\n'); fs.mkdirSync(path.dirname(relPath), { recursive: true }); fs.writeFileSync(relPath, content); console.log(relPath);\"",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 300000,
@@ -243,11 +317,21 @@
 
   "edges": [
     { "from": "stage.intake", "to": "stage.preflight" },
-    { "from": "stage.preflight", "to": "execute.plan" },
+    { "from": "stage.preflight", "to": "prepare_plan_input" },
+    { "from": "prepare_plan_input", "to": "ai_generate_plan" },
+    { "from": "ai_generate_plan", "to": "parse_plan_result", "condition": "success" },
+    { "from": "ai_generate_plan", "to": "fallback_plan", "condition": "failure" },
+    { "from": "parse_plan_result", "to": "execute.plan" },
+    { "from": "fallback_plan", "to": "execute.plan" },
     { "from": "execute.plan", "to": "execute.taskpack" },
-    { "from": "execute.taskpack", "to": "execute.compose_taskpack", "condition": "!inputs.task_pack_path" },
+    { "from": "execute.taskpack", "to": "prepare_taskpack_input", "condition": "!inputs.task_pack_path" },
     { "from": "execute.taskpack", "to": "execute.edit", "condition": "inputs.task_pack_path" },
-    { "from": "execute.compose_taskpack", "to": "execute.edit" },
+    { "from": "prepare_taskpack_input", "to": "ai_compose_taskpack" },
+    { "from": "ai_compose_taskpack", "to": "parse_taskpack_result", "condition": "success" },
+    { "from": "ai_compose_taskpack", "to": "fallback_compose_taskpack", "condition": "failure" },
+    { "from": "parse_taskpack_result", "to": "write_taskpack" },
+    { "from": "fallback_compose_taskpack", "to": "write_taskpack" },
+    { "from": "write_taskpack", "to": "execute.edit" },
     { "from": "execute.edit", "to": "execute.lint" },
     { "from": "execute.lint", "to": "execute.test" },
     { "from": "execute.test", "to": "execute.summary" },

@@ -50,27 +50,54 @@ select_model() {
   local taskType="$1"
   local complexity="$2"
   local override="$3"
+  local taskPack="$4"
 
+  # 如果明确指定了模型，直接使用
   case "$override" in
     ""|auto|none|"-") override="";;
+    *)
+      echo "$override"
+      return 0
+      ;;
   esac
 
-  if [[ -n "$override" ]]; then
-    echo "$override"
-    return 0
+  # 尝试使用 AI 智能选择模型
+  local AI_ANALYZE_SCRIPT="${SCRIPT_DIR}/ai-analyze.sh"
+  if [[ -x "$AI_ANALYZE_SCRIPT" ]]; then
+    local taskContent=""
+    if [[ -f "$taskPack" ]]; then
+      taskContent="$(head -100 "$taskPack" 2>/dev/null | tr '\n' ' ' | sed 's/"/\\"/g')"
+    fi
+    local inputJson="{\"task_type\":\"$taskType\",\"complexity\":\"$complexity\",\"task_content\":\"$taskContent\"}"
+    
+    # 尝试 AI 选择（带超时，失败则降级）
+    local aiResult
+    aiResult=$(timeout 30s bash "$AI_ANALYZE_SCRIPT" --type model-select --input "$inputJson" 2>/dev/null || echo "")
+    
+    if [[ -n "$aiResult" ]]; then
+      local recommended
+      recommended=$(echo "$aiResult" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('recommended_model',''))" 2>/dev/null || echo "")
+      if [[ -n "$recommended" && "$recommended" != "auto" ]]; then
+        echo "[run-cursor-task] AI recommended model: $recommended" >&2
+        echo "$recommended"
+        return 0
+      fi
+    fi
   fi
 
+  # 降级：使用硬编码规则
+  echo "[run-cursor-task] Using fallback model selection" >&2
   case "$taskType" in
     doc)
       case "$complexity" in
-        high|max) echo "gpt-5.2-high";;
+        high|max|complex) echo "gpt-5.2-high";;
         normal) echo "gpt-5.2";;
         *) echo "gpt-5.2";;
       esac
       ;;
     code)
       case "$complexity" in
-        high|max) echo "opus-4.5-thinking";;
+        high|max|complex) echo "opus-4.5-thinking";;
         normal) echo "opus-4.5";;
         *) echo "opus-4.5";;
       esac
@@ -79,13 +106,19 @@ select_model() {
       echo "gemini-3-pro"
       ;;
     *)
-      # Safe default
-      echo "auto"
+      # Safe default based on complexity
+      case "$complexity" in
+        high|max|complex) echo "opus-4.5-thinking";;
+        *) echo "opus-4.5";;
+      esac
       ;;
   esac
 }
 
-MODEL="$(select_model "$TASK_TYPE" "$COMPLEXITY" "$MODEL_OVERRIDE")"
+# 获取脚本所在目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+MODEL="$(select_model "$TASK_TYPE" "$COMPLEXITY" "$MODEL_OVERRIDE" "$TASK_PACK")"
 
 echo "[run-cursor-task] task_pack=$TASK_PACK task_type=$TASK_TYPE complexity=$COMPLEXITY model=$MODEL" >&2
 

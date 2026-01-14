@@ -110,23 +110,50 @@
       "on_failure": "notify_error"
     },
     {
+      "id": "prepare_review_input",
+      "type": "transform",
+      "name": "准备审查输入",
+      "description": "构建 AI 审查的输入数据",
+      "expression": "(() => { const files = (nodes.detect_changes.output.stdout || '').split('\\n').filter(Boolean).slice(0, 20); const diff = (nodes.get_diff_content.output.stdout || '').slice(0, 5000); return JSON.stringify({ task_id: inputs.task_id, dimensions: inputs.review_dimensions, files: files, diff_preview: diff }); })()",
+      "timeout_ms": 30000,
+      "on_success": "ai_review"
+    },
+    {
       "id": "ai_review",
       "type": "shell",
       "name": "AI 代码审查",
-      "description": "使用 AI 进行代码审查分析",
-      "command": "cat << 'REVIEW_PROMPT' | head -100\n代码审查请求:\n任务ID: ${inputs.task_id}\n审查维度: ${inputs.review_dimensions}\n\n变更文件:\n$(echo \"${nodes.detect_changes.output.stdout}\" | head -20)\n\n代码差异摘要:\n$(echo \"${nodes.get_diff_content.output.stdout}\" | head -100)\n\n请评估:\n1. 逻辑正确性 (0-100)\n2. 代码规范 (0-100)\n3. 安全性 (0-100)\n4. 性能 (0-100)\n5. 可维护性 (0-100)\n\n输出JSON格式评分和问题列表\nREVIEW_PROMPT\necho '{\"logic\":85,\"style\":80,\"security\":90,\"performance\":75,\"maintainability\":82,\"issues\":[],\"summary\":\"代码质量良好，建议优化性能相关代码\"}'",
+      "description": "调用 cursor-agent 进行代码审查分析",
+      "command": "bash workflows/project/tools/ai-analyze.sh --type code-review --input '${nodes.prepare_review_input.output}' --model gpt-5.2 --timeout 180",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 300000,
-      "on_success": "calculate_score",
-      "on_failure": "notify_error"
+      "on_success": "parse_ai_result",
+      "on_failure": "fallback_review"
+    },
+    {
+      "id": "fallback_review",
+      "type": "transform",
+      "name": "降级审查",
+      "description": "AI 审查失败时使用默认评分",
+      "expression": "({ logic: 70, style: 70, security: 70, performance: 70, maintainability: 70, issues: [], suggestions: ['AI 审查失败，使用默认评分'], summary: '无法完成 AI 审查' })",
+      "timeout_ms": 30000,
+      "on_success": "calculate_score"
+    },
+    {
+      "id": "parse_ai_result",
+      "type": "transform",
+      "name": "解析 AI 结果",
+      "description": "解析 cursor-agent 返回的 JSON",
+      "expression": "(() => { try { const result = JSON.parse(nodes.ai_review.output.stdout); return { logic: result.logic || 70, style: result.style || 70, security: result.security || 70, performance: result.performance || 70, maintainability: result.maintainability || 70, issues: result.issues || [], suggestions: result.suggestions || [], summary: result.summary || '审查完成' }; } catch(e) { return { logic: 70, style: 70, security: 70, performance: 70, maintainability: 70, issues: [], suggestions: ['解析失败'], summary: '解析 AI 结果失败' }; } })()",
+      "timeout_ms": 30000,
+      "on_success": "calculate_score"
     },
     {
       "id": "calculate_score",
       "type": "transform",
       "name": "计算综合评分",
-      "description": "根据各维度权重计算总分",
-      "expression": "(function() { const weights = { logic: 0.30, style: 0.25, security: 0.20, performance: 0.15, maintainability: 0.10 }; const scores = { logic: 85, style: 80, security: 90, performance: 75, maintainability: 82 }; let total = 0; for (const [dim, weight] of Object.entries(weights)) { total += (scores[dim] || 70) * weight; } return { total_score: Math.round(total), dimensions: scores, pass_threshold: inputs.pass_threshold, passed: total >= inputs.pass_threshold }; })()",
+      "description": "根据 AI 返回的各维度分数计算总分",
+      "expression": "(function() { const weights = { logic: 0.30, style: 0.25, security: 0.20, performance: 0.15, maintainability: 0.10 }; const aiResult = nodes.parse_ai_result ? nodes.parse_ai_result.output : (nodes.fallback_review ? nodes.fallback_review.output : {}); const scores = { logic: aiResult.logic || 70, style: aiResult.style || 70, security: aiResult.security || 70, performance: aiResult.performance || 70, maintainability: aiResult.maintainability || 70 }; let total = 0; for (const [dim, weight] of Object.entries(weights)) { total += (scores[dim] || 70) * weight; } return { total_score: Math.round(total), dimensions: scores, issues: aiResult.issues || [], suggestions: aiResult.suggestions || [], summary: aiResult.summary || '', pass_threshold: inputs.pass_threshold, passed: total >= inputs.pass_threshold }; })()",
       "timeout_ms": 60000,
       "on_success": "determine_result"
     },
@@ -144,7 +171,7 @@
       "id": "generate_approved_report",
       "type": "transform",
       "name": "生成通过报告",
-      "expression": "({ review_id: nodes.intake.output.review_id, task_id: inputs.task_id, result: 'APPROVED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [], summary: '代码审查通过', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "expression": "({ review_id: nodes.intake.output.review_id, task_id: inputs.task_id, result: 'APPROVED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: nodes.calculate_score.output.issues || [], suggestions: nodes.calculate_score.output.suggestions || [], summary: nodes.calculate_score.output.summary || '代码审查通过', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
       "timeout_ms": 60000,
       "on_success": "save_review_record"
     },
@@ -152,7 +179,7 @@
       "id": "generate_changes_requested_report",
       "type": "transform",
       "name": "生成需修改报告",
-      "expression": "({ review_id: nodes.intake.output.review_id, task_id: inputs.task_id, result: 'CHANGES_REQUESTED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: [{ severity: 'major', message: '总分未达到通过阈值 ' + inputs.pass_threshold }], summary: '需要修改后重新提交', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
+      "expression": "({ review_id: nodes.intake.output.review_id, task_id: inputs.task_id, result: 'CHANGES_REQUESTED', score: nodes.calculate_score.output.total_score, dimensions: nodes.calculate_score.output.dimensions, issues: nodes.calculate_score.output.issues.length > 0 ? nodes.calculate_score.output.issues : [{ severity: 'major', message: '总分未达到通过阈值 ' + inputs.pass_threshold }], suggestions: nodes.calculate_score.output.suggestions || [], summary: nodes.calculate_score.output.summary || '需要修改后重新提交', reviewer: inputs.reviewer, completed_at: new Date().toISOString() })",
       "timeout_ms": 60000,
       "on_success": "save_review_record"
     },
@@ -216,8 +243,12 @@
     { "from": "detect_changes", "to": "check_has_changes" },
     { "from": "check_has_changes", "to": "get_diff_content", "condition": "has_changes" },
     { "from": "check_has_changes", "to": "no_changes_to_review", "condition": "no_changes" },
-    { "from": "get_diff_content", "to": "ai_review" },
-    { "from": "ai_review", "to": "calculate_score" },
+    { "from": "get_diff_content", "to": "prepare_review_input" },
+    { "from": "prepare_review_input", "to": "ai_review" },
+    { "from": "ai_review", "to": "parse_ai_result", "condition": "success" },
+    { "from": "ai_review", "to": "fallback_review", "condition": "failure" },
+    { "from": "parse_ai_result", "to": "calculate_score" },
+    { "from": "fallback_review", "to": "calculate_score" },
     { "from": "calculate_score", "to": "determine_result" },
     { "from": "determine_result", "to": "generate_approved_report", "condition": "pass" },
     { "from": "determine_result", "to": "generate_changes_requested_report", "condition": "fail" },

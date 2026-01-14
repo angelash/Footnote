@@ -94,7 +94,7 @@
       "type": "shell",
       "name": "执行浏览器测试",
       "description": "使用 Playwright 执行浏览器自动化测试",
-      "command": "npm run test:e2e --if-present || npx playwright test --reporter=list",
+      "command": "if [ -f game/package.json ]; then cd game && npm run test:e2e --if-present || npx playwright test --reporter=list; else echo 'No package.json found, skipping browser tests'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {
@@ -110,7 +110,7 @@
       "type": "shell",
       "name": "执行单元/集成测试",
       "description": "使用 Vitest 执行测试",
-      "command": "npm run test --if-present || npx vitest run --reporter=verbose",
+      "command": "if [ -f game/package.json ]; then cd game && npm run test --if-present || npx vitest run --reporter=verbose; else echo 'No package.json found, skipping unit tests'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "env": {

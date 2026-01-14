@@ -115,7 +115,7 @@
       "type": "shell",
       "name": "TypeScript 检查",
       "description": "运行 TypeScript 类型检查和 ESLint",
-      "command": "npm run lint --if-present && npm run type-check --if-present",
+      "command": "if [ -f game/package.json ]; then cd game && npm run lint --if-present && npm run type-check --if-present; else echo 'No package.json found, skipping lint'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 300000,

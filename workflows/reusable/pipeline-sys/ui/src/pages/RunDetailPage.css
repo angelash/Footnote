@@ -109,10 +109,47 @@
 
 .no-graph {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: var(--spacing-xl);
+}
+
+.no-graph-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.no-graph h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-text-primary);
+}
+
+.no-graph p {
+  margin: var(--spacing-sm) 0;
+  color: var(--color-text-secondary);
+}
+
+.no-graph ul {
+  text-align: left;
+  margin: var(--spacing-sm) 0;
+  padding-left: var(--spacing-lg);
   color: var(--color-text-muted);
+}
+
+.no-graph li {
+  margin: var(--spacing-xs) 0;
+}
+
+.no-graph-hint {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
 }
 
 .run-panel-container {

@@ -146,7 +146,7 @@
       "type": "shell",
       "name": "验证数据结构",
       "description": "检查数据结构是否符合规范",
-      "command": "npm run validate:data --if-present || echo 'No schema validation configured'",
+      "command": "if [ -f game/package.json ]; then cd game && npm run validate:data --if-present; else echo 'No package.json found, skipping schema validation'; fi",
       "cwd": "${inputs.project_root}",
       "shell": "bash",
       "timeout_ms": 300000,

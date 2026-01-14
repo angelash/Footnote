@@ -147,7 +147,19 @@ export function RunDetailPage() {
           {currentGraph ? (
             <GraphView graph={currentGraph} nodeRuns={currentNodeRuns} />
           ) : (
-            <div className="no-graph">No graph data available</div>
+            <div className="no-graph">
+              <div className="no-graph-icon">📋</div>
+              <h3>此运行无流程图数据</h3>
+              <p>可能的原因：</p>
+              <ul>
+                <li>这是由 cursor-agent 直接执行的任务（非 FlowSpec 流程）</li>
+                <li>运行还在初始化阶段</li>
+                <li>日志文件格式不兼容</li>
+              </ul>
+              <p className="no-graph-hint">
+                如果这是 cursor-agent 任务，请查看运行目录中的日志文件获取详情。
+              </p>
+            </div>
           )}
         </div>
 

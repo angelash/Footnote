@@ -327,3 +327,41 @@
     opacity: 0.8;
   }
 }
+
+/* Async Task Card (非队列模式任务) */
+.async-task-card {
+  background: var(--bg-tertiary, #252538);
+  border-radius: 6px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--color-info, #0ea5e9);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 6px;
+  animation: pulse 2s infinite;
+}
+
+.async-task-card:hover {
+  background: var(--bg-hover, #2a2a40);
+}
+
+.async-badge {
+  background: var(--color-warning-light, #fef3c7);
+  color: var(--color-warning-dark, #d97706);
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.elapsed {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-info, #0ea5e9);
+}
+
+.status-badge.running {
+  background: var(--color-info-light, #e0f2fe);
+  color: var(--color-info, #0ea5e9);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}

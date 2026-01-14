@@ -143,5 +143,16 @@ export async function registerQueueRoutes(app: FastifyInstance): Promise<void> {
     }
   });
 
+  // GET /api/async-tasks - 获取直接异步执行的任务（非队列模式）
+  app.get('/api/async-tasks', async (request, reply) => {
+    try {
+      const response = await runnerClient.get('/async-tasks');
+      return response.data;
+    } catch (error: any) {
+      const message = error.response?.data?.error || error.message || 'Failed to get async tasks';
+      return reply.status(500).send({ ok: false, error: message });
+    }
+  });
+
   app.log.info('[Queue Routes] Registered queue management routes');
 }

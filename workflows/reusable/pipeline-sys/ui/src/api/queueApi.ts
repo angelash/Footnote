@@ -38,6 +38,20 @@ export interface HistoryResponse {
   offset: number;
 }
 
+// 异步任务（非队列模式）
+export interface AsyncTask {
+  run_id: string;
+  started_at: string;
+  elapsed_ms: number;
+}
+
+// 异步任务响应
+export interface AsyncTasksResponse {
+  ok: boolean;
+  count: number;
+  tasks: AsyncTask[];
+}
+
 /**
  * 获取队列状态
  */
@@ -160,6 +174,18 @@ export async function getSubtasks(taskId: string): Promise<{
   const response = await fetch(`${API_BASE}/queue/${encodeURIComponent(taskId)}/subtasks`);
   if (!response.ok) {
     throw new Error(`Failed to fetch subtasks: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * 获取直接异步执行的任务（非队列模式）
+ * 这些任务通过 async=true 但不使用 use_queue 参数执行
+ */
+export async function getAsyncTasks(): Promise<AsyncTasksResponse> {
+  const response = await fetch(`${API_BASE}/async-tasks`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch async tasks: ${response.statusText}`);
   }
   return response.json();
 }

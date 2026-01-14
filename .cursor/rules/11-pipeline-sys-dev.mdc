@@ -26,13 +26,17 @@ Pipeline-Sys 由多个服务组成，修改不同部分需要重启不同服务�
 
 ## 自动重启脚本
 
+> ⚠️ **注意**: `pkill -f` 使用模式匹配，可能误杀其他包含相同模式的进程。生产环境建议使用 pm2 或记录 PID 的方式管理进程。当前脚本适用于本地开发环境。
+
 ### 重启 Console 服务
 ```bash
+# 注：使用较精确的模式匹配减少误杀风险
 wsl -e bash -c "pkill -f 'tsx.*main.ts'; sleep 2; cd /mnt/f/workspace/github/Footnote/workflows/reusable/pipeline-sys/console; npm run dev"
 ```
 
 ### 重启 Vite Dev Server
 ```bash
+# 注：使用较精确的模式匹配减少误杀风险
 wsl -e bash -c "pkill -f 'node.*vite'; sleep 2; cd /mnt/f/workspace/github/Footnote/workflows/reusable/pipeline-sys/ui; npm run dev"
 ```
 

@@ -6,8 +6,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   QueuedTask,
+  AsyncTask,
   getQueueStatus,
   getQueueHistory,
+  getAsyncTasks,
   pauseQueue,
   resumeQueue,
   clearQueue,
@@ -28,6 +30,7 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
   const [paused, setPaused] = useState(false);
   const [current, setCurrent] = useState<string | null>(null);
   const [queue, setQueue] = useState<QueuedTask[]>([]);
+  const [asyncTasks, setAsyncTasks] = useState<AsyncTask[]>([]);
   const [history, setHistory] = useState<QueuedTask[]>([]);
   const [historyTotal, setHistoryTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -59,19 +62,30 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
     }
   }, []);
 
+  // 加载异步任务（非队列模式）
+  const loadAsyncTasks = useCallback(async () => {
+    try {
+      const data = await getAsyncTasks();
+      setAsyncTasks(data.tasks || []);
+    } catch (e) {
+      console.error('Failed to load async tasks:', e);
+    }
+  }, []);
+
   // 初始加载和定时刷新
   useEffect(() => {
     setLoading(true);
-    Promise.all([loadStatus(), loadHistory()]).finally(() => setLoading(false));
+    Promise.all([loadStatus(), loadHistory(), loadAsyncTasks()]).finally(() => setLoading(false));
 
     // 每 3 秒刷新
     const interval = setInterval(() => {
       loadStatus();
       loadHistory();
+      loadAsyncTasks();
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [loadStatus, loadHistory]);
+  }, [loadStatus, loadHistory, loadAsyncTasks]);
 
   // 暂停/恢复
   const handleTogglePause = async () => {
@@ -282,14 +296,37 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
 
       {/* 当前执行 */}
       <div className="queue-section">
-        <h4>▶ 当前执行</h4>
-        {current ? (
+        <h4>▶ 当前执行 ({(current ? 1 : 0) + asyncTasks.length})</h4>
+        {/* 队列中正在执行的任务 */}
+        {current && (
           <div className="current-task">
             {queue.find((t) => t.id === current)
               ? renderTaskCard(queue.find((t) => t.id === current)!, false)
-              : `${current} (执行中)`}
+              : <div className="async-task-card running">
+                  <span className="task-id">{current.slice(0, 20)}...</span>
+                  <span className="status-badge running">执行中</span>
+                </div>}
           </div>
-        ) : (
+        )}
+        {/* 异步执行的任务（非队列模式） */}
+        {asyncTasks.map((task) => (
+          <div key={task.run_id} className="async-task-card running" onClick={() => onTaskClick?.(task.run_id)}>
+            <div className="task-header">
+              <div className="task-info">
+                <span className="task-id">{task.run_id.slice(0, 20)}...</span>
+                <StatusBadge status={NodeStatus.RUNNING} />
+                <span className="async-badge">异步</span>
+              </div>
+              <div className="task-meta">
+                <span className="elapsed">
+                  {Math.round(task.elapsed_ms / 1000)}s
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+        {/* 空闲状态 */}
+        {!current && asyncTasks.length === 0 && (
           <div className="no-task">{paused ? '队列已暂停' : '空闲'}</div>
         )}
       </div>

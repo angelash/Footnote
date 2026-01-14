@@ -144,7 +144,7 @@
       "type": "transform",
       "name": "解析 AI 结果",
       "description": "解析 cursor-agent 返回的 JSON",
-      "expression": "(() => { try { const result = JSON.parse(nodes.ai_review.output.stdout); return { logic: result.logic || 70, style: result.style || 70, security: result.security || 70, performance: result.performance || 70, maintainability: result.maintainability || 70, issues: result.issues || [], suggestions: result.suggestions || [], summary: result.summary || '审查完成' }; } catch(e) { return { logic: 70, style: 70, security: 70, performance: 70, maintainability: 70, issues: [], suggestions: ['解析失败'], summary: '解析 AI 结果失败' }; } })()",
+      "expression": "(() => { try { const stdout = nodes.ai_review && nodes.ai_review.output ? nodes.ai_review.output.stdout : ''; if (!stdout) throw new Error('No output'); const result = JSON.parse(stdout); return { logic: result.logic || 70, style: result.style || 70, security: result.security || 70, performance: result.performance || 70, maintainability: result.maintainability || 70, issues: result.issues || [], suggestions: result.suggestions || [], summary: result.summary || '审查完成' }; } catch(e) { return { logic: 70, style: 70, security: 70, performance: 70, maintainability: 70, issues: [], suggestions: ['解析失败'], summary: '解析 AI 结果失败' }; } })()",
       "timeout_ms": 30000,
       "on_success": "calculate_score"
     },

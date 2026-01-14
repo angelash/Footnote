@@ -105,7 +105,7 @@
       "id": "parse_analysis",
       "type": "transform",
       "name": "解析分析结果",
-      "expression": "(() => { try { const result = JSON.parse(nodes.analyze_request.output.stdout); return { role: result.role || 'L3_engineer', task_type: result.task_type || 'code', complexity: result.complexity || 'normal', summary: result.summary || '', deliverables: result.deliverables || [] }; } catch(e) { return { role: 'L3_engineer', task_type: 'code', complexity: 'normal', summary: '', deliverables: [] }; } })()",
+      "expression": "(() => { try { const stdout = nodes.analyze_request && nodes.analyze_request.output ? nodes.analyze_request.output.stdout : ''; if (!stdout) throw new Error('No output'); const result = JSON.parse(stdout); return { role: result.role || 'L3_engineer', task_type: result.task_type || 'code', complexity: result.complexity || 'normal', summary: result.summary || '', deliverables: result.deliverables || [] }; } catch(e) { return { role: 'L3_engineer', task_type: 'code', complexity: 'normal', summary: '', deliverables: [] }; } })()",
       "timeout_ms": 30000,
       "on_success": "prepare_taskpack"
     },

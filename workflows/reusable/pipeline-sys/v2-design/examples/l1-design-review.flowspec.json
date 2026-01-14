@@ -147,7 +147,7 @@
       "type": "transform",
       "name": "解析设计审查结果",
       "description": "解析 cursor-agent 返回的 JSON",
-      "expression": "(() => { try { const result = JSON.parse(nodes.ai_design_review.output.stdout); return { completeness: result.completeness || 70, consistency: result.consistency || 70, feasibility: result.feasibility || 70, clarity: result.clarity || 70, missing_sections: result.missing_sections || [], issues: result.issues || [], suggestions: result.suggestions || [], summary: result.summary || '审查完成' }; } catch(e) { return { completeness: 70, consistency: 70, feasibility: 70, clarity: 70, missing_sections: [], issues: [], suggestions: ['解析失败'], summary: '解析 AI 结果失败' }; } })()",
+      "expression": "(() => { try { const stdout = nodes.ai_design_review && nodes.ai_design_review.output ? nodes.ai_design_review.output.stdout : ''; if (!stdout) throw new Error('No output'); const result = JSON.parse(stdout); return { completeness: result.completeness || 70, consistency: result.consistency || 70, feasibility: result.feasibility || 70, clarity: result.clarity || 70, missing_sections: result.missing_sections || [], issues: result.issues || [], suggestions: result.suggestions || [], summary: result.summary || '审查完成' }; } catch(e) { return { completeness: 70, consistency: 70, feasibility: 70, clarity: 70, missing_sections: [], issues: [], suggestions: ['解析失败'], summary: '解析 AI 结果失败' }; } })()",
       "timeout_ms": 30000,
       "on_success": "calculate_score"
     },

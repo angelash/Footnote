@@ -125,7 +125,7 @@
       "type": "transform",
       "name": "生成测试报告",
       "description": "汇总测试结果",
-      "expression": "({ test_type: inputs.test_type, browser_tests: nodes.execute_browser_tests ? { exit_code: nodes.execute_browser_tests.output.exitCode } : null, unit_tests: nodes.execute_tests ? { exit_code: nodes.execute_tests.output.exitCode } : null, summary: '测试完成', finished_at: new Date().toISOString() })",
+      "expression": "({ test_type: inputs.test_type, browser_tests: nodes.execute_browser_tests && nodes.execute_browser_tests.output ? { exit_code: nodes.execute_browser_tests.output.exitCode || 0, status: nodes.execute_browser_tests.status } : null, unit_tests: nodes.execute_tests && nodes.execute_tests.output ? { exit_code: nodes.execute_tests.output.exitCode || 0, status: nodes.execute_tests.status } : null, summary: '测试完成', finished_at: new Date().toISOString() })",
       "timeout_ms": 60000,
       "on_success": "check_test_result"
     },

@@ -45,10 +45,12 @@ export async function listRuns(): Promise<IRunListItem[]> {
       // 兼容 v1 格式（ok/stage）和 v2 格式（status/flow_id）
       let ok: boolean;
       let stage: number;
+      let rawStatusValue: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | undefined;
       
-      if ('status' in rawStatus) {
+      if ('status' in rawStatus && typeof rawStatus.status === 'string') {
         // v2 FlowRunner 格式
         const v2Status = rawStatus.status as string;
+        rawStatusValue = v2Status as 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED';
         ok = v2Status === 'SUCCESS';
         stage = v2Status === 'SUCCESS' ? 99 : 
                 v2Status === 'RUNNING' ? 50 : 0;
@@ -57,6 +59,7 @@ export async function listRuns(): Promise<IRunListItem[]> {
         const status = rawStatus as unknown as IStatusV1;
         ok = status.ok;
         stage = status.stage;
+        rawStatusValue = ok ? 'SUCCESS' : (stage > 0 ? 'RUNNING' : 'FAILED');
       }
       
       runs.push({
@@ -68,6 +71,11 @@ export async function listRuns(): Promise<IRunListItem[]> {
         started_at: rawStatus.started_at as string,
         updated_at: (rawStatus.updated_at as string) || (rawStatus.finished_at as string),
         mtime: stat.mtimeMs,
+        // 扩展字段
+        parent_id: rawStatus.parent_id as string | undefined,
+        flow_id: rawStatus.flow_id as string | undefined,
+        flow_name: rawStatus.flow_name as string | undefined,
+        raw_status: rawStatusValue,
       });
     } catch {
       // 跳过无效的 run 目录

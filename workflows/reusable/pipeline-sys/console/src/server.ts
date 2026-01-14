@@ -13,7 +13,9 @@ import { registerControlRoutes } from './routes/control.js';
 import { registerQueueRoutes } from './routes/queue.js';
 import { registerReviewRoutes } from './routes/review.js';
 import { registerTaskRoutes } from './routes/task.js';
+import { registerSystemRoutes } from './routes/system.js';
 import { checkRunnerHealth } from './clients/runnerClient.js';
+import { startHealthMonitor } from './services/healthMonitor.js';
 
 /**
  * 创建并配置 Fastify 实例
@@ -63,6 +65,10 @@ export async function createServer() {
   await registerQueueRoutes(app);
   await registerReviewRoutes(app);
   await registerTaskRoutes(app);
+  await registerSystemRoutes(app);
+
+  // 启动健康监控（每 10 秒检查一次）
+  startHealthMonitor(10000);
 
   // 全局错误处理
   app.setErrorHandler((error, request, reply) => {

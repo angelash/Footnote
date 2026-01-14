@@ -9,29 +9,40 @@ import { RunDetailPage } from '../pages/RunDetailPage';
 import { QueuePage } from '../pages/QueuePage';
 import { ReviewPage } from '../pages/ReviewPage';
 import { TaskPage } from '../pages/TaskPage';
+import { SystemStatusPage } from '../pages/SystemStatusPage';
+import { StatusBar } from '../components/StatusBar';
+import { ErrorBanner } from '../components/Common/ErrorBanner';
 import './App.css';
 
 export function App() {
   return (
     <BrowserRouter>
       <div className="app-container">
+        {/* 全局错误横幅 */}
+        <ErrorBanner />
+
         {/* 导航栏 */}
         <nav className="app-nav">
           <div className="nav-brand">Pipeline-Sys</div>
           <div className="nav-links">
             <NavLink to="/task" className={({ isActive }) => (isActive ? 'active' : '')}>
-              ➕ 发起任务
+              发起任务
             </NavLink>
             <NavLink to="/runs" className={({ isActive }) => (isActive ? 'active' : '')}>
-              📋 运行列表
+              运行列表
             </NavLink>
             <NavLink to="/queue" className={({ isActive }) => (isActive ? 'active' : '')}>
-              🚦 任务队列
+              任务队列
             </NavLink>
             <NavLink to="/review" className={({ isActive }) => (isActive ? 'active' : '')}>
-              🔍 审查中心
+              审查中心
+            </NavLink>
+            <NavLink to="/system" className={({ isActive }) => (isActive ? 'active' : '')}>
+              系统状态
             </NavLink>
           </div>
+          {/* 状态指示器 */}
+          <StatusBar />
         </nav>
 
         {/* 路由 */}
@@ -43,6 +54,7 @@ export function App() {
             <Route path="/runs/:runId" element={<RunDetailPage />} />
             <Route path="/queue" element={<QueuePage />} />
             <Route path="/review" element={<ReviewPage />} />
+            <Route path="/system" element={<SystemStatusPage />} />
           </Routes>
         </main>
       </div>

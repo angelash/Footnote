@@ -16,6 +16,12 @@ export interface IRunListItem {
   current_node_id: string;
   started_at: string;
   updated_at: string;
+  // 扩展字段
+  parent_id?: string;
+  subtask_ids?: string[];
+  flow_id?: string;
+  flow_name?: string;
+  raw_status?: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED';
 }
 
 /**

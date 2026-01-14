@@ -1,0 +1,229 @@
+/* StatusBar 组件样式 */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 100%;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+}
+
+.status-indicator:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.online {
+  background-color: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+}
+
+.status-dot.offline {
+  background-color: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  animation: pulse-error 1s infinite;
+}
+
+.status-dot.restarting {
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  animation: pulse-warning 0.5s infinite;
+}
+
+.status-dot.unknown {
+  background-color: #6b7280;
+  box-shadow: 0 0 8px rgba(107, 114, 128, 0.6);
+}
+
+.status-text {
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
+.status-text.error {
+  color: #fca5a5;
+}
+
+.status-text.warning {
+  color: #fcd34d;
+}
+
+/* 状态详情弹出层 */
+.status-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  min-width: 320px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  padding: 16px;
+}
+
+.status-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #374151;
+}
+
+.status-dropdown-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f3f4f6;
+}
+
+.status-dropdown-link {
+  font-size: 13px;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.status-dropdown-link:hover {
+  text-decoration: underline;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #374151;
+}
+
+.status-item:last-child {
+  border-bottom: none;
+}
+
+.status-item-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #d1d5db;
+}
+
+.status-item-value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-item-value.online {
+  color: #22c55e;
+}
+
+.status-item-value.offline {
+  color: #ef4444;
+}
+
+.status-item-value.restarting {
+  color: #f59e0b;
+}
+
+.status-diagnosis {
+  margin-top: 12px;
+  padding: 12px;
+  background: #374151;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.status-diagnosis.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+.status-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.status-action-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.status-action-btn.primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.status-action-btn.primary:hover {
+  background: #2563eb;
+}
+
+.status-action-btn.primary:disabled {
+  background: #4b5563;
+  cursor: not-allowed;
+}
+
+.status-action-btn.secondary {
+  background: #374151;
+  color: #d1d5db;
+}
+
+.status-action-btn.secondary:hover {
+  background: #4b5563;
+}
+
+/* 动画 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulse-error {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}

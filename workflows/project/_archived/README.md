@@ -16,4 +16,4 @@ n8n 相关的 pipeline 文档（n8n_cursor_cli_overview.md、n8n_cursor_cli_pipe
 
 **替代方案**：
 - 工作流总览：`workflows/reusable/pipeline-sys/WORKFLOW-OVERVIEW.md`
-- 审查指南：`workflows/project/pipelines/review_system_guide.md`
+- 审查指南：`workflows/project/pipelines/pipelines/review_system_guide.md`

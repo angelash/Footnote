@@ -1,0 +1,162 @@
+/* ErrorBanner 组件样式 */
+
+.error-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  border-bottom: 2px solid #dc2626;
+  padding: 16px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.error-banner.warning {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  border-bottom-color: #f59e0b;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.error-banner-icon {
+  flex-shrink: 0;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.error-banner-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.error-banner-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fecaca;
+  margin: 0 0 4px 0;
+}
+
+.error-banner.warning .error-banner-title {
+  color: #fef3c7;
+}
+
+.error-banner-message {
+  font-size: 14px;
+  color: #fca5a5;
+  margin: 0 0 4px 0;
+  line-height: 1.5;
+}
+
+.error-banner.warning .error-banner-message {
+  color: #fde68a;
+}
+
+.error-banner-diagnosis {
+  font-size: 13px;
+  color: #f87171;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.error-banner.warning .error-banner-diagnosis {
+  color: #fbbf24;
+}
+
+.error-banner-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.error-banner-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.error-banner-btn.primary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.error-banner-btn.primary:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.error-banner-btn.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error-banner-btn.secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: underline;
+}
+
+.error-banner-btn.secondary:hover {
+  color: white;
+}
+
+.error-banner-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.error-banner-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* 进度指示 */
+.error-banner-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.error-banner-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

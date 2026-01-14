@@ -22,6 +22,18 @@ interface IStatusV2 {
   finished_at?: string;
   duration_ms?: number;
   error?: string | null;
+  parent_id?: string;  // 父任务 ID（如果是子任务）
+}
+
+/**
+ * 扩展 Status 类型，包含子任务信息
+ */
+export interface IStatusExtended extends IStatusV1 {
+  parent_id?: string;
+  subtask_ids?: string[];
+  flow_id?: string;
+  flow_name?: string;
+  raw_status?: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED';
 }
 
 /**
@@ -39,9 +51,9 @@ function isValidStatusV2(obj: unknown): obj is IStatusV2 {
 }
 
 /**
- * 将 v2 状态转换为 v1 兼容格式
+ * 将 v2 状态转换为 v1 兼容格式（扩展版）
  */
-function convertV2ToV1(v2: IStatusV2): IStatusV1 {
+function convertV2ToV1(v2: IStatusV2): IStatusExtended {
   return {
     run_id: v2.run_id,
     task_id: v2.flow_id,
@@ -56,13 +68,18 @@ function convertV2ToV1(v2: IStatusV2): IStatusV1 {
       branch: 'unknown',
       head: 'unknown',
     },
+    // 扩展字段
+    parent_id: v2.parent_id,
+    flow_id: v2.flow_id,
+    flow_name: v2.flow_name,
+    raw_status: v2.status,
   };
 }
 
 /**
  * 加载 status.json（支持 v1 和 v2 格式）
  */
-export async function loadStatus(runId: string): Promise<IStatusV1 | null> {
+export async function loadStatus(runId: string): Promise<IStatusExtended | null> {
   const runDir = getRunDir(runId);
   const statusPath = path.join(runDir, 'status.json');
   
@@ -72,18 +89,65 @@ export async function loadStatus(runId: string): Promise<IStatusV1 | null> {
     
     // 先尝试 v1 格式
     if (isValidStatusV1(data)) {
-      return data;
+      // 转为扩展格式
+      const extended: IStatusExtended = { ...data };
+      // 尝试提取子任务 ID
+      extended.subtask_ids = await extractSubtaskIds(runId);
+      return extended;
     }
     
     // 再尝试 v2 格式并转换
     if (isValidStatusV2(data)) {
-      return convertV2ToV1(data);
+      const extended = convertV2ToV1(data);
+      // 尝试提取子任务 ID
+      extended.subtask_ids = await extractSubtaskIds(runId);
+      return extended;
     }
     
     return null;
   } catch {
     return null;
   }
+}
+
+/**
+ * 从 node_runs.json 中提取子任务 ID
+ * 查找 dispatch_to_executor 等节点的输出中的 run_id
+ */
+async function extractSubtaskIds(runId: string): Promise<string[]> {
+  const runDir = getRunDir(runId);
+  const nodeRunsPath = path.join(runDir, 'node_runs.json');
+  const subtaskIds: string[] = [];
+  
+  try {
+    const content = await fs.readFile(nodeRunsPath, 'utf8');
+    const data = JSON.parse(content);
+    
+    // 遍历所有节点，查找可能包含子任务 ID 的输出
+    const nodes = data.nodes || data;
+    for (const [nodeId, nodeData] of Object.entries(nodes)) {
+      // 检查是否是 dispatch 类型的节点
+      if (nodeId.includes('dispatch') || nodeId.includes('executor')) {
+        const output = (nodeData as { output?: unknown })?.output;
+        if (output && typeof output === 'object') {
+          // 检查 body.run_id
+          const body = (output as { body?: { run_id?: string } })?.body;
+          if (body?.run_id) {
+            subtaskIds.push(body.run_id);
+          }
+          // 检查直接的 run_id
+          const directRunId = (output as { run_id?: string })?.run_id;
+          if (directRunId && !subtaskIds.includes(directRunId)) {
+            subtaskIds.push(directRunId);
+          }
+        }
+      }
+    }
+  } catch {
+    // 忽略错误
+  }
+  
+  return subtaskIds;
 }
 
 /**

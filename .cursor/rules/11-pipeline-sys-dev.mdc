@@ -1,4 +1,12 @@
-# Pipeline-Sys 开发规范, glob pattern(s) for applicable files: ["**/pipeline-sys/**/*.ts", "**/pipeline-sys/**/*.tsx", "**/pipeline-sys/**/*.css", "**/pipeline-sys/**/*.mjs"]
+---
+glob:
+  - "**/pipeline-sys/**/*.ts"
+  - "**/pipeline-sys/**/*.tsx"
+  - "**/pipeline-sys/**/*.css"
+  - "**/pipeline-sys/**/*.mjs"
+---
+
+# Pipeline-Sys 开发规范
 
 ## 核心原则
 

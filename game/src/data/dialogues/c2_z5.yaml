@@ -22,7 +22,7 @@ dialogues:
       - speaker: 阿棠
         text: 你别去边缘断口……那里以后会坏掉。
       - speaker: 岑回
-        text: "以后"？
+        text: '"以后"？'
       - speaker: 阿棠
         text: 我不是在猜。我记得。
     choices:

@@ -24,6 +24,8 @@
     "generate:assets": "tsx scripts/generate-assets.ts",
     "generate:pixel-assets": "python scripts/generate_pixel_assets.py",
     "generate:pixel-assets:128": "python scripts/generate_pixel_assets.py --out-dir assets/images/pixel --scale 8 --max-colors 24 --with-sequences --sequence-frames 12",
+    "validate:data": "tsx scripts/validate-data.ts",
+    "validate:assets": "tsx scripts/validate-assets.ts",
     "validate:mermaid": "node ../workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs .."
   },
   "dependencies": {

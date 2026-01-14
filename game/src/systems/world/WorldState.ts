@@ -158,6 +158,7 @@ class WorldState {
   // 计数器
   private _scarIdCounter: number = 0;
   private _contaminationIdCounter: number = 0;
+  private _cardChecker?: (cardId: string) => boolean;
 
   private constructor() {
     this._initializeDefaultZones();
@@ -171,6 +172,13 @@ class WorldState {
       WorldState._instance = new WorldState();
     }
     return WorldState._instance;
+  }
+
+  /**
+   * 注册卡片检查器
+   */
+  registerCardChecker(checker: (cardId: string) => boolean): void {
+    this._cardChecker = checker;
   }
 
   // ==================== 计数器操作 ====================
@@ -541,9 +549,15 @@ class WorldState {
   checkCondition(condition: IConditionConfig): boolean {
     const counters = this.getCounters();
 
-    // 卡片检查（需要NarrativeEngine，这里先返回true）
+    // 卡片检查
     if (condition.hasCard) {
-      // TODO: 连接NarrativeEngine检查
+      if (this._cardChecker) {
+        if (!this._cardChecker(condition.hasCard)) return false;
+      } else {
+        console.warn('[WorldState] Card checker not registered');
+        // 如果没有检查器，默认返回false以策安全
+        return false;
+      }
     }
 
     // 能力检查

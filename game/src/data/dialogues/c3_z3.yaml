@@ -67,13 +67,13 @@ dialogues:
       - speaker: 岑回
         text: 等等，这里——
       - speaker: ""
-        text: "门影区域"在三张地图上的显示不同：
+        text: '"门影区域"在三张地图上的显示不同：'
       - speaker: ""
-        text: V1：一个小空白
+        text: 'V1：一个小空白'
       - speaker: ""
-        text: V2：空白被涂抹
+        text: 'V2：空白被涂抹'
       - speaker: ""
-        text: V3：空白位置被写成"墙"
+        text: 'V3：空白位置被写成"墙"'
       - speaker: 岑回
         text: 他们一直在"更正"这个区域的记录……
     onComplete:

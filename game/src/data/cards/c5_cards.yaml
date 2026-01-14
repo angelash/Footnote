@@ -127,7 +127,7 @@ cards:
       判词：此行为在当前模型中无意义。
       
       注：解释成本↑（字段待定）
-    flavorText: "无意义"是他们的词。
+    flavorText: '"无意义"是他们的词。'
     rarity: legendary
     foreshadowId: F21
 

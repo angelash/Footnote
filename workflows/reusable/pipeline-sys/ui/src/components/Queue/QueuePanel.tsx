@@ -39,6 +39,7 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
   const [error, setError] = useState<string | null>(null);
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
   const [subtasks, setSubtasks] = useState<Record<string, QueuedTask[]>>({});
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // 加载队列状态
   const loadStatus = useCallback(async () => {
@@ -48,6 +49,7 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
       setRunningTasks(status.running_tasks || []);
       setQueue(status.queue || []);
       setError(null);
+      setLastUpdated(new Date());
     } catch (e) {
       setError((e as Error).message);
     }
@@ -69,14 +71,28 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
     setLoading(true);
     Promise.all([loadStatus(), loadHistory()]).finally(() => setLoading(false));
 
-    // 每 3 秒刷新
+    // 每 1 秒刷新（提高实时性）
     const interval = setInterval(() => {
       loadStatus();
-      loadHistory();
-    }, 3000);
+    }, 1000);
 
-    return () => clearInterval(interval);
+    // 每 5 秒刷新历史（不需要那么频繁）
+    const historyInterval = setInterval(() => {
+      loadHistory();
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearInterval(historyInterval);
+    };
   }, [loadStatus, loadHistory]);
+
+  // 手动刷新
+  const handleRefresh = async () => {
+    setLoading(true);
+    await Promise.all([loadStatus(), loadHistory()]);
+    setLoading(false);
+  };
 
   // 暂停/恢复
   const handleTogglePause = async () => {
@@ -315,6 +331,14 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
         <h3>🚦 任务队列</h3>
         <div className="queue-controls">
           <button
+            className="btn btn-refresh"
+            onClick={handleRefresh}
+            disabled={loading}
+            title="刷新队列状态"
+          >
+            🔄
+          </button>
+          <button
             className={`btn ${paused ? 'btn-resume' : 'btn-pause'}`}
             onClick={handleTogglePause}
           >
@@ -327,6 +351,17 @@ export function QueuePanel({ onTaskClick }: QueuePanelProps) {
       </div>
 
       {error && <div className="queue-error">{error}</div>}
+
+      {/* 状态栏 */}
+      <div className="queue-status-bar">
+        <span className="update-time">
+          {lastUpdated ? `更新于 ${lastUpdated.toLocaleTimeString()}` : '加载中...'}
+        </span>
+        <span className="stats">
+          运行: {runningTasks.length} | 队列: {queue.length} | 历史: {historyTotal}
+        </span>
+        <span className="auto-refresh-hint">🔄 1s</span>
+      </div>
 
       {/* 当前执行（支持多任务并行） */}
       <div className="queue-section">

@@ -20,7 +20,7 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ['text', 'html', 'lcov'],
       all: false,
-      include: ['src/systems/world/WorldState.ts'],
+      include: ['src/systems/world/WorldState.ts', 'src/scenes/GameScene.ts'],
       exclude: [
         'node_modules/',
         'tests/',

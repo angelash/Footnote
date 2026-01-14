@@ -107,11 +107,11 @@ dialogues:
       - speaker: ""
         text: 时间线显示：
       - speaker: ""
-        text: T1: 薄墙完整
+        text: 'T1: 薄墙完整'
       - speaker: ""
-        text: T2: 薄墙开裂
+        text: 'T2: 薄墙开裂'
       - speaker: ""
-        text: NOW: 薄墙有补丁
+        text: 'NOW: 薄墙有补丁'
 
   RV03_THIN_WALL:
     id: RV03_THIN_WALL

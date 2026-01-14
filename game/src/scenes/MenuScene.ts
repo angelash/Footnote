@@ -4,6 +4,7 @@
 import Phaser from 'phaser';
 import { SCENES, TEXT_STYLES, COLORS } from '@/config/game.config';
 import { saveManager } from '@/systems/save';
+import { worldState } from '@/systems/world';
 import type { ISaveMetadata, IGameSettings } from '@/systems/save';
 
 // ==================== 配置常量 ====================
@@ -354,7 +355,7 @@ export class MenuScene extends Phaser.Scene {
 
       this.cameras.main.once('camerafadeoutcomplete', () => {
         // worldState.getCurrentZone 已经被 load 方法更新
-        const currentZone = 'C0-Z1'; // TODO: 从 worldState 获取当前 zone
+        const currentZone = worldState.getCurrentZone() || 'C0-Z1';
         this.scene.start(SCENES.GAME, { zoneId: currentZone, isNewGame: false });
       });
     } else {

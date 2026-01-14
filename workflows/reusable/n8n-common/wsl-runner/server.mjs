@@ -563,8 +563,10 @@ async function executeQueuedTask(task, options) {
   
   // 解析 FlowSpec
   let flowSpecObj;
-  const flowPath = safeResolveUnderProject(projectRoot, 
-    flowspec.startsWith('/') ? flowspec : `workflows/reusable/pipeline-sys/v2-design/examples/${flowspec}`
+  // 检查是否已经是完整路径（包含 workflows/ 或以 / 开头）
+  const isFullPath = flowspec.startsWith('/') || flowspec.startsWith('workflows/');
+  const flowPath = safeResolveUnderProject(projectRoot,
+    isFullPath ? flowspec : `workflows/reusable/pipeline-sys/v2-design/examples/${flowspec}`
   );
   try {
     const content = await fs.readFile(flowPath, "utf8");

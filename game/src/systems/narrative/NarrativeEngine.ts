@@ -200,7 +200,10 @@ class NarrativeEngine {
   private _onDialogueEnd?: () => void;
   private _choiceHandler?: (choiceId: string) => void;
 
-  private constructor() {}
+  private constructor() {
+    // 注册卡片检查器到 WorldState
+    worldState.registerCardChecker((id) => this.hasCard(id));
+  }
 
   /**
    * 获取单例实例

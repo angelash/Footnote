@@ -339,7 +339,7 @@ test.describe('输入系统（带断言验证）', () => {
 });
 
 test.describe('移动端触控', () => {
-  test.use({ ...test.info().project.use, hasTouch: true });
+  test.use({ hasTouch: true });
 
   test('触控应该工作', async ({ page }) => {
     await page.goto('/');

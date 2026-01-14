@@ -7,6 +7,8 @@
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { worldState } from '@/systems/world';
+import { saveManager } from '@/systems/save';
+import { SCENES } from '@/config/game.config';
 import type { AbilityType } from '@/config/game.config';
 
 // ==================== 配置常量 ====================
@@ -314,7 +316,7 @@ export class AbilitySystem {
   /**
    * 时间干预：回溯到之前的状态节点
    */
-  private _activateTimeIntervention(): void {
+  private async _activateTimeIntervention(): Promise<void> {
     const { width, height } = this._scene.scale;
 
     // 创建时间干预UI
@@ -327,7 +329,7 @@ export class AbilitySystem {
 
     // 标题
     const title = this._scene.add
-      .text(width / 2, 100, '时间干预', {
+      .text(width / 2, 50, '时间干预', {
         fontSize: '32px',
         color: '#FFD700',
       })
@@ -336,25 +338,79 @@ export class AbilitySystem {
 
     // 警告文字
     const warning = this._scene.add
-      .text(width / 2, 150, '回溯会产生时间污染', {
+      .text(width / 2, 90, '回溯会产生时间污染', {
         fontSize: '14px',
         color: '#FF4444',
       })
       .setOrigin(0.5);
     this._timeInterventionUI.add(warning);
 
-    // TODO: 显示可回溯的时间节点列表
-    const noNodeText = this._scene.add
-      .text(width / 2, height / 2, '暂无可回溯节点', {
-        fontSize: '18px',
-        color: '#888888',
-      })
-      .setOrigin(0.5);
-    this._timeInterventionUI.add(noNodeText);
+    // 获取存档列表
+    const saves = await saveManager.getSaveList();
+
+    if (saves.length === 0) {
+      const noNodeText = this._scene.add
+        .text(width / 2, height / 2, '暂无可回溯节点', {
+          fontSize: '18px',
+          color: '#888888',
+        })
+        .setOrigin(0.5);
+      this._timeInterventionUI.add(noNodeText);
+    } else {
+      // 显示存档列表
+      saves.forEach((save, index) => {
+        const y = 150 + index * 60;
+        const container = this._scene.add.container(width / 2, y);
+
+        const bg = this._scene.add.graphics();
+        bg.fillStyle(0x333333, 1);
+        bg.fillRoundedRect(-200, -25, 400, 50, 8);
+        bg.lineStyle(1, 0x666666, 1);
+        bg.strokeRoundedRect(-200, -25, 400, 50, 8);
+
+        const text = this._scene.add
+          .text(
+            0,
+            0,
+            `${save.chapter} - ${save.currentZone} (${new Date(save.timestamp).toLocaleTimeString()})`,
+            {
+              fontSize: '16px',
+              color: '#FFFFFF',
+            }
+          )
+          .setOrigin(0.5);
+
+        container.add([bg, text]);
+        container.setSize(400, 50);
+        container
+          .setInteractive({ useHandCursor: true })
+          .on('pointerover', () => {
+            bg.clear();
+            bg.fillStyle(0x444444, 1);
+            bg.fillRoundedRect(-200, -25, 400, 50, 8);
+            bg.lineStyle(1, 0xffd700, 1);
+            bg.strokeRoundedRect(-200, -25, 400, 50, 8);
+            text.setColor('#FFD700');
+          })
+          .on('pointerout', () => {
+            bg.clear();
+            bg.fillStyle(0x333333, 1);
+            bg.fillRoundedRect(-200, -25, 400, 50, 8);
+            bg.lineStyle(1, 0x666666, 1);
+            bg.strokeRoundedRect(-200, -25, 400, 50, 8);
+            text.setColor('#FFFFFF');
+          })
+          .on('pointerdown', () => {
+            this.performTimeRewind(save.slot.toString());
+          });
+
+        this._timeInterventionUI?.add(container);
+      });
+    }
 
     // 取消按钮
     const cancelBtn = this._scene.add
-      .text(width / 2, height - 100, '取消', {
+      .text(width / 2, height - 50, '取消', {
         fontSize: '20px',
         color: '#888888',
         backgroundColor: '#333333',
@@ -398,26 +454,36 @@ export class AbilitySystem {
   /**
    * 执行时间回溯
    */
-  performTimeRewind(nodeId: string): void {
+  async performTimeRewind(nodeId: string): Promise<void> {
     if (!this.isAbilityActive('TIME_INTERVENTION' as AbilityType)) {
       console.warn('[AbilitySystem] 时间干预未激活');
       return;
     }
 
-    // 创建时间污染
+    const slot = parseInt(nodeId);
+    if (isNaN(slot)) return;
+
+    // 1. 加载旧状态
+    const success = await saveManager.load(slot);
+    if (!success) {
+      console.error('[AbilitySystem] 回溯失败: 无法加载存档');
+      return;
+    }
+
+    // 2. 创建时间污染 (在加载后的状态上添加)
     const currentZone = worldState.getCurrentZone();
     worldState.addContamination({
       sourceZoneId: currentZone,
-      affectedZoneIds: [currentZone], // 可以扩展到相邻Zone
+      affectedZoneIds: [currentZone],
       type: 'timeline_fracture',
     });
 
-    // TODO: 实际的回溯逻辑
-
-    // 停用能力
-    this.deactivateAbility('TIME_INTERVENTION' as AbilityType);
-
     console.log(`[AbilitySystem] 时间回溯完成: ${nodeId}`);
+
+    // 3. 重启场景
+    this._scene.scene.start(SCENES.GAME, { zoneId: currentZone, isNewGame: false });
+
+    // UI会自动销毁，不需要手动deactivate
   }
 
   // ==================== 私有方法 ====================
@@ -454,7 +520,7 @@ export class AbilitySystem {
         this._activateDepthIntervention();
         break;
       case 'TIME_INTERVENTION':
-        this._activateTimeIntervention();
+        void this._activateTimeIntervention();
         break;
     }
   }

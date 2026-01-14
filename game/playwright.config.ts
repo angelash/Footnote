@@ -15,7 +15,7 @@ export default defineConfig({
   
   /* 报告器配置 */
   reporter: [
-    ['html', { outputFolder: 'test-results/html' }],
+    ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['list'],
   ],

@@ -23,17 +23,17 @@ function getOverallStatus(status: ISystemStatus | null): ServiceStatus {
  * 获取状态显示文本
  */
 function getStatusText(status: ISystemStatus | null): string {
-  if (!status) return 'Loading...';
+  if (!status) return '加载中...';
   const overall = getOverallStatus(status);
   switch (overall) {
     case 'online':
-      return 'All Systems OK';
+      return '系统正常';
     case 'offline':
-      return 'Service Issue';
+      return '服务异常';
     case 'restarting':
-      return 'Restarting...';
+      return '重启中...';
     default:
-      return 'Unknown';
+      return '未知';
   }
 }
 
@@ -106,42 +106,42 @@ export function StatusBar() {
       {isOpen && (
         <div className="status-dropdown">
           <div className="status-dropdown-header">
-            <span className="status-dropdown-title">System Status</span>
+            <span className="status-dropdown-title">系统状态</span>
             <Link to="/system" className="status-dropdown-link" onClick={() => setIsOpen(false)}>
-              View Details
+              查看详情
             </Link>
           </div>
 
           {/* Console 状态 */}
           <div className="status-item">
             <span className="status-item-label">
-              Console Service
+              控制台服务
             </span>
             <span className={`status-item-value ${status?.console.ok ? 'online' : 'offline'}`}>
-              {status?.console.ok ? 'Online' : 'Offline'}
+              {status?.console.ok ? '在线' : '离线'}
             </span>
           </div>
 
           {/* Runner 状态 */}
           <div className="status-item">
             <span className="status-item-label">
-              WSL Runner
+              WSL 执行器
             </span>
             <span className={`status-item-value ${status?.runner.status || 'unknown'}`}>
-              {status?.runner.status === 'online' && 'Online'}
-              {status?.runner.status === 'offline' && 'Offline'}
-              {status?.runner.status === 'restarting' && 'Restarting...'}
-              {status?.runner.status === 'unknown' && 'Unknown'}
+              {status?.runner.status === 'online' && '在线'}
+              {status?.runner.status === 'offline' && '离线'}
+              {status?.runner.status === 'restarting' && '重启中...'}
+              {status?.runner.status === 'unknown' && '未知'}
             </span>
           </div>
 
           {/* 队列状态 */}
           <div className="status-item">
             <span className="status-item-label">
-              Task Queue
+              任务队列
             </span>
             <span className="status-item-value" style={{ color: '#d1d5db' }}>
-              {status?.queue.pending ?? 0} pending / {status?.queue.running ?? 0} running
+              等待 {status?.queue.pending ?? 0} / 运行 {status?.queue.running ?? 0}
             </span>
           </div>
 
@@ -155,7 +155,7 @@ export function StatusBar() {
           {/* 错误信息 */}
           {error && (
             <div className="status-diagnosis error">
-              Error: {error}
+              错误: {error}
             </div>
           )}
 
@@ -167,14 +167,14 @@ export function StatusBar() {
                 onClick={handleRestart}
                 disabled={isRestarting || status?.runner.status === 'restarting'}
               >
-                {isRestarting ? 'Restarting...' : 'Restart Runner'}
+                {isRestarting ? '重启中...' : '重启执行器'}
               </button>
               <Link 
                 to="/system" 
                 className="status-action-btn secondary"
                 onClick={() => setIsOpen(false)}
               >
-                View Logs
+                查看日志
               </Link>
             </div>
           )}

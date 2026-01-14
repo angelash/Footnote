@@ -84,23 +84,25 @@ function flattenTree(nodes: IRunTreeNode[]): IRunTreeNode[] {
 }
 
 /**
- * 获取状态标签
+ * 获取状态标签（中文）
  */
 function getStatusLabel(run: IRunListItem): string {
-  if (run.raw_status) {
-    return run.raw_status;
-  }
-  if (run.ok) return 'SUCCESS';
-  if (run.stage > 0 && run.stage < 99) return 'RUNNING';
-  return 'FAILED';
+  const status = run.raw_status || (run.ok ? 'SUCCESS' : (run.stage > 0 && run.stage < 99 ? 'RUNNING' : 'FAILED'));
+  const labels: Record<string, string> = {
+    SUCCESS: '成功',
+    RUNNING: '运行中',
+    PENDING: '等待中',
+    FAILED: '失败',
+  };
+  return labels[status] || status;
 }
 
 /**
  * 获取状态颜色类名
  */
 function getStatusClass(run: IRunListItem): string {
-  const status = getStatusLabel(run);
-  switch (status) {
+  const rawStatus = run.raw_status || (run.ok ? 'SUCCESS' : (run.stage > 0 && run.stage < 99 ? 'RUNNING' : 'FAILED'));
+  switch (rawStatus) {
     case 'SUCCESS': return 'status-success';
     case 'RUNNING': return 'status-running';
     case 'PENDING': return 'status-pending';
@@ -146,13 +148,13 @@ export function RunsPage() {
   return (
     <div className="runs-page">
       <header className="runs-header">
-        <h1>Pipeline-Sys Console</h1>
-        <p className="runs-subtitle">Behavior Tree Visualization & Control</p>
+        <h1>流水线控制台</h1>
+        <p className="runs-subtitle">任务树可视化与控制</p>
       </header>
 
       <main className="runs-content">
         {runsLoading && runs.length === 0 && (
-          <div className="runs-loading">Loading runs...</div>
+          <div className="runs-loading">加载运行记录中...</div>
         )}
 
         {runsError && (
@@ -165,8 +167,8 @@ export function RunsPage() {
         {!runsLoading && !runsError && runs.length === 0 && (
           <div className="runs-empty">
             <span className="empty-icon">📭</span>
-            <p>No runs found</p>
-            <p className="empty-hint">Runs will appear here when triggered via n8n or API</p>
+            <p>暂无运行记录</p>
+            <p className="empty-hint">通过 n8n 或 API 触发任务后，记录将显示在这里</p>
           </div>
         )}
 
@@ -174,11 +176,11 @@ export function RunsPage() {
           <table className="runs-table">
             <thead>
               <tr>
-                <th>Status</th>
-                <th>Run ID / Flow</th>
-                <th>Task ID</th>
-                <th>Started</th>
-                <th>Updated</th>
+                <th>状态</th>
+                <th>运行 ID / 流程</th>
+                <th>任务 ID</th>
+                <th>开始时间</th>
+                <th>更新时间</th>
               </tr>
             </thead>
             <tbody>
@@ -207,7 +209,7 @@ export function RunsPage() {
                       )}
                       {run.children.length > 0 && (
                         <span className="subtask-count">
-                          {run.children.length} subtask{run.children.length > 1 ? 's' : ''}
+                          {run.children.length} 个子任务
                         </span>
                       )}
                     </div>

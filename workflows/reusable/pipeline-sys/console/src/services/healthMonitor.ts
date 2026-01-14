@@ -344,26 +344,26 @@ class HealthMonitor {
    */
   private getDiagnosis(): string {
     if (this.runnerStatus.ok) {
-      return 'All services operational';
+      return '所有服务运行正常';
     }
 
     if (this.isRestarting) {
-      return 'WSL Runner is restarting...';
+      return 'WSL 执行器正在重启...';
     }
 
     if (this.runnerStatus.error?.includes('ECONNREFUSED')) {
-      return 'WSL Runner not running - automatic restart will be attempted';
+      return 'WSL 执行器未运行 - 将尝试自动重启';
     }
 
     if (this.runnerStatus.error?.includes('timeout')) {
-      return 'WSL Runner not responding - may be overloaded or frozen';
+      return 'WSL 执行器无响应 - 可能过载或卡死';
     }
 
     if (this.consecutiveFailures >= this.maxFailuresBeforeRestart) {
-      return `WSL Runner offline after ${this.runnerStatus.restart_count} restart attempts - manual intervention may be required`;
+      return `WSL 执行器在 ${this.runnerStatus.restart_count} 次重启后仍然离线 - 可能需要人工介入`;
     }
 
-    return `WSL Runner health check failed: ${this.runnerStatus.error || 'Unknown error'}`;
+    return `WSL 执行器健康检查失败: ${this.runnerStatus.error || '未知错误'}`;
   }
 
   /**

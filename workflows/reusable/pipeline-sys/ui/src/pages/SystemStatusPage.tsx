@@ -45,10 +45,10 @@ function getDiagnosisType(status: ISystemStatus | null): 'ok' | 'warning' | 'err
  */
 function StatusBadge({ status }: { status: ServiceStatus }) {
   const labels: Record<ServiceStatus, string> = {
-    online: 'Online',
-    offline: 'Offline',
-    restarting: 'Restarting',
-    unknown: 'Unknown',
+    online: '在线',
+    offline: '离线',
+    restarting: '重启中',
+    unknown: '未知',
   };
 
   return (
@@ -123,7 +123,7 @@ export function SystemStatusPage() {
       <div className="system-status-page">
         <div className="loading">
           <div className="loading-spinner" />
-          Loading system status...
+          加载系统状态中...
         </div>
       </div>
     );
@@ -135,8 +135,8 @@ export function SystemStatusPage() {
     <div className="system-status-page">
       {/* 页面标题 */}
       <div className="page-header">
-        <h1 className="page-title">System Status</h1>
-        <p className="page-subtitle">Monitor service health and manage system components</p>
+        <h1 className="page-title">系统状态</h1>
+        <p className="page-subtitle">监控服务健康状态，管理系统组件</p>
       </div>
 
       {/* 状态卡片 */}
@@ -144,18 +144,18 @@ export function SystemStatusPage() {
         {/* Console Service */}
         <div className="status-card">
           <div className="status-card-header">
-            <span className="status-card-title">Console Service</span>
+            <span className="status-card-title">控制台服务</span>
             <StatusBadge status={status?.console.ok ? 'online' : 'offline'} />
           </div>
           <div className="status-card-body">
             <div className="status-row">
-              <span className="status-row-label">Host</span>
+              <span className="status-row-label">地址</span>
               <span className="status-row-value">
                 {status?.console.host}:{status?.console.port}
               </span>
             </div>
             <div className="status-row">
-              <span className="status-row-label">Uptime</span>
+              <span className="status-row-label">运行时长</span>
               <span className="status-row-value">{status?.console.uptime}</span>
             </div>
           </div>
@@ -164,27 +164,27 @@ export function SystemStatusPage() {
         {/* WSL Runner */}
         <div className="status-card">
           <div className="status-card-header">
-            <span className="status-card-title">WSL Runner</span>
+            <span className="status-card-title">WSL 执行器</span>
             <StatusBadge status={status?.runner.status || 'unknown'} />
           </div>
           <div className="status-card-body">
             <div className="status-row">
-              <span className="status-row-label">Last Check</span>
+              <span className="status-row-label">最后检查</span>
               <span className="status-row-value">
                 {status?.runner.last_check ? formatTimestamp(status.runner.last_check) : '-'}
               </span>
             </div>
             <div className="status-row">
-              <span className="status-row-label">Retry Count</span>
+              <span className="status-row-label">重试次数</span>
               <span className="status-row-value">{status?.runner.retry_count ?? 0}</span>
             </div>
             <div className="status-row">
-              <span className="status-row-label">Restart Count</span>
+              <span className="status-row-label">重启次数</span>
               <span className="status-row-value">{status?.runner.restart_count ?? 0}</span>
             </div>
             {status?.runner.error && (
               <div className="status-row">
-                <span className="status-row-label">Error</span>
+                <span className="status-row-label">错误</span>
                 <span className="status-row-value error">{status.runner.error}</span>
               </div>
             )}
@@ -194,21 +194,21 @@ export function SystemStatusPage() {
         {/* Task Queue */}
         <div className="status-card">
           <div className="status-card-header">
-            <span className="status-card-title">Task Queue</span>
+            <span className="status-card-title">任务队列</span>
             <StatusBadge status={status?.runner.ok ? 'online' : 'offline'} />
           </div>
           <div className="status-card-body">
             <div className="status-row">
-              <span className="status-row-label">Pending Tasks</span>
+              <span className="status-row-label">等待中</span>
               <span className="status-row-value">{status?.queue.pending ?? 0}</span>
             </div>
             <div className="status-row">
-              <span className="status-row-label">Running Tasks</span>
+              <span className="status-row-label">运行中</span>
               <span className="status-row-value">{status?.queue.running ?? 0}</span>
             </div>
             {status?.queue.error && (
               <div className="status-row">
-                <span className="status-row-label">Error</span>
+                <span className="status-row-label">错误</span>
                 <span className="status-row-value error">{status.queue.error}</span>
               </div>
             )}
@@ -218,13 +218,13 @@ export function SystemStatusPage() {
 
       {/* 诊断信息 */}
       <div className="diagnosis-section">
-        <h2 className="diagnosis-title">Diagnosis</h2>
+        <h2 className="diagnosis-title">诊断信息</h2>
         <div className={`diagnosis-content ${diagnosisType}`}>
-          {status?.diagnosis || 'Unable to determine system status'}
+          {status?.diagnosis || '无法确定系统状态'}
         </div>
         {error && (
           <div className="diagnosis-content error" style={{ marginTop: '12px' }}>
-            Error: {error}
+            错误: {error}
           </div>
         )}
       </div>
@@ -236,27 +236,27 @@ export function SystemStatusPage() {
           onClick={handleRestart}
           disabled={isRestarting || status?.runner.status === 'restarting'}
         >
-          {isRestarting ? 'Restarting...' : 'Restart WSL Runner'}
+          {isRestarting ? '重启中...' : '重启 WSL 执行器'}
         </button>
         <button className="action-btn secondary" onClick={loadLogs}>
-          Refresh Logs
+          刷新日志
         </button>
         <button className="action-btn secondary" onClick={loadStatus}>
-          Refresh Status
+          刷新状态
         </button>
       </div>
 
       {/* 日志 */}
       <div className="logs-section">
         <div className="logs-header">
-          <h2 className="logs-title">Service Logs</h2>
+          <h2 className="logs-title">服务日志</h2>
           <button className="logs-refresh-btn" onClick={loadLogs}>
-            Refresh
+            刷新
           </button>
         </div>
         <div className="logs-container">
           {logs.length === 0 ? (
-            <div className="logs-empty">No logs available</div>
+            <div className="logs-empty">暂无日志</div>
           ) : (
             logs.map((log, index) => (
               <div key={index} className="log-entry">

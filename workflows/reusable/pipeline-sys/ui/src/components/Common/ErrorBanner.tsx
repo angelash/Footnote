@@ -69,12 +69,12 @@ export function ErrorBanner() {
       
       <div className="error-banner-content">
         <h3 className="error-banner-title">
-          {isRestarting_ ? 'WSL Runner Restarting' : 'WSL Runner Unavailable'}
+          {isRestarting_ ? 'WSL 执行器重启中' : 'WSL 执行器不可用'}
         </h3>
         
         {status?.runner.error && (
           <p className="error-banner-message">
-            Reason: {status.runner.error}
+            原因: {status.runner.error}
           </p>
         )}
         
@@ -85,7 +85,7 @@ export function ErrorBanner() {
         {isRestarting_ && (
           <div className="error-banner-progress">
             <span className="error-banner-spinner" />
-            <span>Attempting to restart service...</span>
+            <span>正在尝试重启服务...</span>
           </div>
         )}
 
@@ -96,14 +96,14 @@ export function ErrorBanner() {
               onClick={handleRestart}
               disabled={isRestarting}
             >
-              Restart Runner
+              重启执行器
             </button>
           )}
           <Link 
             to="/system" 
             className="error-banner-btn secondary"
           >
-            View Details
+            查看详情
           </Link>
         </div>
       </div>
@@ -111,7 +111,7 @@ export function ErrorBanner() {
       <button 
         className="error-banner-close"
         onClick={() => setDismissed(true)}
-        title="Dismiss"
+        title="关闭"
       >
         ×
       </button>

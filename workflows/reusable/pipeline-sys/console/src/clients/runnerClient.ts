@@ -55,27 +55,14 @@ async function wslFetch(url: string, options?: { method?: string; body?: string 
 async function fetchWithFallback(url: string, options?: RequestInit): Promise<Response> {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000); // 2秒超时
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10秒超时（增加以提高稳定性）
     
     const response = await fetch(url, { ...options, signal: controller.signal });
     clearTimeout(timeout);
     return response;
   } catch (directError) {
-    // 直接连接失败，在 Windows 上尝试 WSL 代理
-    if (isWindows) {
-      const wslResult = await wslFetch(url, {
-        method: options?.method,
-        body: options?.body as string,
-      });
-      
-      // 创建一个模拟的 Response 对象
-      return {
-        ok: wslResult.ok,
-        status: wslResult.status,
-        json: async () => wslResult.data,
-        text: async () => JSON.stringify(wslResult.data),
-      } as Response;
-    }
+    // 禁用 WSL 回退 - WSL 命令会触发 PM2 信号问题导致服务崩溃
+    // 如果直接连接失败，直接抛出错误
     throw directError;
   }
 }

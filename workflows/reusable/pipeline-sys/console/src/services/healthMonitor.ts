@@ -212,11 +212,12 @@ class HealthMonitor {
 
     this.log('warn', `Runner health check failed (${this.consecutiveFailures}/${this.maxFailuresBeforeRestart}): ${error}`);
 
-    // 达到失败阈值，触发自动重启
-    if (this.consecutiveFailures >= this.maxFailuresBeforeRestart && !this.isRestarting) {
-      this.log('warn', 'Triggering automatic restart...');
-      this.restartRunner();
-    }
+    // 禁用自动重启 - WSL 命令会触发 PM2 信号问题导致服务崩溃
+    // 用户需要手动在 WSL 终端中运行: pm2 restart wsl-cursor-runner
+    // if (this.consecutiveFailures >= this.maxFailuresBeforeRestart && !this.isRestarting) {
+    //   this.log('warn', 'Triggering automatic restart...');
+    //   this.restartRunner();
+    // }
   }
 
   /**

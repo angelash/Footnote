@@ -192,16 +192,33 @@ export class FlowRunner extends EventEmitter {
 
   /**
    * 发出事件并记录
+   * 同时实时追加到 events.ndjson 文件
+   * 事件格式符合 IEventV1（ts, run_id, node_id, seq, type, payload）
    */
-  _emitEvent(type, data) {
+  _emitEvent(type, data = {}) {
+    const seq = this.events.length + 1;
+    
+    // 从 data 中提取 nodeId，其余作为 payload
+    const { nodeId, ...payload } = data;
+    
+    // 构建符合 IEventV1 格式的事件
     const event = {
+      seq,
       type,
-      timestamp: new Date().toISOString(),
-      runId: this.runId,
-      ...data,
+      ts: new Date().toISOString(),
+      run_id: this.runId,
+      node_id: nodeId || '',
+      payload,
     };
     
     this.events.push(event);
+    
+    // 实时写入 events.ndjson
+    if (this.artifactWriter) {
+      this._appendEventToFile(event).catch(err => {
+        console.warn(`[FlowRunner] Failed to append event: ${err.message}`);
+      });
+    }
     
     if (this.emitEvents) {
       this.emit(type, event);
@@ -209,6 +226,27 @@ export class FlowRunner extends EventEmitter {
     }
 
     return event;
+  }
+
+  /**
+   * 追加事件到 events.ndjson 文件
+   */
+  async _appendEventToFile(event) {
+    const line = JSON.stringify(event) + '\n';
+    await this.artifactWriter('events.ndjson', line, { append: true, raw: true });
+  }
+
+  /**
+   * 实时更新 graph.json 文件（反映当前节点状态）
+   */
+  async _updateGraphArtifact() {
+    if (!this.artifactWriter) return;
+    try {
+      const graph = this._buildGraph();
+      await this.artifactWriter('graph.json', graph);
+    } catch (err) {
+      console.warn(`[FlowRunner] Failed to update graph: ${err.message}`);
+    }
   }
 
   /**
@@ -348,6 +386,9 @@ export class FlowRunner extends EventEmitter {
 
     // 发出节点开始事件
     this._emitEvent(EventType.NODE_STARTED, { nodeId, nodeType: node.type });
+    
+    // 实时更新 graph.json（节点开始）
+    await this._updateGraphArtifact();
 
     const startTime = Date.now();
     let result;
@@ -370,6 +411,24 @@ export class FlowRunner extends EventEmitter {
         signal: this.abortController.signal,
         timeout,
       };
+
+      // 如果是 shell 类型节点，添加流式输出回调（用于实时推送日志到 UI）
+      if (node.type === 'shell') {
+        execOptions.onStdout = (text) => {
+          this._emitEvent(EventType.NODE_LOG, {
+            nodeId,
+            stream: 'stdout',
+            text,
+          });
+        };
+        execOptions.onStderr = (text) => {
+          this._emitEvent(EventType.NODE_LOG, {
+            nodeId,
+            stream: 'stderr',
+            text,
+          });
+        };
+      }
 
       // 如果是 loop 节点，注入 body 执行器
       if (node.type === 'loop') {
@@ -419,6 +478,9 @@ export class FlowRunner extends EventEmitter {
       duration: nodeResult.duration,
       error: nodeResult.error,
     });
+    
+    // 实时更新 graph.json（节点完成）
+    await this._updateGraphArtifact();
 
     // 处理后续节点
     await this._handleNodeCompletion(node, result);
@@ -747,9 +809,7 @@ export class FlowRunner extends EventEmitter {
       subtasks_count: this.subtasks.length,
     });
 
-    // 写入 events.ndjson
-    const eventsNdjson = this.events.map(e => JSON.stringify(e)).join('\n');
-    await this.artifactWriter('events.ndjson', eventsNdjson, { raw: true });
+    // events.ndjson 已通过 _appendEventToFile 实时写入，无需重复写入
 
     // 写入 node_runs.json
     const nodeRuns = {};

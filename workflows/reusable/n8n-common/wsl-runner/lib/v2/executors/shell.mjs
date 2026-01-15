@@ -101,12 +101,19 @@ export class ShellExecutor extends NodeExecutor {
         proc.stdin.end();
       }
 
+      // 从 options 中提取流式输出回调
+      const { onStdout, onStderr } = options || {};
+
       // 捕获 stdout
       if (captureStdout) {
         proc.stdout.on('data', (data) => {
           const text = data.toString();
           stdout.push(text);
           this.debug(`stdout: ${text.trim()}`);
+          // 流式回调（用于实时推送到 UI）
+          if (onStdout) {
+            try { onStdout(text); } catch { /* ignore callback errors */ }
+          }
         });
       }
 
@@ -116,6 +123,10 @@ export class ShellExecutor extends NodeExecutor {
           const text = data.toString();
           stderr.push(text);
           this.debug(`stderr: ${text.trim()}`);
+          // 流式回调（用于实时推送到 UI）
+          if (onStderr) {
+            try { onStderr(text); } catch { /* ignore callback errors */ }
+          }
         });
       }
 

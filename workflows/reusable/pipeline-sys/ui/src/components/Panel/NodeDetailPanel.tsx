@@ -1,12 +1,14 @@
 /**
  * Node Detail Panel Component
- * 节点详情面板
+ * 节点详情面板（含实时日志流）
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { fetchRunFile, retryNode } from '../../api/consoleApi';
 import { StatusBadge } from '../Common/StatusBadge';
+import { useRunStore } from '../../state/runStore';
 import type { IGraph, INodeRunsSnapshot, IOutputRef, NodeStatus } from '../../types/dto';
+import { EventType } from '../../types/dto';
 import './NodeDetailPanel.css';
 
 interface INodeDetailPanelProps {
@@ -20,10 +22,28 @@ export function NodeDetailPanel({ runId, nodeId, graph, nodeRuns }: INodeDetailP
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [fileLoading, setFileLoading] = useState(false);
   const [selectedOutput, setSelectedOutput] = useState<IOutputRef | null>(null);
+  const logEndRef = useRef<HTMLDivElement>(null);
+
+  // 获取事件流（用于实时日志）
+  const events = useRunStore((state) => state.events);
 
   // 获取节点信息
   const graphNode = nodeId ? graph?.nodes.find((n) => n.id === nodeId) : null;
   const nodeRun = nodeId ? nodeRuns?.nodes[nodeId] : null;
+
+  // 过滤当前节点的 NODE_LOG 事件
+  const nodeLogs = nodeId
+    ? events.filter(
+        (e) => e.type === EventType.NODE_LOG && e.node_id === nodeId
+      )
+    : [];
+
+  // 自动滚动到底部
+  useEffect(() => {
+    if (logEndRef.current && nodeLogs.length > 0) {
+      logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [nodeLogs.length]);
 
   // 加载文件内容
   useEffect(() => {
@@ -132,6 +152,30 @@ export function NodeDetailPanel({ runId, nodeId, graph, nodeRuns }: INodeDetailP
         <div className="panel-section panel-error-section">
           <h4>Error</h4>
           <pre className="panel-error">{nodeRun.last_error}</pre>
+        </div>
+      )}
+
+      {/* Real-time logs section */}
+      {nodeLogs.length > 0 && (
+        <div className="panel-section panel-logs-section">
+          <h4>
+            实时输出
+            <span className="log-count">({nodeLogs.length})</span>
+          </h4>
+          <div className="panel-logs-container">
+            <pre className="panel-logs">
+              {nodeLogs.map((log, idx) => {
+                const payload = log.payload as { stream?: string; text?: string };
+                const isStderr = payload.stream === 'stderr';
+                return (
+                  <span key={idx} className={isStderr ? 'log-stderr' : 'log-stdout'}>
+                    {payload.text || ''}
+                  </span>
+                );
+              })}
+              <div ref={logEndRef} />
+            </pre>
+          </div>
         </div>
       )}
 

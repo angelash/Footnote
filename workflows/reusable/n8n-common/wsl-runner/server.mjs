@@ -575,10 +575,13 @@ async function executeQueuedTask(task, options) {
     return { ok: false, error: `Failed to load flowspec: ${e.message}` };
   }
   
-  // 创建工件写入器
+  // 创建工件写入器（支持 append 模式用于实时事件写入）
   const artifactWriter = async (name, data, opts = {}) => {
     const absPath = path.posix.join(runAbsDir, name);
-    if (opts.raw) {
+    const content = opts.raw ? data : JSON.stringify(data, null, 2);
+    if (opts.append) {
+      await fs.appendFile(absPath, content);
+    } else if (opts.raw) {
       await writeText(absPath, data);
     } else {
       await writeJson(absPath, data);
@@ -702,10 +705,13 @@ async function handleV2Run(body) {
     flowSpecObj = flowspec;
   }
 
-  // 创建工件写入器
+  // 创建工件写入器（支持 append 模式用于实时事件写入）
   const artifactWriter = async (name, data, options = {}) => {
     const absPath = path.posix.join(runAbsDir, name);
-    if (options.raw) {
+    const content = options.raw ? data : JSON.stringify(data, null, 2);
+    if (options.append) {
+      await fs.appendFile(absPath, content);
+    } else if (options.raw) {
       await writeText(absPath, data);
     } else {
       await writeJson(absPath, data);

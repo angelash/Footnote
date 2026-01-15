@@ -146,13 +146,32 @@ export class TaskQueueManager extends EventEmitter {
       this.state.tasks = savedState.tasks || [];
       this.state.history = savedState.history || [];
       
-      // 将中断的 running 任务改为 queued（重启后重新执行）
-      this.state.tasks.forEach(task => {
+      // 将中断的 running 任务标记为 failed（服务重启时无法确定执行状态）
+      const interruptedTasks = [];
+      this.state.tasks = this.state.tasks.filter(task => {
         if (task.status === TaskStatus.RUNNING) {
-          task.status = TaskStatus.QUEUED;
-          delete task.started_at;
+          // 标记为失败并移到历史
+          task.status = TaskStatus.FAILED;
+          task.error = 'Task interrupted by service restart';
+          task.finished_at = new Date().toISOString();
+          interruptedTasks.push(task);
+          return false; // 从队列中移除
         }
+        return true;
       });
+      
+      // 将中断的任务加入历史
+      interruptedTasks.forEach(task => {
+        this._addToHistory(task);
+      });
+      
+      // 同时更新 automation_runs 中的 status.json（避免僵尸状态）
+      await this._cleanupInterruptedRunStatus(interruptedTasks);
+      
+      if (interruptedTasks.length > 0) {
+        console.log(`[TaskQueue] Marked ${interruptedTasks.length} interrupted tasks as failed`);
+        await this._persist();
+      }
       
       console.log(`[TaskQueue] Restored ${this.state.tasks.length} queued tasks`);
     } catch (err) {
@@ -162,8 +181,78 @@ export class TaskQueueManager extends EventEmitter {
       // 文件不存在或解析失败，使用默认状态
     }
     
+    // 扫描并清理 automation_runs 中的所有僵尸状态
+    await this._cleanupAllZombieRuns();
+    
     // 启动处理循环
     this._startProcessing();
+  }
+  
+  /**
+   * 扫描并清理所有僵尸状态的运行记录
+   * （服务重启后，automation_runs 中可能有 RUNNING 状态但实际已中断的任务）
+   */
+  async _cleanupAllZombieRuns() {
+    const runsDir = path.join(this.projectRoot, 'workflows/project/logs/automation_runs');
+    
+    try {
+      const entries = await fs.readdir(runsDir).catch(() => []);
+      let cleaned = 0;
+      
+      for (const entry of entries) {
+        if (entry.startsWith('_') || entry.startsWith('.')) continue; // 跳过隐藏目录
+        
+        const statusPath = path.join(runsDir, entry, 'status.json');
+        try {
+          const content = await fs.readFile(statusPath, 'utf8');
+          const status = JSON.parse(content);
+          
+          // 如果状态是 RUNNING，但不在当前运行中的任务列表里，则是僵尸
+          if (status.status === 'RUNNING' && !this.runningTasks.has(entry)) {
+            status.status = 'FAILED';
+            status.error = 'Task interrupted by service restart (zombie cleanup)';
+            status.finished_at = new Date().toISOString();
+            await fs.writeFile(statusPath, JSON.stringify(status, null, 2));
+            cleaned++;
+          }
+        } catch {
+          // 忽略无效的运行记录
+        }
+      }
+      
+      if (cleaned > 0) {
+        console.log(`[TaskQueue] Cleaned up ${cleaned} zombie run status files`);
+      }
+    } catch (err) {
+      console.warn(`[TaskQueue] Failed to cleanup zombie runs: ${err.message}`);
+    }
+  }
+  
+  /**
+   * 清理中断任务的 status.json（防止僵尸状态）
+   * @param {QueuedTask[]} tasks - 中断的任务列表
+   */
+  async _cleanupInterruptedRunStatus(tasks) {
+    for (const task of tasks) {
+      try {
+        const statusPath = path.join(this.projectRoot, 'workflows/project/logs/automation_runs', task.id, 'status.json');
+        const statusContent = await fs.readFile(statusPath, 'utf8').catch(() => null);
+        
+        if (statusContent) {
+          const status = JSON.parse(statusContent);
+          // 如果 status.json 还显示 RUNNING，更新为 FAILED
+          if (status.status === 'RUNNING') {
+            status.status = 'FAILED';
+            status.error = 'Task interrupted by service restart';
+            status.finished_at = new Date().toISOString();
+            await fs.writeFile(statusPath, JSON.stringify(status, null, 2));
+            console.log(`[TaskQueue] Updated status.json for interrupted task: ${task.id}`);
+          }
+        }
+      } catch (err) {
+        console.warn(`[TaskQueue] Failed to cleanup status for ${task.id}: ${err.message}`);
+      }
+    }
   }
 
   /**

@@ -113,6 +113,10 @@ export interface IStatus {
   updated_at: string;
   repo: IRepoInfo;
   note?: string;
+  // 扩展字段（v2 格式）
+  raw_status?: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED';
+  flow_id?: string;
+  flow_name?: string;
 }
 
 // ============ Event Types ============

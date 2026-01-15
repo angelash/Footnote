@@ -12,6 +12,7 @@ import { GraphView } from '../components/BehaviorTree/GraphView';
 import { NodeDetailPanel } from '../components/Panel/NodeDetailPanel';
 import { EventsTimeline } from '../components/Timeline/EventsTimeline';
 import { StatusBadge } from '../components/Common/StatusBadge';
+import { NodeStatus } from '../types/dto';
 import './RunDetailPage.css';
 
 export function RunDetailPage() {
@@ -125,7 +126,7 @@ export function RunDetailPage() {
         <div className="run-header-left">
           <Link to="/runs" className="back-link">← Runs</Link>
           <h1>{currentStatus.run_id}</h1>
-          <StatusBadge ok={currentStatus.ok} />
+          <StatusBadge status={currentStatus.raw_status as NodeStatus || (currentStatus.ok ? NodeStatus.SUCCESS : (currentStatus.stage > 0 && currentStatus.stage < 99 ? NodeStatus.RUNNING : NodeStatus.FAILED))} />
           {eventsConnected && <span className="live-badge">● LIVE</span>}
         </div>
         <div className="run-header-right">

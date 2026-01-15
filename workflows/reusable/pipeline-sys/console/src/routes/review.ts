@@ -203,7 +203,7 @@ export async function registerReviewRoutes(app: FastifyInstance): Promise<void> 
       // 如果是新结构，检查包含的审查文件
       if (isDir) {
         const auditDirPath = path.join(absBaseDir, auditId);
-        const files = await fs.readdir(auditDirPath).catch(() => []);
+        const files = await fs.readdir(auditDirPath).catch((): string[] => []);
         audit._files = files;
         audit._has_code_review = files.includes('code-review.json');
         audit._has_design_review = files.includes('design-review.json');

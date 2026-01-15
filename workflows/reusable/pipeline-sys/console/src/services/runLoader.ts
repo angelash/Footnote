@@ -194,9 +194,11 @@ function convertGraphV2ToV1(v2: IGraphV2, runId: string): IGraphV1 {
     id: n.id,
     type: n.type as IGraphV1['nodes'][number]['type'],
     title: n.name || n.id,  // v1 用 title，v2 用 name
+    name: n.name || n.id,   // 同时保留 name 字段
+    status: n.status,       // 保留 status 字段供 UI 使用
     parent_id: null,
     outputs: [],
-  }));
+  }) as IGraphV1['nodes'][number]);
   
   // v2 edge 用 source/target，v1 用 from/to
   const edges: IGraphV1['edges'] = v2.edges?.map(e => ({

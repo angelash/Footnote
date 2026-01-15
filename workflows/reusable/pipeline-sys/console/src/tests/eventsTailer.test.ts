@@ -186,7 +186,7 @@ describe('createSseEventGenerator', () => {
       expect(result.value).toContain('data:');
     }
     
-    await generator.return();
+    await generator.return('');
     await startPromise;
   });
 });

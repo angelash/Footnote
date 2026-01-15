@@ -99,10 +99,10 @@ describe('Runs Routes', () => {
     };
 
     const mockGraph = {
-      version: 'v1',
+      version: 'v1' as const,
       run_id: 'RUN-001',
-      nodes: [],
-      edges: [],
+      nodes: [] as never[],
+      edges: [] as never[],
       layout: { direction: 'TB' as const, group_padding: 16 },
     };
 

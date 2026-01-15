@@ -238,8 +238,18 @@ fi
 # Add prompt content
 CURSOR_CMD+=("$PROMPT_CONTENT")
 
-"${CURSOR_CMD[@]}"
-AGENT_EXIT=$?
+# 运行 cursor-agent，使用 unbuffered 输出并转发到 stderr
+# 这样 shell executor 的 onStderr 回调能实时捕获流式输出
+# stdbuf -oL 禁用 stdout 行缓冲，2>&1 合并 stderr，>&2 输出到 stderr
+if command -v stdbuf >/dev/null 2>&1; then
+  # 使用 stdbuf 禁用缓冲，实时输出
+  stdbuf -oL -eL "${CURSOR_CMD[@]}" 2>&1 >&2
+  AGENT_EXIT=$?
+else
+  # 降级：直接运行，输出可能有缓冲
+  "${CURSOR_CMD[@]}" 2>&1 >&2
+  AGENT_EXIT=$?
+fi
 set -e
 
 # Use timeout to prevent git from hanging

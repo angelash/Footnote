@@ -838,12 +838,23 @@ export class FlowRunner extends EventEmitter {
   _buildGraph() {
     const flowNodes = this.flowSpec?.nodes || [];
     const nodes = flowNodes.map(node => {
+      // 优先从 context 获取节点状态（包含 RUNNING），然后从 nodeResults 获取
+      const contextState = this.context?.getNodeState?.(node.id);
       const result = this.nodeResults.get(node.id);
+      
+      // 状态优先级：context 状态 > nodeResults 状态 > PENDING
+      let status = NodeStatus.PENDING;
+      if (contextState?.status) {
+        status = contextState.status;
+      } else if (result?.status) {
+        status = result.status;
+      }
+      
       return {
         id: node.id,
         type: node.type,
         name: node.name || node.id,
-        status: result?.status || NodeStatus.PENDING,
+        status,
       };
     });
 

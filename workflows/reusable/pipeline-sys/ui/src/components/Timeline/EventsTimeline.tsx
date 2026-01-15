@@ -3,21 +3,22 @@
  * 事件时间线
  */
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useRunStore } from '../../state/runStore';
 import type { IEvent, EventType } from '../../types/dto';
 import './EventsTimeline.css';
 
 export function EventsTimeline() {
   const { events } = useRunStore();
-  const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
 
-  // 自动滚动到底部
+  // 自动滚动到底部（受 checkbox 控制）
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    if (autoScroll && contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
     }
-  }, [events]);
+  }, [events, autoScroll]);
 
   const getEventIcon = (type: EventType) => {
     switch (type) {
@@ -99,13 +100,23 @@ export function EventsTimeline() {
   };
 
   return (
-    <div className="events-timeline" ref={containerRef}>
+    <div className="events-timeline">
       <div className="timeline-header">
         <h4>Events Timeline</h4>
-        <span className="event-count">{events.length} events</span>
+        <div className="timeline-controls">
+          <label className="auto-scroll-toggle">
+            <input
+              type="checkbox"
+              checked={autoScroll}
+              onChange={(e) => setAutoScroll(e.target.checked)}
+            />
+            <span>自动滚动</span>
+          </label>
+          <span className="event-count">{events.length} events</span>
+        </div>
       </div>
       
-      <div className="timeline-content">
+      <div className="timeline-content" ref={contentRef}>
         {events.length === 0 ? (
           <div className="timeline-empty">Waiting for events...</div>
         ) : (

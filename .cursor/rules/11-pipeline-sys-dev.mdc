@@ -1,9 +1,7 @@
 ---
-glob:
-  - "**/pipeline-sys/**/*.ts"
-  - "**/pipeline-sys/**/*.tsx"
-  - "**/pipeline-sys/**/*.css"
-  - "**/pipeline-sys/**/*.mjs"
+description: Pipeline-Sys 开发规范
+globs: ["**/pipeline-sys/**/*.ts", "**/pipeline-sys/**/*.tsx", "**/pipeline-sys/**/*.css", "**/pipeline-sys/**/*.mjs"]
+alwaysApply: false
 ---
 
 # Pipeline-Sys 开发规范

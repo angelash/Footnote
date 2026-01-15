@@ -23,6 +23,30 @@
   letter-spacing: 0.05em;
 }
 
+.timeline-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.auto-scroll-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.auto-scroll-toggle input {
+  cursor: pointer;
+  accent-color: var(--color-running);
+}
+
+.auto-scroll-toggle:hover {
+  color: var(--color-text-primary);
+}
+
 .event-count {
   font-size: 0.75rem;
   color: var(--color-text-muted);

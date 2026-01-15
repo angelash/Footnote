@@ -261,15 +261,16 @@ class HealthMonitor {
         };
       }
 
-      // 构建重启命令
-      const projectRoot = '/mnt/f/workspace/github/Footnote';
-      const serverPath = 'workflows/reusable/n8n-common/wsl-runner/server.mjs';
-      const cmd = `pkill -f 'node.*wsl-runner' 2>/dev/null; sleep 2; cd ${projectRoot} && nohup node ${serverPath} > /tmp/wsl-runner.log 2>&1 &`;
+      // 使用 PM2 重启命令（避免直接 kill 导致信号传播问题）
+      // PM2 方式比直接 pkill 更安全，不会触发 SIGINT 传播
+      const cmd = 'pm2 restart wsl-cursor-runner --update-env';
 
       // 使用 spawn 执行 WSL 命令
       const child = spawn('wsl', ['-e', 'bash', '-c', cmd], {
         detached: true,
         stdio: 'ignore',
+        // 使用 setsid 创建新会话，防止信号传播
+        shell: false,
       });
       child.unref();
 

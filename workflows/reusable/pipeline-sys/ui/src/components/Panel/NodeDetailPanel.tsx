@@ -30,6 +30,9 @@ export function NodeDetailPanel({ runId, nodeId, graph, nodeRuns }: INodeDetailP
   // 获取节点信息
   const graphNode = nodeId ? graph?.nodes.find((n) => n.id === nodeId) : null;
   const nodeRun = nodeId ? nodeRuns?.nodes[nodeId] : null;
+  
+  // 优先使用 nodeRun 的状态，没有则使用 graphNode 的状态
+  const nodeStatus = (nodeRun?.status || graphNode?.status || 'PENDING') as NodeStatus;
 
   // 过滤当前节点的 NODE_LOG 事件
   const nodeLogs = nodeId
@@ -79,7 +82,7 @@ export function NodeDetailPanel({ runId, nodeId, graph, nodeRuns }: INodeDetailP
     }
   };
 
-  const canRetry = nodeRun && ['FAILED', 'TIMEOUT', 'CANCELLED'].includes(nodeRun.status);
+  const canRetry = ['FAILED', 'TIMEOUT', 'CANCELLED'].includes(nodeStatus);
 
   if (!nodeId || !graphNode) {
     return (
@@ -102,9 +105,9 @@ export function NodeDetailPanel({ runId, nodeId, graph, nodeRuns }: INodeDetailP
 
       {/* Status section */}
       <div className="panel-section">
-        <h4>Status</h4>
+        <h4>STATUS</h4>
         <div className="panel-status-row">
-          <StatusBadge status={nodeRun?.status as NodeStatus} />
+          <StatusBadge status={nodeStatus} />
           {nodeRun?.attempt && nodeRun.attempt > 1 && (
             <span className="attempt-badge">Attempt {nodeRun.attempt}</span>
           )}

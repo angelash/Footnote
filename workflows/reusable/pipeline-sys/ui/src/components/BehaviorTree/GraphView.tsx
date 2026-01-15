@@ -3,7 +3,7 @@
  * 行为树图谱视图（使用 ReactFlow）
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -43,7 +43,8 @@ function convertToReactFlow(
 
   for (const node of graph.nodes) {
     const nodeRun = nodeRuns?.nodes[node.id];
-    const status = nodeRun?.status || ('PENDING' as NodeStatus);
+    // 优先使用 nodeRuns 状态，其次使用 graph.nodes 状态（来自 graph.json）
+    const status = nodeRun?.status || node.status || ('PENDING' as NodeStatus);
 
     nodes.push({
       id: node.id,
@@ -51,12 +52,12 @@ function convertToReactFlow(
       position: nodePositions[node.id] || { x: 0, y: 0 },
       data: {
         id: node.id,
-        title: node.title,
+        title: node.name || node.title || node.id,
         nodeType: node.type,
         status,
         attempt: nodeRun?.attempt || 0,
         elapsed_ms: nodeRun?.elapsed_ms,
-        outputs: node.outputs,
+        outputs: node.outputs || [],
       },
     });
   }
@@ -156,8 +157,8 @@ export function GraphView({ graph, nodeRuns }: IGraphViewProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // 更新节点状态
-  useMemo(() => {
+  // 当 nodeRuns 更新时同步节点状态
+  useEffect(() => {
     setNodes(initialNodes);
     setEdges(initialEdges);
   }, [initialNodes, initialEdges, setNodes, setEdges]);

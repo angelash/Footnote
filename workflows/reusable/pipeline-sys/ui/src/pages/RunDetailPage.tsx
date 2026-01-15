@@ -53,7 +53,21 @@ export function RunDetailPage() {
 
     loadRun();
 
+    // 定期刷新 graph 数据（每 2 秒）以获取最新节点状态
+    const refreshInterval = setInterval(async () => {
+      try {
+        const data = await fetchRunDetail(runId);
+        // 只更新 graph，不重置整个状态
+        if (data.graph) {
+          setCurrentRun(runId, data.status, data.graph, data.nodeRuns);
+        }
+      } catch {
+        // 忽略轮询错误
+      }
+    }, 2000);
+
     return () => {
+      clearInterval(refreshInterval);
       clearCurrentRun();
     };
   }, [runId, setCurrentRun, setCurrentLoading, setCurrentError, clearCurrentRun]);

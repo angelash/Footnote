@@ -53,9 +53,11 @@ export interface IOutputRef {
 export interface IGraphNode {
   id: string;
   type: NodeType;
-  title: string;
-  parent_id: string | null;
-  outputs: IOutputRef[];
+  title?: string;
+  name?: string;
+  status?: NodeStatus;
+  parent_id?: string | null;
+  outputs?: IOutputRef[];
 }
 
 export interface IGraphEdge {

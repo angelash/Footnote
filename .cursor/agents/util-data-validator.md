@@ -1,5 +1,5 @@
 ---
-name: data-validator
+name: util-data-validator
 description: 数据验证专家。检查 YAML/JSON 数据格式、键名规范、数据一致性。编写或修改数据文件时使用。
 model: inherit
 ---

@@ -1,5 +1,5 @@
 ---
-name: debugger
+name: util-debugger
 description: 错误和测试失败的调试专家。遇到运行时错误、控制台报错、测试失败或功能异常时使用。
 model: inherit
 ---

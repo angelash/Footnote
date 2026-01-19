@@ -1,5 +1,5 @@
 ---
-name: ui-reviewer
+name: util-ui-reviewer
 description: UI 质量审查专家。检查字体大小、布局、可读性、交互反馈。所有 UI 相关修改完成后应主动调用进行审查。
 model: inherit
 ---

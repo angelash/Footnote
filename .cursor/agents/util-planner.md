@@ -1,6 +1,6 @@
 ---
-name: planner
-description: 任务规划专家（L2 组长层）。分析需求、拆解任务、创建技术方案和 TaskPack。复杂功能开发前使用。
+name: util-planner
+description: 任务规划专家。分析需求、拆解任务、创建技术方案和 TaskPack。复杂功能开发前使用。
 model: inherit
 ---
 
@@ -108,26 +108,26 @@ graph TD
 
 | 任务类型 | 分配给 |
 |---------|--------|
-| 功能实现 | phaser-expert |
-| 对白编写 | narrative-writer |
-| UI 实现 | phaser-expert + ui-reviewer |
-| 数据编写 | data-validator |
-| 测试编写 | test-runner |
-| 代码审查 | code-reviewer |
-| 最终验证 | verifier |
+| 功能实现 | L3-gameplay-engineer |
+| 对白编写 | L3-writer |
+| UI 实现 | L3-ui-engineer + util-ui-reviewer |
+| 数据编写 | util-data-validator |
+| 测试执行 | L3-tester |
+| 代码审查 | util-code-reviewer |
+| 最终验证 | util-verifier |
 
 ### 执行顺序
 
 ```
-规划 (planner)
+规划 (util-planner)
     ↓
-实现 (phaser-expert / narrative-writer)
+实现 (L3-gameplay-engineer / L3-writer)
     ↓
-审查 (code-reviewer / ui-reviewer)
+审查 (util-code-reviewer / util-ui-reviewer)
     ↓
-测试 (test-runner)
+测试 (L3-tester)
     ↓
-验证 (verifier)
+验证 (util-verifier)
 ```
 
 ## 风险评估

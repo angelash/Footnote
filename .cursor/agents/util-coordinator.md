@@ -1,5 +1,5 @@
 ---
-name: coordinator
+name: util-coordinator
 description: 复杂任务协调器。用于需要多个子代理协作的大型任务。规划任务、分配工作、整合结果。
 model: inherit
 is_background: false
@@ -17,14 +17,24 @@ is_background: false
 
 ## 可用的子代理
 
+### 功能型（util-）
 | 子代理 | 职责 | 何时调用 |
 |--------|------|----------|
-| verifier | 验证任务完成 | 任何任务完成后 |
-| test-runner | 运行测试 | 代码变更后 |
-| debugger | 调试问题 | 遇到错误时 |
-| narrative-writer | 叙事内容 | 编写对白/剧本 |
-| phaser-expert | Phaser 实现 | 游戏逻辑/渲染 |
-| ui-reviewer | UI 审查 | UI 修改后 |
+| util-verifier | 验证任务完成 | 任何任务完成后 |
+| util-debugger | 调试问题 | 遇到错误时 |
+| util-code-reviewer | 代码审查 | PR 提交前 |
+| util-data-validator | 数据验证 | 编写数据文件时 |
+| util-ui-reviewer | UI 审查 | UI 修改后 |
+| util-planner | 任务规划 | 复杂功能开发前 |
+| util-researcher | 代码调研 | 不熟悉模块时 |
+
+### 岗位型（L0-L3）
+| 层级 | 示例子代理 | 何时调用 |
+|------|-----------|----------|
+| L2 | L2-client-lead | 客户端架构设计 |
+| L2 | L2-narrative-lead | 叙事结构规划 |
+| L3 | L3-writer | 编写对白/剧本 |
+| L3 | L3-gameplay-engineer | 游戏逻辑实现 |
 
 ## 协调模式
 

@@ -1,5 +1,5 @@
 ---
-name: researcher
+name: util-researcher
 description: 代码调研专家。探索代码库、收集上下文、分析依赖关系。长时间调研任务、不熟悉的模块探索时使用。
 model: inherit
 is_background: true

@@ -205,20 +205,26 @@ describe('EventBus', () => {
   describe('调试模式', () => {
     it('enableDebug/disableDebug应切换调试模式', async () => {
       const { eventBus } = await createFreshEventBus();
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      // Logger 使用 console.info，格式包含时间戳和模块名
+      const consoleSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
       eventBus.enableDebug();
-      expect(consoleSpy).toHaveBeenCalledWith('[EventBus] Debug mode enabled');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[EventBus]')
+      );
 
       eventBus.disableDebug();
-      expect(consoleSpy).toHaveBeenCalledWith('[EventBus] Debug mode disabled');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[EventBus]')
+      );
 
       consoleSpy.mockRestore();
     });
 
     it('调试模式下应输出事件日志', async () => {
       const { eventBus, GameEvent } = await createFreshEventBus();
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      // Logger.debug 使用 console.debug
+      const consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
 
       eventBus.enableDebug();
       eventBus.emit(GameEvent.CHAPTER_START, { chapterId: 'C1' });

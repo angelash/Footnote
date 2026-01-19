@@ -3,6 +3,9 @@
  * @module systems/EventBus
  */
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('EventBus');
 
 /**
  * 游戏事件类型枚举
@@ -297,7 +300,7 @@ class EventBus extends TypedEventEmitter {
    */
   enableDebug(): void {
     this._debugMode = true;
-    console.log('[EventBus] Debug mode enabled');
+    logger.info('Debug mode enabled');
   }
 
   /**
@@ -305,7 +308,7 @@ class EventBus extends TypedEventEmitter {
    */
   disableDebug(): void {
     this._debugMode = false;
-    console.log('[EventBus] Debug mode disabled');
+    logger.info('Debug mode disabled');
   }
 
   /**
@@ -329,7 +332,7 @@ class EventBus extends TypedEventEmitter {
 
     // 调试输出
     if (this._debugMode) {
-      console.log(`[EventBus] ${eventName}`, payload);
+      logger.debug(eventName, payload);
     }
 
     return super.emit(event, ...args);

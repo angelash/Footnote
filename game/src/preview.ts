@@ -7,6 +7,16 @@
 
 import Phaser from 'phaser';
 import { GAME_CONFIG } from './config/game.config';
+import { createLogger } from './utils/Logger';
+
+const logger = createLogger('Preview');
+
+// 扩展 Window 接口以支持调试变量
+declare global {
+  interface Window {
+    __PREVIEW_GAME__?: Phaser.Game;
+  }
+}
 
 // 预览场景导入
 import { DevPreviewScene } from './scenes/preview/DevPreviewScene';
@@ -85,25 +95,25 @@ const config: Phaser.Types.Core.GameConfig = {
   // 回调
   callbacks: {
     preBoot: () => {
-      console.log('[Footnote Preview] 预览工具启动中...');
+      logger.info('预览工具启动中...');
     },
     postBoot: (game) => {
-      console.log('[Footnote Preview] 预览工具已就绪');
-      console.log('[Footnote Preview] 支持的预览类型:');
-      console.log('  - scene: 场景预览 (Prefab模式)');
-      console.log('  - object: 物件预览 (碰撞/交互/动画)');
-      console.log('  - character: 角色预览');
-      console.log('  - animation: 动画预览');
-      console.log('  - ui: UI预览 (完整界面)');
-      console.log('  - effect: 特效预览');
-      console.log('  - audio: 音频预览');
-      console.log('  - card: 卡片预览');
-      console.log('  - dialogue: 对话预览');
-      console.log('[Footnote Preview] URL参数快速跳转: ?preview=scene');
+      logger.info('预览工具已就绪');
+      logger.info('支持的预览类型:');
+      logger.info('  - scene: 场景预览 (Prefab模式)');
+      logger.info('  - object: 物件预览 (碰撞/交互/动画)');
+      logger.info('  - character: 角色预览');
+      logger.info('  - animation: 动画预览');
+      logger.info('  - ui: UI预览 (完整界面)');
+      logger.info('  - effect: 特效预览');
+      logger.info('  - audio: 音频预览');
+      logger.info('  - card: 卡片预览');
+      logger.info('  - dialogue: 对话预览');
+      logger.info('URL参数快速跳转: ?preview=scene');
 
       // 开发模式下暴露游戏实例
       if (import.meta.env.DEV) {
-        (window as any).__PREVIEW_GAME__ = game;
+        window.__PREVIEW_GAME__ = game;
       }
     },
   },

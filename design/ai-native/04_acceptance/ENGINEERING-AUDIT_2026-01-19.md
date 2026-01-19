@@ -411,6 +411,10 @@ I18nManager.ts (1209行) → 拆分为:
 |------|------|------|
 | 修复 TypeScript 错误 | `I18nManager.ts` | ✅ 已修复 |
 | 修复 Prettier 错误 | 多个文件 | ✅ 已修复 |
+| 创建 Logger 工具类 | `utils/Logger.ts` | ✅ 已创建 |
+| 替换核心文件 console 语句 | `EventBus.ts`, `main.ts`, `preview.ts` | ✅ 已修复 |
+| 修复 GameScene any 类型 | `GameScene.ts` | ✅ 已修复 |
+| 更新测试适应 Logger | `EventBus.test.ts` | ✅ 已修复 |
 
 ### P1 - 本周修复（代码质量）
 

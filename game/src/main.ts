@@ -11,6 +11,22 @@ import { BootScene } from './scenes/BootScene';
 import { PreloadScene } from './scenes/PreloadScene';
 import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
+import { createLogger, LogLevel, configureLogger } from './utils/Logger';
+
+// 初始化 Logger
+if (import.meta.env.PROD) {
+  configureLogger({ level: LogLevel.WARN });
+}
+
+const logger = createLogger('Main');
+
+// 扩展 Window 接口以支持调试变量
+declare global {
+  interface Window {
+    __GAME__?: Phaser.Game;
+    __DEBUG_STATE__?: unknown;
+  }
+}
 
 // 场景注册
 const scenes = [BootScene, PreloadScene, MenuScene, GameScene];
@@ -75,15 +91,15 @@ const config: Phaser.Types.Core.GameConfig = {
   // 回调
   callbacks: {
     preBoot: () => {
-      console.log('[Footnote] 游戏初始化中...');
+      logger.info('游戏初始化中...');
     },
     postBoot: (game) => {
-      console.log('[Footnote] 游戏启动完成');
+      logger.info('游戏启动完成');
 
       // 开发模式下暴露游戏实例
       if (import.meta.env.DEV) {
-        (window as any).__GAME__ = game;
-        (window as any).__DEBUG_STATE__ = null; // 将由WorldState设置
+        window.__GAME__ = game;
+        window.__DEBUG_STATE__ = null; // 将由WorldState设置
       }
     },
   },
@@ -131,10 +147,11 @@ document.body.addEventListener(
 
 // PWA Service Worker 注册
 if ('serviceWorker' in navigator) {
+  const pwaLogger = createLogger('PWA');
   window.addEventListener('load', async () => {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('[PWA] Service Worker 注册成功:', registration.scope);
+      pwaLogger.info('Service Worker 注册成功:', registration.scope);
 
       // 检查更新
       registration.addEventListener('updatefound', () => {
@@ -142,14 +159,14 @@ if ('serviceWorker' in navigator) {
         if (newWorker) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              console.log('[PWA] 发现新版本，刷新页面以更新');
+              pwaLogger.info('发现新版本，刷新页面以更新');
               // 可以在这里显示更新提示
             }
           });
         }
       });
     } catch (error) {
-      console.warn('[PWA] Service Worker 注册失败:', error);
+      pwaLogger.warn('Service Worker 注册失败:', error);
     }
   });
 }

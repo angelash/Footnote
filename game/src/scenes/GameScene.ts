@@ -3,7 +3,8 @@
  * 负责Zone渲染和游戏逻辑
  */
 import Phaser from 'phaser';
-import { SCENES, TEXT_STYLES } from '@/config/game.config';
+import { SCENES, TEXT_STYLES, CONSTANTS } from '@/config/game.config';
+import type { AbilityType } from '@/config/game.config';
 import { UI_FONT_SIZE } from '@/config/ui.config';
 import { getZoneBackgroundKey } from '@/config/zones.config';
 import { getSceneConfig } from '@/data/scenes';
@@ -584,10 +585,10 @@ export class GameScene extends Phaser.Scene {
     this._abilityBar = this.add.container(width / 2, height - 60);
     this._abilityBar.setDepth(1000);
 
-    const abilities = [
-      { key: '1', name: '深度感知', type: 'DEPTH_PERCEPTION', color: 0x00ffaa },
-      { key: '2', name: '深度介入', type: 'DEPTH_INTERVENTION', color: 0xff00ff },
-      { key: '3', name: '时间干预', type: 'TIME_INTERVENTION', color: 0xffd700 },
+    const abilities: Array<{ key: string; name: string; type: AbilityType; color: number }> = [
+      { key: '1', name: '深度感知', type: CONSTANTS.ABILITY.DEPTH_PERCEPTION, color: 0x00ffaa },
+      { key: '2', name: '深度介入', type: CONSTANTS.ABILITY.DEPTH_INTERVENTION, color: 0xff00ff },
+      { key: '3', name: '时间干预', type: CONSTANTS.ABILITY.TIME_INTERVENTION, color: 0xffd700 },
     ];
 
     abilities.forEach((ability, index) => {
@@ -623,7 +624,7 @@ export class GameScene extends Phaser.Scene {
       lockMask.setName(`lock_${ability.type}`);
 
       // 检查是否解锁
-      if (worldState.hasAbility(ability.type as any)) {
+      if (worldState.hasAbility(ability.type)) {
         lockMask.setVisible(false);
       }
 
@@ -634,8 +635,8 @@ export class GameScene extends Phaser.Scene {
         .rectangle(x, 0, 60, 50, 0x000000, 0)
         .setInteractive({ useHandCursor: true })
         .on('pointerdown', () => {
-          if (worldState.hasAbility(ability.type as any)) {
-            this._abilitySystem?.activateAbility(ability.type as any);
+          if (worldState.hasAbility(ability.type)) {
+            this._abilitySystem?.activateAbility(ability.type);
           } else {
             this._toastManager?.showWarning('能力尚未解锁');
           }
@@ -645,13 +646,13 @@ export class GameScene extends Phaser.Scene {
 
     // 键盘快捷键
     this.input.keyboard?.on('keydown-ONE', () => {
-      this._abilitySystem?.activateAbility('DEPTH_PERCEPTION' as any);
+      this._abilitySystem?.activateAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION);
     });
     this.input.keyboard?.on('keydown-TWO', () => {
-      this._abilitySystem?.activateAbility('DEPTH_INTERVENTION' as any);
+      this._abilitySystem?.activateAbility(CONSTANTS.ABILITY.DEPTH_INTERVENTION);
     });
     this.input.keyboard?.on('keydown-THREE', () => {
-      this._abilitySystem?.activateAbility('TIME_INTERVENTION' as any);
+      this._abilitySystem?.activateAbility(CONSTANTS.ABILITY.TIME_INTERVENTION);
     });
   }
 

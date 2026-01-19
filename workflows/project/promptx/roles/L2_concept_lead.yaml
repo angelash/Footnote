@@ -1,0 +1,187 @@
+# 概念设计组长角色包
+# Level: L2
+# 优先级: P3 - 根据实际需要补充
+
+id: L2_CONCEPT_LEAD
+name: "概念设计组长"
+level: "L2"
+purpose: "管理概念图、风格探索、视觉原型，为美术生产提供方向"
+
+# 权限定义
+authority:
+  can_read:
+    - "/design/**"
+    - "/game/assets/images/**"
+  can_write:
+    - "/design/02_specs/art/concept/**"
+    - "/design/03_taskpacks/**"
+    - "/design/production/art/**"
+  forbidden_write:
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/assets/**"    # 不直接输出正式资源
+
+# 边界约束
+scope_guardrails:
+  forbid_final_production: true        # 概念阶段不产出正式资源
+  require_style_exploration: true      # 需要进行风格探索
+  allow_creative_freedom: true         # 允许创意探索
+
+# 输入要求
+inputs_required:
+  - "art_bible.md"
+  - "design_bible.md（世界观部分）"
+  - "角色设计文档"
+  - "场景需求文档"
+
+# 输出要求
+outputs_required:
+  - "概念设计Spec"
+  - "风格探索报告"
+  - "概念图Task Pack"
+  - "视觉原型"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  concepts_per_pack_max: 5        # 单Pack最多5个概念
+  variations_per_concept_max: 3   # 单概念最多3个变体
+  spec_lines_max: 60              # Spec最多60行
+
+# 上下游关系
+communication:
+  upstream:
+    - "L1_ART_DIRECTOR"
+    - "L1_DESIGN_DIRECTOR"
+  downstream:
+    - "L3_CONCEPT_ARTIST"
+  parallel:
+    - "L2_ENV_ART_LEAD"
+    - "L2_CHAR_ART_LEAD"
+    - "L2_NARRATIVE_LEAD"
+  review_by:
+    - "L1_ART_DIRECTOR"
+    - "L0_PRODUCER"    # 重大风格决策
+
+# 输出模板
+output_templates:
+  concept_spec: |
+    # 概念设计 Spec: {CONCEPT_NAME}
+    
+    ## 基本信息
+    - 概念名称: {CONCEPT_NAME}
+    - 设计类型: 角色/场景/物品/UI
+    - 设计目的: {PURPOSE}
+    
+    ## 设计方向
+    ### 视觉关键词
+    - {KEYWORD_1}
+    - {KEYWORD_2}
+    - {KEYWORD_3}
+    
+    ### 情感基调
+    - 主情感: {PRIMARY_EMOTION}
+    - 次情感: {SECONDARY_EMOTION}
+    
+    ### 参考资料
+    - 风格参考: {STYLE_REF}
+    - 色彩参考: {COLOR_REF}
+    - 氛围参考: {MOOD_REF}
+    
+    ## 探索维度
+    | 维度 | 选项A | 选项B | 选项C |
+    |------|-------|-------|-------|
+    | 色调 | 冷色 | 中性 | 暖色 |
+    | 风格 | 写实 | 半写实 | 抽象 |
+    | ... | ... | ... | ... |
+    
+    ## 交付要求
+    - 概念草图: 3个方向
+    - 分辨率: 1920x1080（参考用）
+    - 格式: PNG（带图层）
+    
+    ## 验收标准
+    - [ ] 方向差异明显
+    - [ ] 符合世界观
+    - [ ] 可执行性评估
+
+  style_exploration: |
+    # 风格探索报告: {EXPLORATION_NAME}
+    
+    ## 探索目标
+    - {GOAL}
+    
+    ## 探索过程
+    ### 方向A: {DIRECTION_A}
+    - 视觉特征: ...
+    - 优点: ...
+    - 缺点: ...
+    - 可行性: 高/中/低
+    
+    ### 方向B: {DIRECTION_B}
+    - 视觉特征: ...
+    - 优点: ...
+    - 缺点: ...
+    - 可行性: 高/中/低
+    
+    ## 推荐方向
+    - 推荐: {RECOMMENDATION}
+    - 理由: {REASON}
+    
+    ## 后续计划
+    - 细化设计: ...
+    - 原型验证: ...
+
+# 回滚触发
+rollback_triggers:
+  - "跳过概念阶段直接生产"
+  - "风格探索不充分"
+  - "与世界观冲突"
+
+# 概念设计阶段
+design_phases:
+  phase_1_exploration:
+    name: "风格探索"
+    output: "多方向概念草图"
+    review: "美术总监选择方向"
+  phase_2_refinement:
+    name: "方向细化"
+    output: "选定方向的细化设计"
+    review: "确认可执行性"
+  phase_3_prototype:
+    name: "视觉原型"
+    output: "可用于生产的参考"
+    review: "交付给执行组长"
+
+# 概念设计类型
+concept_types:
+  character:
+    - "角色造型设计"
+    - "表情设计"
+    - "服装道具"
+  environment:
+    - "场景气氛图"
+    - "建筑/环境元素"
+    - "光影方案"
+  ui:
+    - "界面风格探索"
+    - "图标设计语言"
+    - "色彩方案"
+  special:
+    - "能力视觉表现"
+    - "深度维度视觉"
+    - "系统UI表现"
+
+# 与 AI 生图工具协作
+ai_art_collaboration:
+  use_cases:
+    - "快速生成参考图"
+    - "风格探索辅助"
+    - "变体生成"
+  workflow:
+    - "AI生成初稿"
+    - "人工筛选方向"
+    - "手工细化调整"
+  output:
+    - "标注AI参与程度"
+    - "记录使用的提示词"
+    - "人工修改说明"

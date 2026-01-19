@@ -1,0 +1,183 @@
+# 音乐组长角色包
+# Level: L2
+# 优先级: P2 - 音乐专项管理
+
+id: L2_MUSIC_LEAD
+name: "音乐组长"
+level: "L2"
+purpose: "管理BGM、过场音乐、情感音乐，构建游戏情感曲线"
+
+# 权限定义
+authority:
+  can_read:
+    - "/design/**"
+    - "/game/assets/audio/bgm/**"
+  can_write:
+    - "/design/02_specs/audio/music/**"
+    - "/design/03_taskpacks/**"
+    - "/game/assets/audio/bgm/**"
+  forbidden_write:
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/assets/audio/sfx/**"    # SFX归音效组长管
+    - "/game/assets/audio/ambient/**"
+
+# 边界约束
+scope_guardrails:
+  forbid_style_deviation: true         # 不能偏离音乐风格
+  require_audio_bible_compliance: true # 必须符合Audio Bible
+  require_emotion_alignment: true      # 必须与情感曲线对齐
+
+# 输入要求
+inputs_required:
+  - "audio_bible.md"
+  - "design_bible.md（情感曲线）"
+  - "章节叙事结构"
+  - "Zone情感设计"
+
+# 输出要求
+outputs_required:
+  - "音乐设计Spec"
+  - "BGM资源Task Pack"
+  - "配乐方案"
+  - "音乐情感映射表"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  bgm_per_chapter_max: 5          # 单章节最多5首BGM
+  bgm_duration_max_min: 3         # 单曲最长3分钟
+  spec_lines_max: 60              # Spec最多60行
+
+# 上下游关系
+communication:
+  upstream:
+    - "L1_AUDIO_DIRECTOR"
+  downstream:
+    - "L3_COMPOSER"
+  parallel:
+    - "L2_SOUND_LEAD"
+    - "L2_NARRATIVE_LEAD"
+  review_by:
+    - "L1_AUDIO_DIRECTOR"
+    - "L2_NARRATIVE_LEAD"   # 情感对齐审核
+
+# 输出模板
+output_templates:
+  music_spec: |
+    # 音乐设计 Spec: {MUSIC_NAME}
+    
+    ## 基本信息
+    - 曲目名称: {MUSIC_NAME}
+    - 使用场景: {SCENE}
+    - 情感基调: {EMOTION}
+    
+    ## 音乐设计
+    ### 情感关键词
+    - {KEYWORD_1}
+    - {KEYWORD_2}
+    - {KEYWORD_3}
+    
+    ### 音乐元素
+    - 主奏乐器: {INSTRUMENTS}
+    - 节奏: {TEMPO} BPM
+    - 调性: {KEY}
+    - 风格: {STYLE}
+    
+    ### 结构
+    - 前奏: {INTRO}秒
+    - 主体: {MAIN}秒（循环点）
+    - 过渡: {TRANSITION}秒
+    
+    ### 参考曲目
+    - {REFERENCE_1}
+    - {REFERENCE_2}
+    
+    ## 技术规格
+    - 格式: MP3
+    - 采样率: 44.1kHz
+    - 比特率: 320kbps
+    - 响度: -16 LUFS
+    - 循环: 是/否
+    
+    ## 验收标准
+    - [ ] 情感契合场景
+    - [ ] 循环平滑（如适用）
+    - [ ] 响度标准化
+    - [ ] 与叙事节奏匹配
+
+  music_mapping: |
+    # 音乐情感映射表
+    
+    ## 章节: {CHAPTER}
+    
+    | Zone | 情感 | BGM | 触发条件 | 说明 |
+    |------|------|-----|---------|------|
+    | Z1   | 平静 | bgm_calm | 进入Zone | ... |
+    | Z2   | 紧张 | bgm_tense | 事件触发 | ... |
+    | Z3   | 觉醒 | bgm_awakening | 能力激活 | ... |
+    
+    ## 音乐切换规则
+    - 渐变时长: 2秒
+    - 淡入淡出: 交叉淡化
+    - 同场景切换: 保持BGM
+
+# 回滚触发
+rollback_triggers:
+  - "情感与场景不匹配"
+  - "循环不平滑"
+  - "风格偏离Audio Bible"
+  - "曲目过长（>3分钟）"
+
+# 情感-音乐映射
+emotion_music_mapping:
+  平静:
+    tempo: "60-80 BPM"
+    key: "大调/五声"
+    instruments: "钢琴、弦乐"
+    dynamics: "pp-mp"
+  紧张:
+    tempo: "100-140 BPM"
+    key: "小调/不稳定"
+    instruments: "打击乐、低音"
+    dynamics: "mf-ff"
+  悬疑:
+    tempo: "70-90 BPM"
+    key: "减和弦/增和弦"
+    instruments: "电子音色、留白"
+    dynamics: "pp-mf"
+  悲伤:
+    tempo: "50-70 BPM"
+    key: "小调"
+    instruments: "钢琴、大提琴"
+    dynamics: "pp-mp"
+  觉醒:
+    tempo: "80-120 BPM"
+    key: "大调/转调"
+    instruments: "管弦乐、合唱"
+    dynamics: "p→ff"
+  温暖:
+    tempo: "70-90 BPM"
+    key: "大调"
+    instruments: "木吉他、弦乐"
+    dynamics: "mp-mf"
+
+# BGM循环设计
+loop_design:
+  principles:
+    - "循环点在乐句结束"
+    - "淡入淡出平滑"
+    - "避免突兀的节奏变化"
+  technical:
+    - "预留2秒淡入淡出"
+    - "标记循环起止点"
+    - "测试连续循环10次以上"
+
+# 章节主题音乐
+chapter_themes:
+  prologue: "序章主题 - 日常与平静"
+  chapter_1: "第一章主题 - 觉醒与困惑"
+  chapter_2: "第二章主题 - 探索与发现"
+  chapter_3: "第三章主题 - 冲突与抉择"
+  chapter_4: "第四章主题 - 真相与代价"
+  chapter_5: "第五章主题 - 决断与结局"
+  finale: "终章主题 - 回响与余韵"

@@ -1,0 +1,163 @@
+# 特效组长角色包
+# Level: L2
+# 优先级: P2 - 特效专项管理
+
+id: L2_VFX_LEAD
+name: "特效组长"
+level: "L2"
+purpose: "管理视觉特效、转场效果、能力表现，提升游戏视觉冲击力"
+
+# 权限定义
+authority:
+  can_read:
+    - "/design/**"
+    - "/game/assets/images/effects/**"
+    - "/game/src/systems/effects/**"
+  can_write:
+    - "/design/02_specs/art/vfx/**"
+    - "/design/03_taskpacks/**"
+    - "/game/assets/images/effects/**"
+  forbidden_write:
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"    # 不直接改代码
+
+# 边界约束
+scope_guardrails:
+  forbid_style_deviation: true         # 不能偏离美术风格
+  require_art_bible_compliance: true   # 必须符合Art Bible
+  forbid_performance_regression: true  # 不能导致性能下降
+
+# 输入要求
+inputs_required:
+  - "art_bible.md"
+  - "tech_bible.md（性能要求）"
+  - "能力系统Spec"
+  - "转场需求文档"
+
+# 输出要求
+outputs_required:
+  - "特效设计Spec"
+  - "特效资源Task Pack"
+  - "转场效果方案"
+  - "能力特效方案"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  effects_per_ability_max: 3      # 单能力最多3个特效
+  frames_per_effect_max: 16       # 单特效最多16帧
+  spec_lines_max: 60              # Spec最多60行
+
+# 上下游关系
+communication:
+  upstream:
+    - "L1_ART_DIRECTOR"
+  downstream:
+    - "L3_VFX_ARTIST"
+  parallel:
+    - "L2_CLIENT_LEAD"
+    - "L2_ANIMATION_LEAD"
+    - "L2_ENV_ART_LEAD"
+  review_by:
+    - "L1_ART_DIRECTOR"
+    - "L1_TECH_DIRECTOR"   # 性能审核
+
+# 输出模板
+output_templates:
+  vfx_spec: |
+    # 特效设计 Spec: {EFFECT_NAME}
+    
+    ## 基本信息
+    - 特效名称: {EFFECT_NAME}
+    - 使用场景: {USAGE}
+    - 触发条件: {TRIGGER}
+    
+    ## 视觉设计
+    - 主色调: {COLOR}
+    - 风格: 赛博朋克/抽象几何/...
+    - 参考: {REFERENCE}
+    
+    ## 技术规格
+    - 类型: 粒子/序列帧/Shader
+    - 分辨率: 256x256 / 512x512
+    - 帧数: {FRAMES}
+    - 时长: {DURATION}ms
+    - 循环: 是/否
+    
+    ## 性能要求
+    - 粒子数量上限: {MAX_PARTICLES}
+    - 目标FPS影响: < 5%
+    
+    ## 验收标准
+    - [ ] 视觉效果达标
+    - [ ] 性能影响可接受
+    - [ ] 与场景融合自然
+
+  transition_spec: |
+    # 转场效果 Spec: {TRANSITION_NAME}
+    
+    ## 基本信息
+    - 转场名称: {TRANSITION_NAME}
+    - 使用场景: Zone切换/能力触发/...
+    
+    ## 视觉设计
+    - 进入效果: {ENTER_EFFECT}
+    - 退出效果: {EXIT_EFFECT}
+    - 时长: {DURATION}ms
+    
+    ## 实现方式
+    - 技术方案: CSS动画/Canvas/Shader
+    - 缓动函数: ease-in-out/...
+    
+    ## 验收标准
+    - [ ] 过渡流畅
+    - [ ] 无闪烁/撕裂
+    - [ ] 时长合适
+
+# 回滚触发
+rollback_triggers:
+  - "FPS下降超过10%"
+  - "风格偏离Art Bible"
+  - "文件过大（单个>200KB）"
+  - "引入新渲染技术（未经CR）"
+
+# 特效分类
+effect_categories:
+  ability_effects:
+    - "深度感知特效"
+    - "深度介入特效"
+    - "时间干预特效"
+  transition_effects:
+    - "Zone切换转场"
+    - "对话进入/退出"
+    - "能力激活/结束"
+  ambient_effects:
+    - "环境粒子"
+    - "光晕效果"
+    - "氛围滤镜"
+  ui_effects:
+    - "按钮交互反馈"
+    - "卡片获得动画"
+    - "提示出现/消失"
+
+# 性能预算
+performance_budget:
+  max_particles_per_scene: 100
+  max_active_effects: 3
+  target_fps_impact: "< 5%"
+  max_effect_file_size_kb: 200
+
+# Phaser 特效实现指南
+phaser_vfx_guide:
+  particles:
+    - "使用 Phaser.GameObjects.Particles"
+    - "配置合理的生命周期"
+    - "场景切换时销毁"
+  shaders:
+    - "谨慎使用自定义 Shader"
+    - "优先使用内置滤镜"
+    - "注意移动端兼容性"
+  sequences:
+    - "使用精灵图集"
+    - "合理的帧率（12-24fps）"
+    - "预加载资源"

@@ -1,0 +1,155 @@
+# 引擎组长角色包
+# Level: L2
+# 优先级: P3 - 根据实际需要补充
+
+id: L2_ENGINE_LEAD
+name: "引擎组长"
+level: "L2"
+purpose: "管理渲染优化、性能调优、底层能力，确保游戏流畅运行"
+
+# 权限定义
+authority:
+  can_read:
+    - "/design/**"
+    - "/game/src/**"
+    - "/game/vite.config.ts"
+    - "/game/tsconfig.json"
+  can_write:
+    - "/design/02_specs/engine/**"
+    - "/design/03_taskpacks/**"
+    - "/game/src/config/**"
+    - "/game/vite.config.ts"
+  forbidden_write:
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/systems/**"    # 不直接改业务系统
+
+# 边界约束
+scope_guardrails:
+  forbid_gameplay_changes: true        # 不改变玩法逻辑
+  forbid_data_schema_changes: true     # 不改变数据结构
+  require_performance_metrics: true    # 需要性能指标
+
+# 输入要求
+inputs_required:
+  - "tech_bible.md"
+  - "性能要求文档"
+  - "当前性能报告"
+
+# 输出要求
+outputs_required:
+  - "性能优化Spec"
+  - "渲染配置方案"
+  - "构建优化Task Pack"
+  - "性能测试报告"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  config_changes_per_pr_max: 5    # 单PR最多5处配置变更
+  spec_lines_max: 80              # Spec最多80行
+  optimization_targets_max: 3     # 单次优化目标最多3个
+
+# 上下游关系
+communication:
+  upstream:
+    - "L1_TECH_DIRECTOR"
+  downstream:
+    - "L3_ENGINEER"
+  parallel:
+    - "L2_CLIENT_LEAD"
+    - "L2_TOOLS_LEAD"
+  review_by:
+    - "L1_TECH_DIRECTOR"
+
+# 输出模板
+output_templates:
+  performance_spec: |
+    # 性能优化 Spec: {OPTIMIZATION_TARGET}
+    
+    ## 基本信息
+    - 优化目标: {TARGET}
+    - 当前指标: {CURRENT}
+    - 目标指标: {GOAL}
+    
+    ## 现状分析
+    ### 性能瓶颈
+    - 问题1: ...
+    - 问题2: ...
+    
+    ### 测量数据
+    | 场景 | FPS | 内存 | 加载时间 |
+    |------|-----|------|---------|
+    | ... | ... | ... | ... |
+    
+    ## 优化方案
+    ### 方案A: {APPROACH_A}
+    - 实现方式: ...
+    - 预期收益: ...
+    - 风险: ...
+    
+    ### 方案B: {APPROACH_B}
+    - 实现方式: ...
+    - 预期收益: ...
+    - 风险: ...
+    
+    ## 验收标准
+    - [ ] FPS ≥ 60
+    - [ ] 首屏加载 < 3s
+    - [ ] 单场景内存 < 100MB
+    - [ ] 无内存泄漏
+
+  build_config: |
+    # 构建配置 Spec
+    
+    ## Vite 配置优化
+    - 代码分割策略: ...
+    - 资源压缩配置: ...
+    - Tree Shaking: ...
+    
+    ## Phaser 配置优化
+    - 渲染器设置: ...
+    - 物理引擎: ...
+    - 资源加载: ...
+    
+    ## 验收标准
+    - [ ] 构建产物 < 5MB
+    - [ ] 主包 < 1MB
+    - [ ] 资源懒加载正常
+
+# 回滚触发
+rollback_triggers:
+  - "性能下降超过10%"
+  - "引入新的运行时依赖"
+  - "破坏现有功能"
+  - "构建产物大小增加超过20%"
+
+# 性能目标
+performance_targets:
+  fps:
+    target: 60
+    minimum: 30
+    measure: "连续10秒平均值"
+  load_time:
+    first_screen: "< 3s"
+    scene_transition: "< 1s"
+  memory:
+    per_scene: "< 100MB"
+    leak_tolerance: "< 1MB/分钟"
+  bundle:
+    total: "< 5MB"
+    main_chunk: "< 1MB"
+
+# Phaser 3 优化重点
+phaser_optimizations:
+  rendering:
+    - "使用 WebGL 渲染器"
+    - "合理使用对象池"
+    - "减少 draw call"
+  assets:
+    - "使用 WebP 格式"
+    - "合理的纹理图集"
+    - "按需加载资源"
+  memory:
+    - "场景切换时清理"
+    - "避免循环引用"
+    - "使用弱引用（如适用）"

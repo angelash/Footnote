@@ -503,70 +503,73 @@ flowchart LR
 | Design Director | L1_design_director | ✅ 已有 |
 | Tech Director | L1_tech_director | ✅ 已有 |
 | Art Director | L1_art_director | ✅ 已有 |
-| Audio Director | **L1_audio_director** | ⚠️ 缺失 |
+| Audio Director | L1_audio_director | ✅ 已有 |
 | QA Director | L1_qa_director | ✅ 已有 |
 | PMO | L1_pmo | ✅ 已有 |
 | Systems Lead | L2_systems_lead | ✅ 已有 |
 | Narrative Lead | L2_narrative_lead | ✅ 已有 |
-| Level Lead | **L2_level_lead** | ⚠️ 缺失 |
-| Economy Lead | **L2_economy_lead** | ⚠️ 缺失 |
+| Level Lead | L2_level_lead | ✅ 已有 |
+| Economy Lead | L2_economy_lead | ✅ 已有 |
 | Client Lead | L2_client_lead | ✅ 已有 |
 | Tools Lead | L2_tools_lead | ✅ 已有 |
-| Engine Lead | **L2_engine_lead** | ⚠️ 缺失 |
-| Network Lead | **L2_network_lead** | ⚠️ 缺失 |
-| Environment Art Lead | **L2_env_art_lead** | ⚠️ 缺失 |
-| Character Art Lead | **L2_char_art_lead** | ⚠️ 缺失 |
+| Engine Lead | L2_engine_lead | ✅ 已有 |
+| Network Lead | L2_network_lead | ✅ 已有 |
+| Environment Art Lead | L2_env_art_lead | ✅ 已有 |
+| Character Art Lead | L2_char_art_lead | ✅ 已有 |
 | UI/UX Lead | L2_ui_lead | ✅ 已有 |
-| VFX Lead | **L2_vfx_lead** | ⚠️ 缺失 |
-| Animation Lead | **L2_animation_lead** | ⚠️ 缺失 |
-| Concept Lead | **L2_concept_lead** | ⚠️ 缺失 |
-| Sound Design Lead | **L2_sound_lead** | ⚠️ 缺失 |
-| Music Lead | **L2_music_lead** | ⚠️ 缺失 |
+| VFX Lead | L2_vfx_lead | ✅ 已有 |
+| Animation Lead | L2_animation_lead | ✅ 已有 |
+| Concept Lead | L2_concept_lead | ✅ 已有 |
+| Sound Design Lead | L2_sound_lead | ✅ 已有 |
+| Music Lead | L2_music_lead | ✅ 已有 |
 | QA Lead | L2_qa_lead | ✅ 已有 |
-| Automation Lead | **L2_automation_lead** | ⚠️ 缺失 |
+| Automation Lead | L2_automation_lead | ✅ 已有 |
 | Gameplay Engineer | L3_gameplay_engineer | ✅ 已有 |
 | UI Engineer | L3_ui_engineer | ✅ 已有 |
 | Tools Engineer | L3_engineer (通用) | ✅ 已有 |
 | Writer | L3_writer | ✅ 已有 |
 | Scripter | L3_scripter | ✅ 已有 |
 | Tester | L3_tester | ✅ 已有 |
-| Artist (各类) | **L3_artist** | ⚠️ 缺失 |
-| Sound Designer | **L3_sound_designer** | ⚠️ 缺失 |
+| Artist (各类) | L3_artist | ✅ 已有 |
+| Sound Designer | L3_sound_designer | ✅ 已有 |
 
-### 8.2 缺口分析
+### 8.2 角色补充状态
 
-#### 8.2.1 L1 层缺失（1个）
-- **L1_audio_director** - 音频总监（音效+音乐规范）
+> **状态更新**: 2026-01-19，所有角色已补充完成
 
-#### 8.2.2 L2 层缺失（12个）
-- **L2_level_lead** - 关卡组长
-- **L2_economy_lead** - 经济系统组长
-- **L2_engine_lead** - 引擎组长
-- **L2_network_lead** - 网络组长
-- **L2_env_art_lead** - 场景美术组长
-- **L2_char_art_lead** - 角色美术组长
-- **L2_vfx_lead** - 特效组长
-- **L2_animation_lead** - 动画组长
-- **L2_concept_lead** - 概念设计组长
-- **L2_sound_lead** - 音效组长
-- **L2_music_lead** - 音乐组长
-- **L2_automation_lead** - 自动化测试组长
+#### 8.2.1 L1 层（已全部补充）
+- ✅ **L1_audio_director** - 音频总监（音效+音乐规范）
 
-#### 8.2.3 L3 层缺失（2个）
-- **L3_artist** - 美术执行岗（通用）
-- **L3_sound_designer** - 音效执行岗
+#### 8.2.2 L2 层（已全部补充，共12个）
+- ✅ **L2_level_lead** - 关卡组长
+- ✅ **L2_economy_lead** - 经济系统组长
+- ✅ **L2_engine_lead** - 引擎组长
+- ✅ **L2_network_lead** - 网络组长
+- ✅ **L2_env_art_lead** - 场景美术组长
+- ✅ **L2_char_art_lead** - 角色美术组长
+- ✅ **L2_vfx_lead** - 特效组长
+- ✅ **L2_animation_lead** - 动画组长
+- ✅ **L2_concept_lead** - 概念设计组长
+- ✅ **L2_sound_lead** - 音效组长
+- ✅ **L2_music_lead** - 音乐组长
+- ✅ **L2_automation_lead** - 自动化测试组长
 
-### 8.3 优先补充建议
+#### 8.2.3 L3 层（已全部补充，共2个）
+- ✅ **L3_artist** - 美术执行岗（通用，含变体）
+- ✅ **L3_sound_designer** - 音效执行岗（含变体）
 
-| 优先级 | 角色 | 理由 |
-|--------|------|------|
-| P0 | L2_level_lead | 项目有大量Zone设计需求 |
-| P0 | L2_automation_lead | 需要加强自动化测试 |
-| P1 | L1_audio_director | 音频工作需要规范 |
-| P1 | L3_artist | 美术资源生产需要 |
-| P2 | L2_env_art_lead | 场景美术专项管理 |
-| P2 | L2_char_art_lead | 角色美术专项管理 |
-| P3 | 其他 | 根据实际需要逐步补充 |
+### 8.3 角色文件清单
+
+所有角色定义文件位于 `workflows/project/promptx/roles/` 目录下：
+
+| 层级 | 角色数量 | 文件清单 |
+|------|---------|----------|
+| L0 | 1 | L0_producer.yaml |
+| L1 | 7 | L1_art_director.yaml, L1_audio_director.yaml, L1_design_director.yaml, L1_pmo.yaml, L1_qa_director.yaml, L1_tech_director.yaml |
+| L2 | 19 | L2_automation_lead.yaml, L2_animation_lead.yaml, L2_char_art_lead.yaml, L2_client_lead.yaml, L2_concept_lead.yaml, L2_economy_lead.yaml, L2_engine_lead.yaml, L2_env_art_lead.yaml, L2_event_lead.yaml, L2_level_lead.yaml, L2_music_lead.yaml, L2_narrative_lead.yaml, L2_network_lead.yaml, L2_qa_lead.yaml, L2_sound_lead.yaml, L2_systems_lead.yaml, L2_tools_lead.yaml, L2_ui_lead.yaml, L2_vfx_lead.yaml, L2_writing_lead.yaml |
+| L3 | 7 | L3_artist.yaml, L3_engineer.yaml, L3_gameplay_engineer.yaml, L3_scripter.yaml, L3_sound_designer.yaml, L3_tester.yaml, L3_ui_engineer.yaml, L3_writer.yaml |
+
+**总计**: 34个完整角色定义
 
 ---
 
@@ -583,9 +586,10 @@ flowchart LR
 | 版本 | 日期 | 变更内容 | 作者 |
 |------|------|---------|------|
 | v1.0 | 2026-01-19 | 初版创建 | AI |
+| v1.1 | 2026-01-19 | 补充全部15个缺失角色（L1:1, L2:12, L3:2），更新角色映射表 | AI |
 
 ---
 
-*文档版本: v1.0*  
+*文档版本: v1.1*  
 *创建日期: 2026-01-19*  
 *维护者: L1 层*

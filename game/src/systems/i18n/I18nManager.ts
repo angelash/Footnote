@@ -56,9 +56,10 @@ interface IPluralTranslation {
 }
 
 /**
- * 格式化选项
+ * 格式化选项（预留接口，供未来扩展使用）
+ * @internal 当前版本未使用，保留供后续版本实现高级格式化功能
  */
-interface IFormatOptions {
+export interface IFormatOptions {
   /** 数字格式化选项 */
   number?: Intl.NumberFormatOptions;
   /** 日期格式化选项 */
@@ -679,7 +680,7 @@ class I18nManager {
     // 尝试查找带上下文的翻译
     const contextKeys = Object.entries(context)
       .filter(([, v]) => v !== undefined)
-      .map(([k, v]) => `${key}.${v}`);
+      .map(([_k, v]) => `${key}.${v}`);
 
     for (const contextKey of contextKeys) {
       const value = this._getValue(contextKey, this._currentLocale);
@@ -764,7 +765,11 @@ class I18nManager {
    */
   public formatRelativeTime(date: Date | number, baseDate?: Date | number): string {
     const target = typeof date === 'number' ? date : date.getTime();
-    const base = baseDate ? (typeof baseDate === 'number' ? baseDate : baseDate.getTime()) : Date.now();
+    const base = baseDate
+      ? typeof baseDate === 'number'
+        ? baseDate
+        : baseDate.getTime()
+      : Date.now();
     const diff = target - base;
     const absDiff = Math.abs(diff);
     const isPast = diff < 0;

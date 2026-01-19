@@ -541,7 +541,10 @@ export class GameScene extends Phaser.Scene {
     const pIcon = this.textures.exists('px_counter_p')
       ? this.add.image(width - 160, counterY + spacing, 'px_counter_p').setScale(0.3)
       : this.add
-          .text(width - 160, counterY + spacing, 'P', { fontSize: UI_FONT_SIZE.TINY, color: '#4A9EFF' })
+          .text(width - 160, counterY + spacing, 'P', {
+            fontSize: UI_FONT_SIZE.TINY,
+            color: '#4A9EFF',
+          })
           .setOrigin(0.5);
     const pText = this.add
       .text(width - 130, counterY + spacing, `${counters.P}`, {
@@ -555,7 +558,10 @@ export class GameScene extends Phaser.Scene {
     const wIcon = this.textures.exists('px_counter_w')
       ? this.add.image(width - 160, counterY + spacing * 2, 'px_counter_w').setScale(0.3)
       : this.add
-          .text(width - 160, counterY + spacing * 2, 'W', { fontSize: UI_FONT_SIZE.TINY, color: '#FFD700' })
+          .text(width - 160, counterY + spacing * 2, 'W', {
+            fontSize: UI_FONT_SIZE.TINY,
+            color: '#FFD700',
+          })
           .setOrigin(0.5);
     const wText = this.add
       .text(width - 130, counterY + spacing * 2, `${counters.W}`, {

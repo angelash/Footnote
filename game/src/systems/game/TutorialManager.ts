@@ -5,7 +5,10 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('TutorialManager');
 import { worldState } from '@/systems/world';
 import { newGamePlusManager } from './NewGamePlus';
 import { UI_FONT_SIZE } from '@/config/ui.config';
@@ -147,7 +150,7 @@ export class TutorialManager {
         steps.forEach((step) => this._completedSteps.add(step));
       }
     } catch (error) {
-      console.warn('[TutorialManager] 加载教程进度失败:', error);
+      logger.warn('加载教程进度失败:', error);
     }
   }
 
@@ -161,7 +164,7 @@ export class TutorialManager {
         JSON.stringify(Array.from(this._completedSteps))
       );
     } catch (error) {
-      console.error('[TutorialManager] 保存教程进度失败:', error);
+      logger.error('保存教程进度失败:', error);
     }
   }
 
@@ -213,7 +216,7 @@ export class TutorialManager {
     // 获取配置
     const config = TUTORIAL_CONFIGS.find((c) => c.step === step);
     if (!config) {
-      console.warn(`[TutorialManager] 未知教程步骤: ${step}`);
+      logger.warn(`未知教程步骤: ${step}`);
       return;
     }
 

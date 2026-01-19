@@ -5,6 +5,9 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('AudioManager');
 
 export interface IBgmConfig {
   id: string;
@@ -87,7 +90,7 @@ export class AudioManager {
 
     const config = this._bgmConfigs.get(bgmId);
     if (!config) {
-      console.warn(`BGM not found: ${bgmId}`);
+      logger.warn(`BGM not found: ${bgmId}`);
       return;
     }
 
@@ -155,7 +158,7 @@ export class AudioManager {
   public playSfx(sfxId: string): void {
     const config = this._sfxConfigs.get(sfxId);
     if (!config) {
-      console.warn(`SFX not found: ${sfxId}`);
+      logger.warn(`SFX not found: ${sfxId}`);
       return;
     }
 
@@ -172,7 +175,7 @@ export class AudioManager {
 
     const config = this._ambienceConfigs.get(ambienceId);
     if (!config) {
-      console.warn(`Ambience not found: ${ambienceId}`);
+      logger.warn(`Ambience not found: ${ambienceId}`);
       return;
     }
 

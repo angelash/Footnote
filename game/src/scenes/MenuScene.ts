@@ -3,6 +3,9 @@
  */
 import Phaser from 'phaser';
 import { SCENES, TEXT_STYLES, COLORS } from '@/config/game.config';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('MenuScene');
 import { UI_FONT_SIZE } from '@/config/ui.config';
 import { saveManager } from '@/systems/save';
 import { worldState } from '@/systems/world';
@@ -38,7 +41,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   create(): void {
-    console.log('[MenuScene] 创建主菜单');
+    logger.info('创建主菜单');
 
     const { width, height } = this.scale;
 
@@ -347,7 +350,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private async _loadSave(slot: number): Promise<void> {
-    console.log(`[MenuScene] 加载存档 ${slot}`);
+    logger.info(`加载存档 ${slot}`);
 
     const success = await saveManager.load(slot);
     if (success) {
@@ -765,7 +768,7 @@ export class MenuScene extends Phaser.Scene {
   }
 
   private _startNewGame(): void {
-    console.log('[MenuScene] 开始新游戏');
+    logger.info('开始新游戏');
 
     // 淡出过渡
     this.cameras.main.fadeOut(500, 10, 10, 15);

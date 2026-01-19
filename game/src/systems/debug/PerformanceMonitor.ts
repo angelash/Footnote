@@ -5,6 +5,25 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('PerformanceMonitor');
+
+// 扩展 Performance 接口以支持 Chrome 内存 API
+interface IPerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
+interface IPerformanceWithMemory extends Performance {
+  memory?: IPerformanceMemory;
+}
+
+// 扩展 SoundManager 接口
+interface ISoundManagerWithSounds extends Phaser.Sound.BaseSoundManager {
+  sounds?: unknown[];
+}
 
 export interface IPerformanceMetrics {
   fps: number;
@@ -74,7 +93,7 @@ export class PerformanceMonitor {
     this._scene = scene;
     this._isEnabled = true;
     this._createOverlay();
-    console.log('[PerformanceMonitor] 已启用');
+    logger.info('已启用');
   }
 
   /**
@@ -83,7 +102,7 @@ export class PerformanceMonitor {
   public disable(): void {
     this._isEnabled = false;
     this._removeOverlay();
-    console.log('[PerformanceMonitor] 已禁用');
+    logger.info('已禁用');
   }
 
   /**
@@ -141,8 +160,9 @@ export class PerformanceMonitor {
     const fps = Math.round(game.loop.actualFps);
     const avgFps = Math.round(this._fpsHistory.sum / 60);
 
-    // 内存信息（如果可用）
-    const memory = (performance as any).memory;
+    // 内存信息（如果可用 - Chrome 特有 API）
+    const perfWithMemory = performance as IPerformanceWithMemory;
+    const memory = perfWithMemory.memory;
     const heapUsed = memory ? Math.round(memory.usedJSHeapSize / 1024 / 1024) : 0;
     const heapTotal = memory ? Math.round(memory.totalJSHeapSize / 1024 / 1024) : 0;
 
@@ -157,7 +177,7 @@ export class PerformanceMonitor {
       drawCalls: this._getDrawCalls(),
       gameObjects: this._scene.children.length,
       textures: game.textures.list ? Object.keys(game.textures.list).length : 0,
-      sounds: (game.sound as any).sounds?.length ?? 0,
+      sounds: (game.sound as ISoundManagerWithSounds).sounds?.length ?? 0,
     };
   }
 
@@ -187,8 +207,8 @@ export class PerformanceMonitor {
     if (!this._scene) return 0;
     // Phaser没有直接暴露drawCalls，这里返回可见对象数作为近似
     let count = 0;
-    this._scene.children.each((child) => {
-      if ((child as any).visible) count++;
+    this._scene.children.each((child: Phaser.GameObjects.GameObject) => {
+      if ('visible' in child && (child as unknown as { visible: boolean }).visible) count++;
     });
     return count;
   }
@@ -223,7 +243,7 @@ export class PerformanceMonitor {
    */
   public endLoadTracking(): ILoadMetrics {
     this._loadMetrics.totalLoadTime = Math.round(performance.now() - this._loadStartTime);
-    console.log('[PerformanceMonitor] 加载完成:', this._loadMetrics);
+    logger.info('加载完成:', this._loadMetrics);
     return this._loadMetrics;
   }
 

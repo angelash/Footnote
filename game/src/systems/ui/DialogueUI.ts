@@ -5,7 +5,10 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('DialogueUI');
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 import {
@@ -493,11 +496,11 @@ export class DialogueUI {
     // 根据说话者和表情查找立绘资源
     const portraitKey = this._getPortraitKey(speaker, expression);
     if (!portraitKey || !this._scene.textures.exists(portraitKey)) {
-      console.log(`[DialogueUI] 立绘未找到: ${speaker} - ${expression} (key: ${portraitKey})`);
+      logger.debug(`立绘未找到: ${speaker} - ${expression} (key: ${portraitKey})`);
       return;
     }
 
-    console.log(`[DialogueUI] 显示立绘: ${speaker} - ${expression} (key: ${portraitKey})`);
+    logger.debug(`显示立绘: ${speaker} - ${expression} (key: ${portraitKey})`);
     const { width, height } = this._scene.scale;
 
     this._portrait = this._scene.add.image(
@@ -555,7 +558,7 @@ export class DialogueUI {
 
     // 如果指定表情不存在，回退到neutral
     if (expression !== 'neutral') {
-      console.log(`[DialogueUI] 表情 ${expression} 不存在，回退到 neutral`);
+      logger.debug(`表情 ${expression} 不存在，回退到 neutral`);
       return getCharacterPortraitKey(charId, 'neutral') || null;
     }
 

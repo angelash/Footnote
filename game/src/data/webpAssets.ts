@@ -10,6 +10,10 @@
  * - 可动物件动画
  */
 
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('WebpAssets');
+
 // ==================== 角色头像 ====================
 
 /**
@@ -820,4 +824,4 @@ export const WEBP_ASSET_STATS = {
   },
 } as const;
 
-console.log(`[WebpAssets] 已注册 ${WEBP_ASSET_STATS.total} 个webp资产`);
+logger.info(`已注册 ${WEBP_ASSET_STATS.total} 个webp资产`);

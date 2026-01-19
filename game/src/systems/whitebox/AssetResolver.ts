@@ -5,6 +5,9 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('AssetResolver');
 import {
   CURRENT_ASSET_MODE,
   AssetMode,
@@ -47,7 +50,7 @@ class AssetResolver {
       this._billboardFactory = new BillboardFactory(scene);
     }
     this._initialized = true;
-    console.log(`[AssetResolver] 初始化完成，当前模式: ${CURRENT_ASSET_MODE.mode}`);
+    logger.info(`初始化完成，当前模式: ${CURRENT_ASSET_MODE.mode}`);
   }
 
   /**

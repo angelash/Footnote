@@ -266,11 +266,11 @@ type AbilityEvent =
 ### 4.3 类型定义
 
 ```typescript
-enum AbilityType {
-  DepthPerception = 'DEPTH_PERCEPTION',
-  DepthIntervention = 'DEPTH_INTERVENTION',
-  TimeIntervention = 'TIME_INTERVENTION',
-}
+/**
+ * 能力类型（使用常量字符串联合类型，与 game.config.ts 保持一致）
+ * @see game/src/config/game.config.ts CONSTANTS.ABILITY
+ */
+type AbilityType = 'DEPTH_PERCEPTION' | 'DEPTH_INTERVENTION' | 'TIME_INTERVENTION';
 
 enum AbilityState {
   Locked = 'LOCKED',
@@ -281,31 +281,39 @@ enum AbilityState {
   Disabled = 'DISABLED',
 }
 
+/**
+ * 伤痕数据（与 game/src/systems/world/WorldState.ts 保持一致）
+ */
 interface IScar {
   id: string;
-  type: 'minor' | 'moderate' | 'severe';
   zoneId: string;
-  targetId: string;
-  createdAt: number;
-  description: string;
+  objectId: string;  // 被介入的对象ID
+  type: 'visual_glitch' | 'structural_crack' | 'data_corruption' | 'minor';
+  timestamp: number;
+  description?: string;  // 可选的描述
 }
 
+/**
+ * 污染数据（与 game/src/systems/world/WorldState.ts 保持一致）
+ */
 interface IContamination {
   id: string;
-  severity: 'light' | 'medium' | 'heavy' | 'extreme';
-  fromNodeId: string;
-  toNodeId: string;
-  createdAt: number;
-  effects: string[];
+  sourceZoneId: string;       // 回溯起点Zone
+  affectedZoneIds: string[];  // 受影响的Zone列表
+  type: 'timeline_fracture' | 'causality_leak' | 'version_conflict';
+  severity: number;           // 污染严重程度（数值）
+  timestamp: number;
 }
 
+/**
+ * 时间节点（与 game/src/types/index.ts 保持一致）
+ */
 interface ITimeNode {
   id: string;
   zoneId: string;
   timestamp: number;
-  type: 'auto' | 'manual' | 'event';
   label: string;
-  canJumpTo: boolean;
+  canRewind: boolean;  // 是否可以回溯到此节点
 }
 ```
 
@@ -374,4 +382,4 @@ W = max(0, 100 - (R × 3 + P × 2) - 异常事件修正)
 
 ---
 
-*版本: v1.0 | 创建: 2026-01-19 | 状态: 草案*
+*版本: v1.1 | 创建: 2026-01-19 | 更新: 2026-01-20 | 状态: 已同步代码*

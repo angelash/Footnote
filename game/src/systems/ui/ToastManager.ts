@@ -5,6 +5,7 @@
  */
 
 import Phaser from 'phaser';
+import { BaseUIComponent, type IBaseUIConfig } from './BaseUIComponent';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 
@@ -25,6 +26,8 @@ const CONFIG = {
   SPACING: UI.SPACING.SM,
   /** 顶部边距 */
   MARGIN_TOP: 80,
+  /** 默认深度 */
+  DEFAULT_DEPTH: 1200,
 };
 
 // ==================== 类型定义 ====================
@@ -38,24 +41,47 @@ interface IToast {
   timer?: Phaser.Time.TimerEvent;
 }
 
-interface IToastConfig {
-  scene: Phaser.Scene;
+interface IToastConfig extends Omit<IBaseUIConfig, 'depth'> {
+  /** 深度层级，默认1200 */
+  depth?: number;
 }
 
 // ==================== ToastManager类 ====================
 
 /**
  * Toast提示管理器
+ * 继承自 BaseUIComponent，提供统一的生命周期管理
  */
-export class ToastManager {
-  private _scene: Phaser.Scene;
+export class ToastManager extends BaseUIComponent {
   private _toasts: IToast[] = [];
   private _toastIdCounter: number = 0;
-  private _mainContainer!: Phaser.GameObjects.Container;
 
   constructor(config: IToastConfig) {
-    this._scene = config.scene;
-    this._createMainContainer();
+    super({
+      ...config,
+      depth: config.depth ?? CONFIG.DEFAULT_DEPTH,
+    });
+
+    // ToastManager 容器始终可见，由内部 toast 控制显示
+    this._container.setVisible(true);
+  }
+
+  // ==================== 基类方法实现 ====================
+
+  /**
+   * 创建UI - 设置容器位置
+   */
+  protected _createUI(): void {
+    const { width } = this._scene.scale;
+    // 将容器定位到屏幕顶部中央
+    this._container.setPosition(width / 2, CONFIG.MARGIN_TOP);
+  }
+
+  /**
+   * 销毁前钩子 - 清理所有 Toast
+   */
+  protected _onBeforeDestroy(): void {
+    this.dismissAll();
   }
 
   // ==================== 公共方法 ====================
@@ -113,21 +139,13 @@ export class ToastManager {
   }
 
   /**
-   * 销毁管理器
+   * 获取当前显示的Toast数量
    */
-  destroy(): void {
-    this.dismissAll();
-    this._mainContainer.destroy();
+  getToastCount(): number {
+    return this._toasts.length;
   }
 
   // ==================== 私有方法 - 创建 ====================
-
-  private _createMainContainer(): void {
-    const { width } = this._scene.scale;
-
-    this._mainContainer = this._scene.add.container(width / 2, CONFIG.MARGIN_TOP);
-    this._mainContainer.setDepth(1200);
-  }
 
   private _showToast(message: string, type: ToastType, duration: number = CONFIG.DURATION): number {
     // 如果超过最大数量，移除最旧的
@@ -142,7 +160,7 @@ export class ToastManager {
     const yOffset = this._toasts.length * (CONFIG.HEIGHT + CONFIG.SPACING);
     container.y = yOffset;
 
-    this._mainContainer.add(container);
+    this._container.add(container);
 
     // 进入动画
     container.setAlpha(0);
@@ -182,7 +200,7 @@ export class ToastManager {
     const yOffset = this._toasts.length * (CONFIG.HEIGHT + 20 + CONFIG.SPACING);
     container.y = yOffset;
 
-    this._mainContainer.add(container);
+    this._container.add(container);
 
     // 特殊的进入动画
     container.setAlpha(0);

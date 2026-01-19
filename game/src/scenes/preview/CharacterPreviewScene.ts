@@ -8,12 +8,16 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('CharacterPreview');
 import { BasePreviewScene } from './BasePreviewScene';
 import {
   CHARACTERS,
   CharacterId,
   getPortraitKey,
   ICharacterInfo,
+  type CharacterExpression,
 } from '@/config/characters.config';
 import { CHARACTER_PORTRAITS } from '@/data/webpAssets';
 import { DialogueUI } from '@/systems/ui/DialogueUI';
@@ -327,7 +331,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
     container.add(bg);
 
     // 头像
-    const portraitKey = getPortraitKey(characterId, expression as any);
+    const portraitKey = getPortraitKey(characterId, expression as CharacterExpression);
     const portraitUrl = CHARACTER_PORTRAITS[portraitKey];
 
     if (portraitUrl) {
@@ -454,8 +458,8 @@ export class CharacterPreviewScene extends BasePreviewScene {
     // 创建对话UI
     this._dialogueUI = new DialogueUI({
       scene: this,
-      onDialogueEnd: () => {
-        console.log('[CharacterPreview] 对话结束');
+      onDialogueEnd: (): void => {
+        logger.debug('对话结束');
       },
     });
 

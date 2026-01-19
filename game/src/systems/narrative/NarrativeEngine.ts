@@ -4,9 +4,13 @@
  * @module systems/narrative/NarrativeEngine
  */
 
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('NarrativeEngine');
 import { worldState } from '@/systems/world';
 import type { ChapterID } from '@/config/game.config';
+import { AbilityType } from '@/config/game.config';
 
 // ==================== 类型定义 ====================
 
@@ -242,7 +246,7 @@ class NarrativeEngine {
     }
 
     // TODO: 从YAML文件加载
-    console.warn(`[NarrativeEngine] Dialogue not found: ${dialogueId}`);
+    logger.warn(`Dialogue not found: ${dialogueId}`);
     return null;
   }
 
@@ -255,7 +259,7 @@ class NarrativeEngine {
     if (typeof dialogueIdOrData === 'string') {
       const loaded = await this.loadDialogue(dialogueIdOrData);
       if (!loaded) {
-        console.error(`[NarrativeEngine] Cannot start dialogue: ${dialogueIdOrData}`);
+        logger.error(`Cannot start dialogue: ${dialogueIdOrData}`);
         return;
       }
       dialogue = loaded;
@@ -447,7 +451,7 @@ class NarrativeEngine {
         break;
       case 'ability':
         if (action.abilityType) {
-          worldState.unlockAbility(action.abilityType as any);
+          worldState.unlockAbility(action.abilityType as AbilityType);
         }
         break;
       case 'sfx':
@@ -465,7 +469,8 @@ class NarrativeEngine {
 
   private _checkChoiceCondition(condition: IChoiceCondition): boolean {
     if (condition.hasCard && !this.hasCard(condition.hasCard)) return false;
-    if (condition.hasAbility && !worldState.hasAbility(condition.hasAbility as any)) return false;
+    if (condition.hasAbility && !worldState.hasAbility(condition.hasAbility as AbilityType))
+      return false;
     if (condition.flagTrue && !worldState.getFlag(condition.flagTrue)) return false;
     if (condition.rMin !== undefined) {
       const { R } = worldState.getCounters();
@@ -512,7 +517,7 @@ class NarrativeEngine {
 
     const card = this._cardRegistry.get(cardId);
     if (!card) {
-      console.warn(`[NarrativeEngine] Card not found: ${cardId}`);
+      logger.warn(`Card not found: ${cardId}`);
       return false;
     }
 
@@ -607,7 +612,7 @@ class NarrativeEngine {
   triggerForeshadow(foreshadowId: string, stage: ForeshadowStage): boolean {
     const state = this._foreshadowStates.get(foreshadowId);
     if (!state) {
-      console.warn(`[NarrativeEngine] Foreshadow not found: ${foreshadowId}`);
+      logger.warn(`Foreshadow not found: ${foreshadowId}`);
       return false;
     }
 

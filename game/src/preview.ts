@@ -13,6 +13,7 @@ const logger = createLogger('Preview');
 
 // 扩展 Window 接口以支持调试变量
 declare global {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   interface Window {
     __PREVIEW_GAME__?: Phaser.Game;
   }

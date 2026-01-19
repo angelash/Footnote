@@ -5,6 +5,10 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('AssetManager');
+
 import {
   CHARACTER_PORTRAITS,
   SCENE_BACKGROUNDS,
@@ -215,11 +219,11 @@ class AssetManager {
     }
 
     if (!this._scene) {
-      console.warn('[AssetManager] 没有设置场景，无法加载资源');
+      logger.warn('没有设置场景，无法加载资源');
       return;
     }
 
-    console.log(`[AssetManager] 开始加载章节资源: ${group}`);
+    logger.info(`开始加载章节资源: ${group}`);
 
     const config = CHAPTER_ASSET_MAP[group];
     if (!config) {
@@ -236,7 +240,7 @@ class AssetManager {
     await this._loadAudio(config.audio);
 
     this._loadedGroups.add(group);
-    console.log(`[AssetManager] 章节资源加载完成: ${group}`);
+    logger.info(`章节资源加载完成: ${group}`);
   }
 
   /**
@@ -247,7 +251,7 @@ class AssetManager {
     if (nextChapter) {
       // 使用requestIdleCallback在空闲时加载
       if ('requestIdleCallback' in window) {
-        (window as any).requestIdleCallback(() => {
+        window.requestIdleCallback((): void => {
           this.loadChapterAssets(nextChapter);
         });
       } else {
@@ -279,7 +283,7 @@ class AssetManager {
 
     // 可选：卸载纹理释放内存
     // 注意：谨慎使用，可能影响游戏体验
-    console.log(`[AssetManager] 卸载章节资源: ${group}`);
+    logger.info(`卸载章节资源: ${group}`);
     this._loadedGroups.delete(group);
   }
 

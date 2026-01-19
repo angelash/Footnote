@@ -4,7 +4,10 @@
  * @module systems/analytics/AnalyticsManager
  */
 
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('Analytics');
 
 // ==================== 类型定义 ====================
 
@@ -103,18 +106,18 @@ class AnalyticsManager {
     // 检查是否应该启用
     const isDev = import.meta.env.DEV;
     if (isDev && !this._config.enableInDev) {
-      console.log('[Analytics] 开发模式下已禁用');
+      logger.info('开发模式下已禁用');
       return;
     }
 
     // 采样检查
     if (Math.random() > this._config.sampleRate) {
-      console.log('[Analytics] 未被采样');
+      logger.info('未被采样');
       return;
     }
 
     if (!this._config.enabled) {
-      console.log('[Analytics] 已禁用');
+      logger.info('已禁用');
       return;
     }
 
@@ -123,7 +126,7 @@ class AnalyticsManager {
     this._trackSessionStart();
     this._isInitialized = true;
 
-    console.log('[Analytics] 初始化完成，会话ID:', this._sessionId);
+    logger.info('初始化完成，会话ID:', this._sessionId);
   }
 
   /**
@@ -276,7 +279,7 @@ class AnalyticsManager {
 
     // 本地日志
     if (import.meta.env.DEV) {
-      console.log('[Analytics]', event);
+      logger.debug('Event:', event);
     }
 
     // 达到批量大小时刷新
@@ -351,7 +354,7 @@ class AnalyticsManager {
       const updated = [...existing, ...events].slice(-500); // 最多保留 500 条
       localStorage.setItem(key, JSON.stringify(updated));
     } catch (error) {
-      console.warn('[Analytics] 本地存储失败:', error);
+      logger.warn('本地存储失败:', error);
     }
   }
 
@@ -374,7 +377,7 @@ class AnalyticsManager {
         }),
       });
     } catch (error) {
-      console.warn('[Analytics] 上报失败:', error);
+      logger.warn('上报失败:', error);
       // 失败的事件重新加入队列
       this._eventQueue.unshift(...events);
     }
@@ -395,7 +398,7 @@ class AnalyticsManager {
 
       navigator.sendBeacon(this._config.endpoint, data);
     } catch (error) {
-      console.warn('[Analytics] Beacon 发送失败:', error);
+      logger.warn('Beacon 发送失败:', error);
     }
   }
 
@@ -447,7 +450,7 @@ class AnalyticsManager {
       }
     }
     keys.forEach((key) => localStorage.removeItem(key));
-    console.log('[Analytics] 已清除本地数据');
+    logger.info('已清除本地数据');
   }
 
   /**

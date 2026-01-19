@@ -11,7 +11,10 @@
  * @module systems/i18n/I18nManager
  */
 
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '../EventBus';
+
+const logger = createLogger('I18n');
 
 export type SupportedLocale = 'zh-CN' | 'zh-TW' | 'en-US' | 'ja-JP';
 
@@ -957,7 +960,7 @@ class I18nManager {
 
       // 输出警告
       if (this._warnOnMissing) {
-        console.warn(`[I18n] Missing translation: "${key}" for locale "${this._currentLocale}"`);
+        logger.warn(`Missing translation: "${key}" for locale "${this._currentLocale}"`);
       }
     }
   }
@@ -1002,7 +1005,7 @@ class I18nManager {
     // 通知内部监听器
     this._listeners.forEach((listener) => listener());
 
-    console.log(`[I18n] 语言切换为: ${LOCALE_NAMES[locale]}`);
+    logger.info(`语言切换为: ${LOCALE_NAMES[locale]}`);
   }
 
   /**
@@ -1060,8 +1063,8 @@ class I18nManager {
     }
 
     this._translations.set(locale, mergedData);
-    console.log(
-      `[I18n] 加载翻译: ${locale}${namespace ? ` (namespace: ${namespace})` : ''}, 键数: ${this._countKeys(data)}`
+    logger.info(
+      `加载翻译: ${locale}${namespace ? ` (namespace: ${namespace})` : ''}, 键数: ${this._countKeys(data)}`
     );
   }
 
@@ -1100,7 +1103,7 @@ class I18nManager {
       const data = (await response.json()) as ITranslation;
       this.loadTranslations(locale, { data, namespace });
     } catch (error) {
-      console.error(`[I18n] 加载翻译失败: ${url}`, error);
+      logger.error(`加载翻译失败: ${url}`, error);
       throw error;
     }
   }
@@ -1117,7 +1120,7 @@ class I18nManager {
       const translations = this._translations.get(loc);
       if (translations && namespace in translations) {
         delete translations[namespace];
-        console.log(`[I18n] 卸载翻译: ${loc} (namespace: ${namespace})`);
+        logger.debug(`卸载翻译: ${loc} (namespace: ${namespace})`);
       }
     }
   }

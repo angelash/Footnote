@@ -4,7 +4,10 @@
  * 支持动态加载、回退机制、按需加载
  */
 
+import { createLogger } from '@/utils/Logger';
 import { i18n, SupportedLocale } from '@/systems/i18n/I18nManager';
+
+const logger = createLogger('Locales');
 
 /** 默认回退语言 */
 const FALLBACK_LOCALE: SupportedLocale = 'zh-CN';
@@ -48,11 +51,11 @@ export async function loadDialogueTranslations(
     loadedTranslations.add(key);
     return true;
   } catch (error) {
-    console.warn(`[Locales] Failed to load dialogue translations for ${locale}/${chapter}:`, error);
+    logger.warn(`Failed to load dialogue translations for ${locale}/${chapter}:`, error);
 
     // 尝试回退到默认语言
     if (useFallback && locale !== FALLBACK_LOCALE) {
-      console.log(`[Locales] Falling back to ${FALLBACK_LOCALE} for dialogues/${chapter}`);
+      logger.info(`Falling back to ${FALLBACK_LOCALE} for dialogues/${chapter}`);
       return loadDialogueTranslations(FALLBACK_LOCALE, chapter, { force, useFallback: false });
     }
 
@@ -86,11 +89,11 @@ export async function loadCardTranslations(
     loadedTranslations.add(key);
     return true;
   } catch (error) {
-    console.warn(`[Locales] Failed to load card translations for ${locale}:`, error);
+    logger.warn(`Failed to load card translations for ${locale}:`, error);
 
     // 尝试回退到默认语言
     if (useFallback && locale !== FALLBACK_LOCALE) {
-      console.log(`[Locales] Falling back to ${FALLBACK_LOCALE} for cards`);
+      logger.info(`Falling back to ${FALLBACK_LOCALE} for cards`);
       return loadCardTranslations(FALLBACK_LOCALE, { force, useFallback: false });
     }
 
@@ -131,9 +134,7 @@ export async function loadAllTranslations(
   const loaded = results.filter((r) => r.success).map((r) => r.key);
   const failed = results.filter((r) => !r.success).map((r) => r.key);
 
-  console.log(
-    `[Locales] Loaded translations for ${locale}: ${loaded.length}/${results.length} successful`
-  );
+  logger.info(`Loaded translations for ${locale}: ${loaded.length}/${results.length} successful`);
 
   return {
     success: failed.length === 0,
@@ -262,11 +263,11 @@ export async function loadUITranslations(
     loadedTranslations.add(key);
     return true;
   } catch (error) {
-    console.warn(`[Locales] Failed to load UI translations for ${locale}:`, error);
+    logger.warn(`Failed to load UI translations for ${locale}:`, error);
 
     // 尝试回退到默认语言
     if (useFallback && locale !== FALLBACK_LOCALE) {
-      console.log(`[Locales] Falling back to ${FALLBACK_LOCALE} for UI`);
+      logger.info(`Falling back to ${FALLBACK_LOCALE} for UI`);
       return loadUITranslations(FALLBACK_LOCALE, { force, useFallback: false });
     }
 
@@ -287,6 +288,6 @@ export async function loadChapterOnDemand(chapter: string): Promise<boolean> {
     return true;
   }
 
-  console.log(`[Locales] Loading chapter ${chapter} on demand for ${currentLocale}`);
+  logger.info(`Loading chapter ${chapter} on demand for ${currentLocale}`);
   return loadDialogueTranslations(currentLocale, chapter);
 }

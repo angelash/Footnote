@@ -4,7 +4,10 @@
  * @module data/NarrativeDataLoader
  */
 
+import { createLogger } from '@/utils/Logger';
 import { parse as parseYaml } from 'yaml';
+
+const logger = createLogger('NarrativeDataLoader');
 import type { IDialogue, ICard, IForeshadow } from '@/types';
 import type { CardType, ChapterID, AbilityType } from '@/config/game.config';
 
@@ -125,7 +128,7 @@ export function loadDialogues(yamlContent: string): IDialogue[] {
       } as IDialogue;
     });
   } catch (error) {
-    console.error('[NarrativeDataLoader] 解析对话数据失败:', error);
+    logger.error('解析对话数据失败:', error);
     return [];
   }
 }
@@ -157,7 +160,7 @@ export function loadCards(yamlContent: string): ICard[] {
       } as ICard;
     });
   } catch (error) {
-    console.error('[NarrativeDataLoader] 解析卡片数据失败:', error);
+    logger.error('解析卡片数据失败:', error);
     return [];
   }
 }
@@ -185,7 +188,7 @@ export function loadForeshadows(yamlContent: string): IForeshadow[] {
       } as IForeshadow;
     });
   } catch (error) {
-    console.error('[NarrativeDataLoader] 解析伏笔数据失败:', error);
+    logger.error('解析伏笔数据失败:', error);
     return [];
   }
 }
@@ -238,7 +241,7 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
         dialogues.push(...loadDialogues(content));
       }
     } catch (error) {
-      console.warn(`[NarrativeDataLoader] 加载对话文件失败: ${file}`, error);
+      logger.warn(`加载对话文件失败: ${file}`, error);
     }
   }
 
@@ -255,7 +258,7 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
         cards.push(...loadCards(content));
       }
     } catch (error) {
-      console.warn(`[NarrativeDataLoader] 加载卡片文件失败: ${file}`, error);
+      logger.warn(`加载卡片文件失败: ${file}`, error);
     }
   }
 
@@ -266,10 +269,10 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
       foreshadows.push(...loadForeshadows(content));
     }
   } catch (error) {
-    console.warn('[NarrativeDataLoader] 加载伏笔文件失败', error);
+    logger.warn('加载伏笔文件失败', error);
   }
 
-  console.log(`[NarrativeDataLoader] 数据加载完成:`, {
+  logger.info('数据加载完成:', {
     dialogues: dialogues.length,
     cards: cards.length,
     foreshadows: foreshadows.length,

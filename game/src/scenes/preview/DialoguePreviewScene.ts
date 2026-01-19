@@ -6,7 +6,7 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import { CharacterId, getPortraitKey } from '@/config/characters.config';
+import { CharacterId, getPortraitKey, type CharacterExpression } from '@/config/characters.config';
 
 // 示例对话数据
 interface IDialogueLine {
@@ -493,7 +493,7 @@ export class DialoguePreviewScene extends BasePreviewScene {
     // 显示头像
     if (line.speakerId) {
       const expression = line.expression || 'neutral';
-      const portraitKey = getPortraitKey(line.speakerId, expression as any);
+      const portraitKey = getPortraitKey(line.speakerId, expression as CharacterExpression);
 
       if (this.textures.exists(portraitKey)) {
         const portrait = this.add.image(0, 0, portraitKey);

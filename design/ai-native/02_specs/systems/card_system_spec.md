@@ -26,14 +26,19 @@
 
 ## 2. 卡片类型定义
 
-### 2.1 四种卡片类型
+### 2.1 七种卡片类型
+
+> **注意**: 代码实现中支持 7 种卡片类型，详见 `game/src/config/game.config.ts CONSTANTS.CARD_TYPE`
 
 | 类型 | 英文标识 | 获取方式 | 预计数量 | 作用 |
 |------|----------|----------|----------|------|
 | **档案卡** | archive | Zone探索/长按 | ~30 | 世界观补充 |
 | **物品卡** | item | 关键道具获取 | ~20 | 剧情线索 |
+| **地图卡** | map | 特定区域获取 | ~5 | 区域导航 |
 | **祷文卡** | prayer | 礼堂街支线 | 5 | 首字链/F15 |
+| **回执卡** | receipt | 系统操作后 | ~8 | 操作记录 |
 | **判定卡** | verdict | 系统生成 | ~10 | 记录关键选择 |
+| **日记卡** | diary | 角色相关 | ~7 | 角色内心 |
 
 ### 2.2 类型特征
 
@@ -47,15 +52,30 @@
 - 可能用于后续解谜/触发
 - 示例：旧灯芯、身份卡
 
+**地图卡 (map)**:
+- 区域地图或路线图
+- 提供空间导航信息
+- 部分区域解锁后获得
+
 **祷文卡 (prayer)**:
 - 礼堂街牧平支线获取
 - 首字组成隐链
 - 通关后解锁拼读功能
 
+**回执卡 (receipt)**:
+- 系统操作后自动生成
+- 记录差异提交、纠偏等操作
+- 包含系统回执信息
+
 **判定卡 (verdict)**:
 - 系统自动生成
 - 记录关键决策后果
 - 包含判定句/字段信息
+
+**日记卡 (diary)**:
+- 角色个人日记片段
+- 提供角色内心视角
+- 可能包含碎片化信息
 
 ---
 
@@ -64,70 +84,92 @@
 ### 3.1 基础卡片结构
 
 ```typescript
+/**
+ * 卡片数据（与 game/src/types/index.ts 保持一致）
+ * @see game/src/types/index.ts ICard
+ */
 interface ICard {
   // 标识
   id: string;           // 如 'CARD_C0_01'
-  type: CardType;       // 'archive' | 'item' | 'prayer' | 'verdict'
-  
-  // 显示信息
-  title: string;        // 卡片标题
-  subtitle?: string;    // 副标题
+  name: string;         // 卡片名称
+  type: CardType;       // 卡片类型
   
   // 内容
-  frontText: string;    // 正面文本（2-6行）
-  detailText: string;   // 长按详情文本
+  front: string[];      // 正面文本（数组形式，每项一行）
+  detail: string[];     // 长按详情文本（数组形式）
   
   // 视觉
-  image?: string;       // 卡面图片资源ID
   fx?: ICardFX[];       // 特效列表
   
   // 元数据
-  chapter: string;      // 所属章节（C0-CF）
-  obtainZone: string;   // 获取Zone
-  obtainCondition: string; // 获取条件描述
+  chapter: ChapterID;   // 所属章节（'C0' | 'C1' | ... | 'CF'）
+  zone: string;         // 获取Zone
   
-  // 关联
-  relatedForeshadow?: string;  // 关联伏笔ID
-  relatedCards?: string[];     // 关联卡片ID
-  
-  // 状态
-  variants?: ICardVariant[];   // 状态变体
+  // 状态变体
+  states?: Record<string, ICardStateOverride>;  // 状态覆盖配置
+  currentState?: string;  // 当前状态键
 }
 
-type CardType = 'archive' | 'item' | 'prayer' | 'verdict';
+/**
+ * 卡片状态覆盖（与 game/src/types/index.ts 保持一致）
+ */
+interface ICardStateOverride {
+  trigger: string;  // 触发条件
+  override?: Partial<Pick<ICard, 'front' | 'detail'>>;  // 覆盖内容
+  append?: Partial<Pick<ICard, 'front' | 'detail'>>;    // 追加内容
+}
+
+/**
+ * 卡片类型（与 game/src/config/game.config.ts 保持一致）
+ * @see game/src/config/game.config.ts CONSTANTS.CARD_TYPE
+ */
+type CardType = 'archive' | 'item' | 'map' | 'prayer' | 'receipt' | 'verdict' | 'diary';
 ```
 
 ### 3.2 卡片特效结构
 
 ```typescript
+/**
+ * 卡片特效（与 game/src/types/index.ts 保持一致）
+ * @see game/src/types/index.ts ICardFX
+ */
 interface ICardFX {
-  type: CardFXType;
+  type: 'taint' | 'flash' | 'shake' | 'fade';  // 特效类型
   target: string;      // 作用目标（文字/区域）
-  params: Record<string, unknown>;
+  effect?: string;     // 可选的效果参数
+  duration?: number;   // 可选的持续时间（毫秒）
 }
 
-type CardFXType =
-  | 'strikethrough'    // 划线
-  | 'correction'       // 涂改痕迹
-  | 'flash'           // 闪现
-  | 'fadeOut'         // 淡出
-  | 'shake'           // 抖动
-  | 'glitch'          // 故障效果
-  | 'overlay'         // 覆盖
-  | 'highlight';      // 高亮
+// 特效类型说明：
+// - 'taint': 污染/涂改效果
+// - 'flash': 闪现效果
+// - 'shake': 抖动效果
+// - 'fade': 淡入淡出效果
 ```
 
-### 3.3 卡片变体结构
+### 3.3 卡片状态覆盖结构
+
+> **注意**: 代码实现中使用 `states: Record<string, ICardStateOverride>` 而非数组形式的 `variants`。
 
 ```typescript
-interface ICardVariant {
-  id: string;
-  triggerCondition: ICondition;  // 触发条件
-  frontText?: string;            // 覆盖正面文本
-  detailText?: string;           // 覆盖详情文本
-  appendText?: string;           // 追加文本
-  fx?: ICardFX[];               // 追加特效
+/**
+ * 卡片状态覆盖（与 game/src/types/index.ts 保持一致）
+ * 使用 Record 形式，键为状态名称
+ * @see game/src/types/index.ts ICardStateOverride
+ */
+interface ICardStateOverride {
+  trigger: string;  // 触发条件（如 flag 名称）
+  override?: Partial<Pick<ICard, 'front' | 'detail'>>;  // 覆盖内容
+  append?: Partial<Pick<ICard, 'front' | 'detail'>>;    // 追加内容
 }
+
+// 使用示例:
+// states: {
+//   'alignment_therapy': {
+//     trigger: 'accepted_therapy',
+//     override: { front: ['纪念墙抄录', '状态：已对齐'] }
+//   }
+// }
 ```
 
 ---
@@ -170,13 +212,26 @@ enum CardStateTransition {
 
 **覆盖效果**:
 ```typescript
-const alignmentOverlay: ICardVariant = {
-  id: 'alignment_therapy',
-  triggerCondition: { flag: 'accepted_therapy', value: true },
-  frontText: '纪念墙抄录\n状态：已对齐',
-  detailText: '（条目内容被覆盖为空白）\n\n（极淡小字）\n解释成本：下降',
+// 使用 ICardStateOverride 格式（与代码实现一致）
+const cardWithAlignmentState: ICard = {
+  id: 'CARD_C5_02',
+  name: '纪念墙抄录',
+  type: 'archive',
+  chapter: 'C5',
+  zone: 'C5-Z3',
+  front: ['纪念墙抄录', '...原始内容...'],
+  detail: ['...原始详情...'],
+  states: {
+    'alignment_therapy': {
+      trigger: 'accepted_therapy',
+      override: {
+        front: ['纪念墙抄录', '状态：已对齐'],
+        detail: ['（条目内容被覆盖为空白）', '', '（极淡小字）', '解释成本：下降']
+      }
+    }
+  },
   fx: [
-    { type: 'fadeOut', target: 'original_content', params: { duration: 1000 } }
+    { type: 'fade', target: 'original_content', duration: 1000 }
   ]
 };
 ```
@@ -193,12 +248,18 @@ const alignmentOverlay: ICardVariant = {
 
 **追加效果**:
 ```typescript
-const fieldAcceptedAppend: ICardVariant = {
-  id: 'field_accepted',
-  triggerCondition: { flag: 'field_accepted', value: true },
-  appendText: '\n字段：◦◦◦（已占位）',
+// 使用 ICardStateOverride 格式（与代码实现一致）
+const cardWithFieldAcceptedState: Partial<ICard> = {
+  states: {
+    'field_accepted': {
+      trigger: 'field_accepted',
+      append: {
+        detail: ['字段：◦◦◦（已占位）']
+      }
+    }
+  },
   fx: [
-    { type: 'flash', target: 'append_text', params: { duration: 600 } }
+    { type: 'flash', target: 'append_text', duration: 600 }
   ]
 };
 ```
@@ -367,77 +428,75 @@ function onCardObtain(cardId: string): void {
 
 ### 9.1 档案卡示例
 
+> **注意**: 以下示例使用代码中的实际数据结构
+
 ```yaml
+# 与 game/src/types/index.ts ICard 接口一致
 id: CARD_C0_01
+name: "身份识别卡：岑回"
 type: archive
-title: "身份识别卡：岑回"
-subtitle: "外勤巡检"
 chapter: C0
-obtainZone: C0-Z1
-obtainCondition: "长按身份卡"
+zone: C0-Z1
 
-frontText: |
-  岑回  /  外勤巡检
-  通行级别：灰
-  所属：维修局外勤
-  签发日期：20██-██-██（已更正）
+front:
+  - "岑回  /  外勤巡检"
+  - "通行级别：灰"
+  - "所属：维修局外勤"
+  - "签发日期：20██-██-██（已更正）"
 
-detailText: |
-  备注：例外权限待评估
-  提示：按流程执行 / 避免越界
-  
-  校验行：
-  — 人像比对：通过
-  — 指纹比对：通过
-  — 叙述一致性：通过（已对齐）
-  
-  （极淡小字，加载时闪 0.2s）
-  字段：——
+detail:
+  - "备注：例外权限待评估"
+  - "提示：按流程执行 / 避免越界"
+  - ""
+  - "校验行："
+  - "— 人像比对：通过"
+  - "— 指纹比对：通过"
+  - "— 叙述一致性：通过（已对齐）"
+  - ""
+  - "（极淡小字，加载时闪 0.2s）"
+  - "字段：——"
 
 fx:
-  - type: correction
+  - type: taint
     target: "已更正"
-    params: { intensity: 0.3 }
+    effect: "correction"
+    duration: 300
   - type: flash
     target: "字段：——"
-    params: { duration: 200, delay: 1000 }
-
-relatedForeshadow: F11
+    duration: 200
 ```
 
 ### 9.2 祷文卡示例
 
 ```yaml
+# 与 game/src/types/index.ts ICard 接口一致
 id: CARD_C1_06
+name: "祷文抄本-01"
 type: prayer
-title: "祷文抄本-01"
 chapter: C1
-obtainZone: C1-Z5
-obtainCondition: "礼堂街听完获得"
+zone: C1-Z5
 
-frontText: |
-  祷文抄本-01
-  看见是风
-  写入是墨
-  墨多纸裂
-  折痕不灭
+front:
+  - "祷文抄本-01"
+  - "看见是风"
+  - "写入是墨"
+  - "墨多纸裂"
+  - "折痕不灭"
 
-detailText: |
-  （首字隐链，通关后可高亮）
-  看 / 写 / 墨 / 折
-  
-  注：
-  "折痕不是惩罚，是记号。"
+detail:
+  - "（首字隐链，通关后可高亮）"
+  - "看 / 写 / 墨 / 折"
+  - ""
+  - "注："
+  - "折痕不是惩罚，是记号。"
 
-variants:
-  - id: post_completion
-    triggerCondition: { flag: 'game_completed', value: true }
-    fx:
-      - type: highlight
-        target: "首字"
-        params: { chars: ['看', '写', '墨', '折'] }
-
-relatedForeshadow: F15
+# 状态覆盖使用 Record 形式
+states:
+  post_completion:
+    trigger: "game_completed"
+    append:
+      detail:
+        - "【首字链已解锁】"
 ```
 
 ---
@@ -481,4 +540,4 @@ relatedForeshadow: F15
 
 ---
 
-*版本: v1.0 | 创建: 2026-01-19 | 状态: 草案*
+*版本: v1.1 | 创建: 2026-01-19 | 更新: 2026-01-20 | 状态: 已同步代码*

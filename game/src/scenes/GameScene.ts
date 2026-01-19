@@ -5,6 +5,9 @@
 import Phaser from 'phaser';
 import { SCENES, TEXT_STYLES, CONSTANTS } from '@/config/game.config';
 import type { AbilityType } from '@/config/game.config';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('GameScene');
 import { UI_FONT_SIZE } from '@/config/ui.config';
 import { getZoneBackgroundKey } from '@/config/zones.config';
 import { getSceneConfig } from '@/data/scenes';
@@ -111,7 +114,7 @@ export class GameScene extends Phaser.Scene {
     this._currentZoneId = data.zoneId || 'C0-Z1';
     this._isNewGame = data.isNewGame ?? false;
 
-    console.log(`[GameScene] 初始化 Zone: ${this._currentZoneId}`);
+    logger.info(`初始化 Zone: ${this._currentZoneId}`);
   }
 
   create(): void {
@@ -242,7 +245,7 @@ export class GameScene extends Phaser.Scene {
     if (closest) {
       // 触发交互
       const objectId = closest.name;
-      console.log(`[GameScene] 触发交互: ${objectId}`);
+      logger.info(`触发交互: ${objectId}`);
       eventBus.emit(GameEvent.INTERACT_START, { objectId, actionType: 'touch' });
 
       // 使用getData获取存储的action（如果有的话）
@@ -260,13 +263,13 @@ export class GameScene extends Phaser.Scene {
     // 对话UI
     this._dialogueUI = new DialogueUI({
       scene: this,
-      onDialogueEnd: (dialogueId) => {
-        console.log(`[GameScene] 对话结束: ${dialogueId}`);
+      onDialogueEnd: (dialogueId): void => {
+        logger.debug(`对话结束: ${dialogueId}`);
         // 对话结束，检查是否需要继续
         // NarrativeEngine会自动处理对话链
       },
-      onChoiceSelected: (dialogueId, choiceIndex) => {
-        console.log(`[GameScene] 选择了选项 ${choiceIndex} in ${dialogueId}`);
+      onChoiceSelected: (dialogueId, choiceIndex): void => {
+        logger.debug(`选择了选项 ${choiceIndex} in ${dialogueId}`);
         // 选择已由DialogueUI和NarrativeEngine处理
       },
     });
@@ -274,8 +277,8 @@ export class GameScene extends Phaser.Scene {
     // 卡片UI
     this._cardUI = new CardUI({
       scene: this,
-      onCardClosed: (cardId) => {
-        console.log(`[GameScene] 卡片关闭: ${cardId}`);
+      onCardClosed: (cardId): void => {
+        logger.debug(`卡片关闭: ${cardId}`);
       },
     });
 
@@ -285,26 +288,26 @@ export class GameScene extends Phaser.Scene {
     // 能力系统
     this._abilitySystem = new AbilitySystem({
       scene: this,
-      onAbilityActivate: (type) => {
+      onAbilityActivate: (type): void => {
         this._toastManager.showInfo(`能力激活: ${type}`);
       },
-      onAbilityDeactivate: (type) => {
-        console.log(`[GameScene] 能力停用: ${type}`);
+      onAbilityDeactivate: (type): void => {
+        logger.debug(`能力停用: ${type}`);
       },
     });
 
     // 暂停菜单
     this._pauseMenu = new PauseMenu({
       scene: this,
-      onResume: () => {
-        console.log('[GameScene] 游戏继续');
+      onResume: (): void => {
+        logger.debug('游戏继续');
       },
-      onSettings: () => {
-        console.log('[GameScene] 打开设置');
+      onSettings: (): void => {
+        logger.debug('打开设置');
         // 设置面板已在PauseMenu内部处理
       },
-      onSave: async () => {
-        console.log('[GameScene] 保存游戏');
+      onSave: async (): Promise<void> => {
+        logger.info('保存游戏');
         try {
           // 使用槽位1进行手动存档
           const zoneName = this._zoneTitle?.text || this._currentZoneId;
@@ -315,12 +318,12 @@ export class GameScene extends Phaser.Scene {
             this._toastManager.showError('保存失败');
           }
         } catch (error) {
-          console.error('[GameScene] 保存错误:', error);
+          logger.error('保存错误:', error);
           this._toastManager.showError('保存失败');
         }
       },
-      onLoad: async () => {
-        console.log('[GameScene] 加载存档');
+      onLoad: async (): Promise<void> => {
+        logger.info('加载存档');
         // 返回主菜单的存档列表进行读档
         this._pauseMenu.hide();
         this.cameras.main.fadeOut(300, 0, 0, 0);
@@ -328,7 +331,7 @@ export class GameScene extends Phaser.Scene {
           this.scene.start(SCENES.MENU);
         });
       },
-      onMainMenu: () => {
+      onMainMenu: (): void => {
         // 自动存档后返回主菜单
         void saveManager.autoSave().then(() => {
           this._pauseMenu.hide();
@@ -343,15 +346,15 @@ export class GameScene extends Phaser.Scene {
     // 物品栏UI
     this._inventoryUI = new InventoryUI({
       scene: this,
-      onCardSelect: (cardId: string) => {
-        console.log(`[GameScene] 选中卡片: ${cardId}`);
+      onCardSelect: (cardId: string): void => {
+        logger.debug(`选中卡片: ${cardId}`);
         const card = narrativeEngine.getCard(cardId);
         if (card) {
           this._cardUI.showCard(this._convertNarrativeCard(card));
         }
       },
-      onClose: () => {
-        console.log('[GameScene] 物品栏关闭');
+      onClose: (): void => {
+        logger.debug('物品栏关闭');
       },
     });
 
@@ -377,7 +380,7 @@ export class GameScene extends Phaser.Scene {
     // 加载音频配置
     this._audioManager.loadConfigs(AUDIO_CONFIG.bgm, AUDIO_CONFIG.sfx, AUDIO_CONFIG.ambience);
 
-    console.log('[GameScene] 音频系统初始化完成');
+    logger.info('音频系统初始化完成');
   }
 
   /**
@@ -388,9 +391,9 @@ export class GameScene extends Phaser.Scene {
       await assetManager.loadChapterAssets(chapter);
       // 预加载下一章资源
       assetManager.preloadNextChapter(chapter);
-      console.log(`[GameScene] 章节资源加载完成: ${chapter}`);
+      logger.info(`章节资源加载完成: ${chapter}`);
     } catch (error) {
-      console.warn('[GameScene] 章节资源加载失败:', error);
+      logger.warn('章节资源加载失败:', error);
     }
   }
 
@@ -404,14 +407,14 @@ export class GameScene extends Phaser.Scene {
       if (this.cache.audio.exists(audioConfig.bgm)) {
         this._audioManager.playBgm(audioConfig.bgm);
       } else {
-        console.log(`[GameScene] BGM未加载: ${audioConfig.bgm}`);
+        logger.debug(`BGM未加载: ${audioConfig.bgm}`);
       }
 
       // 播放环境音
       if (this.cache.audio.exists(audioConfig.ambience)) {
         this._audioManager.playAmbience(audioConfig.ambience);
       } else {
-        console.log(`[GameScene] 环境音未加载: ${audioConfig.ambience}`);
+        logger.debug(`环境音未加载: ${audioConfig.ambience}`);
       }
     }
   }
@@ -431,14 +434,14 @@ export class GameScene extends Phaser.Scene {
   private async _loadNarrativeData(): Promise<void> {
     try {
       const data = await loadAllNarrativeData(this);
-      console.log('[GameScene] 叙事数据加载完成:', {
+      logger.info('叙事数据加载完成:', {
         dialogues: data.dialogues.length,
         cards: data.cards.length,
         foreshadows: data.foreshadows.length,
       });
       // 数据已由NarrativeDataLoader加载到narrativeEngine
     } catch (error) {
-      console.warn('[GameScene] 叙事数据加载失败:', error);
+      logger.warn('叙事数据加载失败:', error);
     }
   }
 
@@ -450,12 +453,12 @@ export class GameScene extends Phaser.Scene {
     let bgKey = 'placeholder_bg';
     if (this.textures.exists(zoneBgKey)) {
       bgKey = zoneBgKey;
-      console.log(`[GameScene] 使用Zone背景: ${zoneBgKey}`);
+      logger.debug(`使用Zone背景: ${zoneBgKey}`);
     } else if (this.textures.exists('px_bg_placeholder')) {
       bgKey = 'px_bg_placeholder';
-      console.log(`[GameScene] Zone背景未找到(${zoneBgKey})，使用像素占位符`);
+      logger.debug(`Zone背景未找到(${zoneBgKey})，使用像素占位符`);
     } else {
-      console.log(`[GameScene] 使用默认占位符背景`);
+      logger.debug('使用默认占位符背景');
     }
 
     this.add
@@ -784,7 +787,7 @@ export class GameScene extends Phaser.Scene {
    */
   private _onCardObtained(payload: { cardId: string }): void {
     // 显示收集提示已由_showCard处理
-    console.log(`[GameScene] 卡片获得事件: ${payload.cardId}`);
+    logger.debug(`卡片获得事件: ${payload.cardId}`);
   }
 
   /**
@@ -915,7 +918,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private _loadZone(zoneId: string): void {
-    console.log(`[GameScene] 加载Zone: ${zoneId}`);
+    logger.info(`加载Zone: ${zoneId}`);
 
     // Zone标题映射
     const zoneTitles: Record<string, string> = {
@@ -1160,13 +1163,13 @@ export class GameScene extends Phaser.Scene {
     // 初始化触控系统（移动端）
     this._touchControls = new TouchControls({
       scene: this,
-      onMove: (direction) => {
+      onMove: (direction): void => {
         this._touchMoveDirection = direction;
       },
-      onInteract: () => {
+      onInteract: (): void => {
         this._tryInteract();
       },
-      onAbility: (index) => {
+      onAbility: (index): void => {
         // 0=深度感知, 1=深度介入, 2=时间干预
         const abilityTypes = [
           'DEPTH_PERCEPTION',
@@ -1187,7 +1190,7 @@ export class GameScene extends Phaser.Scene {
 
     // 如果是移动设备，显示移动教程
     if (this._touchControls.isMobile()) {
-      console.log('[GameScene] 移动设备检测，启用触控控制');
+      logger.info('移动设备检测，启用触控控制');
     }
   }
 
@@ -1311,10 +1314,10 @@ export class GameScene extends Phaser.Scene {
       },
       onChoice: (choices) => {
         // 选项由DialogueUI处理
-        console.log(`[GameScene] 对话选项:`, choices);
+        logger.debug('对话选项:', choices);
       },
       onEnd: () => {
-        console.log(`[GameScene] 对话结束`);
+        logger.debug('对话结束');
       },
     });
 
@@ -1345,7 +1348,7 @@ export class GameScene extends Phaser.Scene {
    * 显示卡片
    */
   private _showCard(cardId: string): void {
-    console.log(`[GameScene] 显示卡片: ${cardId}`);
+    logger.info(`显示卡片: ${cardId}`);
 
     // 尝试从narrativeEngine获取卡片数据
     const narrativeCard = narrativeEngine.getCard(cardId);
@@ -1404,21 +1407,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   private _openPauseMenu(): void {
-    console.log('[GameScene] 打开暂停菜单');
+    logger.debug('打开暂停菜单');
     if (this._pauseMenu && !this._pauseMenu.isVisible()) {
       this._pauseMenu.show();
     }
   }
 
   private _openInventory(): void {
-    console.log('[GameScene] 打开物品栏');
+    logger.debug('打开物品栏');
     if (this._inventoryUI && !this._inventoryUI.isVisible()) {
       this._inventoryUI.show();
     }
   }
 
   private _playPrologueIntro(): void {
-    console.log('[GameScene] 播放序章开场');
+    logger.debug('播放序章开场');
 
     // 延迟显示第一条对话
     this.time.delayedCall(1000, () => {

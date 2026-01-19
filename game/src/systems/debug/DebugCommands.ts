@@ -4,10 +4,30 @@
  * @module systems/debug/DebugCommands
  */
 
+import { createLogger } from '@/utils/Logger';
 import { worldState } from '@/systems/world';
 import { narrativeEngine } from '@/systems/narrative';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import type { AbilityType, ChapterID } from '@/config/game.config';
+
+const logger = createLogger('DebugCommands');
+
+// 扩展 Window 接口以支持调试命令
+declare global {
+  interface IWindowDebug {
+    __DEBUG__?: DebugCommands;
+    __GAME_STATE__?: () => Record<string, unknown>;
+  }
+}
+
+// 定义带有 _player 属性的场景接口
+interface IGameSceneWithPlayer extends Phaser.Scene {
+  _player?: Phaser.GameObjects.Sprite & {
+    x: number;
+    y: number;
+    setPosition: (x: number, y: number) => void;
+  };
+}
 
 // ==================== 类型定义 ====================
 
@@ -87,8 +107,9 @@ class DebugCommands {
   private constructor() {
     // 暴露到 window 对象
     if (typeof window !== 'undefined') {
-      (window as any).__DEBUG__ = this;
-      (window as any).__GAME_STATE__ = () => this.getGameState();
+      const win = window as unknown as IWindowDebug;
+      win.__DEBUG__ = this;
+      win.__GAME_STATE__ = (): Record<string, unknown> => this.getGameState();
     }
   }
 
@@ -136,7 +157,8 @@ class DebugCommands {
    */
   getPlayerPosition(): { x: number; y: number } | null {
     if (!this._scene) return null;
-    const player = (this._scene as any)._player;
+    const scene = this._scene as IGameSceneWithPlayer;
+    const player = scene._player;
     return player ? { x: player.x, y: player.y } : null;
   }
 
@@ -351,7 +373,8 @@ class DebugCommands {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
     if (!this._scene) return { success: false, message: '场景未初始化' };
 
-    const player = (this._scene as any)._player;
+    const scene = this._scene as IGameSceneWithPlayer;
+    const player = scene._player;
     if (player) {
       player.setPosition(x, y);
       this._logCommand(`movePlayer(${x}, ${y})`);
@@ -367,7 +390,8 @@ class DebugCommands {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
     if (!this._scene) return { success: false, message: '场景未初始化' };
 
-    const player = (this._scene as any)._player;
+    const scene = this._scene as IGameSceneWithPlayer;
+    const player = scene._player;
     if (!player) return { success: false, message: '玩家不存在' };
 
     return new Promise((resolve) => {
@@ -463,7 +487,7 @@ class DebugCommands {
     const stepResults: IStepResult[] = [];
     let passed = true;
 
-    console.log(`[DebugCommands] 开始测试: ${script.name}`);
+    logger.info(`开始测试: ${script.name}`);
 
     try {
       // 执行设置步骤
@@ -480,7 +504,7 @@ class DebugCommands {
 
         if (!result.passed) {
           passed = false;
-          console.error(`[DebugCommands] 步骤失败: ${step.action}`, result);
+          logger.error(`步骤失败: ${step.action}`, result);
         }
 
         // 步骤间延迟
@@ -497,7 +521,7 @@ class DebugCommands {
       }
     } catch (error) {
       passed = false;
-      console.error(`[DebugCommands] 测试出错:`, error);
+      logger.error('测试出错:', error);
     }
 
     const result: ITestResult = {
@@ -508,7 +532,7 @@ class DebugCommands {
     };
 
     this._testResults.push(result);
-    console.log(`[DebugCommands] 测试完成: ${script.name} - ${passed ? '通过' : '失败'}`);
+    logger.info(`测试完成: ${script.name} - ${passed ? '通过' : '失败'}`);
 
     return result;
   }
@@ -688,7 +712,7 @@ class DebugCommands {
 
   private _logCommand(command: string): void {
     this._commandHistory.push(`${new Date().toISOString()} - ${command}`);
-    console.log(`[DebugCommands] ${command}`);
+    logger.debug(command);
   }
 
   private _delay(ms: number): Promise<void> {
@@ -720,6 +744,7 @@ class DebugCommands {
    * 打印帮助信息
    */
   help(): void {
+    // eslint-disable-next-line no-console
     console.log(`
 ╔══════════════════════════════════════════════════════════════╗
 ║                    调试命令帮助                              ║

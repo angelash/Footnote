@@ -4,7 +4,10 @@
  * @module systems/world/WorldState
  */
 
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('WorldState');
 import { CONSTANTS } from '@/config/game.config';
 import type { AbilityType, ChapterID } from '@/config/game.config';
 
@@ -554,7 +557,7 @@ class WorldState {
       if (this._cardChecker) {
         if (!this._cardChecker(condition.hasCard)) return false;
       } else {
-        console.warn('[WorldState] Card checker not registered');
+        logger.warn('Card checker not registered');
         // 如果没有检查器，默认返回false以策安全
         return false;
       }

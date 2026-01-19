@@ -5,7 +5,10 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('ForeshadowManager');
 import { worldState } from '@/systems/world';
 import { UI_FONT_SIZE } from '@/config/ui.config';
 
@@ -211,7 +214,7 @@ export class ForeshadowManager {
     const foreshadow = this._foreshadows.get(foreshadowId);
 
     if (!foreshadow) {
-      console.warn(`[ForeshadowManager] 未知伏笔: ${foreshadowId}`);
+      logger.warn(`未知伏笔: ${foreshadowId}`);
       return;
     }
 

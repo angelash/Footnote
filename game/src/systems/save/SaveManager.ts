@@ -4,7 +4,10 @@
  * @module systems/save/SaveManager
  */
 
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('SaveManager');
 import { worldState } from '@/systems/world';
 import { narrativeEngine } from '@/systems/narrative';
 import type { IWorldStateData } from '@/systems/world';
@@ -128,9 +131,9 @@ class SaveManager {
       this._db = await this._openDatabase();
       await this._loadSettings();
       this._isInitialized = true;
-      console.log('[SaveManager] 初始化完成');
+      logger.info('初始化完成');
     } catch (error) {
-      console.error('[SaveManager] 初始化失败:', error);
+      logger.error('初始化失败:', error);
       // 回退到LocalStorage
       this._fallbackToLocalStorage();
     }
@@ -143,7 +146,7 @@ class SaveManager {
    */
   async save(slot: number, name?: string, screenshot?: string): Promise<boolean> {
     if (slot < 0 || slot > CONFIG.MAX_SLOTS) {
-      console.error(`[SaveManager] 无效的存档槽位: ${slot}`);
+      logger.error(`无效的存档槽位: ${slot}`);
       return false;
     }
 
@@ -170,12 +173,12 @@ class SaveManager {
         timestamp: saveData.timestamp,
       });
 
-      console.log(`[SaveManager] 存档成功: 槽位${slot}`);
+      logger.info(`存档成功: 槽位${slot}`);
       return true;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : '未知错误';
       eventBus.emit(GameEvent.SAVE_ERROR, { slot, error: errorMsg });
-      console.error(`[SaveManager] 存档失败:`, error);
+      logger.error('存档失败:', error);
       return false;
     }
   }
@@ -194,7 +197,7 @@ class SaveManager {
     try {
       const saveData = await this._readSave(slot);
       if (!saveData) {
-        console.warn(`[SaveManager] 槽位${slot}没有存档`);
+        logger.warn(`槽位${slot}没有存档`);
         return false;
       }
 
@@ -205,10 +208,10 @@ class SaveManager {
       worldState.restore(migratedData.worldState);
       narrativeEngine.restore(migratedData.narrativeState);
 
-      console.log(`[SaveManager] 加载成功: 槽位${slot}`);
+      logger.info(`加载成功: 槽位${slot}`);
       return true;
     } catch (error) {
-      console.error(`[SaveManager] 加载失败:`, error);
+      logger.error('加载失败:', error);
       return false;
     }
   }
@@ -219,10 +222,10 @@ class SaveManager {
   async deleteSave(slot: number): Promise<boolean> {
     try {
       await this._deleteSave(slot);
-      console.log(`[SaveManager] 删除成功: 槽位${slot}`);
+      logger.info(`删除成功: 槽位${slot}`);
       return true;
     } catch (error) {
-      console.error(`[SaveManager] 删除失败:`, error);
+      logger.error('删除失败:', error);
       return false;
     }
   }
@@ -293,18 +296,18 @@ class SaveManager {
   // ==================== 私有方法 - IndexedDB ====================
 
   private _openDatabase(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       const request = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
 
-      request.onerror = () => {
+      request.onerror = (): void => {
         reject(new Error('无法打开IndexedDB'));
       };
 
-      request.onsuccess = () => {
+      request.onsuccess = (): void => {
         resolve(request.result);
       };
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = (event): void => {
         const db = (event.target as IDBOpenDBRequest).result;
 
         // 创建存档Store
@@ -326,13 +329,13 @@ class SaveManager {
       return;
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       const transaction = this._db!.transaction([CONFIG.SAVE_STORE], 'readwrite');
       const store = transaction.objectStore(CONFIG.SAVE_STORE);
       const request = store.put(saveData);
 
-      request.onerror = () => reject(new Error('写入存档失败'));
-      request.onsuccess = () => resolve();
+      request.onerror = (): void => reject(new Error('写入存档失败'));
+      request.onsuccess = (): void => resolve();
     });
   }
 
@@ -341,13 +344,13 @@ class SaveManager {
       return this._readFromLocalStorage(`save_${slot}`);
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       const transaction = this._db!.transaction([CONFIG.SAVE_STORE], 'readonly');
       const store = transaction.objectStore(CONFIG.SAVE_STORE);
       const request = store.get(slot);
 
-      request.onerror = () => reject(new Error('读取存档失败'));
-      request.onsuccess = () => resolve(request.result || null);
+      request.onerror = (): void => reject(new Error('读取存档失败'));
+      request.onsuccess = (): void => resolve(request.result || null);
     });
   }
 
@@ -357,13 +360,13 @@ class SaveManager {
       return;
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       const transaction = this._db!.transaction([CONFIG.SAVE_STORE], 'readwrite');
       const store = transaction.objectStore(CONFIG.SAVE_STORE);
       const request = store.delete(slot);
 
-      request.onerror = () => reject(new Error('删除存档失败'));
-      request.onsuccess = () => resolve();
+      request.onerror = (): void => reject(new Error('删除存档失败'));
+      request.onsuccess = (): void => resolve();
     });
   }
 
@@ -378,20 +381,20 @@ class SaveManager {
       return;
     }
 
-    return new Promise((resolve) => {
+    return new Promise((resolve): void => {
       const transaction = this._db!.transaction([CONFIG.SETTINGS_STORE], 'readonly');
       const store = transaction.objectStore(CONFIG.SETTINGS_STORE);
       const request = store.get('game_settings');
 
-      request.onsuccess = () => {
+      request.onsuccess = (): void => {
         if (request.result) {
           this._settings = { ...this._getDefaultSettings(), ...request.result.data };
         }
         resolve();
       };
 
-      request.onerror = () => {
-        console.warn('[SaveManager] 加载设置失败，使用默认值');
+      request.onerror = (): void => {
+        logger.warn('加载设置失败，使用默认值');
         resolve();
       };
     });
@@ -403,13 +406,13 @@ class SaveManager {
       return;
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       const transaction = this._db!.transaction([CONFIG.SETTINGS_STORE], 'readwrite');
       const store = transaction.objectStore(CONFIG.SETTINGS_STORE);
       const request = store.put({ id: 'game_settings', data: this._settings });
 
-      request.onerror = () => reject(new Error('保存设置失败'));
-      request.onsuccess = () => resolve();
+      request.onerror = (): void => reject(new Error('保存设置失败'));
+      request.onsuccess = (): void => resolve();
     });
   }
 
@@ -429,7 +432,7 @@ class SaveManager {
   // ==================== 私有方法 - LocalStorage回退 ====================
 
   private _fallbackToLocalStorage(): void {
-    console.warn('[SaveManager] 使用LocalStorage作为回退存储');
+    logger.warn('使用LocalStorage作为回退存储');
     this._isInitialized = true;
   }
 
@@ -437,7 +440,7 @@ class SaveManager {
     try {
       localStorage.setItem(`footnote_${key}`, JSON.stringify(data));
     } catch (error) {
-      console.error('[SaveManager] LocalStorage写入失败:', error);
+      logger.error('LocalStorage写入失败:', error);
     }
   }
 
@@ -455,7 +458,7 @@ class SaveManager {
   private _migrateSaveData(saveData: ISaveData): ISaveData {
     // 版本迁移逻辑
     if (saveData.version < CONFIG.SAVE_VERSION) {
-      console.log(`[SaveManager] 迁移存档: v${saveData.version} -> v${CONFIG.SAVE_VERSION}`);
+      logger.info(`迁移存档: v${saveData.version} -> v${CONFIG.SAVE_VERSION}`);
 
       // 根据版本差异进行迁移
       // if (saveData.version < 2) { ... }

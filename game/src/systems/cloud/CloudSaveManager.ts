@@ -4,7 +4,10 @@
  * @module systems/cloud/CloudSaveManager
  */
 
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('CloudSave');
 import { saveManager } from '@/systems/save';
 import type { ISaveData, ISaveMetadata } from '@/systems/save';
 
@@ -81,12 +84,12 @@ class CloudSaveManager {
     this._config = { ...DEFAULT_CONFIG, ...config };
 
     if (!this._config.enabled || !this._config.endpoint) {
-      console.log('[CloudSave] 云存档未启用或未配置端点');
+      logger.info('云存档未启用或未配置端点');
       return;
     }
 
     if (!this._config.userId || !this._config.accessToken) {
-      console.log('[CloudSave] 未登录，云存档不可用');
+      logger.info('未登录，云存档不可用');
       return;
     }
 
@@ -94,7 +97,7 @@ class CloudSaveManager {
     this._startSyncTimer();
     this._loadPendingUploads();
 
-    console.log('[CloudSave] 初始化完成');
+    logger.info('初始化完成');
   }
 
   /**
@@ -109,7 +112,7 @@ class CloudSaveManager {
 
     // 监听网络状态
     window.addEventListener('online', () => {
-      console.log('[CloudSave] 网络恢复，尝试同步');
+      logger.info('网络恢复，尝试同步');
       this._processPendingUploads();
     });
   }
@@ -137,12 +140,12 @@ class CloudSaveManager {
       const store = tx.objectStore('saves');
       const request = store.get(slot);
 
-      return new Promise((resolve, reject) => {
-        request.onsuccess = () => resolve(request.result || null);
-        request.onerror = () => reject(request.error);
+      return new Promise((resolve, reject): void => {
+        request.onsuccess = (): void => resolve(request.result || null);
+        request.onerror = (): void => reject(request.error);
       });
     } catch (error) {
-      console.error('[CloudSave] 获取本地存档失败:', error);
+      logger.error('获取本地存档失败:', error);
       return null;
     }
   }
@@ -151,10 +154,10 @@ class CloudSaveManager {
    * 打开IndexedDB
    */
   private _openDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject): void => {
       const request = indexedDB.open('FootnoteGameDB', 1);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
+      request.onsuccess = (): void => resolve(request.result);
+      request.onerror = (): void => reject(request.error);
     });
   }
 
@@ -170,12 +173,12 @@ class CloudSaveManager {
       saveData.slot = slot;
       store.put(saveData);
 
-      await new Promise<void>((resolve, reject) => {
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
+      await new Promise<void>((resolve, reject): void => {
+        tx.oncomplete = (): void => resolve();
+        tx.onerror = (): void => reject(tx.error);
       });
     } catch (error) {
-      console.error('[CloudSave] 导入存档失败:', error);
+      logger.error('导入存档失败:', error);
     }
   }
 
@@ -205,7 +208,7 @@ class CloudSaveManager {
         );
       }
     } catch (error) {
-      console.warn('[CloudSave] 加载待上传队列失败:', error);
+      logger.warn('加载待上传队列失败:', error);
     }
   }
 
@@ -217,7 +220,7 @@ class CloudSaveManager {
       const obj = Object.fromEntries(this._pendingUploads);
       localStorage.setItem('cloud_pending_uploads', JSON.stringify(obj));
     } catch (error) {
-      console.warn('[CloudSave] 保存待上传队列失败:', error);
+      logger.warn('保存待上传队列失败:', error);
     }
   }
 
@@ -276,7 +279,7 @@ class CloudSaveManager {
       const result: ICloudSaveResponse = await response.json();
 
       if (result.success) {
-        console.log(`[CloudSave] 槽位 ${slot} 上传成功`);
+        logger.info(`槽位 ${slot} 上传成功`);
         eventBus.emit(GameEvent.CLOUD_SAVE_UPLOAD, { slot, success: true });
         return true;
       } else if (result.conflictData) {
@@ -284,11 +287,11 @@ class CloudSaveManager {
         await this._handleConflict(slot, saveData, result.conflictData);
         return false;
       } else {
-        console.error('[CloudSave] 上传失败:', result.error);
+        logger.error('上传失败:', result.error);
         return false;
       }
     } catch (error) {
-      console.error('[CloudSave] 上传异常:', error);
+      logger.error('上传异常:', error);
       return false;
     }
   }
@@ -309,15 +312,15 @@ class CloudSaveManager {
       const result: ICloudSaveResponse = await response.json();
 
       if (result.success && result.data) {
-        console.log(`[CloudSave] 槽位 ${slot} 下载成功`);
+        logger.info(`槽位 ${slot} 下载成功`);
         eventBus.emit(GameEvent.CLOUD_SAVE_DOWNLOAD, { slot, success: true });
         return result.data;
       } else {
-        console.error('[CloudSave] 下载失败:', result.error);
+        logger.error('下载失败:', result.error);
         return null;
       }
     } catch (error) {
-      console.error('[CloudSave] 下载异常:', error);
+      logger.error('下载异常:', error);
       return null;
     }
   }
@@ -342,7 +345,7 @@ class CloudSaveManager {
       }
       return [];
     } catch (error) {
-      console.error('[CloudSave] 获取列表失败:', error);
+      logger.error('获取列表失败:', error);
       return [];
     }
   }
@@ -363,7 +366,7 @@ class CloudSaveManager {
     }
 
     this._isSyncing = true;
-    console.log('[CloudSave] 开始同步...');
+    logger.info('开始同步...');
 
     try {
       // 获取云端存档列表
@@ -411,11 +414,11 @@ class CloudSaveManager {
       }
 
       this._lastSyncTime = Date.now();
-      console.log('[CloudSave] 同步完成:', result);
+      logger.info('同步完成:', result);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       result.errors.push(errorMsg);
-      console.error('[CloudSave] 同步失败:', error);
+      logger.error('同步失败:', error);
     } finally {
       this._isSyncing = false;
     }
@@ -431,7 +434,7 @@ class CloudSaveManager {
     localData: ISaveData,
     cloudData: ISaveData
   ): Promise<void> {
-    console.log(`[CloudSave] 槽位 ${slot} 存在冲突`);
+    logger.warn(`槽位 ${slot} 存在冲突`);
 
     let resolvedData: ISaveData;
 
@@ -533,7 +536,7 @@ class CloudSaveManager {
   public login(userId: string, accessToken: string): void {
     this._config.userId = userId;
     this._config.accessToken = accessToken;
-    console.log('[CloudSave] 用户已登录:', userId);
+    logger.info('用户已登录:', userId);
   }
 
   /**
@@ -544,7 +547,7 @@ class CloudSaveManager {
     this._config.accessToken = undefined;
     this._pendingUploads.clear();
     this._savePendingUploads();
-    console.log('[CloudSave] 用户已登出');
+    logger.info('用户已登出');
   }
 
   /**

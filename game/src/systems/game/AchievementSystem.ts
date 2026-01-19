@@ -5,7 +5,10 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('AchievementManager');
 import { worldState } from '@/systems/world';
 import { UI_FONT_SIZE } from '@/config/ui.config';
 
@@ -397,7 +400,7 @@ export class AchievementManager {
         });
       }
     } catch (error) {
-      console.warn('[AchievementManager] 加载成就状态失败:', error);
+      logger.warn('加载成就状态失败:', error);
     }
   }
 
@@ -412,7 +415,7 @@ export class AchievementManager {
       });
       localStorage.setItem('footnote_achievements', JSON.stringify(data));
     } catch (error) {
-      console.error('[AchievementManager] 保存成就状态失败:', error);
+      logger.error('保存成就状态失败:', error);
     }
   }
 
@@ -553,7 +556,7 @@ export class AchievementManager {
   public unlock(achievementId: string): boolean {
     const achievement = this._achievements.get(achievementId);
     if (!achievement) {
-      console.warn(`[AchievementManager] 未知成就: ${achievementId}`);
+      logger.warn(`未知成就: ${achievementId}`);
       return false;
     }
 
@@ -579,7 +582,7 @@ export class AchievementManager {
       this._applyReward(achievement.rewards);
     }
 
-    console.log(`[AchievementManager] 成就解锁: ${achievement.name}`);
+    logger.info(`成就解锁: ${achievement.name}`);
     return true;
   }
 

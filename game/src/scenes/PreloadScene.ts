@@ -4,6 +4,9 @@
  */
 import Phaser from 'phaser';
 import { SCENES } from '@/config/game.config';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('PreloadScene');
 import { PIXEL_IMAGE_ASSETS, PIXEL_SPRITESHEETS } from '@/data/pixelAssets';
 import {
   CHARACTER_PORTRAITS,
@@ -30,7 +33,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create(): void {
-    console.log('[PreloadScene] 资源加载完成');
+    logger.info('资源加载完成');
 
     // 创建动画
     this._createAnimations();
@@ -155,7 +158,7 @@ export class PreloadScene extends Phaser.Scene {
     // ===== WebP可动物件动画 =====
     this._createWebpAnimations();
 
-    console.log('[PreloadScene] 动画创建完成');
+    logger.info('动画创建完成');
   }
 
   /**
@@ -252,7 +255,7 @@ export class PreloadScene extends Phaser.Scene {
       });
     }
 
-    console.log('[PreloadScene] WebP动画创建完成');
+    logger.info('WebP动画创建完成');
   }
 
   private _createLoadingUI(): void {
@@ -333,7 +336,7 @@ export class PreloadScene extends Phaser.Scene {
     });
 
     // ===== WebP资产（智绘AI生成）=====
-    console.log(`[PreloadScene] 开始加载 ${WEBP_ASSET_STATS.total} 个WebP资产...`);
+    logger.info(`开始加载 ${WEBP_ASSET_STATS.total} 个WebP资产...`);
 
     // 角色头像
     Object.entries(CHARACTER_PORTRAITS).forEach(([key, url]) => {
@@ -365,7 +368,7 @@ export class PreloadScene extends Phaser.Scene {
 
   private _loadAudio(): void {
     const totalAudio = BGM_CONFIGS.length + SFX_CONFIGS.length + AMBIENCE_CONFIGS.length;
-    console.log(`[PreloadScene] 开始加载 ${totalAudio} 个音频资产...`);
+    logger.info(`开始加载 ${totalAudio} 个音频资产...`);
 
     // 加载BGM
     BGM_CONFIGS.forEach((config) => {

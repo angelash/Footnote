@@ -4,7 +4,10 @@
  * @module systems/accessibility/A11yManager
  */
 
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('A11y');
 
 export interface IA11ySettings {
   /** 高对比度模式 */
@@ -58,7 +61,7 @@ class A11yManager {
         return { ...DEFAULT_SETTINGS, ...JSON.parse(stored) };
       }
     } catch (error) {
-      console.warn('[A11y] 加载设置失败:', error);
+      logger.warn('加载设置失败:', error);
     }
     return { ...DEFAULT_SETTINGS };
   }
@@ -70,7 +73,7 @@ class A11yManager {
     try {
       localStorage.setItem('footnote_a11y', JSON.stringify(this._settings));
     } catch (error) {
-      console.error('[A11y] 保存设置失败:', error);
+      logger.error('保存设置失败:', error);
     }
   }
 
@@ -301,7 +304,7 @@ class A11yManager {
     this._applySettings();
 
     eventBus.emit(GameEvent.SETTINGS_UPDATE, { settings: { a11y: { [key]: value } } });
-    console.log(`[A11y] 设置更新: ${key} = ${value}`);
+    logger.debug(`设置更新: ${key} = ${value}`);
   }
 
   /**

@@ -11,6 +11,9 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('UIPreview');
 import { BasePreviewScene } from './BasePreviewScene';
 import { DialogueUI } from '@/systems/ui/DialogueUI';
 import { CardUI } from '@/systems/ui/CardUI';
@@ -349,11 +352,11 @@ export class UIPreviewScene extends BasePreviewScene {
     // 创建真实的 DialogueUI 实例
     this._dialogueUI = new DialogueUI({
       scene: this,
-      onDialogueEnd: () => {
-        console.log('[UIPreview] 对话结束');
+      onDialogueEnd: (): void => {
+        logger.debug('对话结束');
       },
-      onChoiceSelected: (id, index) => {
-        console.log(`[UIPreview] 选择了选项 ${index}`);
+      onChoiceSelected: (id, index): void => {
+        logger.debug(`选择了选项 ${index}, id: ${id}`);
       },
     });
 
@@ -390,8 +393,8 @@ export class UIPreviewScene extends BasePreviewScene {
   private _previewCardUI(): void {
     this._cardUI = new CardUI({
       scene: this,
-      onCardClosed: () => {
-        console.log('[UIPreview] 卡片关闭');
+      onCardClosed: (): void => {
+        logger.debug('卡片关闭');
       },
     });
 
@@ -728,7 +731,13 @@ export class UIPreviewScene extends BasePreviewScene {
     this._uiPreviewContainer.add(instructions);
 
     // Toast类型按钮
-    const toastTypes = [
+    type ToastMethodName = 'showSuccess' | 'showError' | 'showWarning' | 'showInfo';
+    interface IToastTypeConfig {
+      name: string;
+      method: ToastMethodName;
+      color: number;
+    }
+    const toastTypes: IToastTypeConfig[] = [
       { name: '成功', method: 'showSuccess', color: 0x00cc66 },
       { name: '错误', method: 'showError', color: 0xff4444 },
       { name: '警告', method: 'showWarning', color: 0xffd700 },
@@ -760,14 +769,14 @@ export class UIPreviewScene extends BasePreviewScene {
         .rectangle(x, y, 90, 40, 0x000000, 0)
         .setInteractive({ useHandCursor: true });
 
-      hitArea.on('pointerdown', () => {
-        const messages: Record<string, string> = {
+      hitArea.on('pointerdown', (): void => {
+        const messages: Record<ToastMethodName, string> = {
           showSuccess: '操作成功完成！',
           showError: '操作失败，请重试。',
           showWarning: '请注意：这是一条警告。',
           showInfo: '这是一条信息提示。',
         };
-        (this._toastManager as any)[toast.method](messages[toast.method]);
+        this._toastManager[toast.method](messages[toast.method]);
       });
       this._uiPreviewContainer.add(hitArea);
     });

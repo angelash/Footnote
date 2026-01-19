@@ -4,7 +4,10 @@
  * @module systems/game/NewGamePlus
  */
 
+import { createLogger } from '@/utils/Logger';
 import { worldState } from '@/systems/world';
+
+const logger = createLogger('NewGamePlus');
 import { saveManager } from '@/systems/save';
 
 export interface INewGamePlusRewards {
@@ -65,10 +68,10 @@ class NewGamePlusManager {
       const stored = localStorage.getItem('footnote_ngplus');
       if (stored) {
         this._state = JSON.parse(stored);
-        console.log('[NewGamePlus] 加载NG+状态:', this._state);
+        logger.info('加载NG+状态:', this._state);
       }
     } catch (error) {
-      console.warn('[NewGamePlus] 加载NG+状态失败:', error);
+      logger.warn('加载NG+状态失败:', error);
     }
   }
 
@@ -112,7 +115,7 @@ class NewGamePlusManager {
     // 保存
     this._save();
 
-    console.log('[NewGamePlus] 通关记录:', {
+    logger.info('通关记录:', {
       cycle: this._state.cycleCount,
       ending: endingType,
       endings: this._state.achievedEndings,
@@ -187,7 +190,7 @@ class NewGamePlusManager {
    */
   public async startNewGamePlus(): Promise<void> {
     if (!this._state.isNewGamePlus) {
-      console.warn('[NewGamePlus] 尚未解锁NG+');
+      logger.warn('尚未解锁NG+');
       return;
     }
 
@@ -202,7 +205,7 @@ class NewGamePlusManager {
       await saveManager.deleteSave(i);
     }
 
-    console.log('[NewGamePlus] NG+开始，周回:', this._state.cycleCount);
+    logger.info('NG+开始，周回:', this._state.cycleCount);
   }
 
   /**
@@ -228,7 +231,7 @@ class NewGamePlusManager {
     try {
       localStorage.setItem('footnote_ngplus', JSON.stringify(this._state));
     } catch (error) {
-      console.error('[NewGamePlus] 保存失败:', error);
+      logger.error('保存失败:', error);
     }
   }
 

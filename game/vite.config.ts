@@ -90,7 +90,7 @@ export default defineConfig({
     // 资源内联阈值 (4kb)
     assetsInlineLimit: 4096,
     // 提高chunk大小警告阈值（Phaser本身就很大）
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1500,
   },
 
   // 优化依赖

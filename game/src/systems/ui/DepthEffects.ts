@@ -30,6 +30,7 @@ export class DepthEffects {
   private _perceptionOverlay!: Phaser.GameObjects.Rectangle;
   private _interventionGrid!: Phaser.GameObjects.Graphics;
   private _timelineOverlay!: Phaser.GameObjects.Container;
+  private _edgeGlow: Phaser.GameObjects.Graphics | null = null;
 
   // 粒子效果 (预留)
 
@@ -294,10 +295,10 @@ export class DepthEffects {
     });
 
     // 清理边缘发光
-    if ((this as any)._edgeGlow) {
-      this._scene.tweens.killTweensOf((this as any)._edgeGlow);
-      (this as any)._edgeGlow.destroy();
-      (this as any)._edgeGlow = null;
+    if (this._edgeGlow) {
+      this._scene.tweens.killTweensOf(this._edgeGlow);
+      this._edgeGlow.destroy();
+      this._edgeGlow = null;
     }
   }
 
@@ -417,8 +418,8 @@ export class DepthEffects {
     this._interventionGrid?.destroy();
     this._timelineOverlay?.destroy();
 
-    if ((this as any)._edgeGlow) {
-      (this as any)._edgeGlow.destroy();
+    if (this._edgeGlow) {
+      this._edgeGlow.destroy();
     }
   }
 }

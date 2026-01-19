@@ -5,7 +5,10 @@
  */
 
 import Phaser from 'phaser';
+import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+
+const logger = createLogger('AbilitySystem');
 import { worldState } from '@/systems/world';
 import { saveManager } from '@/systems/save';
 import { SCENES } from '@/config/game.config';
@@ -75,14 +78,14 @@ export class AbilitySystem {
   activateAbility(type: AbilityType): boolean {
     // 检查是否解锁
     if (!worldState.hasAbility(type)) {
-      console.log(`[AbilitySystem] 能力未解锁: ${type}`);
+      logger.debug(`能力未解锁: ${type}`);
       return false;
     }
 
     // 检查冷却
     const state = this._states.get(type);
     if (!state || state.cooldownRemaining > 0) {
-      console.log(`[AbilitySystem] 能力冷却中: ${type}`);
+      logger.debug(`能力冷却中: ${type}`);
       return false;
     }
 
@@ -93,7 +96,7 @@ export class AbilitySystem {
 
     // 使用能力（消耗P值）
     if (!worldState.useAbility(type)) {
-      console.log(`[AbilitySystem] P值过高，无法使用能力: ${type}`);
+      logger.debug(`P值过高，无法使用能力: ${type}`);
       return false;
     }
 
@@ -294,7 +297,7 @@ export class AbilitySystem {
    */
   performIntervention(objectId: string, zoneId: string, modification: string): void {
     if (!this.isAbilityActive('DEPTH_INTERVENTION' as AbilityType)) {
-      console.warn('[AbilitySystem] 深度介入未激活');
+      logger.warn('深度介入未激活');
       return;
     }
 
@@ -309,7 +312,7 @@ export class AbilitySystem {
     // 停用能力
     this.deactivateAbility('DEPTH_INTERVENTION' as AbilityType);
 
-    console.log(`[AbilitySystem] 深度介入完成: ${objectId} @ ${zoneId}`);
+    logger.info(`深度介入完成: ${objectId} @ ${zoneId}`);
   }
 
   // ==================== 时间干预 ====================
@@ -457,7 +460,7 @@ export class AbilitySystem {
    */
   async performTimeRewind(nodeId: string): Promise<void> {
     if (!this.isAbilityActive('TIME_INTERVENTION' as AbilityType)) {
-      console.warn('[AbilitySystem] 时间干预未激活');
+      logger.warn('时间干预未激活');
       return;
     }
 
@@ -467,7 +470,7 @@ export class AbilitySystem {
     // 1. 加载旧状态
     const success = await saveManager.load(slot);
     if (!success) {
-      console.error('[AbilitySystem] 回溯失败: 无法加载存档');
+      logger.error('回溯失败: 无法加载存档');
       return;
     }
 
@@ -479,7 +482,7 @@ export class AbilitySystem {
       type: 'timeline_fracture',
     });
 
-    console.log(`[AbilitySystem] 时间回溯完成: ${nodeId}`);
+    logger.info(`时间回溯完成: ${nodeId}`);
 
     // 3. 重启场景
     this._scene.scene.start(SCENES.GAME, { zoneId: currentZone, isNewGame: false });
@@ -508,7 +511,7 @@ export class AbilitySystem {
   private _setupEventListeners(): void {
     // 监听能力解锁
     eventBus.onTyped(GameEvent.ABILITY_UNLOCK, (payload: { abilityType: string }) => {
-      console.log(`[AbilitySystem] 能力解锁: ${payload.abilityType}`);
+      logger.info(`能力解锁: ${payload.abilityType}`);
     });
   }
 

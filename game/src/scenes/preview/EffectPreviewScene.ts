@@ -561,7 +561,7 @@ export class EffectPreviewScene extends BasePreviewScene {
    * 脉冲波纹效果
    */
   private _createPulseRipple(x: number, y: number, color: number, _config: IAnimationConfig): void {
-    const createRipple = () => {
+    const createRipple = (): void => {
       const ripple = this.add.graphics();
       ripple.lineStyle(3, color, 0.8);
       ripple.strokeCircle(x, y, 10);

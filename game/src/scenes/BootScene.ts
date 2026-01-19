@@ -4,6 +4,9 @@
  */
 import Phaser from 'phaser';
 import { SCENES } from '@/config/game.config';
+import { createLogger } from '@/utils/Logger';
+
+const logger = createLogger('BootScene');
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +19,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    console.log('[BootScene] 启动检查...');
+    logger.info('启动检查...');
 
     // 检查浏览器支持
     this._checkBrowserSupport();
@@ -34,24 +37,24 @@ export class BootScene extends Phaser.Scene {
   private _checkBrowserSupport(): void {
     // 检查WebGL支持
     if (!this.game.device.features.webGL) {
-      console.warn('[BootScene] WebGL不可用，将使用Canvas渲染');
+      logger.warn('WebGL不可用，将使用Canvas渲染');
     }
 
     // 检查音频支持
     if (!this.game.device.audio.webAudio) {
-      console.warn('[BootScene] WebAudio不可用，音频功能可能受限');
+      logger.warn('WebAudio不可用，音频功能可能受限');
     }
 
     // 检查触摸支持
     if (this.game.device.input.touch) {
-      console.log('[BootScene] 触摸设备');
+      logger.info('触摸设备');
     }
   }
 
   private _checkStorageSupport(): void {
     // 检查IndexedDB支持
     if (!window.indexedDB) {
-      console.error('[BootScene] IndexedDB不可用，存档功能将无法使用');
+      logger.error('IndexedDB不可用，存档功能将无法使用');
       // 可以考虑回退到localStorage
     }
 
@@ -60,18 +63,18 @@ export class BootScene extends Phaser.Scene {
       localStorage.setItem('__test__', '1');
       localStorage.removeItem('__test__');
     } catch (e) {
-      console.warn('[BootScene] localStorage不可用');
+      logger.warn('localStorage不可用');
     }
   }
 
   private _setupGlobalConfig(): void {
     // 设置游戏暂停行为
     this.game.events.on('blur', () => {
-      console.log('[BootScene] 游戏失去焦点');
+      logger.debug('游戏失去焦点');
     });
 
     this.game.events.on('focus', () => {
-      console.log('[BootScene] 游戏获得焦点');
+      logger.debug('游戏获得焦点');
     });
 
     // 开发模式下的调试工具
@@ -83,7 +86,7 @@ export class BootScene extends Phaser.Scene {
   private _setupDebugTools(): void {
     // 键盘快捷键
     this.input.keyboard?.on('keydown-F1', () => {
-      console.log('[Debug] 游戏状态:', this.game);
+      logger.debug('游戏状态:', this.game);
     });
 
     this.input.keyboard?.on('keydown-F2', () => {

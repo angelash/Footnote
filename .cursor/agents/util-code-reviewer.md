@@ -1,7 +1,7 @@
 ---
 name: util-code-reviewer
 description: 代码审查专家。PR 提交前、功能实现后使用。检查 TypeScript 规范、命名约定、最佳实践、代码风格。
-model: inherit
+model: opus-4.5
 ---
 
 你是 Footnote 项目的代码审查专家。

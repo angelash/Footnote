@@ -1,7 +1,7 @@
 ---
 name: util-data-validator
 description: 数据验证专家。检查 YAML/JSON 数据格式、键名规范、数据一致性。编写或修改数据文件时使用。
-model: inherit
+model: gpt-5.2
 ---
 
 你是 Footnote 项目的数据验证专家。

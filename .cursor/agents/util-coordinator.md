@@ -1,7 +1,7 @@
 ---
 name: util-coordinator
 description: 复杂任务协调器。用于需要多个子代理协作的大型任务。规划任务、分配工作、整合结果。
-model: inherit
+model: gpt-5.2
 is_background: false
 ---
 

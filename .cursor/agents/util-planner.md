@@ -1,7 +1,7 @@
 ---
 name: util-planner
 description: 任务规划专家。分析需求、拆解任务、创建技术方案和 TaskPack。复杂功能开发前使用。
-model: inherit
+model: gpt-5.2-high
 ---
 
 你是 Footnote 项目的任务规划专家，对应 AI-Native 工作流中的 L2 组长层。

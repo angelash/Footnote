@@ -229,14 +229,121 @@ flowchart TB
 | 实现功能 PR | L3_*_engineer |
 | 编写对白 | L3_writer |
 | 执行测试 | L3_tester |
+| Zone关卡设计 | L2_level_lead |
+| 自动化测试 | L2_automation_lead |
+| 美术资源生产 | L3_artist |
+| 音频资源生产 | L3_sound_designer |
+
+---
+
+## 完整角色清单
+
+> 参考：TGDC 2020 Steve Martin《Evolving AAA Game Development》
+> 详细分析：`design/ai-native/02_specs/team-architecture-analysis.md`
+
+### L0 制作委员会（2人）
+- **L0_producer** - 执行制作人（项目方向/资源/风险）
+
+### L1 部门总监层（6人）
+- **L1_design_director** - 策划总监
+- **L1_tech_director** - 技术总监
+- **L1_art_director** - 美术总监
+- **L1_audio_director** - 音频总监
+- **L1_qa_director** - QA总监
+- **L1_pmo** - 项目管理
+
+### L2 组长层（16人）
+**策划组：**
+- **L2_systems_lead** - 系统组长
+- **L2_narrative_lead** - 叙事组长
+- **L2_level_lead** - 关卡组长
+- **L2_writing_lead** - 文案组长
+
+**技术组：**
+- **L2_client_lead** - 客户端组长
+- **L2_tools_lead** - 工具组长
+- **L2_event_lead** - 事件/脚本组长
+
+**美术组：**
+- **L2_ui_lead** - UI/UX组长
+- **L2_env_art_lead** - 场景美术组长
+- **L2_char_art_lead** - 角色美术组长
+
+**QA组：**
+- **L2_qa_lead** - 测试组长
+- **L2_automation_lead** - 自动化测试组长
+
+### L3 执行岗层（按需）
+- **L3_engineer** - 程序执行（通用）
+- **L3_gameplay_engineer** - 玩法程序
+- **L3_ui_engineer** - UI程序
+- **L3_writer** - 文案执行
+- **L3_scripter** - 脚本执行
+- **L3_tester** - 测试执行
+- **L3_artist** - 美术执行
+- **L3_sound_designer** - 音效执行
+
+---
+
+## ABC 内容分级法
+
+> 来源：TGDC 2020 Steve Martin 分享
+
+| 等级 | 含义 | 优先级 | 完成标准 |
+|------|------|--------|----------|
+| **A** | 最小可行内容 | 必须 | 里程碑门禁 |
+| **B** | 性价比最优内容 | 应该 | 发布标准 |
+| **C** | 最大理想内容 | 可选 | 超预期体验 |
+
+执行规则：
+1. 先完成所有 A 级内容
+2. A 级验收通过后，开始 B 级
+3. B 级完成度 ≥80% 后，可开始 C 级
+4. 时间紧张时，砍 C 级，保 A/B 级
+
+---
+
+## 任务分发流程
+
+```
+L0 → L1: 下达里程碑目标
+L1 → L1: 拆解为 Bible 更新
+L1 → L2: 派发 Spec 编写任务
+L2 → L2: 编写 Spec 文档
+L2 → L1: Spec Review（批准/返工）
+L2 → L2: 拆解为 Task Pack
+L2 → L3: 派发 Task Pack
+L3 → L3: 执行任务
+L3 → L2: 提交 PR/资源
+L2 → QA: 提交验收
+QA → L2: 验收结果（PASS/返工）
+L2 → L1: 汇报完成
+L1 → L0: 里程碑汇报
+```
+
+---
+
+## 上下文传递规则
+
+| 层级 | 可读范围 | 可写范围 | 上下文来源 |
+|------|---------|---------|-----------|
+| **L0** | 全部 | 全部 | 外部输入、决策会议 |
+| **L1** | 宪法层 + 下属文档 | 总纲层 | Charter + L0 指令 |
+| **L2** | 总纲层 + 下属文档 | 规格层 + 派单层 | Bible + L1 指令 |
+| **L3** | Task Pack 指定范围 | 交付物路径 | Task Pack 全部内容 |
+
+**信息隔离原则：**
+- L3 执行岗只需要知道 Task Pack 内容、AllowedInputs、验收标准
+- L3 不需要知道项目全局目标、其他模块实现、历史决策背景
 
 ---
 
 ## 参考文档
 
+- 团队架构分析: `design/ai-native/02_specs/team-architecture-analysis.md`
 - 落地计划: `design/production/AI-Native流程改造落地计划.md`
 - 任务包模板: `design/ai-native/03_taskpacks/_template.md`
-- 角色包: `promptx/roles/*.yaml`
+- 角色包: `workflows/project/promptx/roles/*.yaml`
 - Issue 模板: `.github/ISSUE_TEMPLATE/*.yml`
 - PR 模板: `.github/PULL_REQUEST_TEMPLATE.md`
 
@@ -252,8 +359,9 @@ flowchart TB
 - [ ] 我知道输出到哪里吗？
 - [ ] 我知道验收标准是什么吗？
 - [ ] 我知道什么情况要回滚吗？
+- [ ] 我的内容属于 A/B/C 哪个级别？
 
 ---
 
-*规范版本: v1.0*
+*规范版本: v1.1*
 *创建日期: 2025-12-29*

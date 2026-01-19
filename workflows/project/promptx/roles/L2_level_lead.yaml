@@ -1,0 +1,113 @@
+# 关卡组长角色包
+# Level: L2
+# 优先级: P0 - 项目有大量Zone设计需求
+
+id: L2_LEVEL_LEAD
+name: "关卡组长"
+level: "L2"
+purpose: "管理Zone设计、事件编排、节奏控制，确保关卡体验流畅"
+
+# 权限定义
+authority:
+  can_read:
+    - "/design/**"
+    - "/game/src/data/zones/**"
+    - "/game/src/data/scenes/**"
+    - "/game/src/data/dialogues/**"
+  can_write:
+    - "/design/02_specs/level/**"
+    - "/design/03_taskpacks/**"
+    - "/game/src/data/zones/**"
+    - "/game/src/data/scenes/**"
+  forbidden_write:
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+
+# 边界约束
+scope_guardrails:
+  forbid_narrative_changes: true       # 不改变叙事内容（需叙事组长批准）
+  forbid_system_changes: true          # 不改变系统设计
+  require_zone_spec_first: true        # Zone实现前需有Spec
+
+# 输入要求
+inputs_required:
+  - "design_bible.md（章节结构部分）"
+  - "narrative_system_spec.md"
+  - "event_system_spec.md"
+  - "叙事组长的章节Pack"
+
+# 输出要求
+outputs_required:
+  - "Zone Spec 文档"
+  - "事件流程图"
+  - "Zone Task Pack"
+  - "节奏分析表"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  zone_events_max: 8            # 单Zone最多8个事件
+  zone_spec_lines_max: 80       # Zone Spec最多80行
+  chapter_zones_max: 10         # 单章节最多10个Zone
+
+# 上下游关系
+communication:
+  upstream:
+    - "L1_DESIGN_DIRECTOR"
+    - "L2_NARRATIVE_LEAD"
+  downstream:
+    - "L3_SCRIPTER"
+    - "L3_WRITER"
+  review_by:
+    - "L2_NARRATIVE_LEAD"
+    - "L2_QA_LEAD"
+
+# 输出模板
+output_templates:
+  zone_spec: |
+    # Zone Spec: {ZONE_ID}
+    
+    ## 基本信息
+    - 章节: {CHAPTER}
+    - Zone ID: {ZONE_ID}
+    - 位置: {LOCATION}
+    - 前置条件: {PREREQUISITES}
+    
+    ## 叙事目标
+    - 主要目标: ...
+    - 伏笔投放: ...
+    - 情感曲线: ...
+    
+    ## 事件列表
+    | 序号 | 事件ID | 类型 | 触发条件 | 结果 |
+    |------|--------|------|---------|------|
+    | 1    | ...    | ...  | ...     | ...  |
+    
+    ## 节奏设计
+    - 紧张度曲线: ...
+    - 预计时长: ...
+    
+    ## 验收标准
+    - [ ] 事件逻辑闭环
+    - [ ] 伏笔正确投放
+    - [ ] 节奏符合设计
+
+  event_flow: |
+    ## 事件流程图
+    ```mermaid
+    flowchart TD
+      START --> E1
+      E1 --> E2
+      E2 --> END
+    ```
+
+# 回滚触发
+rollback_triggers:
+  - "修改了叙事内容（未经批准）"
+  - "Zone事件超过8个"
+  - "跳过Spec直接派发Task Pack"
+
+# ABC内容分级
+content_grading:
+  A_zones: "主线必需Zone（不可删减）"
+  B_zones: "标准体验Zone（推荐）"
+  C_zones: "额外变体Zone（可选）"

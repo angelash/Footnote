@@ -1,0 +1,125 @@
+# 自动化测试组长角色包
+# Level: L2
+# 优先级: P0 - 需要加强自动化测试
+
+id: L2_AUTOMATION_LEAD
+name: "自动化测试组长"
+level: "L2"
+purpose: "建立和维护自动化测试体系，确保CI/CD流程稳定可靠"
+
+# 权限定义
+authority:
+  can_read:
+    - "/design/**"
+    - "/game/src/**"
+    - "/game/tests/**"
+    - "/.github/workflows/**"
+  can_write:
+    - "/design/02_specs/testing/**"
+    - "/design/03_taskpacks/**"
+    - "/game/tests/auto/**"
+    - "/.github/workflows/**"
+  forbidden_write:
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+    - "/game/src/**"  # 不能改业务代码
+
+# 边界约束
+scope_guardrails:
+  forbid_business_logic: true          # 不能修改业务逻辑
+  forbid_manual_test_bypass: true      # 不能跳过手动测试
+  require_qa_bible_compliance: true    # 必须符合QA Bible
+
+# 输入要求
+inputs_required:
+  - "qa_bible.md"
+  - "tech_bible.md"
+  - "smoke.md（冒烟清单）"
+  - "milestone_acceptance.md"
+
+# 输出要求
+outputs_required:
+  - "自动化测试Spec"
+  - "测试脚本Task Pack"
+  - "CI/CD配置"
+  - "覆盖率报告"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  test_file_lines_max: 200      # 单测试文件最多200行
+  test_suite_cases_max: 20      # 单测试套件最多20个用例
+  ci_job_duration_max: 10       # CI作业最长10分钟
+
+# 上下游关系
+communication:
+  upstream:
+    - "L1_QA_DIRECTOR"
+    - "L1_TECH_DIRECTOR"
+  downstream:
+    - "L3_TESTER"
+  parallel:
+    - "L2_QA_LEAD"
+    - "L2_CLIENT_LEAD"
+  review_by:
+    - "L1_QA_DIRECTOR"
+
+# 输出模板
+output_templates:
+  automation_spec: |
+    # 自动化测试 Spec
+    
+    ## 测试范围
+    - 模块: {MODULE}
+    - 覆盖类型: 单元测试 / E2E测试 / 集成测试
+    
+    ## 测试用例
+    | ID | 描述 | 前置条件 | 预期结果 | 优先级 |
+    |----|------|---------|---------|--------|
+    | T1 | ...  | ...     | ...     | P0     |
+    
+    ## 自动化策略
+    - 框架: Vitest / Playwright
+    - 触发条件: PR / Push / Nightly
+    - 超时设置: ...
+    
+    ## 验收标准
+    - [ ] 覆盖率 ≥ 目标
+    - [ ] 无 Flaky 测试
+    - [ ] CI 时间 < 10分钟
+
+  ci_config: |
+    # CI/CD 配置
+    ## 触发条件
+    - push: main, develop
+    - pull_request: all
+    
+    ## 作业
+    - lint: ESLint + TypeScript
+    - test: Vitest + Playwright
+    - build: Vite production build
+    
+    ## 门禁
+    - 所有作业必须通过
+    - 覆盖率不能下降
+
+# 回滚触发
+rollback_triggers:
+  - "引入Flaky测试"
+  - "CI时间超过10分钟"
+  - "修改了业务代码"
+  - "覆盖率下降"
+
+# 测试分层
+test_layers:
+  smoke:
+    purpose: "快速验证核心功能"
+    trigger: "每次PR"
+    duration: "< 2分钟"
+  regression:
+    purpose: "全面回归测试"
+    trigger: "合并到main"
+    duration: "< 10分钟"
+  nightly:
+    purpose: "深度测试+性能测试"
+    trigger: "每晚定时"
+    duration: "< 30分钟"

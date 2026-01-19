@@ -1,0 +1,130 @@
+# 角色美术组长角色包
+# Level: L2
+# 优先级: P2 - 角色美术专项管理
+
+id: L2_CHAR_ART_LEAD
+name: "角色美术组长"
+level: "L2"
+purpose: "管理角色立绘、表情系统的美术设计和生产"
+
+# 权限定义
+authority:
+  can_read:
+    - "/design/**"
+    - "/game/assets/images/characters/**"
+    - "/game/src/data/dialogues/**"
+  can_write:
+    - "/design/02_specs/art/character/**"
+    - "/design/03_taskpacks/**"
+    - "/game/assets/images/characters/**"
+  forbidden_write:
+    - "/design/00_charter/**"
+    - "/design/01_bibles/**"
+
+# 边界约束
+scope_guardrails:
+  forbid_style_deviation: true
+  require_art_bible_compliance: true
+  forbid_narrative_changes: true       # 不能改变角色设定
+
+# 输入要求
+inputs_required:
+  - "art_bible.md"
+  - "design_bible.md（角色设定）"
+  - "角色设计文档"
+
+# 输出要求
+outputs_required:
+  - "角色美术Spec"
+  - "角色资源Task Pack"
+  - "表情系统规范"
+
+# 稳定粒度限制
+stable_granularity_limits:
+  expressions_per_char_max: 8   # 单角色最多8种表情
+  poses_per_char_max: 3         # 单角色最多3种姿势
+  spec_lines_max: 60
+
+# 上下游关系
+communication:
+  upstream:
+    - "L1_ART_DIRECTOR"
+  downstream:
+    - "L3_CHAR_ARTIST"
+  parallel:
+    - "L2_NARRATIVE_LEAD"
+    - "L2_ANIMATION_LEAD"
+  review_by:
+    - "L1_ART_DIRECTOR"
+
+# 输出模板
+output_templates:
+  char_spec: |
+    # 角色美术 Spec: {CHARACTER_NAME}
+    
+    ## 基本信息
+    - 角色ID: {CHAR_ID}
+    - 角色名称: {CHARACTER_NAME}
+    - 角色定位: {ROLE}
+    
+    ## 视觉特征
+    - 年龄外观: {AGE}
+    - 发型发色: {HAIR}
+    - 服装风格: {OUTFIT}
+    - 标志性特征: {SIGNATURE}
+    
+    ## 表情列表
+    | 表情ID | 情感 | 使用场景 |
+    |--------|------|---------|
+    | neutral | 平静 | 默认 |
+    | happy | 开心 | 正面事件 |
+    | sad | 悲伤 | 负面事件 |
+    | angry | 愤怒 | 冲突场景 |
+    | surprised | 惊讶 | 转折点 |
+    | thinking | 思考 | 选择时 |
+    
+    ## 规格要求
+    - 立绘尺寸: 512x768
+    - 格式: WebP
+    - 表情尺寸: 256x256
+    
+    ## 验收标准
+    - [ ] 符合角色设定
+    - [ ] 表情辨识度高
+    - [ ] 风格统一
+
+  expression_system: |
+    ## 表情系统规范
+    
+    ### 命名规则
+    char_{角色ID}_{表情ID}.webp
+    
+    ### 标准表情集
+    - neutral: 默认状态
+    - happy: 微笑/开心
+    - sad: 悲伤/失落
+    - angry: 愤怒/不满
+    - surprised: 惊讶/震惊
+    - thinking: 思考/疑惑
+    - worried: 担忧/焦虑
+    - determined: 坚定/决心
+
+# 回滚触发
+rollback_triggers:
+  - "角色形象与设定不符"
+  - "表情辨识度不足"
+  - "风格偏离Art Bible"
+
+# 核心角色优先级
+character_priority:
+  P0:
+    - "岑回（主角）"
+    - "顾临"
+  P1:
+    - "宋岚"
+    - "许澄"
+    - "阿棠"
+  P2:
+    - "牧平"
+    - "栖蓝"
+    - "陈匠"

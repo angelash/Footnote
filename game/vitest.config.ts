@@ -20,18 +20,26 @@ export default defineConfig({
       provider: 'istanbul',
       reporter: ['text', 'html', 'lcov'],
       all: false,
-      include: ['src/systems/world/WorldState.ts', 'src/scenes/GameScene.ts'],
+      include: [
+        'src/systems/world/WorldState.ts',
+        'src/systems/narrative/NarrativeEngine.ts',
+        'src/systems/EventBus.ts',
+        'src/systems/i18n/I18nManager.ts',
+        'src/scenes/GameScene.ts',
+      ],
       exclude: [
         'node_modules/',
         'tests/',
         'src/types/',
         '**/*.d.ts',
+        // SaveManager excluded: requires IndexedDB which can't be unit tested
+        'src/systems/save/SaveManager.ts',
       ],
       thresholds: {
-        statements: 60,
+        statements: 80,
         branches: 60,
-        functions: 60,
-        lines: 60,
+        functions: 80,
+        lines: 80,
       },
     },
     

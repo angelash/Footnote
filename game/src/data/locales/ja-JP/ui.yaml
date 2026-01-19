@@ -1,0 +1,37 @@
+# 日本語 - UI テキスト拡張
+# コアUIはI18nManagerに組み込み済み、このファイルは拡張用
+
+ui:
+  # ゲームヒント
+  hints:
+    first_interaction: オブジェクトをクリックしてインタラクト
+    collect_card: E キーでカードを収集
+    ability_ready: 能力準備完了
+    save_reminder: ゲームの保存をお勧めします
+
+  # 上級チュートリアル
+  tutorial_advanced:
+    depth_perception: 深度知覚で隠れた層を見ることができます
+    depth_intervention: 深度介入でオブジェクトの状態を変更できます
+    time_intervention: 時間干渉で過去のノードに戻れます
+
+  # 確認ダイアログ
+  confirm:
+    delete_save: このセーブを削除しますか？この操作は取り消せません。
+    overwrite_save: このスロットには既存のデータがあります。上書きしますか？
+    quit_game: ゲームを終了しますか？保存されていない進行状況は失われます。
+    new_game: 新しいゲームを開始しますか？
+
+  # エラーメッセージ
+  errors:
+    save_failed: 保存に失敗しました。もう一度お試しください
+    load_failed: ロードに失敗しました。セーブデータが破損している可能性があります
+    network_error: ネットワーク接続に失敗しました
+    unknown_error: 不明なエラーが発生しました
+
+  # ロード状態
+  loading:
+    game: ゲームをロード中...
+    zone: ゾーンをロード中...
+    assets: アセットをロード中...
+    please_wait: お待ちください...

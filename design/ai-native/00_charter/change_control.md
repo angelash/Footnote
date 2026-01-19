@@ -118,7 +118,7 @@
 <!-- 哪些模块/文档/系统会受影响？ -->
 
 ### 受影响的文件
-- [ ] docs/01_bibles/xxx.md
+- [ ] design/ai-native/01_bibles/xxx.md
 - [ ] src/systems/xxx.ts
 - ...
 
@@ -189,7 +189,7 @@
 
 ### 5.3 回滚记录
 
-每次回滚必须记录到 `docs/05_logs/rollback_log.md`:
+每次回滚必须记录到 `workflows/project/logs/rollback_log.md`:
 
 ```markdown
 ## ROLLBACK-YYYY-NNNN
@@ -350,9 +350,9 @@
 | 记录类型 | 位置 |
 |---------|------|
 | CR Issue | GitHub Issues |
-| 决策记录 | `docs/05_logs/decisions_log.md` |
-| 回滚记录 | `docs/05_logs/rollback_log.md` |
-| 任务记录 | `docs/05_logs/task_log.md` |
+| 决策记录 | `workflows/project/logs/decisions_log.md` |
+| 回滚记录 | `workflows/project/logs/rollback_log.md` |
+| 任务记录 | `workflows/project/logs/task_log.md` |
 
 ---
 

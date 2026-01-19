@@ -43,7 +43,7 @@
 | A-M1 | Major | 规格层文档缺失 | `02_specs/systems/` | 创建 `ability_system_spec.md`、`counter_system_spec.md`、`card_system_spec.md` |
 | A-M2 | Major | 文档路径引用不一致 | 多个文档 | 统一为 `design/ai-native/` 而非 `docs/` |
 | A-M3 | Major | 审计层目录未建立 | `workflows/project/logs/` | 初始化 `automation_runs/`、`decisions_log.md` 等 |
-| A-M4 | Major | 角色包双重定义 | `.cursor/agents/` vs `promptx/roles/` | 明确主从关系或合并 |
+| A-M4 | ~~Major~~ | ~~角色包双重定义~~ | `.cursor/agents/` 为唯一来源 | ✅ 已解决：统一使用 `.cursor/agents/`，`promptx/roles/` 保留 README 指向 |
 | A-m1 | Minor | Bible 参考索引路径过时 | `design_bible.md` §9 | 更新路径索引 |
 | A-m2 | Minor | QA Bible 路径引用错误 | `qa_bible.md` §6, §9 | 统一路径格式 |
 

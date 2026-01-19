@@ -677,7 +677,10 @@ sequenceDiagram
 
 ## 7. 角色包补充（需要创建）
 
-以下角色包需要在 `workflows/project/promptx/roles/` 中创建：
+> 注：角色定义已迁移至 `.cursor/agents/` 目录（Cursor 原生格式）。
+> 原 `workflows/project/promptx/roles/` 的 YAML 格式已废弃。
+
+以下角色包需要在 `.cursor/agents/` 中创建：
 
 ### 7.1 程序类角色包
 

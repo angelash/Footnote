@@ -31,22 +31,22 @@ requires_mcp: false
 
 ## 2. Allowed Inputs（允许引用的输入）
 
-- `package.json`
-- `src/`
-- `tests/`
-- `docs/01_bibles/tech_bible.md`
-- `docs/01_bibles/qa_bible.md`
-- `docs/01_bibles/production_plan.md`
-- `docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
+- `game/package.json`
+- `game/src/`
+- `game/tests/`
+- `design/ai-native/01_bibles/tech_bible.md`
+- `design/ai-native/01_bibles/qa_bible.md`
+- `design/ai-native/01_bibles/production_plan.md`
+- `workflows/project/pipelines/n8n_cursor_cli_pipeline_spec.md`
 
 ## 3. Deliverables（必须交付物）
 
-- `docs/04_acceptance/PROJECT-QUALITY-REVIEW_2026-01-03.md`
-- `docs/02_specs/DEV-PLAN_2026Q1.md`
+- `design/ai-native/04_acceptance/PROJECT-QUALITY-REVIEW_2026-01-03.md`
+- `design/ai-native/02_specs/DEV-PLAN_2026Q1.md`
 
 ## 4. Constraints（硬约束 / 禁止事项）
 
-- 禁止修改冻结目录：`docs/00_charter/**`、`docs/01_bibles/**`
+- 禁止修改冻结目录：`design/ai-native/00_charter/**`、`design/ai-native/01_bibles/**`
 - 文档必须可读、结构化（含表格/清单），且能直接被执行
 - 结论必须能从“输入证据”推出（不要凭空断言）
 

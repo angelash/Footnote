@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export enum EndingType {
   /** 结局A：继续收敛（平面稳定） */
@@ -104,7 +105,7 @@ export class EndingEffects {
     // 中心文字
     const titleText = this._scene.add.text(0, -50, '收敛继续', {
       fontFamily: 'serif',
-      fontSize: '48px',
+      fontSize: UI_FONT_SIZE.HUGE,
       color: '#4444ff',
     });
     titleText.setOrigin(0.5);
@@ -113,7 +114,7 @@ export class EndingEffects {
 
     const subtitleText = this._scene.add.text(0, 20, '城还能继续被读。', {
       fontFamily: 'serif',
-      fontSize: '24px',
+      fontSize: UI_FONT_SIZE.ICON,
       color: '#aaaacc',
     });
     subtitleText.setOrigin(0.5);
@@ -122,7 +123,7 @@ export class EndingEffects {
 
     const fieldText = this._scene.add.text(0, 80, '字段：◦◦◦（边缘保留）', {
       fontFamily: 'monospace',
-      fontSize: '18px',
+      fontSize: UI_FONT_SIZE.MEDIUM,
       color: '#666688',
     });
     fieldText.setOrigin(0.5);
@@ -224,7 +225,7 @@ export class EndingEffects {
     // 中心文字
     const titleText = this._scene.add.text(0, -50, '表示松开', {
       fontFamily: 'serif',
-      fontSize: '48px',
+      fontSize: UI_FONT_SIZE.HUGE,
       color: '#ffaa44',
     });
     titleText.setOrigin(0.5);
@@ -233,7 +234,7 @@ export class EndingEffects {
 
     const subtitleText = this._scene.add.text(0, 20, '版本不再排队。它们同时存在。', {
       fontFamily: 'serif',
-      fontSize: '22px',
+      fontSize: UI_FONT_SIZE.ICON,
       color: '#ccaa88',
     });
     subtitleText.setOrigin(0.5);
@@ -308,7 +309,7 @@ export class EndingEffects {
     // 字段符号
     const fieldSymbol = this._scene.add.text(0, -100, '◦◦◦', {
       fontFamily: 'monospace',
-      fontSize: '72px',
+      fontSize: UI_FONT_SIZE.GIANT,
       color: '#88ff88',
     });
     fieldSymbol.setOrigin(0.5);
@@ -323,7 +324,7 @@ export class EndingEffects {
     // 中心文字
     const titleText = this._scene.add.text(0, 20, '字段交接', {
       fontFamily: 'serif',
-      fontSize: '48px',
+      fontSize: UI_FONT_SIZE.HUGE,
       color: '#88ff88',
     });
     titleText.setOrigin(0.5);
@@ -332,7 +333,7 @@ export class EndingEffects {
 
     const subtitleText = this._scene.add.text(0, 90, '你把代价背走了。', {
       fontFamily: 'serif',
-      fontSize: '24px',
+      fontSize: UI_FONT_SIZE.ICON,
       color: '#aaffaa',
     });
     subtitleText.setOrigin(0.5);
@@ -345,7 +346,7 @@ export class EndingEffects {
       '你不是升维成神，你是背债。\n但你让某些人多活了一点。',
       {
         fontFamily: 'serif',
-        fontSize: '18px',
+        fontSize: UI_FONT_SIZE.MEDIUM,
         color: '#88aa88',
         align: 'center',
       }

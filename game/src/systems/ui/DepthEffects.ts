@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 /** 能力类型（本地定义以避免循环依赖） */
 export enum AbilityType {
@@ -103,7 +104,7 @@ export class DepthEffects {
 
         const label = this._scene.add.text(x, 20, nodeLabels[i], {
           fontFamily: 'monospace',
-          fontSize: '14px',
+          fontSize: UI_FONT_SIZE.TINY,
           color: '#aaccff',
         });
         label.setOrigin(0.5, 0);
@@ -382,7 +383,7 @@ export class DepthEffects {
   public showPollutionMark(x: number, y: number): void {
     const mark = this._scene.add.text(x, y, '◦', {
       fontFamily: 'monospace',
-      fontSize: '24px',
+      fontSize: UI_FONT_SIZE.ICON,
       color: '#aa4444',
     });
     mark.setOrigin(0.5);

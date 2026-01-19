@@ -1,0 +1,30 @@
+# 日本語 - カードテキスト
+
+cards:
+  # アーカイブカード
+  ARCHIVE_MAINTENANCE_BUREAU:
+    title: 維修局アーカイブ
+    description: 維修局は平面維持を担当する中核機関です。
+    content: |
+      [機密レベル：内部]
+      維修局は主平面安定後の第一紀元に設立されました。
+      主な職務：平面異常の監視、記録、修復。
+
+  ARCHIVE_DEPTH_LATTICE:
+    title: 深度格原理
+    description: 深度格に関する基礎理論。
+    content: |
+      深度格は各次元を繋ぐ基礎構造です。
+      一般人は感知できませんが、訓練されたプロセッサーは短時間触れることができます。
+
+  # アイテムカード
+  ITEM_TOOLKIT:
+    title: 標準ツールキット
+    description: 維修局から支給された標準装備。
+    effect: 基本的な修復作業に使用できます。
+
+  # 祈りカード
+  PRAYER_STABILITY:
+    title: 安定の祈り
+    description: 収斂主義の核心的な祈り。
+    content: 平面が平穏に帰し、差異が無形に消えますように。

@@ -1,0 +1,30 @@
+# 简体中文 - 卡片文本
+
+cards:
+  # 档案卡
+  ARCHIVE_MAINTENANCE_BUREAU:
+    title: 维修局档案
+    description: 维修局是负责平面维护的核心机构。
+    content: |
+      [机密等级：内部]
+      维修局成立于主平面稳定后第一纪元。
+      核心职责：监控、记录、修复平面异常。
+
+  ARCHIVE_DEPTH_LATTICE:
+    title: 深度格原理
+    description: 关于深度格的基础理论。
+    content: |
+      深度格是连接各维度的基础结构。
+      普通人无法感知，但训练有素的处理器可以短暂触及。
+
+  # 道具卡
+  ITEM_TOOLKIT:
+    title: 标准工具包
+    description: 维修局发放的标准配置。
+    effect: 可用于基础修复工作。
+
+  # 祷文卡
+  PRAYER_STABILITY:
+    title: 稳定祷文
+    description: 收敛主义的核心祈祷。
+    content: 愿平面归于安宁，愿差异消弭于无形。

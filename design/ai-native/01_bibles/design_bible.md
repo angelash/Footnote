@@ -272,14 +272,14 @@ if (R < 3) {
 
 | 内容 | 文件路径 |
 |------|---------|
-| 完整世界观 | `design/01-narrative/世界观完整版 v3.md` |
-| 角色档案 | `design/01-narrative/角色人生线档案 v2.md` |
-| 伏笔索引 | `design/01-narrative/伏笔索引 v2.md` |
-| 章节布置 | `design/章节×区域叙事布置/` |
-| 对白词库 | `design/对白词库 v1.md` |
-| 卡片文本 | `design/卡片文本全集 v1.md` |
-| 核心玩法 | `design/02-system/核心玩法系统设计_v1.md` |
-| GDD | `design/00-overview/游戏设计文档GDD_v1.md` |
+| 完整世界观 | `design/game/01-narrative/世界观完整版 v3.md` |
+| 角色档案 | `design/game/01-narrative/角色人生线档案 v2.md` |
+| 伏笔索引 | `design/game/01-narrative/伏笔索引 v2.md` |
+| 章节布置 | `design/game/03-level/章节×区域叙事布置/` |
+| 对白词库 | `design/game/01-narrative/对白词库 v1.md` |
+| 卡片文本 | `design/game/02-system/卡片文本全集 v1.md` |
+| 核心玩法 | `design/game/02-system/核心玩法系统设计_v1.md` |
+| GDD | `design/game/00-overview/游戏设计文档GDD_v1.md` |
 
 ---
 

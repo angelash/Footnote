@@ -3,6 +3,7 @@
  */
 import Phaser from 'phaser';
 import { SCENES, TEXT_STYLES, COLORS } from '@/config/game.config';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 import { saveManager } from '@/systems/save';
 import { worldState } from '@/systems/world';
 import type { ISaveMetadata, IGameSettings } from '@/systems/save';
@@ -71,7 +72,7 @@ export class MenuScene extends Phaser.Scene {
     this._title = this.add
       .text(width / 2, height * 0.25, '备 注', {
         ...TEXT_STYLES.TITLE,
-        fontSize: '48px',
+        fontSize: UI_FONT_SIZE.HUGE,
       })
       .setOrigin(0.5)
       .setAlpha(0);
@@ -80,7 +81,7 @@ export class MenuScene extends Phaser.Scene {
     this._subtitle = this.add
       .text(width / 2, height * 0.25 + 60, 'FOOTNOTE', {
         ...TEXT_STYLES.MUTED,
-        fontSize: '16px',
+        fontSize: UI_FONT_SIZE.SMALL,
         letterSpacing: 8,
       })
       .setOrigin(0.5)
@@ -94,7 +95,7 @@ export class MenuScene extends Phaser.Scene {
         '你生活在一个二维世界，\n但你能短暂触碰更高维度——\n代价是：世界会记住你做过的一切。',
         {
           ...TEXT_STYLES.BODY,
-          fontSize: '16px',
+          fontSize: UI_FONT_SIZE.SMALL,
           align: 'center',
           color: '#686868',
         }
@@ -144,7 +145,7 @@ export class MenuScene extends Phaser.Scene {
     const label = this.add
       .text(0, 0, text, {
         ...TEXT_STYLES.BODY,
-        fontSize: '18px',
+        fontSize: UI_FONT_SIZE.NORMAL,
       })
       .setOrigin(0.5);
 
@@ -210,7 +211,7 @@ export class MenuScene extends Phaser.Scene {
     const title = this.add
       .text(0, -260, '选择存档', {
         ...TEXT_STYLES.TITLE,
-        fontSize: '24px',
+        fontSize: UI_FONT_SIZE.ICON,
       })
       .setOrigin(0.5);
     this._saveListContainer.add(title);
@@ -235,7 +236,7 @@ export class MenuScene extends Phaser.Scene {
       const noSaveText = this.add
         .text(0, 0, '没有找到存档\n\n请开始新游戏', {
           ...TEXT_STYLES.BODY,
-          fontSize: '16px',
+          fontSize: UI_FONT_SIZE.SMALL,
           align: 'center',
           color: '#686868',
         })
@@ -272,13 +273,13 @@ export class MenuScene extends Phaser.Scene {
     // 存档名称
     const name = this.add.text(-180, -15, save.name || `存档 ${save.slot}`, {
       ...TEXT_STYLES.BODY,
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
     });
 
     // 章节和位置
     const location = this.add.text(-180, 10, `${save.chapter} - ${save.currentZone}`, {
       ...TEXT_STYLES.MUTED,
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
     });
 
     // 时间
@@ -287,7 +288,7 @@ export class MenuScene extends Phaser.Scene {
     const timeText = this.add
       .text(180, -15, dateStr, {
         ...TEXT_STYLES.MUTED,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
       })
       .setOrigin(1, 0);
 
@@ -296,7 +297,7 @@ export class MenuScene extends Phaser.Scene {
     const playTimeText = this.add
       .text(180, 10, `游玩: ${playTimeStr}`, {
         ...TEXT_STYLES.MUTED,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
       })
       .setOrigin(1, 0);
 
@@ -390,7 +391,7 @@ export class MenuScene extends Phaser.Scene {
     const title = this.add
       .text(0, -210, '设置', {
         ...TEXT_STYLES.TITLE,
-        fontSize: '24px',
+        fontSize: UI_FONT_SIZE.ICON,
       })
       .setOrigin(0.5);
     this._settingsContainer.add(title);
@@ -426,7 +427,7 @@ export class MenuScene extends Phaser.Scene {
 
     const closeX = this.add
       .text(0, 0, '×', {
-        fontSize: '24px',
+        fontSize: UI_FONT_SIZE.ICON,
         color: '#888888',
       })
       .setOrigin(0.5);
@@ -458,7 +459,7 @@ export class MenuScene extends Phaser.Scene {
     // 标签
     const labelText = this.add.text(x, y, label, {
       ...TEXT_STYLES.BODY,
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
     });
     this._settingsContainer.add(labelText);
 
@@ -486,7 +487,7 @@ export class MenuScene extends Phaser.Scene {
     const valueText = this.add
       .text(CONFIG.SETTINGS_WIDTH / 2 - 10, y, `${Math.round(value * 100)}%`, {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
       })
       .setOrigin(1, 0.5);
     this._settingsContainer.add(valueText);
@@ -520,7 +521,7 @@ export class MenuScene extends Phaser.Scene {
   private _createTextSpeedSelector(x: number, y: number): void {
     const labelText = this.add.text(x, y, '文本速度', {
       ...TEXT_STYLES.BODY,
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
     });
     this._settingsContainer.add(labelText);
 
@@ -570,7 +571,7 @@ export class MenuScene extends Phaser.Scene {
     const text = this.add
       .text(0, 0, label, {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: selected ? '#00FFAA' : '#A8A6A3',
       })
       .setOrigin(0.5);
@@ -615,7 +616,7 @@ export class MenuScene extends Phaser.Scene {
   private _createToggle(x: number, y: number, label: string, _key: string): void {
     const labelText = this.add.text(x, y, label, {
       ...TEXT_STYLES.BODY,
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
     });
     this._settingsContainer.add(labelText);
 
@@ -715,7 +716,7 @@ export class MenuScene extends Phaser.Scene {
     this.add
       .text(width / 2, height - 30, `v${version}`, {
         ...TEXT_STYLES.MUTED,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
       })
       .setOrigin(0.5);
   }
@@ -790,7 +791,7 @@ export class MenuScene extends Phaser.Scene {
     const toast = this.add
       .text(width / 2, 80, message, {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         backgroundColor: `#${colors[type].toString(16).padStart(6, '0')}`,
         padding: { x: 16, y: 10 },
       })

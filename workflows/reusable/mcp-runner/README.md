@@ -12,15 +12,15 @@
 - **本工具只解决一个问题**：当 **Windows 没有 cursor-agent** 但需要跑浏览器/ChromeMCP/Browser MCP 时，用 `CUSTOM_API_URL` 的模型 API 来驱动 MCP 工具。
 
 规格文档：
-- `docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
-- `docs/02_specs/pipelines/n8n_cursor_cli_rollout_plan.md`
+- `workflows/project/pipelines/n8n_cursor_cli_pipeline_spec.md`
+- `workflows/project/pipelines/n8n_cursor_cli_rollout_plan.md`
 
 ---
 
 ## 2. 前置条件
 
 ### 2.1 Browser MCP（Chrome 扩展 + 服务）
-参考仓库文档 `docs/智绘AI生图自动化演示文案.md`：
+参考仓库文档 `design/production/智绘AI生图自动化演示文案.md`：
 - Chrome 安装 Browser MCP 扩展
 - Cursor 的 `~/.cursor/mcp.json` 示例：
 

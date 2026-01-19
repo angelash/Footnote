@@ -283,12 +283,12 @@
 
 | 层级 | 目录 | 冻结状态 | 变更流程 |
 |------|------|---------|---------|
-| **宪法层** | `docs/00_charter/` | 🔒完全冻结 | CR + L0审批 |
-| **总纲层** | `docs/01_bibles/` | 🔒基本冻结 | CR + L1审批 |
-| **规格层** | `docs/02_specs/` | 🔓可修改 | L2 Review |
-| **派单层** | `docs/03_taskpacks/` | 🔓可修改 | L2 派发 |
-| **验收层** | `docs/04_acceptance/` | 🔓可修改 | L2 更新 |
-| **审计层** | `docs/05_logs/` | 只追加 | 自动记录 |
+| **宪法层** | `design/ai-native/00_charter/` | 🔒完全冻结 | CR + L0审批 |
+| **总纲层** | `design/ai-native/01_bibles/` | 🔒基本冻结 | CR + L1审批 |
+| **规格层** | `design/ai-native/02_specs/` | 🔓可修改 | L2 Review |
+| **派单层** | `design/ai-native/03_taskpacks/` | 🔓可修改 | L2 派发 |
+| **验收层** | `design/ai-native/04_acceptance/` | 🔓可修改 | L2 更新 |
+| **审计层** | `workflows/project/logs/` | 只追加 | 自动记录 |
 
 ---
 

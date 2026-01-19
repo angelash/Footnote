@@ -67,7 +67,7 @@
 
 > 违反任何一条即判定任务失败。
 
-- [ ] 禁止修改冻结目录（/docs/00_charter/, /docs/01_bibles/）
+- [ ] 禁止修改冻结目录（/design/ai-native/00_charter/, /design/ai-native/01_bibles/）
 - [ ] 禁止引入新系统/新Schema（除非Task Pack明确授权）
 - [ ] 禁止跨模块修改
 - [ ] 禁止超过粒度上限

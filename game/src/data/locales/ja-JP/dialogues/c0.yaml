@@ -1,0 +1,24 @@
+# 日本語 - プロローグ対話
+# ローカライズファイル形式参照：design/game/05-tech/本地化方案_v1.md
+
+dialogues:
+  CENHUI_C0_INTRO:
+    speaker: 岑回（ツェンフイ）
+    lines:
+      - また普通の一日か...
+      - ツールキットは机の上にあるはず。
+
+  GULIN_C0_FIRST:
+    speaker: 顧臨（グーリン）
+    lines:
+      - 記録だけでいい。
+      - 主観を事実と混同するな。
+    options:
+      question: でも、確かに見たんです...
+      accept: 分かりました。
+
+  SYSTEM_WELCOME:
+    speaker: システム
+    lines:
+      - 維修局へようこそ。
+      - あなたの任務は平面の安定を維持することです。

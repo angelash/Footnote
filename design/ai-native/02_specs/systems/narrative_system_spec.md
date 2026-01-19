@@ -140,10 +140,10 @@ type NarrativeEvent =
 
 ## 8. 相关文档
 
-- 设计总纲: `docs/01_bibles/design_bible.md`
-- 技术总纲: `docs/01_bibles/tech_bible.md`
-- 事件系统: `docs/02_specs/systems/event_system_spec.md`
-- 选择系统: `docs/02_specs/systems/choice_system_spec.md`
+- 设计总纲: `design/ai-native/01_bibles/design_bible.md`
+- 技术总纲: `design/ai-native/01_bibles/tech_bible.md`
+- 事件系统: `design/ai-native/02_specs/systems/event_system_spec.md`
+- 选择系统: `design/ai-native/02_specs/systems/choice_system_spec.md`
 
 ---
 

@@ -26,7 +26,16 @@
     "generate:pixel-assets:128": "python scripts/generate_pixel_assets.py --out-dir assets/images/pixel --scale 8 --max-colors 24 --with-sequences --sequence-frames 12",
     "validate:data": "tsx scripts/validate-data.ts",
     "validate:assets": "tsx scripts/validate-assets.ts",
-    "validate:mermaid": "node ../workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs .."
+    "validate:mermaid": "node ../workflows/reusable/pipeline-sys/tools/validate-mermaid.mjs ..",
+    "qc:assets": "node scripts/qa/asset-qc.mjs",
+    "qc:images": "node scripts/qa/asset-qc.mjs --type image",
+    "qc:audio": "node scripts/qa/asset-qc.mjs --type audio",
+    "qc:json": "node scripts/qa/asset-qc.mjs --json",
+    "sync:check": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs",
+    "sync:check:verbose": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --verbose",
+    "sync:check:interfaces": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --interfaces",
+    "sync:check:colors": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --constants",
+    "sync:check:json": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --json"
   },
   "dependencies": {
     "idb": "^8.0.0",

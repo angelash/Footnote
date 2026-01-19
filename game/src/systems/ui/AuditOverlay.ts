@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export enum AuditIntensity {
   /** 轻度 - 边缘提示 */
@@ -60,7 +61,7 @@ export class AuditOverlay {
     // 警告文字
     this._warningText = this._scene.add.text(width / 2, 200, '', {
       fontFamily: 'monospace',
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
       color: '#ff4444',
       align: 'center',
     });

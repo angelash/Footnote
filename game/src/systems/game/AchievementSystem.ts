@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { worldState } from '@/systems/world';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export enum AchievementCategory {
   /** 主线进度 */
@@ -619,7 +620,7 @@ export class AchievementManager {
 
     // 图标
     const icon = this._scene.add.text(-140, 0, achievement.icon, {
-      fontSize: '32px',
+      fontSize: UI_FONT_SIZE.ICON_LARGE,
     });
     icon.setOrigin(0.5);
     this._notificationContainer.add(icon);
@@ -627,7 +628,7 @@ export class AchievementManager {
     // 标题
     const title = this._scene.add.text(-100, -15, '成就解锁', {
       fontFamily: 'monospace',
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: '#888888',
     });
     title.setOrigin(0, 0.5);
@@ -636,7 +637,7 @@ export class AchievementManager {
     // 成就名
     const name = this._scene.add.text(-100, 8, achievement.name, {
       fontFamily: 'monospace',
-      fontSize: '18px',
+      fontSize: UI_FONT_SIZE.MEDIUM,
       color: `#${this._getRarityColor(achievement.rarity).toString(16).padStart(6, '0')}`,
     });
     name.setOrigin(0, 0.5);
@@ -645,7 +646,7 @@ export class AchievementManager {
     // 稀有度标识
     const rarityText = this._scene.add.text(140, 0, this._getRarityText(achievement.rarity), {
       fontFamily: 'monospace',
-      fontSize: '12px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: `#${this._getRarityColor(achievement.rarity).toString(16).padStart(6, '0')}`,
     });
     rarityText.setOrigin(0.5);

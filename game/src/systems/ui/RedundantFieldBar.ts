@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export enum FieldState {
   /** 初始状态：字段：＿ */
@@ -93,7 +94,7 @@ export class RedundantFieldBar extends Phaser.GameObjects.Container {
     // 字段文本
     this._fieldText = this.scene.add.text(0, 0, '字段：＿', {
       fontFamily: 'monospace',
-      fontSize: '18px',
+      fontSize: UI_FONT_SIZE.MEDIUM,
       color: '#aaaacc',
       align: 'center',
     });

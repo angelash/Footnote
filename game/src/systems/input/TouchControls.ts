@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export interface ITouchControlsConfig {
   scene: Phaser.Scene;
@@ -154,7 +155,7 @@ export class TouchControls {
 
     // 按钮图标
     const icon = this._scene.add.text(0, 0, '👆', {
-      fontSize: '28px',
+      fontSize: UI_FONT_SIZE.SECTION,
     });
     icon.setOrigin(0.5);
     this._interactButton.add(icon);
@@ -162,7 +163,7 @@ export class TouchControls {
     // 标签
     const label = this._scene.add.text(0, 50, '交互', {
       fontFamily: 'monospace',
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: '#aaaacc',
     });
     label.setOrigin(0.5);
@@ -206,7 +207,7 @@ export class TouchControls {
 
       // 图标
       const icon = this._scene.add.text(0, 0, ability.icon, {
-        fontSize: '20px',
+        fontSize: UI_FONT_SIZE.NORMAL,
       });
       icon.setOrigin(0.5);
       btn.add(icon);
@@ -214,7 +215,7 @@ export class TouchControls {
       // 快捷键提示
       const hint = this._scene.add.text(0, -35, `${index + 1}`, {
         fontFamily: 'monospace',
-        fontSize: '12px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#666666',
       });
       hint.setOrigin(0.5);

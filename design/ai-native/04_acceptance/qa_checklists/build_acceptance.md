@@ -109,9 +109,9 @@
 
 ## 5. 相关文档
 
-- QA 总纲: `docs/01_bibles/qa_bible.md`
-- 冒烟测试: `docs/04_acceptance/qa_checklists/smoke.md`
-- 技术总纲: `docs/01_bibles/tech_bible.md`
+- QA 总纲: `design/ai-native/01_bibles/qa_bible.md`
+- 冒烟测试: `design/ai-native/04_acceptance/qa_checklists/smoke.md`
+- 技术总纲: `design/ai-native/01_bibles/tech_bible.md`
 
 ---
 

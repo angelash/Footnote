@@ -12,10 +12,10 @@
 - `package.json`
 - `src/`
 - `tests/`
-- `docs/01_bibles/tech_bible.md`
-- `docs/01_bibles/qa_bible.md`
-- `docs/01_bibles/production_plan.md`
-- `docs/02_specs/pipelines/n8n_cursor_cli_pipeline_spec.md`
+- `design/ai-native/01_bibles/tech_bible.md`
+- `design/ai-native/01_bibles/qa_bible.md`
+- `design/ai-native/01_bibles/production_plan.md`
+- `workflows/project/_archived/pipelines/n8n_cursor_cli_pipeline_spec.md`
 
 ### 1.2 关键事实（可审计）
 - **可用门禁脚本（来自 `package.json` scripts）**
@@ -225,9 +225,9 @@
 ## 1. 审查输入与方法
 
 ### 1.1 参考输入
-- **技术总纲**: `docs/01_bibles/tech_bible.md`
-- **QA 总纲**: `docs/01_bibles/qa_bible.md`
-- **生产计划**: `docs/01_bibles/production_plan.md`
+- **技术总纲**: `design/ai-native/01_bibles/tech_bible.md`
+- **QA 总纲**: `design/ai-native/01_bibles/qa_bible.md`
+- **生产计划**: `design/ai-native/01_bibles/production_plan.md`
 - **工程结构**: `src/`（Scenes / Systems / Data / Tests）
 - **自动化脚本**: `package.json` scripts（typecheck/lint/test/test:coverage/test:e2e）
 
@@ -271,7 +271,7 @@
 
 ## 3. 问题清单（分级）
 
-> 分级参考：`docs/01_bibles/qa_bible.md`（Blocker/Critical/Major/Minor）
+> 分级参考：`design/ai-native/01_bibles/qa_bible.md`（Blocker/Critical/Major/Minor）
 
 ### 3.1 Blocker（阻塞交付）
 
@@ -322,7 +322,7 @@
 
 ## 4. 当前里程碑判定（对照 Production Plan）
 
-> `docs/01_bibles/production_plan.md` 定义：M1=基础可运行（门禁：冒烟100%）
+> `design/ai-native/01_bibles/production_plan.md` 定义：M1=基础可运行（门禁：冒烟100%）
 
 - **M1（基础可运行）**：**不通过（暂定）**
   - 理由：build/typecheck/lint 门禁均未通过，缺少“可稳定构建”证据链。

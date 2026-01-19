@@ -1,0 +1,37 @@
+# English - UI Text Extensions
+# Core UI is built into I18nManager, this file is for extensions
+
+ui:
+  # Game Hints
+  hints:
+    first_interaction: Click on objects to interact
+    collect_card: Press E to collect card
+    ability_ready: Ability ready
+    save_reminder: Consider saving your game
+
+  # Advanced Tutorial
+  tutorial_advanced:
+    depth_perception: Depth Perception allows you to see hidden layers
+    depth_intervention: Depth Intervention can change object states
+    time_intervention: Time Intervention can revert to past nodes
+
+  # Confirmation Dialogs
+  confirm:
+    delete_save: Are you sure you want to delete this save? This cannot be undone.
+    overwrite_save: This slot has existing data. Overwrite?
+    quit_game: Are you sure you want to quit? Unsaved progress will be lost.
+    new_game: Are you sure you want to start a new game?
+
+  # Error Messages
+  errors:
+    save_failed: Save failed, please try again
+    load_failed: Load failed, save may be corrupted
+    network_error: Network connection failed
+    unknown_error: An unknown error occurred
+
+  # Loading States
+  loading:
+    game: Loading game...
+    zone: Loading zone...
+    assets: Loading assets...
+    please_wait: Please wait...

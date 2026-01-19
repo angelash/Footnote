@@ -1,0 +1,24 @@
+# English - Prologue Dialogues
+# Localization file format reference: design/game/05-tech/本地化方案_v1.md
+
+dialogues:
+  CENHUI_C0_INTRO:
+    speaker: Cen Hui
+    lines:
+      - Just another ordinary day...
+      - The toolkit should be on the desk.
+
+  GULIN_C0_FIRST:
+    speaker: Gu Lin
+    lines:
+      - Just record it.
+      - Don't treat subjective feelings as facts.
+    options:
+      question: But I did see it...
+      accept: Understood.
+
+  SYSTEM_WELCOME:
+    speaker: System
+    lines:
+      - Welcome to the Maintenance Bureau.
+      - Your task is to maintain plane stability.

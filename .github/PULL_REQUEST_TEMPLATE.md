@@ -1,6 +1,6 @@
 ## 对应任务
 
-- **Task Pack**: /docs/03_taskpacks/T-____.md
+- **Task Pack**: /design/ai-native/03_taskpacks/T-____.md
 - **Issue**: #
 
 ---
@@ -41,8 +41,8 @@
 - [ ] 单模块改动，无跨模块修改
 
 ### 冻结保护
-- [ ] 未修改 `/docs/00_charter/`
-- [ ] 未修改 `/docs/01_bibles/`
+- [ ] 未修改 `/design/ai-native/00_charter/`
+- [ ] 未修改 `/design/ai-native/01_bibles/`
 - [ ] 未引入新系统/Schema（或已提交CR）
 
 ### 功能验证

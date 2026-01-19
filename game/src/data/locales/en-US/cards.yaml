@@ -1,0 +1,30 @@
+# English - Card Texts
+
+cards:
+  # Archive Cards
+  ARCHIVE_MAINTENANCE_BUREAU:
+    title: Maintenance Bureau Archive
+    description: The Maintenance Bureau is the core organization responsible for plane maintenance.
+    content: |
+      [Classification: Internal]
+      The Maintenance Bureau was established in the first epoch after Main Plane stabilization.
+      Core duties: Monitor, record, and repair plane anomalies.
+
+  ARCHIVE_DEPTH_LATTICE:
+    title: Depth Lattice Principles
+    description: Basic theory about the Depth Lattice.
+    content: |
+      The Depth Lattice is the fundamental structure connecting dimensions.
+      Ordinary people cannot perceive it, but trained processors can briefly touch it.
+
+  # Item Cards
+  ITEM_TOOLKIT:
+    title: Standard Toolkit
+    description: Standard equipment issued by the Maintenance Bureau.
+    effect: Can be used for basic repair work.
+
+  # Prayer Cards
+  PRAYER_STABILITY:
+    title: Stability Prayer
+    description: The core prayer of Convergentism.
+    content: May the plane return to peace, may differences dissolve into nothing.

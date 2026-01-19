@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { worldState } from '@/systems/world';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export enum ForeshadowStage {
   /** 首次投放 */
@@ -254,7 +255,7 @@ export class ForeshadowManager {
     // 图标
     const icon = this._scene.add.text(-170, 0, stage === ForeshadowStage.DEEPEN ? '◇' : '◆', {
       fontFamily: 'monospace',
-      fontSize: '24px',
+      fontSize: UI_FONT_SIZE.ICON,
       color: '#aaaaff',
     });
     icon.setOrigin(0.5);
@@ -264,7 +265,7 @@ export class ForeshadowManager {
     const stageText = stage === ForeshadowStage.DEEPEN ? '伏笔加深' : '伏笔误读';
     const text = this._scene.add.text(0, -10, stageText, {
       fontFamily: 'monospace',
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: '#aaaaff',
     });
     text.setOrigin(0.5);
@@ -272,7 +273,7 @@ export class ForeshadowManager {
 
     const nameText = this._scene.add.text(0, 10, foreshadow.name, {
       fontFamily: 'monospace',
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
       color: '#ffffff',
     });
     nameText.setOrigin(0.5);
@@ -296,7 +297,7 @@ export class ForeshadowManager {
     // 图标
     const icon = this._scene.add.text(-170, 0, '★', {
       fontFamily: 'monospace',
-      fontSize: '28px',
+      fontSize: UI_FONT_SIZE.SECTION,
       color: '#ffaa44',
     });
     icon.setOrigin(0.5);
@@ -305,7 +306,7 @@ export class ForeshadowManager {
     // 文本
     const text = this._scene.add.text(0, -15, '伏笔回收', {
       fontFamily: 'monospace',
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: '#ffaa44',
     });
     text.setOrigin(0.5);
@@ -313,7 +314,7 @@ export class ForeshadowManager {
 
     const nameText = this._scene.add.text(0, 8, foreshadow.name, {
       fontFamily: 'monospace',
-      fontSize: '18px',
+      fontSize: UI_FONT_SIZE.MEDIUM,
       color: '#ffffff',
     });
     nameText.setOrigin(0.5);
@@ -321,7 +322,7 @@ export class ForeshadowManager {
 
     const descText = this._scene.add.text(0, 28, foreshadow.description, {
       fontFamily: 'monospace',
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: '#aaaaaa',
     });
     descText.setOrigin(0.5);

@@ -8,6 +8,7 @@ import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { worldState } from '@/systems/world';
 import { newGamePlusManager } from './NewGamePlus';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export enum TutorialStep {
   /** 移动教学 */
@@ -273,7 +274,7 @@ export class TutorialManager {
     // 标题
     const title = this._scene.add.text(0, -50, config.title, {
       fontFamily: 'monospace',
-      fontSize: '20px',
+      fontSize: UI_FONT_SIZE.NORMAL,
       color: '#4a9eff',
     });
     title.setOrigin(0.5);
@@ -282,7 +283,7 @@ export class TutorialManager {
     // 内容
     const content = this._scene.add.text(0, 0, config.content, {
       fontFamily: 'monospace',
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: '#cccccc',
       align: 'center',
       lineSpacing: 5,
@@ -304,7 +305,7 @@ export class TutorialManager {
 
     const continueText = this._scene.add.text(-60, buttonY, '继续', {
       fontFamily: 'monospace',
-      fontSize: '14px',
+      fontSize: UI_FONT_SIZE.TINY,
       color: '#4a9eff',
     });
     continueText.setOrigin(0.5);
@@ -322,7 +323,7 @@ export class TutorialManager {
 
       const skipText = this._scene.add.text(60, buttonY, '跳过全部', {
         fontFamily: 'monospace',
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#ff6644',
       });
       skipText.setOrigin(0.5);

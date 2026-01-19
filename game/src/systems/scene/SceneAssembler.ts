@@ -12,6 +12,7 @@ import type {
   ISceneObjectConfig,
 } from '@/types/scene';
 import { TEXT_STYLES } from '@/config/game.config';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 import { assetResolver } from '@/systems/whitebox/AssetResolver';
 import { useProductionAsset } from '@/config/assetMode.config';
 import type { IZoneBillboardConfig, IBillboardConfig } from '@/systems/whitebox/BillboardFactory';
@@ -241,7 +242,7 @@ export class SceneAssembler {
       const dx = obj.labelOffset?.[0] ?? 0;
       const dy = obj.labelOffset?.[1] ?? 72;
       const label = this._scene.add
-        .text(obj.x + dx, obj.y + dy, obj.label, { ...TEXT_STYLES.MUTED, fontSize: '14px' })
+        .text(obj.x + dx, obj.y + dy, obj.label, { ...TEXT_STYLES.MUTED, fontSize: UI_FONT_SIZE.TINY })
         .setOrigin(0.5, 0.5);
       if (typeof obj.depth === 'number') {
         label.setDepth(obj.depth + 1);

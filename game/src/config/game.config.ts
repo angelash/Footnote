@@ -2,6 +2,7 @@
  * 游戏配置
  */
 import Phaser from 'phaser';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 // 基础游戏配置
 export const GAME_CONFIG: Partial<Phaser.Types.Core.GameConfig> = {
@@ -124,7 +125,7 @@ export const TEXT_STYLES = {
   // 标题
   TITLE: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '28px',
+    fontSize: UI_FONT_SIZE.SECTION,
     color: '#E8E6E3',
     fontStyle: 'bold',
   },
@@ -132,7 +133,7 @@ export const TEXT_STYLES = {
   // 正文
   BODY: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '18px',
+    fontSize: UI_FONT_SIZE.MEDIUM,
     color: '#E8E6E3',
     lineSpacing: 8,
   },
@@ -140,7 +141,7 @@ export const TEXT_STYLES = {
   // 对话
   DIALOGUE: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '16px',
+    fontSize: UI_FONT_SIZE.SMALL,
     color: '#E8E6E3',
     lineSpacing: 6,
     wordWrap: { width: 620 },
@@ -149,7 +150,7 @@ export const TEXT_STYLES = {
   // 说话者名称
   SPEAKER: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '14px',
+    fontSize: UI_FONT_SIZE.TINY,
     color: '#00FFAA',
     fontStyle: 'bold',
   },
@@ -157,14 +158,14 @@ export const TEXT_STYLES = {
   // 系统提示
   SYSTEM: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '14px',
+    fontSize: UI_FONT_SIZE.TINY,
     color: '#4A9EFF',
   },
   
   // 卡片标题
   CARD_TITLE: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '16px',
+    fontSize: UI_FONT_SIZE.SMALL,
     color: '#E8E6E3',
     fontStyle: 'bold',
   },
@@ -172,7 +173,7 @@ export const TEXT_STYLES = {
   // 卡片正文
   CARD_BODY: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '14px',
+    fontSize: UI_FONT_SIZE.TINY,
     color: '#A8A6A3',
     lineSpacing: 4,
   },
@@ -180,7 +181,7 @@ export const TEXT_STYLES = {
   // 淡化文字（极淡小字）
   MUTED: {
     fontFamily: 'Noto Sans SC',
-    fontSize: '12px',
+    fontSize: UI_FONT_SIZE.TINY,
     color: '#686868',
   },
 } as const;

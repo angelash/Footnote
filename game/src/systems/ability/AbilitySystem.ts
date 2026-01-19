@@ -10,6 +10,7 @@ import { worldState } from '@/systems/world';
 import { saveManager } from '@/systems/save';
 import { SCENES } from '@/config/game.config';
 import type { AbilityType } from '@/config/game.config';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 // ==================== 配置常量 ====================
 
@@ -249,7 +250,7 @@ export class AbilitySystem {
     // 提示文字
     const hint = this._scene.add
       .text(width / 2, 100, '深度介入模式\n点击可修改的对象', {
-        fontSize: '20px',
+        fontSize: UI_FONT_SIZE.NORMAL,
         color: '#FF00FF',
         align: 'center',
         backgroundColor: '#000000',
@@ -330,7 +331,7 @@ export class AbilitySystem {
     // 标题
     const title = this._scene.add
       .text(width / 2, 50, '时间干预', {
-        fontSize: '32px',
+        fontSize: UI_FONT_SIZE.ICON_LARGE,
         color: '#FFD700',
       })
       .setOrigin(0.5);
@@ -339,7 +340,7 @@ export class AbilitySystem {
     // 警告文字
     const warning = this._scene.add
       .text(width / 2, 90, '回溯会产生时间污染', {
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#FF4444',
       })
       .setOrigin(0.5);
@@ -351,7 +352,7 @@ export class AbilitySystem {
     if (saves.length === 0) {
       const noNodeText = this._scene.add
         .text(width / 2, height / 2, '暂无可回溯节点', {
-          fontSize: '18px',
+          fontSize: UI_FONT_SIZE.MEDIUM,
           color: '#888888',
         })
         .setOrigin(0.5);
@@ -374,7 +375,7 @@ export class AbilitySystem {
             0,
             `${save.chapter} - ${save.currentZone} (${new Date(save.timestamp).toLocaleTimeString()})`,
             {
-              fontSize: '16px',
+              fontSize: UI_FONT_SIZE.SMALL,
               color: '#FFFFFF',
             }
           )
@@ -411,7 +412,7 @@ export class AbilitySystem {
     // 取消按钮
     const cancelBtn = this._scene.add
       .text(width / 2, height - 50, '取消', {
-        fontSize: '20px',
+        fontSize: UI_FONT_SIZE.NORMAL,
         color: '#888888',
         backgroundColor: '#333333',
         padding: { x: 40, y: 15 },

@@ -1,0 +1,37 @@
+# 繁體中文 - UI文本補充
+# 核心UI已內建於 I18nManager，此文件用於擴展
+
+ui:
+  # 遊戲提示
+  hints:
+    first_interaction: 點擊物體進行互動
+    collect_card: 按 E 收集卡片
+    ability_ready: 能力已就緒
+    save_reminder: 建議保存遊戲
+
+  # 教學進階
+  tutorial_advanced:
+    depth_perception: 深度感知允許你看到隱藏的層
+    depth_intervention: 深度介入可以改變物體狀態
+    time_intervention: 時間干預可以回溯到過去的節點
+
+  # 確認對話框
+  confirm:
+    delete_save: 確定要刪除這個存檔嗎？此操作不可撤銷。
+    overwrite_save: 存檔槽已有資料，確定要覆蓋嗎？
+    quit_game: 確定要退出遊戲嗎？未保存的進度將丟失。
+    new_game: 確定要開始新遊戲嗎？
+
+  # 錯誤訊息
+  errors:
+    save_failed: 保存失敗，請重試
+    load_failed: 載入失敗，存檔可能已損壞
+    network_error: 網路連線失敗
+    unknown_error: 發生未知錯誤
+
+  # 載入狀態
+  loading:
+    game: 載入遊戲中...
+    zone: 載入場景中...
+    assets: 載入資源中...
+    please_wait: 請稍候...

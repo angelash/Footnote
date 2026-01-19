@@ -96,6 +96,9 @@ export enum GameEvent {
   MODEL_REWRITE = 'model:rewrite',
   SETTINGS_UPDATE = 'settings:update',
 
+  // ==================== 国际化事件 ====================
+  LOCALE_CHANGED = 'locale:changed',
+
   // ==================== 新增事件 ====================
   /** Zone过渡 */
   ZONE_TRANSITION = 'zone:transition',
@@ -200,6 +203,9 @@ export interface IEventPayloads {
   [GameEvent.SYSTEM_PAUSE]: { rValue: number };
   [GameEvent.MODEL_REWRITE]: { rValue: number };
   [GameEvent.SETTINGS_UPDATE]: { settings: Record<string, unknown> };
+
+  // 国际化事件
+  [GameEvent.LOCALE_CHANGED]: { locale: string; previousLocale: string };
 
   // 新增事件payload
   [GameEvent.ZONE_TRANSITION]: { targetZone: string };

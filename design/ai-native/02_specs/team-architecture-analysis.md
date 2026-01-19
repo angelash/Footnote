@@ -560,7 +560,9 @@ flowchart LR
 
 ### 8.3 角色文件清单
 
-所有角色定义文件位于 `workflows/project/promptx/roles/` 目录下：
+所有角色定义文件位于 `.cursor/agents/` 目录下（Cursor 原生格式）：
+
+> 注：原 `workflows/project/promptx/roles/` 目录的 YAML 格式已废弃，详见该目录的 README.md。
 
 | 层级 | 角色数量 | 文件清单 |
 |------|---------|----------|

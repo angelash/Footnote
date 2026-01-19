@@ -6,6 +6,7 @@
 
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 
 export interface IVersionInfo {
   id: string;
@@ -55,7 +56,7 @@ export class VersionSwitchEffect {
     // 版本A标签
     this._versionALabel = this._scene.add.text(width * 0.25, 150, '', {
       fontFamily: 'monospace',
-      fontSize: '20px',
+      fontSize: UI_FONT_SIZE.NORMAL,
       color: '#4488ff',
       backgroundColor: '#1a1a2e',
       padding: { x: 10, y: 5 },
@@ -66,7 +67,7 @@ export class VersionSwitchEffect {
     // 版本B标签
     this._versionBLabel = this._scene.add.text(width * 0.75, 150, '', {
       fontFamily: 'monospace',
-      fontSize: '20px',
+      fontSize: UI_FONT_SIZE.NORMAL,
       color: '#ff8844',
       backgroundColor: '#1a1a2e',
       padding: { x: 10, y: 5 },
@@ -96,7 +97,7 @@ export class VersionSwitchEffect {
     // 提示文字
     const hint = this._scene.add.text(0, -35, '选择要保留的版本', {
       fontFamily: 'monospace',
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
       color: '#aaaacc',
     });
     hint.setOrigin(0.5);
@@ -113,7 +114,7 @@ export class VersionSwitchEffect {
 
     const btnAText = this._scene.add.text(-100, 20, '版本 A', {
       fontFamily: 'monospace',
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
       color: '#4488ff',
     });
     btnAText.setOrigin(0.5);
@@ -130,7 +131,7 @@ export class VersionSwitchEffect {
 
     const btnBText = this._scene.add.text(100, 20, '版本 B', {
       fontFamily: 'monospace',
-      fontSize: '16px',
+      fontSize: UI_FONT_SIZE.SMALL,
       color: '#ff8844',
     });
     btnBText.setOrigin(0.5);
@@ -335,7 +336,7 @@ export class VersionSwitchEffect {
     // 版本标签
     const versionText = this._scene.add.text(width / 2, height / 2, `→ V-${toVersion.name}`, {
       fontFamily: 'monospace',
-      fontSize: '32px',
+      fontSize: UI_FONT_SIZE.ICON_LARGE,
       color: `#${toVersion.color.toString(16).padStart(6, '0')}`,
     });
     versionText.setOrigin(0.5);

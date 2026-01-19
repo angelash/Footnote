@@ -399,8 +399,8 @@ window.__DEBUG__.enablePerformance(true);
 
 | 内容 | 文件路径 |
 |------|---------|
-| 完整TDD | `design/05-tech/技术设计文档TDD_v1.md` |
-| 代码规范 | `.cursor/rules/01-typescript.mdc` |
+| 完整TDD | `design/game/05-tech/技术设计文档TDD_v1.md` |
+| 代码规范 | `.cursor/rules/01-code-style.mdc` |
 | Phaser规范 | `.cursor/rules/02-phaser.mdc` |
 | UI规范 | `.cursor/rules/08-ui-qa-rules.mdc` |
 | 测试规范 | `.cursor/rules/04-testing.mdc` |

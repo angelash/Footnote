@@ -20,7 +20,7 @@ estimated_hours: 2
 
 ## 2. Allowed Inputs
 
-- docs/01_bibles/design_bible.md（角色设定部分）
+- design/ai-native/01_bibles/design_bible.md（角色设定部分）
 - design/01-narrative/角色人生线档案 v2.md（岑回、顾临档案）
 - design/03-level/章节×区域叙事布置/C0-Z1.md（Zone 结构）
 - content/text/style_guide.md（文本风格指南）

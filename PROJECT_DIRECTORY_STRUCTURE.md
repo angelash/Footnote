@@ -10,9 +10,9 @@
 
 | 分类 | 主要目录 | 说明 |
 |------|---------|------|
-| 🔧 **工作流相关** | `tools/`, `promptx/`, `docs/05_logs/`, `docs/02_specs/pipelines/` | AI自动化工作流、n8n流程、MCP工具 |
+| 🔧 **工作流相关** | `workflows/project/`, `workflows/reusable/` | AI自动化工作流、n8n流程、MCP工具 |
 | 📜 **项目规则** | `.cursor/rules/` | Cursor AI开发规范、代码规范、工作流规范 |
-| 📖 **项目策划设计** | `design/`, `docs/01_bibles/`, `docs/02_specs/`, `docs/03_taskpacks/`, `docs/04_acceptance/` | 游戏设计文档、技术规格、任务包、验收清单 |
+| 📖 **项目策划设计** | `design/game/`, `design/ai-native/`, `design/production/` | 游戏设计文档、技术规格、任务包、验收清单 |
 | 💻 **代码工程** | `src/`, `scripts/`, `tests/`, 配置文件 | TypeScript源代码、构建脚本、测试代码 |
 | 🎨 **美术资产** | `assets/` | 音频、图片、字体等游戏资源 |
 | 📚 **小说漫画** | `story/`, `comics/` | 小说文本、漫画生成脚本和输出 |
@@ -71,12 +71,12 @@ promptx/
     └── test_planning.yaml  # 测试规划技能
 ```
 
-### 1.3 `docs/05_logs/` - 自动化运行日志
+### 1.3 `workflows/project/logs/` - 自动化运行日志
 
 **用途**：记录AI自动化任务的执行日志
 
 ```
-docs/05_logs/
+workflows/project/logs/
 ├── automation_runs/        # 自动化运行记录
 │   └── RUN-YYYYMMDD-*/    # 每次运行的目录
 │       ├── 00_intake.json      # 任务接收参数
@@ -93,12 +93,12 @@ docs/05_logs/
 └── task_log.md             # 任务日志
 ```
 
-### 1.4 `docs/02_specs/pipelines/` - 流水线规格文档
+### 1.4 `workflows/project/pipelines/` - 流水线规格文档
 
 **用途**：定义各种自动化流水线的规格
 
 ```
-docs/02_specs/pipelines/
+workflows/project/pipelines/
 ├── asset_pipeline_spec.md           # 资产流水线规格
 ├── content_pipeline_spec.md         # 内容流水线规格
 ├── factory_pipeline_spec.md         # 工厂流水线规格
@@ -167,12 +167,12 @@ design/
     └── [1个运营设计文档]
 ```
 
-### 3.2 `docs/01_bibles/` - 总纲层文档（Bible）
+### 3.2 `design/ai-native/01_bibles/` - 总纲层文档（Bible）
 
 **用途**：AI-Native工作流中的总纲层文档（L1产出）
 
 ```
-docs/01_bibles/
+design/ai-native/01_bibles/
 ├── design_bible.md        # 设计总纲
 ├── tech_bible.md          # 技术总纲
 ├── art_bible.md           # 美术总纲
@@ -180,12 +180,12 @@ docs/01_bibles/
 └── production_plan.md     # 生产计划
 ```
 
-### 3.3 `docs/02_specs/` - 规格层文档（Spec）
+### 3.3 `design/ai-native/02_specs/` - 规格层文档（Spec）
 
 **用途**：AI-Native工作流中的规格层文档（L2产出）
 
 ```
-docs/02_specs/
+design/ai-native/02_specs/
 ├── systems/               # 系统规格
 │   ├── narrative_system_spec.md    # 叙事系统规格
 │   ├── event_system_spec.md        # 事件系统规格
@@ -195,27 +195,26 @@ docs/02_specs/
 ├── ui/                    # UI规格
 │   ├── ui_components_spec.md       # UI组件规格
 │   └── ui_flow_spec.md             # UI流程规格
-├── pipelines/             # 流水线规格（见1.4）
 └── DEV-PLAN_2026Q1.md     # 2026 Q1开发计划
 ```
 
-### 3.4 `docs/03_taskpacks/` - 任务包（Task Pack）
+### 3.4 `design/ai-native/03_taskpacks/` - 任务包（Task Pack）
 
 **用途**：AI-Native工作流中的派单层文档（L2派单给L3）
 
 ```
-docs/03_taskpacks/
+design/ai-native/03_taskpacks/
 ├── _template.md                    # 任务包模板
 ├── T-0001_c0_z1_dialogue.md       # 示例任务包
 └── T-REVIEW-20260103_project_quality.md  # 项目质量审查任务包
 ```
 
-### 3.5 `docs/04_acceptance/` - 验收层文档
+### 3.5 `design/ai-native/04_acceptance/` - 验收层文档
 
 **用途**：QA验收清单和标准
 
 ```
-docs/04_acceptance/
+design/ai-native/04_acceptance/
 ├── qa_checklists/         # QA检查清单
 │   ├── build_acceptance.md        # 构建验收
 │   ├── milestone_acceptance.md    # 里程碑验收
@@ -223,10 +222,10 @@ docs/04_acceptance/
 └── PROJECT-QUALITY-REVIEW_2026-01-03.md  # 项目质量审查报告
 ```
 
-### 3.6 `docs/` 其他设计相关文档
+### 3.6 `design/production/` - 生产相关文档
 
 ```
-docs/
+design/production/
 ├── alignment/             # 剧情对齐分析
 │   ├── alignment_check.json
 │   ├── story_index.json
@@ -528,9 +527,9 @@ logs/
 
 | 分类 | 主要目录数 | 说明 |
 |------|-----------|------|
-| 工作流相关 | 4个主要目录 | tools/, promptx/, docs/05_logs/, docs/02_specs/pipelines/ |
-| 项目规则 | 1个目录 | .cursor/rules/ (10个规则文件) |
-| 项目策划设计 | 5个主要目录 | design/, docs/01_bibles/, docs/02_specs/, docs/03_taskpacks/, docs/04_acceptance/ |
+| 工作流相关 | 2个主要目录 | workflows/project/, workflows/reusable/ |
+| 项目规则 | 1个目录 | .cursor/rules/ (11个规则文件) |
+| 项目策划设计 | 3个主要目录 | design/game/, design/ai-native/, design/production/ |
 | 代码工程 | 4个主要目录 | src/, scripts/, tests/, 配置文件 |
 | 美术资产 | 1个目录 | assets/ |
 | 小说漫画 | 2个目录 | story/, comics/ |
@@ -555,7 +554,7 @@ logs/
 → `tools/n8n/` 目录
 
 ### 查找AI角色定义
-→ `promptx/roles/` 目录
+→ `.cursor/agents/` 目录（Cursor 原生格式）
 
 ### 查找测试代码
 → `tests/` 目录
@@ -567,7 +566,7 @@ logs/
 → `comics/output/` 目录
 
 ### 查找自动化运行日志
-→ `docs/05_logs/automation_runs/` 目录
+→ `workflows/project/logs/automation_runs/` 目录
 
 ---
 

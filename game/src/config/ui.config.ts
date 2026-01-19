@@ -22,6 +22,10 @@
  * - 所有UI文字必须使用这些常量，禁止硬编码
  */
 export const UI_FONT_SIZE = {
+  /** 超大特效标题 - 80px (戏剧性揭示、结局标题) */
+  GIANT: '80px',
+  /** 大特效标题 - 64px (章节过场、重要事件) */
+  MEGA: '64px',
   /** 超大标题 - 48px (游戏主标题、重要弹窗标题) */
   HUGE: '48px',
   /** 大标题 - 36px (章节标题、模块标题) */
@@ -30,6 +34,8 @@ export const UI_FONT_SIZE = {
   SECTION: '28px',
   /** 正常文本 - 20px (正文、按钮文字、列表项) */
   NORMAL: '20px',
+  /** 中间字号 - 18px (强调说明、重要标签) */
+  MEDIUM: '18px',
   /** 小号文本 - 16px (说明文字、副标题、标签) */
   SMALL: '16px',
   /** 最小文本 - 14px (辅助信息、时间戳、版本号) */
@@ -44,10 +50,13 @@ export const UI_FONT_SIZE = {
  * 字体大小数值版本（用于需要数字的场景）
  */
 export const UI_FONT_SIZE_NUM = {
+  GIANT: 80,
+  MEGA: 64,
   HUGE: 48,
   TITLE: 36,
   SECTION: 28,
   NORMAL: 20,
+  MEDIUM: 18,
   SMALL: 16,
   TINY: 14,
   ICON: 24,

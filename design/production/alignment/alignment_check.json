@@ -2,10 +2,7 @@
   "declared_episode_chapters": {
     "EP01": [
       1,
-      2,
-      3,
-      4,
-      5
+      2
     ],
     "EP02": [
       3,
@@ -373,10 +370,7 @@
       "anchor": "身份：核对中",
       "declared_chapters": [
         1,
-        2,
-        3,
-        4,
-        5
+        2
       ],
       "novel_chapters": [
         31
@@ -384,17 +378,16 @@
       "used_in": [
         "ep01_scene_analysis",
         "ep01_prompts"
-      ]
+      ],
+      "status": "resolved",
+      "resolution": "EP01范围已修正为1-2章，旧脚本已归档至bak/20251227-162354/，新脚本按章节组织(ch01/ch02)不再包含越界锚点"
     },
     {
       "ep": "EP01",
       "anchor": "空椅",
       "declared_chapters": [
         1,
-        2,
-        3,
-        4,
-        5
+        2
       ],
       "novel_chapters": [
         20,
@@ -416,7 +409,9 @@
       "used_in": [
         "ep01_scene_analysis",
         "ep01_prompts"
-      ]
+      ],
+      "status": "resolved",
+      "resolution": "EP01范围已修正为1-2章，旧脚本已归档至bak/20251227-162354/，新脚本按章节组织(ch01/ch02)不再包含越界锚点"
     }
   ]
 }

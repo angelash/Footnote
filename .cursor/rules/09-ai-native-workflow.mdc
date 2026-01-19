@@ -343,7 +343,7 @@ L1 → L0: 里程碑汇报
 - 团队架构分析: `design/ai-native/02_specs/team-architecture-analysis.md`
 - 落地计划: `design/production/AI-Native流程改造落地计划.md`
 - 任务包模板: `design/ai-native/03_taskpacks/_template.md`
-- 角色包: `workflows/project/promptx/roles/*.yaml`
+- 角色包: `.cursor/agents/*.md`（Cursor 原生格式）
 - Issue 模板: `.github/ISSUE_TEMPLATE/*.yml`
 - PR 模板: `.github/PULL_REQUEST_TEMPLATE.md`
 
@@ -363,5 +363,6 @@ L1 → L0: 里程碑汇报
 
 ---
 
-*规范版本: v1.1*
+*规范版本: v1.2*
 *创建日期: 2025-12-29*
+*更新日期: 2026-01-19*

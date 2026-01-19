@@ -141,9 +141,9 @@ tests/e2e/smoke.spec.ts
 
 ## 6. 相关文档
 
-- QA 总纲: `docs/01_bibles/qa_bible.md`
-- 构建验收: `docs/04_acceptance/qa_checklists/build_acceptance.md`
-- 里程碑验收: `docs/04_acceptance/qa_checklists/milestone_acceptance.md`
+- QA 总纲: `design/ai-native/01_bibles/qa_bible.md`
+- 构建验收: `design/ai-native/04_acceptance/qa_checklists/build_acceptance.md`
+- 里程碑验收: `design/ai-native/04_acceptance/qa_checklists/milestone_acceptance.md`
 
 ---
 

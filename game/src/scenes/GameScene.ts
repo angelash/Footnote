@@ -4,6 +4,7 @@
  */
 import Phaser from 'phaser';
 import { SCENES, TEXT_STYLES } from '@/config/game.config';
+import { UI_FONT_SIZE } from '@/config/ui.config';
 import { getZoneBackgroundKey } from '@/config/zones.config';
 import { getSceneConfig } from '@/data/scenes';
 import { SceneAssembler } from '@/systems/scene/SceneAssembler';
@@ -489,7 +490,7 @@ export class GameScene extends Phaser.Scene {
     this._zoneTitle = this.add
       .text(width / 2, 60, '', {
         ...TEXT_STYLES.BODY,
-        fontSize: '16px',
+        fontSize: UI_FONT_SIZE.SMALL,
       })
       .setOrigin(0.5)
       .setAlpha(0);
@@ -526,12 +527,12 @@ export class GameScene extends Phaser.Scene {
     const rIcon = this.textures.exists('px_counter_r')
       ? this.add.image(width - 160, counterY, 'px_counter_r').setScale(0.3)
       : this.add
-          .text(width - 160, counterY, 'R', { fontSize: '14px', color: '#FF4444' })
+          .text(width - 160, counterY, 'R', { fontSize: UI_FONT_SIZE.TINY, color: '#FF4444' })
           .setOrigin(0.5);
     const rText = this.add
       .text(width - 130, counterY, `${counters.R}`, {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#FF4444',
       })
       .setOrigin(0, 0.5);
@@ -540,12 +541,12 @@ export class GameScene extends Phaser.Scene {
     const pIcon = this.textures.exists('px_counter_p')
       ? this.add.image(width - 160, counterY + spacing, 'px_counter_p').setScale(0.3)
       : this.add
-          .text(width - 160, counterY + spacing, 'P', { fontSize: '14px', color: '#4A9EFF' })
+          .text(width - 160, counterY + spacing, 'P', { fontSize: UI_FONT_SIZE.TINY, color: '#4A9EFF' })
           .setOrigin(0.5);
     const pText = this.add
       .text(width - 130, counterY + spacing, `${counters.P}`, {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#4A9EFF',
       })
       .setOrigin(0, 0.5);
@@ -554,12 +555,12 @@ export class GameScene extends Phaser.Scene {
     const wIcon = this.textures.exists('px_counter_w')
       ? this.add.image(width - 160, counterY + spacing * 2, 'px_counter_w').setScale(0.3)
       : this.add
-          .text(width - 160, counterY + spacing * 2, 'W', { fontSize: '14px', color: '#FFD700' })
+          .text(width - 160, counterY + spacing * 2, 'W', { fontSize: UI_FONT_SIZE.TINY, color: '#FFD700' })
           .setOrigin(0.5);
     const wText = this.add
       .text(width - 130, counterY + spacing * 2, `${counters.W}`, {
         ...TEXT_STYLES.BODY,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
         color: '#FFD700',
       })
       .setOrigin(0, 0.5);
@@ -596,7 +597,7 @@ export class GameScene extends Phaser.Scene {
       // 快捷键提示
       const keyHint = this.add
         .text(x, -15, ability.key, {
-          fontSize: '14px',
+          fontSize: UI_FONT_SIZE.TINY,
           color: '#686868',
         })
         .setOrigin(0.5);
@@ -604,7 +605,7 @@ export class GameScene extends Phaser.Scene {
       // 图标/名称
       const icon = this.add
         .text(x, 5, ability.name.slice(0, 2), {
-          fontSize: '14px',
+          fontSize: UI_FONT_SIZE.TINY,
           color: `#${ability.color.toString(16).padStart(6, '0')}`,
         })
         .setOrigin(0.5);
@@ -823,7 +824,7 @@ export class GameScene extends Phaser.Scene {
       const toast = this.add
         .text(width / 2, 120, message, {
           ...TEXT_STYLES.BODY,
-          fontSize: '14px',
+          fontSize: UI_FONT_SIZE.TINY,
           backgroundColor: '#1E1E24',
           padding: { x: 12, y: 8 },
         })
@@ -884,7 +885,7 @@ export class GameScene extends Phaser.Scene {
   private _createMenuButton(): void {
     const menuBtn = this.add
       .text(30, 30, '☰', {
-        fontSize: '28px',
+        fontSize: UI_FONT_SIZE.SECTION,
         color: '#686868',
       })
       .setInteractive({ useHandCursor: true })
@@ -896,7 +897,7 @@ export class GameScene extends Phaser.Scene {
   private _createInventoryButton(width: number): void {
     const invBtn = this.add
       .text(width - 30, 30, '📋', {
-        fontSize: '24px',
+        fontSize: UI_FONT_SIZE.ICON,
       })
       .setOrigin(1, 0)
       .setInteractive({ useHandCursor: true })
@@ -1086,7 +1087,7 @@ export class GameScene extends Phaser.Scene {
     const text = this.add
       .text(0, 45, label, {
         ...TEXT_STYLES.MUTED,
-        fontSize: '14px',
+        fontSize: UI_FONT_SIZE.TINY,
       })
       .setOrigin(0.5);
 

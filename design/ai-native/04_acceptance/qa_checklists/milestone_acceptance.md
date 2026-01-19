@@ -209,9 +209,9 @@
 
 ## 4. 相关文档
 
-- QA 总纲: `docs/01_bibles/qa_bible.md`
-- 生产计划: `docs/01_bibles/production_plan.md`
-- 冒烟测试: `docs/04_acceptance/qa_checklists/smoke.md`
+- QA 总纲: `design/ai-native/01_bibles/qa_bible.md`
+- 生产计划: `design/ai-native/01_bibles/production_plan.md`
+- 冒烟测试: `design/ai-native/04_acceptance/qa_checklists/smoke.md`
 
 ---
 

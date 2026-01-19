@@ -227,7 +227,7 @@ Footnote/
 - [x] `docs/03_taskpacks/` 目录存在 ✅
 - [x] `docs/04_acceptance/qa_checklists/` 目录存在 ✅
 - [x] `docs/05_logs/` 目录存在 ✅
-- [x] `promptx/roles/` 目录存在 ✅
+- [x] `.cursor/agents/` 角色定义存在 ✅（原 `promptx/roles/` 已废弃）
 - [x] `promptx/skills/` 目录存在 ✅
 - [x] `.github/ISSUE_TEMPLATE/` 目录存在 ✅
 - [x] 任务包模板文件存在 ✅

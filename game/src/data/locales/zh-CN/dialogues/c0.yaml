@@ -1,0 +1,24 @@
+# 简体中文 - 序章对话
+# 本地化文件格式参考：design/game/05-tech/本地化方案_v1.md
+
+dialogues:
+  CENHUI_C0_INTRO:
+    speaker: 岑回
+    lines:
+      - 又是普通的一天...
+      - 工具包应该在桌上。
+
+  GULIN_C0_FIRST:
+    speaker: 顾临
+    lines:
+      - 记录就好。
+      - 别把主观当事实。
+    options:
+      question: 但我确实看到了...
+      accept: 明白了。
+
+  SYSTEM_WELCOME:
+    speaker: 系统
+    lines:
+      - 欢迎来到维修局。
+      - 你的任务是维护平面稳定。

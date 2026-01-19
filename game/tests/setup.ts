@@ -9,10 +9,50 @@ vi.mock('phaser', () => ({
   default: {
     Events: {
       EventEmitter: class MockEventEmitter {
-        emit = vi.fn();
-        on = vi.fn();
-        off = vi.fn();
-        once = vi.fn();
+        private _listeners: Map<string | symbol, Set<(...args: unknown[]) => void>> = new Map();
+
+        emit(event: string | symbol, ...args: unknown[]): boolean {
+          const listeners = this._listeners.get(event);
+          if (listeners) {
+            listeners.forEach((fn) => fn(...args));
+            return true;
+          }
+          return false;
+        }
+
+        on(event: string | symbol, fn: (...args: unknown[]) => void, _context?: unknown): this {
+          if (!this._listeners.has(event)) {
+            this._listeners.set(event, new Set());
+          }
+          this._listeners.get(event)!.add(fn);
+          return this;
+        }
+
+        once(event: string | symbol, fn: (...args: unknown[]) => void, _context?: unknown): this {
+          const wrapper = (...args: unknown[]) => {
+            this.off(event, wrapper);
+            fn(...args);
+          };
+          return this.on(event, wrapper);
+        }
+
+        off(event: string | symbol, fn?: (...args: unknown[]) => void, _context?: unknown): this {
+          if (fn) {
+            this._listeners.get(event)?.delete(fn);
+          } else {
+            this._listeners.delete(event);
+          }
+          return this;
+        }
+
+        removeAllListeners(): this {
+          this._listeners.clear();
+          return this;
+        }
+
+        listenerCount(event: string | symbol): number {
+          return this._listeners.get(event)?.size ?? 0;
+        }
       },
     },
     Scene: class MockScene {

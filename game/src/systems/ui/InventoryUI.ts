@@ -312,7 +312,7 @@ export class InventoryUI {
     const y = CONFIG.PANEL_HEIGHT / 2 - 50;
 
     const totalCards = narrativeEngine.getCardCount();
-    const obtainedCount = narrativeEngine.getCardsByCategory('all').length;
+    const obtainedCount = narrativeEngine.getObtainedCards().length;
 
     const statsText = this._scene.add
       .text(0, y, `已收集: ${obtainedCount} / ${totalCards}`, {
@@ -334,7 +334,8 @@ export class InventoryUI {
     // 获取卡片
     let cards: INarrativeCard[];
     if (this._currentTab === 'all') {
-      cards = narrativeEngine.getCardsByCategory('all');
+      // 获取所有已获得的卡片
+      cards = narrativeEngine.getObtainedCards();
     } else {
       const categoryMap: Record<TabType, CardCategory> = {
         all: CardCategory.ARCHIVE,

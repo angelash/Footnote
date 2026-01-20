@@ -216,7 +216,7 @@ export class CardUI {
     const { width, height } = this._scene.scale;
 
     this._container = this._scene.add.container(0, 0);
-    this._container.setDepth(1100);
+    this._container.setDepth(2000); // 高于 InventoryUI (1500) 以确保在物品栏点击卡片时正确显示
     this._container.setVisible(false);
 
     // 半透明遮罩

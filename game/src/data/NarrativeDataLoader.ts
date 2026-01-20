@@ -651,7 +651,21 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
   // 加载所有47个对话文件
   for (const file of ALL_DIALOGUE_FILES) {
     try {
-      const content = scene.cache.text.get(`dialogue_${file}`);
+      let content = scene.cache.text.get(`dialogue_${file}`);
+      
+      // 如果缓存中没有，动态 fetch 加载（仅加载当前章节相关的对话）
+      if (!content) {
+        try {
+          const response = await fetch(`/src/data/dialogues/${file}.yaml`);
+          if (response.ok) {
+            content = await response.text();
+            logger.debug(`动态加载对话文件: ${file}`);
+          }
+        } catch (fetchError) {
+          // 静默处理，非当前章节的文件可能不存在
+        }
+      }
+      
       if (content) {
         const parsed = loadDialogues(content);
         dialogues.push(...parsed);
@@ -681,7 +695,21 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
 
   for (const file of cardFiles) {
     try {
-      const content = scene.cache.text.get(`cards_${file}`);
+      let content = scene.cache.text.get(`cards_${file}`);
+      
+      // 如果缓存中没有，动态 fetch 加载
+      if (!content) {
+        try {
+          const response = await fetch(`/src/data/cards/${file}.yaml`);
+          if (response.ok) {
+            content = await response.text();
+            logger.debug(`动态加载卡片文件: ${file}`);
+          }
+        } catch (fetchError) {
+          logger.debug(`无法动态加载卡片文件: ${file}`, fetchError);
+        }
+      }
+      
       if (content) {
         cards.push(...loadCards(content));
       }

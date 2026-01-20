@@ -7,10 +7,10 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 身份卡（示例：点击 -> 卡片）
+  # 身份卡（点击获得身份卡）
   - id: identity_card
     type: image
-    texture: obj_filing_cabinet  # WebP物件：文件柜
+    texture: obj_filing_cabinet  # WebP物件：文件柜（存放身份卡的地方）
     x: 200
     y: 620
     scale: 0.8
@@ -22,9 +22,9 @@ objects:
       testid: identity-card
       action:
         type: card
-        cardId: CARD_C0_01
+        cardId: CARD_C0_IDENTITY
 
-  # 公告板（示例：点击 -> 对话）
+  # 公告板（发现日期涂改痕迹）
   - id: notice_board
     type: image
     texture: obj_sign  # WebP物件：标识牌
@@ -39,7 +39,24 @@ objects:
       action:
         type: dialogue
         speaker: 系统
-        text: 公告板上贴满了通知，日期处有涂改痕迹...
+        text: 公告板上贴满了通知，日期处有涂改痕迹...仔细看的话，最新的日期下面还有另一个数字。
+
+  # 储物柜（取工具包）
+  - id: storage_cabinet
+    type: image
+    texture: obj_filing_cabinet
+    x: 350
+    y: 680
+    scale: 0.7
+    depth: 9
+    label: 储物柜
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        speaker: 岑回
+        text: 工具包已经准备好了。标准配置，和每天一样。
 
   # 走廊台灯（WebP可动物件动画）
   - id: corridor_lamp
@@ -63,7 +80,7 @@ objects:
     scale: 0.6
     depth: 8
 
-  # 走廊门
+  # 邻居的门
   - id: corridor_door
     type: image
     texture: obj_door  # WebP物件：门
@@ -78,6 +95,21 @@ objects:
       action:
         type: dialogue
         speaker: 岑回
-        text: 邻居的门紧闭着，门上有一个褪色的号码牌。
+        text: 邻居的门紧闭着，门上有一个褪色的号码牌。...103号？不对，我记得这里应该是102号。
 
+  # 出口门（前往早餐小店）
+  - id: exit_door
+    type: image
+    texture: obj_door
+    x: 600
+    y: 900
+    scale: 0.8
+    depth: 6
+    label: 出口
+    labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      action:
+        type: gotoZone
+        zoneId: C0-Z2
 

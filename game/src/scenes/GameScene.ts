@@ -1279,7 +1279,7 @@ export class GameScene extends Phaser.Scene {
       // 身份卡交互点
       const idCard = this._createInteractable(200, 600, '身份卡', {
         type: 'card',
-        cardId: 'CARD_C0_01',
+        cardId: 'CARD_C0_IDENTITY',
       });
       idCard.setData('testid', 'identity-card');
       this._interactables.push(idCard);
@@ -1291,6 +1291,13 @@ export class GameScene extends Phaser.Scene {
         text: '公告板上贴满了通知，日期处有涂改痕迹...',
       });
       this._interactables.push(noticeBoard);
+
+      // 出口门（前往C0-Z2）
+      const exitDoor = this._createInteractable(600, 900, '出口', {
+        type: 'gotoZone',
+        zoneId: 'C0-Z2',
+      });
+      this._interactables.push(exitDoor);
     }
   }
 

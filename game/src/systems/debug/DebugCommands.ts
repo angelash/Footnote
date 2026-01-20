@@ -8,6 +8,8 @@ import { createLogger } from '@/utils/Logger';
 import { worldState } from '@/systems/world';
 import { narrativeEngine } from '@/systems/narrative';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { performanceMonitor } from '@/systems/debug/PerformanceMonitor';
+import type { IPerformanceMetrics, ILoadMetrics } from '@/systems/debug/PerformanceMonitor';
 import type { AbilityType, ChapterID } from '@/config/game.config';
 
 const logger = createLogger('DebugCommands');
@@ -17,7 +19,30 @@ declare global {
   interface IWindowDebug {
     __DEBUG__?: DebugCommands;
     __GAME_STATE__?: () => Record<string, unknown>;
+    /** Tech Bible 规范的统一 Debug 接口 */
+    __FOOTNOTE_DEBUG__?: IFootnoteDebugAPI;
   }
+}
+
+/**
+ * Footnote 统一 Debug API 接口
+ * 对应 Tech Bible 中的 window.__FOOTNOTE_DEBUG__ 规范
+ */
+export interface IFootnoteDebugAPI {
+  /** 启用/禁用性能监控 */
+  enablePerformance: (enabled: boolean) => void;
+  /** 获取性能指标 */
+  getPerformanceMetrics: () => IPerformanceMetrics;
+  /** 获取加载指标 */
+  getLoadMetrics: () => ILoadMetrics;
+  /** 导出性能报告 */
+  exportPerformanceReport: () => string;
+  /** 重置 FPS 极值 */
+  resetFpsExtremes: () => void;
+  /** 获取游戏状态 */
+  getGameState: () => Record<string, unknown>;
+  /** 调试命令入口 */
+  commands: DebugCommands;
 }
 
 // 定义带有 _player 属性的场景接口
@@ -110,7 +135,38 @@ class DebugCommands {
       const win = window as unknown as IWindowDebug;
       win.__DEBUG__ = this;
       win.__GAME_STATE__ = (): Record<string, unknown> => this.getGameState();
+
+      // 创建统一的 Debug API（符合 Tech Bible 规范）
+      win.__FOOTNOTE_DEBUG__ = this._createDebugAPI();
     }
+  }
+
+  /**
+   * 创建统一的 Debug API
+   * 对应 Tech Bible 中的 window.__FOOTNOTE_DEBUG__ 规范
+   */
+  private _createDebugAPI(): IFootnoteDebugAPI {
+    return {
+      enablePerformance: (enabled: boolean): void => {
+        this.enablePerformance(enabled);
+      },
+      getPerformanceMetrics: (): IPerformanceMetrics => {
+        return performanceMonitor.getMetrics();
+      },
+      getLoadMetrics: (): ILoadMetrics => {
+        return performanceMonitor.getLoadMetrics();
+      },
+      exportPerformanceReport: (): string => {
+        return performanceMonitor.exportReport();
+      },
+      resetFpsExtremes: (): void => {
+        performanceMonitor.resetExtremes();
+      },
+      getGameState: (): Record<string, unknown> => {
+        return this.getGameState();
+      },
+      commands: this,
+    };
   }
 
   static getInstance(): DebugCommands {
@@ -132,6 +188,56 @@ class DebugCommands {
    */
   setEnabled(enabled: boolean): void {
     this._isEnabled = enabled;
+  }
+
+  // ==================== 性能监控命令 ====================
+
+  /**
+   * 启用/禁用性能监控
+   * 对应 Tech Bible 示例: __FOOTNOTE_DEBUG__.enablePerformance(true)
+   */
+  enablePerformance(enabled: boolean): ICommandResult {
+    if (enabled) {
+      if (this._scene) {
+        performanceMonitor.enable(this._scene);
+        this._logCommand(`enablePerformance(true)`);
+        return { success: true, message: '性能监控已启用' };
+      } else {
+        return { success: false, message: '场景未初始化，无法启用性能监控' };
+      }
+    } else {
+      performanceMonitor.disable();
+      this._logCommand(`enablePerformance(false)`);
+      return { success: true, message: '性能监控已禁用' };
+    }
+  }
+
+  /**
+   * 切换性能监控显示
+   */
+  togglePerformance(): ICommandResult {
+    if (this._scene) {
+      performanceMonitor.toggle(this._scene);
+      this._logCommand('togglePerformance()');
+      return { success: true, message: '性能监控已切换' };
+    }
+    return { success: false, message: '场景未初始化' };
+  }
+
+  /**
+   * 获取当前性能指标
+   */
+  getPerformanceMetrics(): IPerformanceMetrics {
+    return performanceMonitor.getMetrics();
+  }
+
+  /**
+   * 导出性能报告
+   */
+  exportPerformanceReport(): string {
+    const report = performanceMonitor.exportReport();
+    this._logCommand('exportPerformanceReport()');
+    return report;
   }
 
   // ==================== 游戏状态查询 ====================
@@ -780,6 +886,12 @@ class DebugCommands {
 ║   setFlag(name, value)  - 设置标记                           ║
 ║   reset()               - 重置游戏                           ║
 ║                                                              ║
+║ 性能监控命令:                                                ║
+║   enablePerformance(bool)     - 启用/禁用性能监控            ║
+║   togglePerformance()         - 切换性能监控显示             ║
+║   getPerformanceMetrics()     - 获取当前性能指标             ║
+║   exportPerformanceReport()   - 导出性能报告JSON             ║
+║                                                              ║
 ║ 测试命令:                                                    ║
 ║   runTest(script)       - 执行测试脚本                       ║
 ║   getTestResults()      - 获取测试结果                       ║
@@ -787,6 +899,11 @@ class DebugCommands {
 ║ 使用方式:                                                    ║
 ║   在浏览器控制台输入: __DEBUG__.命令名(参数)                 ║
 ║   例如: __DEBUG__.teleport('C1-Z1')                          ║
+║                                                              ║
+║ 统一 Debug API（推荐）:                                      ║
+║   __FOOTNOTE_DEBUG__.enablePerformance(true)                 ║
+║   __FOOTNOTE_DEBUG__.getPerformanceMetrics()                 ║
+║   __FOOTNOTE_DEBUG__.exportPerformanceReport()               ║
 ╚══════════════════════════════════════════════════════════════╝
     `);
   }

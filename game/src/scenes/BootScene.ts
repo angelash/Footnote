@@ -5,6 +5,7 @@
 import Phaser from 'phaser';
 import { SCENES } from '@/config/game.config';
 import { createLogger } from '@/utils/Logger';
+import { preloadCurrentLocaleTranslations } from '@/data/locales';
 
 const logger = createLogger('BootScene');
 
@@ -18,7 +19,7 @@ export class BootScene extends Phaser.Scene {
     // 这里可以加载logo等
   }
 
-  create(): void {
+  async create(): Promise<void> {
     logger.info('启动检查...');
 
     // 检查浏览器支持
@@ -27,11 +28,31 @@ export class BootScene extends Phaser.Scene {
     // 检查存储支持
     this._checkStorageSupport();
 
+    // 加载国际化翻译资源
+    await this._loadI18nTranslations();
+
     // 设置游戏全局配置
     this._setupGlobalConfig();
 
     // 跳转到预加载场景
     this.scene.start(SCENES.PRELOAD);
+  }
+
+  /**
+   * 加载国际化翻译资源
+   */
+  private async _loadI18nTranslations(): Promise<void> {
+    try {
+      logger.info('加载国际化翻译资源...');
+      const result = await preloadCurrentLocaleTranslations(['c0']);
+      if (result.success) {
+        logger.info(`翻译资源加载成功: ${result.loaded.join(', ')}`);
+      } else {
+        logger.warn(`部分翻译资源加载失败: ${result.failed.join(', ')}`);
+      }
+    } catch (error) {
+      logger.error('翻译资源加载失败:', error);
+    }
   }
 
   private _checkBrowserSupport(): void {

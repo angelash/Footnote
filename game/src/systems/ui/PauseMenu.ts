@@ -9,6 +9,7 @@ import { eventBus, GameEvent } from '@/systems/EventBus';
 import { saveManager } from '@/systems/save';
 import { TEXT_STYLES, COLORS, SCENES } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
+import { i18n, LOCALE_NAMES, type SupportedLocale } from '@/systems/i18n/I18nManager';
 import type { IGameSettings } from '@/systems/save';
 
 // ==================== 配置常量 ====================
@@ -57,11 +58,42 @@ export class PauseMenu {
     { bar: Phaser.GameObjects.Graphics; handle: Phaser.GameObjects.Rectangle }
   > = new Map();
 
+  // 国际化
+  private _unsubscribeI18n?: () => void;
+  private _i18nTexts: Map<string, Phaser.GameObjects.Text> = new Map();
+
   constructor(config: IPauseMenuConfig) {
     this._scene = config.scene;
     this._callbacks = config;
     this._settings = saveManager.getSettings();
     this._createUI();
+    this._setupI18n();
+  }
+
+  /**
+   * 设置国际化监听
+   */
+  private _setupI18n(): void {
+    this._unsubscribeI18n = i18n.onLocaleChange(() => {
+      this._updateI18nTexts();
+    });
+  }
+
+  /**
+   * 更新国际化文本
+   */
+  private _updateI18nTexts(): void {
+    // 更新所有已注册的国际化文本
+    this._i18nTexts.forEach((text, key) => {
+      text.setText(i18n.t(key));
+    });
+  }
+
+  /**
+   * 注册国际化文本
+   */
+  private _registerI18nText(key: string, text: Phaser.GameObjects.Text): void {
+    this._i18nTexts.set(key, text);
   }
 
   // ==================== 公共方法 ====================
@@ -114,6 +146,8 @@ export class PauseMenu {
    * 销毁
    */
   destroy(): void {
+    this._unsubscribeI18n?.();
+    this._i18nTexts.clear();
     this._container.destroy();
   }
 
@@ -142,25 +176,26 @@ export class PauseMenu {
 
     // 标题
     const title = this._scene.add
-      .text(0, -200, '暂停', {
+      .text(0, -200, i18n.t('pause.title'), {
         ...TEXT_STYLES.TITLE,
         fontSize: UI_FONT_SIZE.TITLE,
       })
       .setOrigin(0.5);
+    this._registerI18nText('pause.title', title);
     this._mainMenuContainer.add(title);
 
-    // 菜单按钮
+    // 菜单按钮（使用国际化键）
     const buttons = [
-      { text: '继续游戏', callback: () => this._onResume() },
-      { text: '游戏设置', callback: () => this._showSettings() },
-      { text: '保存进度', callback: () => this._onSave() },
-      { text: '读取存档', callback: () => this._onLoad() },
-      { text: '返回主菜单', callback: () => this._onQuit() },
+      { key: 'pause.resume', callback: () => this._onResume() },
+      { key: 'pause.settings', callback: () => this._showSettings() },
+      { key: 'pause.save', callback: () => this._onSave() },
+      { key: 'pause.load', callback: () => this._onLoad() },
+      { key: 'pause.mainMenu', callback: () => this._onQuit() },
     ];
 
     buttons.forEach((btn, index) => {
       const y = -80 + index * (CONFIG.BUTTON_HEIGHT + CONFIG.BUTTON_SPACING);
-      const button = this._createButton(0, y, btn.text, btn.callback);
+      const button = this._createButton(0, y, i18n.t(btn.key), btn.callback, btn.key);
       this._mainMenuContainer.add(button);
     });
 
@@ -173,29 +208,36 @@ export class PauseMenu {
 
     // 标题
     const title = this._scene.add
-      .text(0, -250, '设置', {
+      .text(0, -280, i18n.t('settings.title'), {
         ...TEXT_STYLES.TITLE,
         fontSize: UI_FONT_SIZE.SECTION,
       })
       .setOrigin(0.5);
+    this._registerI18nText('settings.title', title);
     this._settingsContainer.add(title);
 
     // 音量设置
     const volumeSettings = [
-      { key: 'masterVolume', label: '主音量', y: -150 },
-      { key: 'bgmVolume', label: '音乐音量', y: -80 },
-      { key: 'sfxVolume', label: '音效音量', y: -10 },
+      { key: 'masterVolume', i18nKey: 'settings.bgmVolume', y: -200 },
+      { key: 'bgmVolume', i18nKey: 'settings.bgmVolume', y: -140 },
+      { key: 'sfxVolume', i18nKey: 'settings.sfxVolume', y: -80 },
     ];
 
     volumeSettings.forEach((setting) => {
-      this._createVolumeSlider(setting.label, setting.key, setting.y);
+      this._createVolumeSlider(i18n.t(setting.i18nKey), setting.key, setting.y, setting.i18nKey);
     });
 
     // 文字速度
-    const speedLabel = this._scene.add.text(-CONFIG.SETTINGS_WIDTH / 2 + 30, 60, '文字速度', {
-      ...TEXT_STYLES.BODY,
-      fontSize: UI_FONT_SIZE.SMALL,
-    });
+    const speedLabel = this._scene.add.text(
+      -CONFIG.SETTINGS_WIDTH / 2 + 30,
+      -20,
+      i18n.t('settings.textSpeed'),
+      {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+      }
+    );
+    this._registerI18nText('settings.textSpeed', speedLabel);
     this._settingsContainer.add(speedLabel);
 
     const speeds = [
@@ -209,7 +251,7 @@ export class PauseMenu {
       const x = CONFIG.SETTINGS_WIDTH / 2 - 200 + index * 60;
       const btn = this._createRadioButton(
         x,
-        60,
+        -20,
         speed.label,
         speed.value === this._settings.textSpeed,
         () => {
@@ -223,15 +265,21 @@ export class PauseMenu {
     });
 
     // 自动播放
-    const autoPlayLabel = this._scene.add.text(-CONFIG.SETTINGS_WIDTH / 2 + 30, 130, '自动播放', {
-      ...TEXT_STYLES.BODY,
-      fontSize: UI_FONT_SIZE.SMALL,
-    });
+    const autoPlayLabel = this._scene.add.text(
+      -CONFIG.SETTINGS_WIDTH / 2 + 30,
+      40,
+      i18n.t('settings.autoPlay'),
+      {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+      }
+    );
+    this._registerI18nText('settings.autoPlay', autoPlayLabel);
     this._settingsContainer.add(autoPlayLabel);
 
     const autoPlayToggle = this._createToggle(
       CONFIG.SETTINGS_WIDTH / 2 - 60,
-      130,
+      40,
       this._settings.autoPlay,
       (value) => {
         this._settings.autoPlay = value;
@@ -241,18 +289,178 @@ export class PauseMenu {
     autoPlayToggle.setName('autoPlayToggle');
     this._settingsContainer.add(autoPlayToggle);
 
+    // 语言选择
+    this._createLanguageSelector(-CONFIG.SETTINGS_WIDTH / 2 + 30, 100);
+
     // 返回按钮
-    const backBtn = this._createButton(0, 220, '返回', () => this._hideSettings());
+    const backBtn = this._createButton(
+      0,
+      180,
+      i18n.t('common.back'),
+      () => this._hideSettings(),
+      'common.back'
+    );
     this._settingsContainer.add(backBtn);
 
     this._container.add(this._settingsContainer);
+  }
+
+  /**
+   * 创建语言选择器
+   */
+  private _createLanguageSelector(x: number, y: number): void {
+    const languageLabel = this._scene.add.text(x, y, i18n.t('settings.language'), {
+      ...TEXT_STYLES.BODY,
+      fontSize: UI_FONT_SIZE.SMALL,
+    });
+    this._registerI18nText('settings.language', languageLabel);
+    this._settingsContainer.add(languageLabel);
+
+    const locales: SupportedLocale[] = ['zh-CN', 'zh-TW', 'en-US', 'ja-JP'];
+    const currentLocale = i18n.getLocale();
+
+    // 创建语言选择下拉按钮
+    const dropdownWidth = 160;
+    const dropdownHeight = 36;
+    const dropdownX = CONFIG.SETTINGS_WIDTH / 2 - dropdownWidth / 2 - 30;
+
+    const dropdownContainer = this._scene.add.container(dropdownX, y);
+    dropdownContainer.setName('languageDropdown');
+
+    // 下拉按钮背景
+    const dropdownBg = this._scene.add.graphics();
+    dropdownBg.fillStyle(COLORS.BG_TERTIARY, 1);
+    dropdownBg.fillRoundedRect(0, -dropdownHeight / 2, dropdownWidth, dropdownHeight, 4);
+    dropdownBg.lineStyle(1, COLORS.BORDER, 1);
+    dropdownBg.strokeRoundedRect(0, -dropdownHeight / 2, dropdownWidth, dropdownHeight, 4);
+
+    // 当前语言文本
+    const currentLangText = this._scene.add
+      .text(10, 0, LOCALE_NAMES[currentLocale], {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+      })
+      .setOrigin(0, 0.5);
+    currentLangText.setName('currentLangText');
+
+    // 下拉箭头
+    const arrow = this._scene.add
+      .text(dropdownWidth - 20, 0, '▼', {
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#888888',
+      })
+      .setOrigin(0.5);
+
+    dropdownContainer.add([dropdownBg, currentLangText, arrow]);
+    dropdownContainer.setSize(dropdownWidth, dropdownHeight);
+
+    // 下拉选项容器（初始隐藏）
+    const optionsContainer = this._scene.add.container(dropdownX, y + dropdownHeight / 2);
+    optionsContainer.setName('languageOptions');
+    optionsContainer.setVisible(false);
+
+    // 创建选项
+    locales.forEach((locale, index) => {
+      const optionY = index * 32 + 16;
+      const optionBg = this._scene.add.graphics();
+      optionBg.fillStyle(
+        locale === currentLocale ? COLORS.ACCENT : COLORS.BG_SECONDARY,
+        locale === currentLocale ? 0.3 : 1
+      );
+      optionBg.fillRect(0, optionY - 16, dropdownWidth, 32);
+
+      const optionText = this._scene.add
+        .text(10, optionY, LOCALE_NAMES[locale], {
+          ...TEXT_STYLES.BODY,
+          fontSize: UI_FONT_SIZE.TINY,
+          color: locale === currentLocale ? '#00FFAA' : '#E8E6E3',
+        })
+        .setOrigin(0, 0.5);
+
+      // 点击选项
+      const hitArea = this._scene.add
+        .rectangle(dropdownWidth / 2, optionY, dropdownWidth, 32, 0x000000, 0)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerover', () => {
+          optionBg.clear();
+          optionBg.fillStyle(COLORS.BG_TERTIARY, 1);
+          optionBg.fillRect(0, optionY - 16, dropdownWidth, 32);
+        })
+        .on('pointerout', () => {
+          optionBg.clear();
+          optionBg.fillStyle(
+            locale === i18n.getLocale() ? COLORS.ACCENT : COLORS.BG_SECONDARY,
+            locale === i18n.getLocale() ? 0.3 : 1
+          );
+          optionBg.fillRect(0, optionY - 16, dropdownWidth, 32);
+        })
+        .on('pointerdown', () => {
+          this._onLanguageChange(locale);
+          optionsContainer.setVisible(false);
+        });
+
+      optionsContainer.add([optionBg, optionText, hitArea]);
+    });
+
+    // 选项容器背景边框
+    const optionsBorder = this._scene.add.graphics();
+    optionsBorder.lineStyle(1, COLORS.BORDER, 1);
+    optionsBorder.strokeRect(0, 0, dropdownWidth, locales.length * 32);
+    optionsContainer.add(optionsBorder);
+    optionsContainer.sendToBack(optionsBorder);
+
+    this._settingsContainer.add(optionsContainer);
+
+    // 下拉按钮交互
+    dropdownContainer
+      .setInteractive({ useHandCursor: true })
+      .on('pointerover', () => {
+        dropdownBg.clear();
+        dropdownBg.fillStyle(COLORS.BG_SECONDARY, 1);
+        dropdownBg.fillRoundedRect(0, -dropdownHeight / 2, dropdownWidth, dropdownHeight, 4);
+        dropdownBg.lineStyle(1, COLORS.ACCENT, 1);
+        dropdownBg.strokeRoundedRect(0, -dropdownHeight / 2, dropdownWidth, dropdownHeight, 4);
+      })
+      .on('pointerout', () => {
+        dropdownBg.clear();
+        dropdownBg.fillStyle(COLORS.BG_TERTIARY, 1);
+        dropdownBg.fillRoundedRect(0, -dropdownHeight / 2, dropdownWidth, dropdownHeight, 4);
+        dropdownBg.lineStyle(1, COLORS.BORDER, 1);
+        dropdownBg.strokeRoundedRect(0, -dropdownHeight / 2, dropdownWidth, dropdownHeight, 4);
+      })
+      .on('pointerdown', () => {
+        optionsContainer.setVisible(!optionsContainer.visible);
+      });
+
+    this._settingsContainer.add(dropdownContainer);
+  }
+
+  /**
+   * 语言变更处理
+   */
+  private _onLanguageChange(locale: SupportedLocale): void {
+    if (locale === i18n.getLocale()) return;
+
+    i18n.setLocale(locale);
+
+    // 更新下拉按钮显示
+    const dropdown = this._settingsContainer.getByName(
+      'languageDropdown'
+    ) as Phaser.GameObjects.Container;
+    if (dropdown) {
+      const langText = dropdown.getByName('currentLangText') as Phaser.GameObjects.Text;
+      if (langText) {
+        langText.setText(LOCALE_NAMES[locale]);
+      }
+    }
   }
 
   private _createButton(
     x: number,
     y: number,
     text: string,
-    callback: () => void
+    callback: () => void,
+    i18nKey?: string
   ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
     const buttonWidth = CONFIG.MENU_WIDTH;
@@ -283,6 +491,11 @@ export class PauseMenu {
         fontSize: UI_FONT_SIZE.NORMAL,
       })
       .setOrigin(0.5);
+
+    // 注册国际化文本
+    if (i18nKey) {
+      this._registerI18nText(i18nKey, label);
+    }
 
     container.add([bg, label]);
     container.setSize(buttonWidth, CONFIG.BUTTON_HEIGHT);
@@ -335,12 +548,15 @@ export class PauseMenu {
     return container;
   }
 
-  private _createVolumeSlider(label: string, key: string, y: number): void {
+  private _createVolumeSlider(label: string, key: string, y: number, i18nKey?: string): void {
     // 标签
     const labelText = this._scene.add.text(-CONFIG.SETTINGS_WIDTH / 2 + 30, y, label, {
       ...TEXT_STYLES.BODY,
       fontSize: UI_FONT_SIZE.SMALL,
     });
+    if (i18nKey) {
+      this._registerI18nText(i18nKey, labelText);
+    }
     this._settingsContainer.add(labelText);
 
     // 滑块轨道

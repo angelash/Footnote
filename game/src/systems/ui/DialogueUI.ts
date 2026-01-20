@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { i18n } from '@/systems/i18n/I18nManager';
 
 const logger = createLogger('DialogueUI');
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
@@ -79,6 +80,9 @@ export class DialogueUI {
   private _onDialogueEnd?: (dialogueId: string) => void;
   private _onChoiceSelected?: (dialogueId: string, choiceIndex: number) => void;
 
+  // 国际化
+  private _unsubscribeI18n?: () => void;
+
   constructor(config: IDialogueUIConfig) {
     this._scene = config.scene;
     this._onDialogueEnd = config.onDialogueEnd;
@@ -95,6 +99,25 @@ export class DialogueUI {
 
     this._createUI();
     this._setupInput();
+    this._setupI18n();
+  }
+
+  /**
+   * 设置国际化监听
+   */
+  private _setupI18n(): void {
+    this._unsubscribeI18n = i18n.onLocaleChange(() => {
+      this._updateI18nTexts();
+    });
+  }
+
+  /**
+   * 更新国际化文本
+   */
+  private _updateI18nTexts(): void {
+    // 继续指示器不需要更新（是符号）
+    // 如果有当前对话，可能需要重新加载翻译
+    // 这里主要是为了支持动态语言切换
   }
 
   // ==================== 公共方法 ====================
@@ -224,6 +247,7 @@ export class DialogueUI {
    */
   destroy(): void {
     this._stopTypewriter();
+    this._unsubscribeI18n?.();
     this._container.destroy();
   }
 

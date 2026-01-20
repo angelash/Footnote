@@ -35,7 +35,9 @@
     "sync:check:verbose": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --verbose",
     "sync:check:interfaces": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --interfaces",
     "sync:check:colors": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --constants",
-    "sync:check:json": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --json"
+    "sync:check:json": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --json",
+    "size": "size-limit",
+    "size:why": "size-limit --why"
   },
   "dependencies": {
     "idb": "^8.0.0",
@@ -44,6 +46,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
+    "@size-limit/preset-app": "^11.0.0",
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
@@ -55,6 +58,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "jsdom": "^27.3.0",
     "prettier": "^3.1.0",
+    "size-limit": "^11.0.0",
     "terser": "^5.44.1",
     "tsx": "^4.6.0",
     "typescript": "^5.3.2",
@@ -72,5 +76,25 @@
   ],
   "author": "Footnote Team",
   "license": "UNLICENSED",
-  "private": true
+  "private": true,
+  "size-limit": [
+    {
+      "name": "主入口 (JS)",
+      "path": "dist/assets/*.js",
+      "limit": "2 MB",
+      "gzip": true
+    },
+    {
+      "name": "Phaser 库",
+      "path": "dist/assets/phaser-*.js",
+      "limit": "1.5 MB",
+      "gzip": true
+    },
+    {
+      "name": "总包体 (不含资源)",
+      "path": "dist/assets/*.js",
+      "limit": "3 MB",
+      "gzip": true
+    }
+  ]
 }

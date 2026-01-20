@@ -33,6 +33,7 @@ import {
   TutorialManager,
   AchievementManager,
   newGamePlusManager,
+  performanceMonitor,
 } from '@/systems';
 import { AudioManager } from '@/systems/audio/AudioManager';
 import { narrativeEngine } from '@/systems/narrative';
@@ -180,6 +181,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
+    // 更新性能监控（每帧调用）
+    performanceMonitor.update(time, delta);
+
     this._updatePlayerMovement();
     // y-sort：玩家随 y 值更新遮挡层级
     this._player.setDepth(this._player.y);
@@ -192,8 +196,6 @@ export class GameScene extends Phaser.Scene {
 
     // 更新能力系统
     this._abilitySystem?.update(delta);
-
-    void time;
   }
 
   shutdown(): void {

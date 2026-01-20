@@ -1,10 +1,13 @@
 /**
  * 预加载场景
- * 负责加载游戏所有资源
+ * 实现分级加载策略：核心资源优先，其他按需懒加载
+ * @module scenes/PreloadScene
  */
 import Phaser from 'phaser';
 import { SCENES } from '@/config/game.config';
+import { LOAD_STRATEGY, PERFORMANCE_THRESHOLDS } from '@/config/performance.config';
 import { createLogger } from '@/utils/Logger';
+import { performanceMonitor } from '@/systems/debug/PerformanceMonitor';
 
 const logger = createLogger('PreloadScene');
 import { PIXEL_IMAGE_ASSETS, PIXEL_SPRITESHEETS } from '@/data/pixelAssets';
@@ -21,19 +24,38 @@ import { BGM_CONFIGS, SFX_CONFIGS, AMBIENCE_CONFIGS } from '@/data/audioConfig';
 export class PreloadScene extends Phaser.Scene {
   private _loadingBar!: Phaser.GameObjects.Graphics;
   private _progressBar!: Phaser.GameObjects.Graphics;
+  private _loadStartTime: number = 0;
 
   constructor() {
     super({ key: SCENES.PRELOAD });
   }
 
   preload(): void {
+    // 开始性能追踪
+    this._loadStartTime = performance.now();
+    performanceMonitor.startLoadTracking();
+
     this._createLoadingUI();
     this._setupLoadingEvents();
-    this._loadAssets();
+
+    // 分级加载：只加载核心资源和首屏资源
+    this._loadCriticalAssets();
   }
 
   create(): void {
-    logger.info('资源加载完成');
+    // 结束性能追踪
+    const loadMetrics = performanceMonitor.endLoadTracking();
+    const loadTime = performance.now() - this._loadStartTime;
+
+    logger.info(`核心资源加载完成，耗时: ${Math.round(loadTime)}ms`);
+    logger.info('加载统计:', loadMetrics);
+
+    // 检查是否超过首屏时间门禁
+    if (loadTime > PERFORMANCE_THRESHOLDS.FIRST_SCREEN_MS) {
+      logger.warn(
+        `首屏加载时间 ${Math.round(loadTime)}ms 超过目标 ${PERFORMANCE_THRESHOLDS.FIRST_SCREEN_MS}ms`
+      );
+    }
 
     // 创建动画
     this._createAnimations();
@@ -47,8 +69,56 @@ export class PreloadScene extends Phaser.Scene {
       }, 500);
     }
 
+    // 后台懒加载其他资源（使用 requestIdleCallback）
+    this._scheduleIdleLoading();
+
     // 跳转到菜单场景
     this.scene.start(SCENES.MENU);
+  }
+
+  /**
+   * 调度空闲时间加载非核心资源
+   */
+  private _scheduleIdleLoading(): void {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(
+        () => {
+          this._loadDeferredAssets();
+        },
+        { timeout: LOAD_STRATEGY.IDLE_PRELOAD_TIMEOUT_MS }
+      );
+    } else {
+      // 降级方案：使用 setTimeout
+      setTimeout(() => {
+        this._loadDeferredAssets();
+      }, 2000);
+    }
+  }
+
+  /**
+   * 延迟加载非核心资源
+   * 这些资源在后台加载，不阻塞首屏
+   */
+  private _loadDeferredAssets(): void {
+    logger.info('开始后台加载延迟资源...');
+
+    // 加载序章对话数据
+    const firstChapterDialogues = LOAD_STRATEGY.FIRST_CHAPTER_ASSETS.dialogues;
+    firstChapterDialogues.forEach((file) => {
+      this.load.text(`dialogue_${file}`, `src/data/dialogues/${file}.yaml`);
+    });
+
+    // 加载序章卡片数据
+    const firstChapterCards = LOAD_STRATEGY.FIRST_CHAPTER_ASSETS.cards;
+    firstChapterCards.forEach((file) => {
+      this.load.text(`cards_${file}`, `src/data/cards/${file}.yaml`);
+    });
+
+    this.load.once('complete', () => {
+      logger.info('延迟资源加载完成');
+    });
+
+    this.load.start();
   }
 
   /**
@@ -306,7 +376,102 @@ export class PreloadScene extends Phaser.Scene {
     });
   }
 
-  private _loadAssets(): void {
+  /**
+   * 加载核心资源（分级策略 - 仅加载启动和首屏必需资源）
+   */
+  private _loadCriticalAssets(): void {
+    // ===== 核心图片资源（占位符）=====
+    this._createPlaceholders();
+
+    // ===== 核心像素资源（UI必需）=====
+    this._loadCorePixelAssets();
+
+    // ===== 首屏资源 =====
+    this._loadFirstScreenAssets();
+
+    // ===== 核心音频（标题BGM）=====
+    this._loadCoreAudio();
+
+    // 字体通过CSS加载，这里只需等待
+  }
+
+  /**
+   * 加载核心像素资源
+   */
+  private _loadCorePixelAssets(): void {
+    // 只加载核心精灵表（用于主角）
+    const coreSpriteSheets = ['px_sprite_cenhui_idle', 'px_sprite_cenhui_walk'];
+
+    Object.entries(PIXEL_SPRITESHEETS).forEach(([key, sheet]) => {
+      if (coreSpriteSheets.includes(key)) {
+        this.load.spritesheet(key, sheet.url, {
+          frameWidth: sheet.frameWidth,
+          frameHeight: sheet.frameHeight,
+        });
+        performanceMonitor.recordAssetLoad('images', true);
+      }
+    });
+
+    // 加载核心图片资源
+    const coreImages = ['px_bg_placeholder', 'px_counter_r', 'px_counter_p', 'px_counter_w'];
+    Object.entries(PIXEL_IMAGE_ASSETS).forEach(([key, url]) => {
+      if (coreImages.includes(key)) {
+        this.load.image(key, url);
+        performanceMonitor.recordAssetLoad('images', true);
+      }
+    });
+  }
+
+  /**
+   * 加载首屏资源
+   */
+  private _loadFirstScreenAssets(): void {
+    // 序章背景（只加载第一个Zone）
+    const firstZoneBackgrounds = ['bg_c0z1_corridor', 'bg_c0z2_cenhui_room'];
+    Object.entries(SCENE_BACKGROUNDS).forEach(([key, url]) => {
+      if (firstZoneBackgrounds.includes(key)) {
+        this.load.image(key, url);
+        performanceMonitor.recordAssetLoad('images', true);
+      }
+    });
+
+    // 核心角色头像
+    if (CHARACTER_PORTRAITS['cenhui']) {
+      Object.entries(CHARACTER_PORTRAITS['cenhui']).forEach(([key, url]) => {
+        this.load.image(`portrait_cenhui_${key}`, url);
+        performanceMonitor.recordAssetLoad('images', true);
+      });
+    }
+  }
+
+  /**
+   * 加载核心音频
+   */
+  private _loadCoreAudio(): void {
+    // 只加载标题BGM和基本音效
+    const coreAudio = ['bgm_title', 'sfx_ui_click', 'sfx_ui_hover'];
+
+    BGM_CONFIGS.forEach((config) => {
+      if (coreAudio.includes(config.id)) {
+        this.load.audio(config.id, config.file);
+        performanceMonitor.recordAssetLoad('audio', true);
+      }
+    });
+
+    SFX_CONFIGS.forEach((config) => {
+      if (coreAudio.includes(config.id)) {
+        this.load.audio(config.id, config.file);
+        performanceMonitor.recordAssetLoad('audio', true);
+      }
+    });
+  }
+
+  /**
+   * [公开] 全量加载所有资源（供调试/测试使用）
+   * 注意：此方法不再在正常流程中调用，仅供需要全量预加载的场景使用
+   * @example window.__FOOTNOTE_DEBUG__.loadAllAssets()
+   */
+  public loadAllAssets(): void {
     // ===== 图片资源 =====
     this._loadImages();
 
@@ -320,74 +485,93 @@ export class PreloadScene extends Phaser.Scene {
     // 字体通过CSS加载，这里只需等待
   }
 
+  /**
+   * [延迟加载] 加载所有图片资源
+   * 此方法由 AssetManager 按需调用，不再在首屏加载
+   */
   private _loadImages(): void {
-    // 临时占位：创建一些基础几何图形作为占位符
-    this._createPlaceholders();
-
     // ===== 像素PNG资源（配置化场景会用到）=====
     Object.entries(PIXEL_IMAGE_ASSETS).forEach(([key, url]) => {
       this.load.image(key, url);
+      performanceMonitor.recordAssetLoad('images', true);
     });
     Object.entries(PIXEL_SPRITESHEETS).forEach(([key, sheet]) => {
       this.load.spritesheet(key, sheet.url, {
         frameWidth: sheet.frameWidth,
         frameHeight: sheet.frameHeight,
       });
+      performanceMonitor.recordAssetLoad('images', true);
     });
 
     // ===== WebP资产（智绘AI生成）=====
-    logger.info(`开始加载 ${WEBP_ASSET_STATS.total} 个WebP资产...`);
+    logger.info(`延迟加载 ${WEBP_ASSET_STATS.total} 个WebP资产...`);
 
     // 角色头像
     Object.entries(CHARACTER_PORTRAITS).forEach(([key, url]) => {
       this.load.image(key, url);
+      performanceMonitor.recordAssetLoad('images', true);
     });
 
     // 场景背景
     Object.entries(SCENE_BACKGROUNDS).forEach(([key, url]) => {
       this.load.image(key, url);
+      performanceMonitor.recordAssetLoad('images', true);
     });
 
     // 场景物件
     Object.entries(ALL_SCENE_OBJECTS).forEach(([key, url]) => {
       this.load.image(key, url);
+      performanceMonitor.recordAssetLoad('images', true);
     });
 
     // 特效
     Object.entries(ALL_EFFECTS).forEach(([key, url]) => {
       this.load.image(key, url);
+      performanceMonitor.recordAssetLoad('images', true);
     });
 
     // 可动物件动画帧
     Object.entries(ANIMATED_OBJECTS).forEach(([key, anim]) => {
       anim.frames.forEach((url, index) => {
         this.load.image(`${key}_frame_${index}`, url);
+        performanceMonitor.recordAssetLoad('images', true);
       });
     });
   }
 
+  /**
+   * [延迟加载] 加载所有音频资源
+   * 此方法由 AssetManager 按需调用，不再在首屏加载
+   */
   private _loadAudio(): void {
     const totalAudio = BGM_CONFIGS.length + SFX_CONFIGS.length + AMBIENCE_CONFIGS.length;
-    logger.info(`开始加载 ${totalAudio} 个音频资产...`);
+    logger.info(`延迟加载 ${totalAudio} 个音频资产...`);
 
     // 加载BGM
     BGM_CONFIGS.forEach((config) => {
       this.load.audio(config.id, config.file);
+      performanceMonitor.recordAssetLoad('audio', true);
     });
 
     // 加载音效
     SFX_CONFIGS.forEach((config) => {
       this.load.audio(config.id, config.file);
+      performanceMonitor.recordAssetLoad('audio', true);
     });
 
     // 加载环境音
     AMBIENCE_CONFIGS.forEach((config) => {
       this.load.audio(config.id, config.file);
+      performanceMonitor.recordAssetLoad('audio', true);
     });
   }
 
+  /**
+   * [延迟加载] 加载所有数据文件
+   * 此方法由 AssetManager 按需调用，数据文件按章节懒加载
+   */
   private _loadData(): void {
-    // 对话数据（YAML格式）
+    // 对话数据（YAML格式）- 按章节分组，由 AssetManager 按需加载
     const dialogueFiles = [
       // 序章
       'c0_z1',
@@ -448,6 +632,7 @@ export class PreloadScene extends Phaser.Scene {
     ];
     dialogueFiles.forEach((file) => {
       this.load.text(`dialogue_${file}`, `src/data/dialogues/${file}.yaml`);
+      performanceMonitor.recordAssetLoad('data', true);
     });
 
     // 卡片数据
@@ -463,10 +648,12 @@ export class PreloadScene extends Phaser.Scene {
     ];
     cardFiles.forEach((file) => {
       this.load.text(`cards_${file}`, `src/data/cards/${file}.yaml`);
+      performanceMonitor.recordAssetLoad('data', true);
     });
 
     // 伏笔数据
     this.load.text('foreshadows', 'src/data/foreshadows/foreshadows.yaml');
+    performanceMonitor.recordAssetLoad('data', true);
 
     // Zone配置数据（场景组装器用）
     // 已在 _loadImages 中通过 YAML 加载

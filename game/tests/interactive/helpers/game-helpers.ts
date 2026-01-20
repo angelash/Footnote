@@ -312,6 +312,188 @@ export class GameHelpers {
       return true;
     }`;
   }
+
+  /**
+   * 跳转到指定章节
+   */
+  static gotoChapterScript(chapter: string): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.gotoChapter('${chapter}');
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 设置结局条件
+   */
+  static setupEndingScript(ending: 'A' | 'B' | 'C'): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.setupEnding('${ending}');
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 设置 R 值
+   */
+  static setRScript(value: number): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.setR(${value});
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 增加 R 值
+   */
+  static addRScript(delta: number): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.addR(${delta});
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 设置 P 值
+   */
+  static setPScript(value: number): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.setP(${value});
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 增加 P 值
+   */
+  static addPScript(delta: number): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.addP(${delta});
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 解锁所有能力
+   */
+  static unlockAllAbilitiesScript(): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.unlockAllAbilities();
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 完成指定 Zone
+   */
+  static completeZoneScript(zoneId: string): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.completeZone('${zoneId}');
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 重置游戏状态
+   */
+  static resetScript(): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.reset();
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 设置 FLAG
+   */
+  static setFlagScript(name: string, value: boolean = true): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.setFlag('${name}', ${value});
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 获取游戏状态快照
+   */
+  static getGameStateScript(): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.getGameState();
+      }
+      return null;
+    }`;
+  }
+
+  /**
+   * 执行测试脚本
+   */
+  static runTestScript(scriptName: string): string {
+    return `async () => {
+      if (window.__DEBUG__) {
+        // 动态导入测试脚本
+        const { ${scriptName} } = await import('/tests/auto/TestRunner.ts');
+        return window.__DEBUG__.runTest(${scriptName});
+      }
+      return null;
+    }`;
+  }
+
+  /**
+   * 触发对话
+   */
+  static triggerDialogueScript(dialogueId: string): string {
+    return `async () => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.triggerDialogue('${dialogueId}');
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 跳过对话
+   */
+  static skipDialogueScript(): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.skipDialogue();
+      }
+      return false;
+    }`;
+  }
+
+  /**
+   * 获取测试结果
+   */
+  static getTestResultsScript(): string {
+    return `() => {
+      if (window.__DEBUG__) {
+        return window.__DEBUG__.getTestResults();
+      }
+      return [];
+    }`;
+  }
 }
 
 /**

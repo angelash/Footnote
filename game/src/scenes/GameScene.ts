@@ -323,33 +323,49 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * 尝试与最近的可交互对象交互
+   * 优先使用已检测到的最近对象，否则重新搜索
    */
   private _tryInteract(): void {
-    if (this._interactables.length === 0) return;
+    // 优先使用交互提示已检测到的最近对象
+    let target: Phaser.GameObjects.Container | null = this._nearestInteractable;
 
-    // 找到最近的可交互对象
-    let closest: Phaser.GameObjects.Container | null = null;
-    let closestDist = Infinity;
-    const playerX = this._player.x;
-    const playerY = this._player.y;
+    // 如果没有预检测的目标，重新搜索
+    if (!target) {
+      const playerX = this._player.x;
+      const playerY = this._player.y;
+      let closestDist = Infinity;
 
-    for (const interactable of this._interactables) {
-      const dist = Phaser.Math.Distance.Between(playerX, playerY, interactable.x, interactable.y);
-      if (dist < closestDist && dist < 100) {
-        // 100px 交互范围
-        closestDist = dist;
-        closest = interactable;
+      // 检查 SceneAssembler 创建的可交互对象
+      if (this._assembledScene) {
+        for (const obj of this._assembledScene.objects) {
+          if (obj instanceof Phaser.GameObjects.Container && obj.getData('action')) {
+            const dist = Phaser.Math.Distance.Between(playerX, playerY, obj.x, obj.y);
+            if (dist < this._interactionRange && dist < closestDist) {
+              closestDist = dist;
+              target = obj;
+            }
+          }
+        }
+      }
+
+      // 检查旧的交互点数组
+      for (const interactable of this._interactables) {
+        const dist = Phaser.Math.Distance.Between(playerX, playerY, interactable.x, interactable.y);
+        if (dist < this._interactionRange && dist < closestDist) {
+          closestDist = dist;
+          target = interactable;
+        }
       }
     }
 
-    if (closest) {
+    if (target) {
       // 触发交互
-      const objectId = closest.name;
+      const objectId = target.name;
       logger.info(`触发交互: ${objectId}`);
       eventBus.emit(GameEvent.INTERACT_START, { objectId, actionType: 'touch' });
 
       // 使用getData获取存储的action（如果有的话）
-      const action = closest.getData('action') as ISceneAction | undefined;
+      const action = target.getData('action') as ISceneAction | undefined;
       if (action) {
         this._handleSceneAction(action);
       }
@@ -1261,28 +1277,31 @@ export class GameScene extends Phaser.Scene {
 
     if (zoneId === 'C0-Z1') {
       // 身份卡交互点
-      const idCard = this._createInteractable(200, 600, '身份卡', () => {
-        this._showCard('CARD_C0_01');
+      const idCard = this._createInteractable(200, 600, '身份卡', {
+        type: 'card',
+        cardId: 'CARD_C0_01',
       });
       idCard.setData('testid', 'identity-card');
       this._interactables.push(idCard);
 
       // 公告板交互点
-      const noticeBoard = this._createInteractable(500, 500, '公告板', () => {
-        this._showDialogue({
-          speaker: '系统',
-          text: '公告板上贴满了通知，日期处有涂改痕迹...',
-        });
+      const noticeBoard = this._createInteractable(500, 500, '公告板', {
+        type: 'dialogue',
+        speaker: '系统',
+        text: '公告板上贴满了通知，日期处有涂改痕迹...',
       });
       this._interactables.push(noticeBoard);
     }
   }
 
+  /**
+   * 创建可交互对象（存储 action 数据，不直接绑定点击事件）
+   */
   private _createInteractable(
     x: number,
     y: number,
     label: string,
-    callback: () => void
+    action: ISceneAction
   ): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
 
@@ -1293,7 +1312,7 @@ export class GameScene extends Phaser.Scene {
     indicator.lineStyle(2, 0x00ffaa, 0.8);
     indicator.strokeCircle(0, 0, 30);
 
-    // 标签
+    // 标签文字
     const text = this.add
       .text(0, 45, label, {
         ...TEXT_STYLES.MUTED,
@@ -1303,9 +1322,14 @@ export class GameScene extends Phaser.Scene {
 
     container.add([indicator, text]);
     container.setSize(60, 60);
+    container.setName(label);
 
-    // 交互
-    container.setInteractive({ useHandCursor: true }).on('pointerdown', callback);
+    // 设置交互区域（仅用于 hover cursor）
+    container.setInteractive({ useHandCursor: true });
+
+    // 存储交互数据，供 InteractionPrompt 触发
+    container.setData('action', action);
+    container.setData('label', label);
 
     // 呼吸动画
     this.tweens.add({

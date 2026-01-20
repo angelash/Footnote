@@ -66,11 +66,14 @@ function inferZoneType(zoneId: string): string {
 
 export class SceneAssembler {
   private readonly _scene: Phaser.Scene;
+  // 保留 callbacks 以便将来扩展，当前交互统一通过 InteractionPrompt 触发
   private readonly _callbacks: ISceneAssemblerCallbacks;
 
   constructor(scene: Phaser.Scene, callbacks: ISceneAssemblerCallbacks) {
     this._scene = scene;
     this._callbacks = callbacks;
+    // 确保 callbacks 被"使用"以避免 TS 警告
+    void this._callbacks;
 
     // 初始化资源解析器
     if (!assetResolver.isInitialized()) {
@@ -229,16 +232,20 @@ export class SceneAssembler {
     if (typeof obj.rotation === 'number') display.setRotation(obj.rotation);
     if (obj.origin) display.setOrigin(obj.origin[0], obj.origin[1]);
 
-    // 交互
+    // 交互数据存储（不再直接绑定点击事件，统一通过 InteractionPrompt 触发）
     if (obj.interactive) {
+      // 保留 hover cursor 提示
       display.setInteractive({ useHandCursor: obj.interactive.cursor ?? true });
+      // 存储 action 数据，供 InteractionPrompt 使用
       if (obj.interactive.action && obj.interactive.action.type !== 'none') {
-        display.on('pointerdown', () => {
-          this._callbacks.onAction(obj.interactive!.action!, obj.id);
-        });
+        display.setData('action', obj.interactive.action);
       }
       if (obj.interactive.testid) {
         display.setData('testid', obj.interactive.testid);
+      }
+      // 存储标签
+      if (obj.label) {
+        display.setData('label', obj.label);
       }
     }
 
@@ -298,7 +305,7 @@ export class SceneAssembler {
     // 设置深度
     container.setDepth(typeof obj.depth === 'number' ? obj.depth : obj.y);
 
-    // 交互处理
+    // 交互数据存储（不再直接绑定点击事件，统一通过 InteractionPrompt 触发）
     if (obj.interactive) {
       container.setInteractive(
         new Phaser.Geom.Rectangle(
@@ -310,8 +317,8 @@ export class SceneAssembler {
         Phaser.Geom.Rectangle.Contains
       );
 
+      // 保留 hover cursor 提示
       if (obj.interactive.cursor) {
-        this._scene.input.setDefaultCursor('pointer');
         container.on('pointerover', () => {
           this._scene.input.setDefaultCursor('pointer');
         });
@@ -320,19 +327,18 @@ export class SceneAssembler {
         });
       }
 
+      // 存储 action 数据，供 InteractionPrompt 使用
       if (obj.interactive.action && obj.interactive.action.type !== 'none') {
-        container.on('pointerdown', () => {
-          this._callbacks.onAction(obj.interactive!.action!, obj.id);
-        });
+        container.setData('action', obj.interactive.action);
       }
 
       if (obj.interactive.testid) {
         container.setData('testid', obj.interactive.testid);
       }
 
-      // 存储action供外部访问
-      if (obj.interactive.action) {
-        container.setData('action', obj.interactive.action);
+      // 存储标签
+      if (obj.label) {
+        container.setData('label', obj.label);
       }
     }
 

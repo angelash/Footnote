@@ -1,5 +1,9 @@
 # CF-Z5 三结局选择
 # A/B/C执行脚本
+# 结局判定条件:
+#   A: R < 6 且 W > 60 (继续收敛)
+#   B: R >= 6 且 40 < W <= 60 (释放表示)
+#   C: R >= 10 且 W <= 40 (承载字段)
 id: CF-Z5
 title: 平面尽头
 background:
@@ -19,7 +23,18 @@ objects:
     depth: 8
     alpha: 0.3
 
+  # 状态说明（显示当前R/W值）
+  - id: status_display
+    type: zone
+    x: 375
+    y: 280
+    width: 400
+    height: 60
+    depth: 15
+    label: 选择你的结局
+
   # 结局A按钮：继续收敛
+  # 条件: R < 6 且 W > 60
   - id: ending_a
     type: image
     texture: px_fx_system_correct
@@ -34,9 +49,10 @@ objects:
       testid: ending-a
       action:
         type: dialogue
-        dialogueId: CFZ5_ENDING_A
+        dialogueId: CFZ5_CONFIRM_ENDING_A
 
   # 结局B按钮：释放表示
+  # 条件: R >= 6 且 40 < W <= 60
   - id: ending_b
     type: image
     texture: px_fx_glitch
@@ -51,9 +67,10 @@ objects:
       testid: ending-b
       action:
         type: dialogue
-        dialogueId: CFZ5_ENDING_B
+        dialogueId: CFZ5_CONFIRM_ENDING_B
 
   # 结局C按钮：承载字段
+  # 条件: R >= 10 且 W <= 40
   - id: ending_c
     type: image
     texture: px_fx_field_accept
@@ -68,7 +85,35 @@ objects:
       testid: ending-c
       action:
         type: dialogue
-        dialogueId: CFZ5_ENDING_C
+        dialogueId: CFZ5_CONFIRM_ENDING_C
+
+  # 条件提示区域
+  - id: condition_hint_a
+    type: zone
+    x: 250
+    y: 470
+    width: 100
+    height: 30
+    depth: 11
+    label: R<6, W>60
+
+  - id: condition_hint_b
+    type: zone
+    x: 375
+    y: 470
+    width: 120
+    height: 30
+    depth: 11
+    label: R≥6, 40<W≤60
+
+  - id: condition_hint_c
+    type: zone
+    x: 500
+    y: 470
+    width: 120
+    height: 30
+    depth: 11
+    label: R≥10, W≤40
 
   # 字段条显示
   - id: field_display
@@ -85,7 +130,7 @@ objects:
     type: image
     texture: px_item_archive
     x: 550
-    y: 500
+    y: 600
     scale: 0.4
     depth: 9
     label: 长按查看代价

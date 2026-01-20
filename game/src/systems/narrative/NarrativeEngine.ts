@@ -119,8 +119,10 @@ export interface ICardEffect {
 
 /**
  * 伏笔阶段
+ * 统一命名：plant/deepen/mislead/reveal
+ * 兼容旧版：misread -> mislead, collect -> reveal
  */
-export type ForeshadowStage = 'plant' | 'deepen' | 'misread' | 'collect';
+export type ForeshadowStage = 'plant' | 'deepen' | 'mislead' | 'reveal' | 'misread' | 'collect';
 
 /**
  * 伏笔数据
@@ -136,7 +138,9 @@ export interface IForeshadow {
       expected: string;
       truth: string;
     };
-    collect: IForeshadowStageConfig;
+    mislead?: IForeshadowStageConfig;
+    collect?: IForeshadowStageConfig;
+    reveal?: IForeshadowStageConfig;
   };
 }
 
@@ -236,18 +240,163 @@ class NarrativeEngine {
   }
 
   /**
-   * 加载对话
+   * 加载对话 - 支持动态加载
+   * 1. 先检查内存缓存（注册表）
+   * 2. 如果没有，尝试从对应YAML文件动态加载
    */
   async loadDialogue(dialogueId: string): Promise<IDialogueData | null> {
-    // 优先从注册表获取
+    // 1. 优先从注册表获取（内存缓存）
     const registered = this._dialogueRegistry.get(dialogueId);
     if (registered) {
       return registered;
     }
 
-    // TODO: 从YAML文件加载
+    // 2. 尝试动态加载
+    const loaded = await this._dynamicLoadDialogue(dialogueId);
+    if (loaded) {
+      return loaded;
+    }
+
     logger.warn(`Dialogue not found: ${dialogueId}`);
     return null;
+  }
+
+  /**
+   * 动态加载对话 - 根据ID推断YAML文件并加载
+   */
+  private async _dynamicLoadDialogue(dialogueId: string): Promise<IDialogueData | null> {
+    // 根据对话ID推断对应的YAML文件
+    const yamlFile = this._inferYamlFileFromDialogueId(dialogueId);
+    if (!yamlFile) {
+      logger.debug(`无法推断对话文件: ${dialogueId}`);
+      return null;
+    }
+
+    try {
+      // 动态fetch YAML文件
+      const response = await fetch(`/assets/data/dialogues/${yamlFile}.yaml`);
+      if (!response.ok) {
+        logger.debug(`对话文件不存在: ${yamlFile}.yaml`);
+        return null;
+      }
+
+      const yamlContent = await response.text();
+      
+      // 使用动态导入加载yaml解析器
+      const { parse: parseYaml } = await import('yaml');
+      const data = parseYaml(yamlContent);
+      
+      if (!data?.dialogues) {
+        logger.debug(`对话文件无有效数据: ${yamlFile}.yaml`);
+        return null;
+      }
+
+      // 解析并注册所有对话（缓存整个文件）
+      const dialogues = this._parseDialoguesFromYaml(data.dialogues);
+      dialogues.forEach((d) => this.registerDialogue(d));
+
+      logger.info(`动态加载对话文件成功: ${yamlFile}.yaml (${dialogues.length}条对话)`);
+
+      // 返回请求的对话
+      return this._dialogueRegistry.get(dialogueId) || null;
+    } catch (error) {
+      logger.warn(`动态加载对话失败: ${yamlFile}.yaml`, error);
+      return null;
+    }
+  }
+
+  /**
+   * 根据对话ID推断YAML文件名
+   * 例如: "CENHUI_MONO_01" -> "c0_z1"
+   *       "C1Z1_TICKET_MACHINE" -> "c1_z1"
+   *       "C2Z1_GULIN_TALK" -> "c2_z1"
+   */
+  private _inferYamlFileFromDialogueId(dialogueId: string): string | null {
+    // 新格式匹配: C{chapter}Z{zone}_xxx
+    const newFormatMatch = dialogueId.match(/^C(\d+)Z(\d+)_/i);
+    if (newFormatMatch) {
+      const chapter = newFormatMatch[1].toLowerCase();
+      const zone = newFormatMatch[2];
+      return `c${chapter}_z${zone}`;
+    }
+
+    // 终章格式匹配: CFZ{zone}_xxx
+    const finalChapterMatch = dialogueId.match(/^CFZ(\d+)_/i);
+    if (finalChapterMatch) {
+      const zone = finalChapterMatch[1];
+      return `cf_z${zone}`;
+    }
+
+    // 特殊对话匹配
+    if (dialogueId.startsWith('RV_') || dialogueId.includes('_RV_')) {
+      return 'rv_dialogues';
+    }
+    if (dialogueId.startsWith('NG_') || dialogueId.includes('_NG_')) {
+      return 'ngplus_dialogues';
+    }
+
+    // 序章旧格式: 假设以 CENHUI_, IDENTITY_, NOTICE_, NEIGHBOR_ 等开头的是 c0_z1
+    // 这需要更复杂的映射逻辑，暂时返回null让系统使用已缓存的数据
+    logger.debug(`无法推断对话文件（旧格式ID）: ${dialogueId}`);
+    return null;
+  }
+
+  /**
+   * 从YAML数据解析对话（兼容新旧格式）
+   */
+  private _parseDialoguesFromYaml(dialoguesData: Record<string, unknown>): IDialogueData[] {
+    const result: IDialogueData[] = [];
+
+    for (const [_key, raw] of Object.entries(dialoguesData)) {
+      const dialogue = raw as Record<string, unknown>;
+      
+      if ('lines' in dialogue && Array.isArray(dialogue.lines)) {
+        // 新格式：直接使用
+        result.push(dialogue as unknown as IDialogueData);
+      } else if ('speaker' in dialogue && 'text' in dialogue) {
+        // 旧格式：转换为新格式
+        const oldFormat = dialogue as {
+          id: string;
+          speaker: string;
+          text: string;
+          expression?: string;
+          next?: string | null;
+          choices?: Array<{ label: string; next: string; effect?: { r?: number; p?: number } }>;
+          trigger?: { card?: string; foreshadow?: [string, string]; ability?: string };
+        };
+
+        result.push({
+          id: oldFormat.id,
+          lines: [
+            {
+              speaker: oldFormat.speaker,
+              text: oldFormat.text,
+              emotion: oldFormat.expression,
+            },
+          ],
+          choices: oldFormat.choices?.map((c) => ({
+            id: c.label,
+            text: c.label,
+            nextDialogueId: c.next,
+            effects: c.effect ? { rDelta: c.effect.r, pDelta: c.effect.p } : undefined,
+          })),
+          onComplete: oldFormat.trigger
+            ? [
+                oldFormat.trigger.card ? { type: 'card' as const, cardId: oldFormat.trigger.card } : null,
+                oldFormat.trigger.foreshadow
+                  ? {
+                      type: 'foreshadow' as const,
+                      foreshadowId: oldFormat.trigger.foreshadow[0],
+                      foreshadowStage: oldFormat.trigger.foreshadow[1] as ForeshadowStage,
+                    }
+                  : null,
+              ].filter(Boolean) as IDialogueAction[]
+            : undefined,
+        });
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -451,7 +600,9 @@ class NarrativeEngine {
         break;
       case 'ability':
         if (action.abilityType) {
-          worldState.unlockAbility(action.abilityType as AbilityType);
+          // 将 camelCase 转换为 UPPER_SNAKE_CASE
+          const normalizedType = this._normalizeAbilityType(action.abilityType);
+          worldState.unlockAbility(normalizedType as AbilityType);
         }
         break;
       case 'sfx':
@@ -467,10 +618,25 @@ class NarrativeEngine {
     }
   }
 
+  /**
+   * 将 camelCase abilityType 转换为 UPPER_SNAKE_CASE
+   * @example depthPerception -> DEPTH_PERCEPTION
+   */
+  private _normalizeAbilityType(type: string): string {
+    const mapping: Record<string, string> = {
+      depthPerception: 'DEPTH_PERCEPTION',
+      depthIntervention: 'DEPTH_INTERVENTION',
+      timeIntervention: 'TIME_INTERVENTION',
+    };
+    return mapping[type] || type;
+  }
+
   private _checkChoiceCondition(condition: IChoiceCondition): boolean {
     if (condition.hasCard && !this.hasCard(condition.hasCard)) return false;
-    if (condition.hasAbility && !worldState.hasAbility(condition.hasAbility as AbilityType))
-      return false;
+    if (condition.hasAbility) {
+      const normalizedType = this._normalizeAbilityType(condition.hasAbility);
+      if (!worldState.hasAbility(normalizedType as AbilityType)) return false;
+    }
     if (condition.flagTrue && !worldState.getFlag(condition.flagTrue)) return false;
     if (condition.rMin !== undefined) {
       const { R } = worldState.getCounters();
@@ -608,6 +774,11 @@ class NarrativeEngine {
 
   /**
    * 触发伏笔
+   * 支持新旧阶段命名：
+   * - plant: 投放
+   * - deepen: 加深
+   * - mislead/misread: 误读
+   * - reveal/collect: 回收
    */
   triggerForeshadow(foreshadowId: string, stage: ForeshadowStage): boolean {
     const state = this._foreshadowStates.get(foreshadowId);
@@ -618,7 +789,10 @@ class NarrativeEngine {
 
     const currentZone = worldState.getCurrentZone();
 
-    switch (stage) {
+    // 标准化阶段名称
+    const normalizedStage = this._normalizeStage(stage);
+
+    switch (normalizedStage) {
       case 'plant':
         if (!state.planted) {
           state.planted = true;
@@ -637,7 +811,19 @@ class NarrativeEngine {
         }
         break;
 
-      case 'collect':
+      case 'mislead':
+        // mislead 是可选阶段，不影响 collected 状态
+        if (state.planted && !state.collected) {
+          eventBus.emit(GameEvent.FORESHADOW_TRIGGERED, {
+            foreshadowId,
+            stage: 'mislead',
+            zoneId: currentZone,
+          });
+          return true;
+        }
+        break;
+
+      case 'reveal':
         if (state.planted && !state.collected) {
           state.collected = true;
           state.collectedAt = currentZone;
@@ -651,13 +837,34 @@ class NarrativeEngine {
   }
 
   /**
+   * 标准化阶段名称（兼容旧版命名）
+   */
+  private _normalizeStage(stage: ForeshadowStage): 'plant' | 'deepen' | 'mislead' | 'reveal' {
+    switch (stage) {
+      case 'plant':
+        return 'plant';
+      case 'deepen':
+        return 'deepen';
+      case 'misread':
+      case 'mislead':
+        return 'mislead';
+      case 'collect':
+      case 'reveal':
+        return 'reveal';
+      default:
+        return 'plant';
+    }
+  }
+
+  /**
    * 获取伏笔状态
+   * 返回统一命名：plant/deepen/reveal
    */
   getForeshadowState(foreshadowId: string): ForeshadowStage | null {
     const state = this._foreshadowStates.get(foreshadowId);
     if (!state) return null;
 
-    if (state.collected) return 'collect';
+    if (state.collected) return 'reveal';
     if (state.deepened) return 'deepen';
     if (state.planted) return 'plant';
     return null;
@@ -672,17 +879,22 @@ class NarrativeEngine {
 
   /**
    * 检查是否可以触发伏笔阶段
+   * 支持新旧命名
    */
   canTriggerForeshadow(foreshadowId: string, stage: ForeshadowStage): boolean {
     const state = this._foreshadowStates.get(foreshadowId);
     if (!state) return false;
 
-    switch (stage) {
+    const normalizedStage = this._normalizeStage(stage);
+
+    switch (normalizedStage) {
       case 'plant':
         return !state.planted;
       case 'deepen':
         return state.planted && !state.deepened;
-      case 'collect':
+      case 'mislead':
+        return state.planted && !state.collected;
+      case 'reveal':
         return state.planted && !state.collected;
       default:
         return false;

@@ -117,18 +117,20 @@ interface IZoneStateData {
 // ==================== 配置常量 ====================
 
 const CONFIG = {
-  /** P值每秒衰减率 */
-  P_DECAY_RATE: 0.001,
-  /** P值上限 */
-  P_MAX: 100,
-  /** R值上限 */
-  R_MAX: 100,
+  /** P值上限 - 根据设计文档要求 */
+  P_MAX: 20,
+  /** R值上限 - 根据设计文档要求 */
+  R_MAX: 15,
   /** W基础值 */
   W_BASE: 100,
-  /** 每个伤痕减少的W值 */
-  W_SCAR_PENALTY: 5,
-  /** 每个污染减少的W值 */
-  W_CONTAMINATION_PENALTY: 10,
+  /** R值对W的影响系数 */
+  W_R_COEFFICIENT: 3,
+  /** P值对W的影响系数 */
+  W_P_COEFFICIENT: 2,
+  /** 每个伤痕对W的影响 (anomalyModifier) */
+  W_SCAR_PENALTY: 2,
+  /** 每个污染对W的影响 (anomalyModifier) */
+  W_CONTAMINATION_PENALTY: 5,
   /** 能力P值消耗 */
   ABILITY_P_COST: {
     DEPTH_PERCEPTION: 1,
@@ -162,6 +164,11 @@ class WorldState {
   private _scarIdCounter: number = 0;
   private _contaminationIdCounter: number = 0;
   private _cardChecker?: (cardId: string) => boolean;
+
+  // R值阈值触发标记（确保每个阈值只触发一次）
+  private _rThreshold3Triggered: boolean = false;
+  private _rThreshold6Triggered: boolean = false;
+  private _rThreshold10Triggered: boolean = false;
 
   private constructor() {
     this._initializeDefaultZones();
@@ -233,13 +240,12 @@ class WorldState {
   }
 
   /**
-   * P值衰减（每帧调用）
+   * P值衰减（已废弃 - 设计文档要求P不应衰减）
+   * @deprecated P值不再自动衰减，此方法保留以兼容旧调用但不执行任何操作
    */
-  decayP(deltaMs: number): void {
-    if (this._P > 0) {
-      const decay = CONFIG.P_DECAY_RATE * deltaMs;
-      this.addP(-decay);
-    }
+  decayP(_deltaMs: number): void {
+    // 根据设计文档要求，P值不应自动衰减
+    // 此方法保留以兼容可能的旧代码调用，但不执行任何操作
   }
 
   /**
@@ -253,25 +259,49 @@ class WorldState {
 
   /**
    * 计算W值
+   * 公式: W = max(0, 100 - (R × 3) - (P × 2) - anomalyModifier)
+   * anomalyModifier = scars.length × 2 + contaminations.length × 5
    */
   private _calculateW(): number {
-    const scarPenalty = this._scars.length * CONFIG.W_SCAR_PENALTY;
-    const contaminationPenalty = this._contaminations.length * CONFIG.W_CONTAMINATION_PENALTY;
-    return Math.max(0, this._baseW - scarPenalty - contaminationPenalty);
+    const rPenalty = this._R * CONFIG.W_R_COEFFICIENT;
+    const pPenalty = this._P * CONFIG.W_P_COEFFICIENT;
+    const anomalyModifier =
+      this._scars.length * CONFIG.W_SCAR_PENALTY +
+      this._contaminations.length * CONFIG.W_CONTAMINATION_PENALTY;
+    return Math.max(0, CONFIG.W_BASE - rPenalty - pPenalty - anomalyModifier);
   }
 
   /**
-   * 检查R值阈值
+   * 检查R值阈值并发出事件
+   * 每个阈值只触发一次
+   * - R ≥ 3: r_threshold_3（语气停顿效果）
+   * - R ≥ 6: r_threshold_6（首次判定句）
+   * - R ≥ 10: r_threshold_10（结局C路径开启）
    */
   private _checkRThresholds(): void {
     const { SYSTEM_PAUSE, F21_WEAK, MODEL_REWRITE } = CONSTANTS.R_THRESHOLD;
 
-    if (this._R >= MODEL_REWRITE) {
+    // R ≥ 10: 结局C路径开启
+    if (this._R >= MODEL_REWRITE && !this._rThreshold10Triggered) {
+      this._rThreshold10Triggered = true;
+      eventBus.emit(GameEvent.R_THRESHOLD_10, { rValue: this._R });
       eventBus.emit(GameEvent.MODEL_REWRITE, { rValue: this._R });
-    } else if (this._R >= F21_WEAK) {
+      logger.info(`R值阈值10触发: R=${this._R}, 结局C路径开启`);
+    }
+
+    // R ≥ 6: 首次判定句
+    if (this._R >= F21_WEAK && !this._rThreshold6Triggered) {
+      this._rThreshold6Triggered = true;
+      eventBus.emit(GameEvent.R_THRESHOLD_6, { rValue: this._R });
       eventBus.emit(GameEvent.SYSTEM_PAUSE, { rValue: this._R });
-    } else if (this._R >= SYSTEM_PAUSE) {
-      // 系统语气停顿（轻微）
+      logger.info(`R值阈值6触发: R=${this._R}, 首次判定句`);
+    }
+
+    // R ≥ 3: 系统语气停顿
+    if (this._R >= SYSTEM_PAUSE && !this._rThreshold3Triggered) {
+      this._rThreshold3Triggered = true;
+      eventBus.emit(GameEvent.R_THRESHOLD_3, { rValue: this._R });
+      logger.info(`R值阈值3触发: R=${this._R}, 系统语气停顿`);
     }
   }
 
@@ -635,6 +665,12 @@ class WorldState {
       this._R = data.counters.R ?? 0;
       this._P = data.counters.P ?? 0;
       this._baseW = data.counters.baseW ?? CONFIG.W_BASE;
+
+      // 根据恢复的R值设置阈值触发状态
+      const { SYSTEM_PAUSE, F21_WEAK, MODEL_REWRITE } = CONSTANTS.R_THRESHOLD;
+      this._rThreshold3Triggered = this._R >= SYSTEM_PAUSE;
+      this._rThreshold6Triggered = this._R >= F21_WEAK;
+      this._rThreshold10Triggered = this._R >= MODEL_REWRITE;
     }
 
     if (data.abilities) {
@@ -693,6 +729,11 @@ class WorldState {
     this._currentChapter = 'C0';
     this._scarIdCounter = 0;
     this._contaminationIdCounter = 0;
+
+    // 重置R值阈值触发标记
+    this._rThreshold3Triggered = false;
+    this._rThreshold6Triggered = false;
+    this._rThreshold10Triggered = false;
 
     this._initializeDefaultZones();
   }

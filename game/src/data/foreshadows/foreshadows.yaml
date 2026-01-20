@@ -1,184 +1,468 @@
 # 伏笔系统数据
 # 包含所有需要追踪的伏笔及其触发条件
+# 阶段命名统一：plant(投放) / deepen(加深) / mislead(误读) / reveal(回收)
 
 foreshadows:
-  # ==================== F01: 岑回身份异常 ====================
+  # ==================== F01: 薄墙回声 ====================
   F01:
     id: F01
-    name: 例外处理器
-    description: 岑回的真实身份远非普通维修员
+    name: 薄墙回声
+    description: 长按墙听回声，表示压缩造成的结构空腔残留
     stages:
       plant:
-        zoneId: C0-Z1
-        dialogueId: CENHUI_MONO_01
+        zone: C0-Z3
+        description: 长按墙听回声
       deepen:
-        zoneId: C2-Z3
-        dialogueId: GULIN_REVEAL_01
-        condition:
-          zoneVisited: C2-Z1
-      resolve:
-        zoneId: C5-Z5
-        condition:
-          rMin: 6
+        zone: C2-Z2
+        description: 深度感知看到空腔线框
+      mislead:
+        zone: C3-Z1
+        description: 玩家以为有人藏在墙里
+      reveal:
+        zone: CF-Z3
+        description: 字段接受后，部分空腔不再被更正抹平
 
-  # ==================== F02: 周期重置痕迹 ====================
+  # ==================== F02: 门牌与面积不符 ====================
   F02:
     id: F02
-    name: 周期涂改
-    description: 世界经历过周期重置，但官方从不承认
+    name: 门牌与面积不符
+    description: 表象编号与深度结构对不齐（表示守恒断裂）
     stages:
       plant:
-        zoneId: C0-Z1
-        dialogueId: NOTICE_BOARD_EXAMINE
+        zone: C1-Z2
+        description: 纯2D解谜发现门牌不对
       deepen:
-        zoneId: C1-Z4
-        condition:
-          hasCard: CARD_C1_OLD_RECORD
-      resolve:
-        zoneId: C4-Z2
-        condition:
-          abilityUnlocked: TIME_INTERVENTION
+        zone: C3-Z2
+        description: 不存在的房间可进入
+      mislead:
+        zone: C4-Z1
+        description: 玩家以为是机关/异次元阴谋
+      reveal:
+        zone: C5-Z1
+        description: 版本冲突时理解：这是互斥版本
 
-  # ==================== F03: 顾临的矛盾 ====================
+  # ==================== F03: 系统提示自我更正 ====================
   F03:
     id: F03
-    name: 收敛者的动摇
-    description: 顾临表面坚定，内心却有裂痕
+    name: 系统提示自我更正
+    description: 收敛运行时在压缩解释成本，自动覆盖表象文本
     stages:
       plant:
-        zoneId: C0-Z4
-        dialogueId: GULIN_INTRO_01
+        zone: C0-Z1
+        description: 公告板闪现"已更正"
       deepen:
-        zoneId: C2-Z6
-        dialogueId: GULIN_DOUBT_01
-        condition:
-          rMin: 3
-      resolve:
-        zoneId: C5-Z3
-        condition:
-          zoneCompleted: C5-Z2
+        zone: C2-Z1
+        description: 授权记录出现"已更正"
+      mislead:
+        zone: C3-Z3
+        description: 玩家以为是某个人在后台改字
+      reveal:
+        zone: C5-Z6
+        description: 审计覆盖区提示语变成结算字段
 
-  # ==================== F04: 宋岚的记录 ====================
+  # ==================== F04: NPC叙述互斥 ====================
   F04:
     id: F04
-    name: 版本差异
-    description: 宋岚记录的「异常」暗示着更大的真相
+    name: NPC叙述互斥
+    description: 因果对账导致记忆漂移与版本切换
     stages:
       plant:
-        zoneId: C1-Z2
-        dialogueId: SONGLAN_FIRST_MEET
+        zone: C1-Z2
+        description: 问路时NPC说法矛盾
       deepen:
-        zoneId: C3-Z1
-        dialogueId: SONGLAN_ARCHIVE_01
-        condition:
-          hasCard: CARD_C2_FRAGMENT
-      resolve:
-        zoneId: C4-Z5
-        condition:
-          abilityUnlocked: DEPTH_PERCEPTION
+        zone: C4-Z1
+        description: 灾后重访"昨天你来过/你没来过"
+      mislead:
+        zone: C4-Z2
+        description: 玩家以为NPC在撒谎
+      reveal:
+        zone: C4-Z3
+        description: 强制回溯后，同一NPC对补丁痕迹描述一致
 
-  # ==================== F05: 阿棠的来历 ====================
+  # ==================== F05: 无奖励支线 ====================
   F05:
     id: F05
-    name: 对账失败
-    description: 阿棠是系统无法解释的存在
+    name: 无奖励支线
+    description: 这些行为就是R（无收益残差）的结构来源
     stages:
       plant:
-        zoneId: C1-Z5
-        dialogueId: ATANG_APPEAR_01
+        zone: C2-Z4
+        description: 路标修补完成，无可用收益
       deepen:
-        zoneId: C3-Z4
-        dialogueId: ATANG_MEMORY_01
-        condition:
-          zoneVisited: C3-Z1
-      resolve:
-        zoneId: C5-Z1
-        condition:
-          rMin: 5
-          zoneCompleted: C4-Z8
+        zone: C3-Z4
+        description: 空椅、贴地图等行为
+      mislead:
+        zone: C4-Z6
+        description: 玩家以为作者故意不给奖励
+      reveal:
+        zone: C5-Z7
+        description: F21判词触发，理解R的意义
 
-  # ==================== F06: 许澄的边界 ====================
+  # ==================== F06: 身份卡日期更正 ====================
   F06:
     id: F06
-    name: 对齐与减伤
-    description: 许澄在帮助和顺从之间寻找平衡
+    name: 身份卡日期更正
+    description: 岑回作为运行时接口，人生片段可拼接以维持可读性
     stages:
       plant:
-        zoneId: C1-Z6
-        dialogueId: XUCHENG_CLINIC_01
+        zone: C0-Z1
+        description: 身份卡细节页出现"更正"
       deepen:
-        zoneId: C3-Z6
-        dialogueId: XUCHENG_DILEMMA_01
-        condition:
-          hasCard: CARD_C3_MEDICINE
-      resolve:
-        zoneId: C5-Z4
-        condition:
-          pMin: 50
+        zone: C2-Z5
+        description: 个人档案页逐渐字段化
+      mislead:
+        zone: C3-Z5
+        description: 玩家以为主角失忆/阴谋实验体
+      reveal:
+        zone: CF-Z6
+        description: 结局C"承载字段"时，档案变为字段表
 
-  # ==================== F07: 牧平的信仰 ====================
+  # ==================== F07: 顾临口癖 ====================
   F07:
     id: F07
-    name: 平面信徒
-    description: 牧平的「迷信」实则是远古的技术残响
+    name: 顾临口癖
+    description: 他是收敛主义的人类代表样本
     stages:
       plant:
-        zoneId: C2-Z1
-        dialogueId: MUPING_PRAYER_01
+        zone: C0-Z4
+        description: "城市不需要更多复杂度"
       deepen:
-        zoneId: C3-Z7
-        dialogueId: MUPING_TRUTH_01
-        condition:
-          hasCard: CARD_C3_RELIC
-      resolve:
-        zoneId: CF-Z2
-        condition:
-          abilityUnlocked: TIME_INTERVENTION
-          zoneCompleted: C5-Z7
+        zone: C4-Z8
+        description: "还能继续被读下去"
+      mislead:
+        zone: C5-Z2
+        description: 玩家以为他在替阴谋说话
+      reveal:
+        zone: CF-Z6
+        description: 顾临承认"读不下去的东西也能留下"
 
-  # ==================== F08: 栖蓝的多余 ====================
+  # ==================== F08-F10: 预留位 ====================
   F08:
     id: F08
-    name: 无收益残差
-    description: 栖蓝的存在本身就在挑战系统
+    name: 预留伏笔08
+    description: 预留位，用于后续扩展
     stages:
       plant:
-        zoneId: C2-Z4
-        dialogueId: QILAN_FIRST_01
+        zone: TBD
+        description: 待定义
       deepen:
-        zoneId: C4-Z1
-        dialogueId: QILAN_PURPOSE_01
-        condition:
-          rMin: 4
-      resolve:
-        zoneId: CF-Z3
-        condition:
-          rMin: 8
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
 
-  # ==================== F09: 陈匠的坚持 ====================
   F09:
     id: F09
-    name: 点灯者
-    description: 陈匠为不存在的人点灯
+    name: 预留伏笔09
+    description: 预留位，用于后续扩展
     stages:
       plant:
-        zoneId: C2-Z5
-        dialogueId: CHENJIANG_LAMP_01
+        zone: TBD
+        description: 待定义
       deepen:
-        zoneId: C4-Z4
-        dialogueId: CHENJIANG_REASON_01
-        condition:
-          zoneCompleted: C4-Z3
-      resolve:
-        zoneId: CF-Z4
-        condition:
-          zoneCompleted: CF-Z3
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
 
+  F10:
+    id: F10
+    name: 预留伏笔10
+    description: 预留位，用于后续扩展
+    stages:
+      plant:
+        zone: TBD
+        description: 待定义
+      deepen:
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
 
+  # ==================== F11: 字段空白闪现 ====================
+  F11:
+    id: F11
+    name: 字段空白闪现
+    description: 第三层显影方式：格式不是给人看的
+    stages:
+      plant:
+        zone: C3-Z2
+        description: 救援记录B版出现"字段：——"
+      deepen:
+        zone: C5-Z2
+        description: 纠偏回执半字段表
+      mislead:
+        zone: C5-Z4
+        description: 玩家以为是外星人/神秘组织在写日志
+      reveal:
+        zone: CF-Z3
+        description: 字段接受回执（字段◦◦◦固定）
 
+  # ==================== F12: 自相似/表示痕迹 ====================
+  F12:
+    id: F12
+    name: 自相似表示痕迹
+    description: 表示格式的投影残留
+    stages:
+      plant:
+        zone: C2-Z3
+        description: 楼梯间地图差异
+      deepen:
+        zone: C5-Z1
+        description: 版本冲突现场滑动对比卡
+      mislead:
+        zone: C5-Z3
+        description: 玩家以为是迷宫彩蛋
+      reveal:
+        zone: CF-Z3
+        description: 格式坠落时，提示语从句子变成标签
 
+  # ==================== F13: 补丁一致性 ====================
+  F13:
+    id: F13
+    name: 补丁一致性
+    description: 自洽代价的可视化（不可归因）
+    stages:
+      plant:
+        zone: C4-Z2
+        description: 演示回溯桌角擦痕
+      deepen:
+        zone: C4-Z3
+        description: 强制回溯后墙面补丁标记
+      mislead:
+        zone: C4-Z5
+        description: 玩家以为系统在惩罚你
+      reveal:
+        zone: CF-Z4
+        description: 补丁不再被视为错误，纳入字段可承载的现象
 
+  # ==================== F14: 编号/刻度点 ====================
+  F14:
+    id: F14
+    name: 编号刻度点
+    description: 对账序列在低维的伪装输出
+    stages:
+      plant:
+        zone: C3-Z5
+        description: 病例卡-01编号空块
+      deepen:
+        zone: C4-Z4
+        description: 病例卡-02刻度点与节点卡一致
+      mislead:
+        zone: C5-Z1
+        description: 玩家以为是单纯UI风格
+      reveal:
+        zone: CF-Z3
+        description: 字段刻度板（玩家亲手点出◦◦◦）
 
+  # ==================== F15: 祷文首字链 ====================
+  F15:
+    id: F15
+    name: 祷文首字链
+    description: 用隐喻绕开"危险知识判定"的传播方式
+    stages:
+      plant:
+        zone: C1-Z5
+        description: 祷文抄本-01首次出现
+      deepen:
+        zone: C5-Z4
+        description: 祷文抄本-04更接近模型词碎片
+      mislead:
+        zone: C5-Z5
+        description: 玩家以为是宗教彩蛋
+      reveal:
+        zone: CF-Z6
+        description: 祷文拼读结果"字段已接受"
 
+  # ==================== F16-F20: 预留位 ====================
+  F16:
+    id: F16
+    name: 预留伏笔16
+    description: 预留位，用于后续扩展
+    stages:
+      plant:
+        zone: TBD
+        description: 待定义
+      deepen:
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
 
+  F17:
+    id: F17
+    name: 预留伏笔17
+    description: 预留位，用于后续扩展
+    stages:
+      plant:
+        zone: TBD
+        description: 待定义
+      deepen:
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
 
+  F18:
+    id: F18
+    name: 预留伏笔18
+    description: 预留位，用于后续扩展
+    stages:
+      plant:
+        zone: TBD
+        description: 待定义
+      deepen:
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
+
+  F19:
+    id: F19
+    name: 预留伏笔19
+    description: 预留位，用于后续扩展
+    stages:
+      plant:
+        zone: TBD
+        description: 待定义
+      deepen:
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
+
+  F20:
+    id: F20
+    name: 预留伏笔20
+    description: 预留位，用于后续扩展
+    stages:
+      plant:
+        zone: TBD
+        description: 待定义
+      deepen:
+        zone: TBD
+        description: 待定义
+      reveal:
+        zone: TBD
+        description: 待定义
+
+  # ==================== F21: 判词无意义 ====================
+  F21:
+    id: F21
+    name: 判词无意义
+    description: 模型无法解释无收益残差，只能判无意义
+    stages:
+      plant:
+        zone: C5-Z7
+        description: 玩家完成无收益微任务触发判词
+      deepen:
+        zone: CF-Z2
+        description: 系统改成"条目：不可结算。已保留。"
+      mislead:
+        zone: CF-Z1
+        description: 玩家以为系统在羞辱玩家
+      reveal:
+        zone: CF-Z3
+        description: 玩家定义字段，系统说"字段已接受"
+
+  # ==================== F22: 冗余信息不可关闭 ====================
+  F22:
+    id: F22
+    name: 冗余信息不可关闭
+    description: 抽象层级坠落，系统不得不保留新字段占位
+    stages:
+      plant:
+        zone: C5-Z6
+        description: 离开审计覆盖区时短暂残留提示条
+      deepen:
+        zone: CF-Z1
+        description: 底部冗余字段条永久存在
+      mislead:
+        zone: CF-Z2
+        description: 玩家以为是bug/界面坏了
+      reveal:
+        zone: CF-Z3
+        description: 字段条可点击并被接受
+
+  # ==================== F23: 非最优解被保存 ====================
+  F23:
+    id: F23
+    name: 非最优解被保存
+    description: 字段接受后，"多余"获得合法性
+    stages:
+      plant:
+        zone: C3-Z4
+        description: 空椅子作为情感锚
+      deepen:
+        zone: C5-Z5
+        description: 椅子消失→占位→R高时短暂实体显影
+      mislead:
+        zone: CF-Z1
+        description: 玩家以为是支线彩蛋物件
+      reveal:
+        zone: CF-Z4
+        description: 系统首次说"条目：保留。"
+
+  # ==================== F24: 解释成本语义漂移 ====================
+  F24:
+    id: F24
+    name: 解释成本语义漂移
+    description: 玩家理解"意义=解释成本=模型参数"
+    stages:
+      plant:
+        zone: C2-Z1
+        description: 早期像行政话术（授权、顾临提醒）
+      deepen:
+        zone: C4-Z1
+        description: 变成警告（权限收紧）
+      mislead:
+        zone: C5-Z1
+        description: 玩家以为是官僚用语
+      reveal:
+        zone: CF-Z3
+        description: 变成无法回避的代价（字段接受回执）
+
+  # ==================== F25: 对象不存在悖论 ====================
+  F25:
+    id: F25
+    name: 对象不存在悖论
+    description: 尺度失配的语言痕迹（不是阴谋，是格式不对）
+    stages:
+      plant:
+        zone: C3-Z5
+        description: 救援时（陈匠、门影）
+      deepen:
+        zone: C4-Z5
+        description: 点灯/纸条塞回墙缝
+      mislead:
+        zone: C5-Z2
+        description: 玩家以为是系统bug或阴谋
+      reveal:
+        zone: CF-Z3
+        description: 仪式③点灯与字段接受
+
+  # ==================== F26: 删选项预言链 ====================
+  F26:
+    id: F26
+    name: 删选项预言链
+    description: 玩家意识到自己一直在和"可选性"对抗
+    stages:
+      plant:
+        zone: C5-Z4
+        description: 牧平说"算不过来会删选项"
+      deepen:
+        zone: CF-Z4
+        description: 感受到选项在减少
+      mislead:
+        zone: CF-Z5
+        description: 玩家以为是分支设计问题
+      reveal:
+        zone: CF-Z5
+        description: 三结局：继续删选项/让选项变多/你背代价

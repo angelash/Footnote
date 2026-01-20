@@ -6,18 +6,22 @@
 
 import { createLogger } from '@/utils/Logger';
 import { parse as parseYaml } from 'yaml';
+import { narrativeEngine } from '@/systems/narrative';
 
 const logger = createLogger('NarrativeDataLoader');
-import type { IDialogue, ICard, IForeshadow } from '@/types';
+import type { IDialogue, ICard, IForeshadow, ICardStateOverride } from '@/types';
 import type { CardType, ChapterID, AbilityType } from '@/config/game.config';
 
 // ==================== 类型定义 ====================
 
-interface IRawDialogue {
+/**
+ * 旧格式对话（C0）- 单行对话
+ */
+interface IRawDialogueOld {
   id: string;
   speaker: string;
   text: string;
-  expression?: string; // 角色表情
+  expression?: string;
   next?: string | null;
   choices?: {
     label: string;
@@ -34,14 +38,88 @@ interface IRawDialogue {
   condition?: IRawCondition;
 }
 
+/**
+ * 新格式对话行
+ */
+interface IRawDialogueLine {
+  speaker: string;
+  text: string;
+  portrait?: string;
+  emotion?: string;
+  action?: IRawDialogueAction;
+  delay?: number;
+}
+
+/**
+ * 新格式对话动作
+ */
+interface IRawDialogueAction {
+  type: 'card' | 'foreshadow' | 'flag' | 'ability' | 'sfx' | 'bgm';
+  cardId?: string;
+  foreshadowId?: string;
+  foreshadowStage?: string;
+  flagName?: string;
+  flagValue?: boolean;
+  abilityType?: string;
+  audioKey?: string;
+}
+
+/**
+ * 新格式对话（C1+）- 多行对话
+ */
+interface IRawDialogueNew {
+  id: string;
+  lines: IRawDialogueLine[];
+  choices?: {
+    id: string;
+    text: string;
+    condition?: IRawCondition | { flagTrue?: string };
+    effects?: {
+      rDelta?: number;
+      pDelta?: number;
+      setFlag?: { name: string; value: boolean };
+      giveCard?: string;
+      triggerForeshadow?: { id: string; stage: string };
+    };
+    nextDialogueId?: string;
+  }[];
+  onComplete?: IRawDialogueAction[];
+}
+
+/**
+ * 统一的原始对话类型（可能是新格式或旧格式）
+ */
+type IRawDialogue = IRawDialogueOld | IRawDialogueNew;
+
+/**
+ * 检查是否为新格式对话
+ */
+function isNewFormatDialogue(raw: IRawDialogue): raw is IRawDialogueNew {
+  return 'lines' in raw && Array.isArray(raw.lines);
+}
+
+/**
+ * 原始卡片数据格式（兼容两种格式）
+ *
+ * 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
+ * 格式B (C1-CF): { id, title, type, content(string), flavorText, rarity, foreshadowId }
+ */
 interface IRawCard {
   id: string;
-  name: string;
+  // 格式A字段
+  name?: string;
+  chapter?: string;
+  zone?: string;
+  front?: string[];
+  detail?: string[];
+  // 格式B字段
+  title?: string;
+  content?: string;
+  flavorText?: string;
+  rarity?: string;
+  foreshadowId?: string;
+  // 通用字段
   type: string;
-  chapter: string;
-  zone: string;
-  front: string[];
-  detail: string[];
   fx?: {
     type: string;
     value: number;
@@ -93,40 +171,160 @@ interface IRawCondition {
 // ==================== 加载函数 ====================
 
 /**
- * 加载对话数据
+ * 将旧格式对话转换为统一的IDialogue格式
+ */
+function normalizeOldFormatDialogue(raw: IRawDialogueOld): IDialogue {
+  return {
+    id: raw.id,
+    speaker: raw.speaker,
+    text: raw.text,
+    expression: raw.expression as IDialogue['expression'],
+    next: raw.next ?? null,
+    choices: raw.choices?.map((c) => ({
+      label: c.label,
+      next: c.next,
+      effect: c.effect,
+      condition: c.condition ? transformCondition(c.condition) : undefined,
+    })),
+    trigger: raw.trigger
+      ? {
+          card: raw.trigger.card,
+          foreshadow: raw.trigger.foreshadow as [string, 'plant' | 'deepen' | 'resolve'] | undefined,
+          ability: raw.trigger.ability as AbilityType | undefined,
+          event: raw.trigger.event,
+        }
+      : undefined,
+    condition: raw.condition ? transformCondition(raw.condition) : undefined,
+  };
+}
+
+/**
+ * 将新格式对话转换为多个IDialogue（每行一个对话，通过next链接）
+ */
+function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
+  const dialogues: IDialogue[] = [];
+  const lines = raw.lines;
+
+  if (lines.length === 0) {
+    return [];
+  }
+
+  // 为每一行生成对话ID
+  const generateLineId = (index: number): string => {
+    return index === 0 ? raw.id : `${raw.id}_LINE_${index}`;
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const isLastLine = i === lines.length - 1;
+    const currentId = generateLineId(i);
+    const nextId = isLastLine ? null : generateLineId(i + 1);
+
+    // 转换行内动作为trigger
+    let trigger: IDialogue['trigger'] | undefined;
+    if (line.action) {
+      trigger = {
+        card: line.action.cardId,
+        foreshadow:
+          line.action.foreshadowId && line.action.foreshadowStage
+            ? ([line.action.foreshadowId, line.action.foreshadowStage] as [
+                string,
+                'plant' | 'deepen' | 'resolve',
+              ])
+            : undefined,
+        ability: line.action.abilityType as AbilityType | undefined,
+      };
+    }
+
+    // 最后一行处理选项和onComplete
+    let choices: IDialogue['choices'] | undefined;
+    if (isLastLine && raw.choices) {
+      choices = raw.choices.map((c) => ({
+        label: c.text,
+        next: c.nextDialogueId ?? '',
+        effect: c.effects
+          ? {
+              r: c.effects.rDelta,
+              p: c.effects.pDelta,
+            }
+          : undefined,
+        condition: c.condition ? transformConditionNew(c.condition) : undefined,
+      }));
+    }
+
+    // 处理onComplete中的触发器（附加到最后一行）
+    if (isLastLine && raw.onComplete) {
+      const triggers = raw.onComplete;
+      // 合并所有onComplete动作到trigger
+      for (const action of triggers) {
+        if (!trigger) trigger = {};
+        if (action.type === 'card' && action.cardId) {
+          trigger.card = action.cardId;
+        }
+        if (action.type === 'foreshadow' && action.foreshadowId && action.foreshadowStage) {
+          trigger.foreshadow = [action.foreshadowId, action.foreshadowStage] as [
+            string,
+            'plant' | 'deepen' | 'resolve',
+          ];
+        }
+        if (action.type === 'ability' && action.abilityType) {
+          trigger.ability = action.abilityType as AbilityType;
+        }
+      }
+    }
+
+    const dialogue: IDialogue = {
+      id: currentId,
+      speaker: line.speaker,
+      text: line.text,
+      expression: (line.emotion || line.portrait) as IDialogue['expression'],
+      next: nextId,
+      choices,
+      trigger,
+    };
+
+    dialogues.push(dialogue);
+  }
+
+  return dialogues;
+}
+
+/**
+ * 转换新格式的条件
+ */
+function transformConditionNew(
+  raw: IRawCondition | { flagTrue?: string }
+): IDialogue['condition'] | undefined {
+  if ('flagTrue' in raw && raw.flagTrue) {
+    // 新格式的flagTrue条件 - 映射到dialogueCompleted（临时方案）
+    return {
+      dialogueCompleted: raw.flagTrue,
+    };
+  }
+  return transformCondition(raw as IRawCondition);
+}
+
+/**
+ * 加载对话数据 - 兼容新旧两种格式
  */
 export function loadDialogues(yamlContent: string): IDialogue[] {
   try {
     const data = parseYaml(yamlContent);
     if (!data?.dialogues) return [];
 
-    return Object.values(data.dialogues).map((raw: unknown) => {
-      const dialogue = raw as IRawDialogue;
-      return {
-        id: dialogue.id,
-        speaker: dialogue.speaker,
-        text: dialogue.text,
-        expression: dialogue.expression as IDialogue['expression'],
-        next: dialogue.next ?? null,
-        choices: dialogue.choices?.map((c) => ({
-          label: c.label,
-          next: c.next,
-          effect: c.effect,
-          condition: c.condition ? transformCondition(c.condition) : undefined,
-        })),
-        trigger: dialogue.trigger
-          ? {
-              card: dialogue.trigger.card,
-              foreshadow: dialogue.trigger.foreshadow as
-                | [string, 'plant' | 'deepen' | 'resolve']
-                | undefined,
-              ability: dialogue.trigger.ability as AbilityType | undefined,
-              event: dialogue.trigger.event,
-            }
-          : undefined,
-        condition: dialogue.condition ? transformCondition(dialogue.condition) : undefined,
-      } as IDialogue;
-    });
+    const result: IDialogue[] = [];
+
+    for (const raw of Object.values(data.dialogues) as IRawDialogue[]) {
+      if (isNewFormatDialogue(raw)) {
+        // 新格式：多行对话转换为多个IDialogue
+        result.push(...normalizeNewFormatDialogue(raw));
+      } else {
+        // 旧格式：单行对话直接转换
+        result.push(normalizeOldFormatDialogue(raw));
+      }
+    }
+
+    return result;
   } catch (error) {
     logger.error('解析对话数据失败:', error);
     return [];
@@ -134,7 +332,118 @@ export function loadDialogues(yamlContent: string): IDialogue[] {
 }
 
 /**
+ * 转换 YAML 中的 fx 数据为 ICardFX 格式
+ * YAML 格式: { type, value, condition }
+ * ICardFX 格式: { type, target, effect?, duration? }
+ */
+function transformCardFx(
+  rawFx?: { type: string; value: number; condition?: IRawCondition }[]
+): ICard['fx'] {
+  if (!rawFx || rawFx.length === 0) return undefined;
+
+  return rawFx.map((f) => ({
+    type: f.type as 'taint' | 'flash' | 'shake' | 'fade',
+    target: 'self', // 默认目标为自身
+    effect: f.condition ? JSON.stringify(f.condition) : undefined,
+    duration: f.value > 0 ? f.value * 1000 : undefined, // 将 value 转换为毫秒
+  }));
+}
+
+/**
+ * 转换 YAML 中的 states 数据为 ICardStateOverride 格式
+ * YAML 格式: Record<string, { front?, detail? }>
+ * ICardStateOverride 格式: { trigger, override?, append? }
+ */
+function transformCardStates(
+  rawStates?: Record<string, { front?: string[]; detail?: string[] }>
+): ICard['states'] {
+  if (!rawStates) return undefined;
+
+  const result: Record<string, ICardStateOverride> = {};
+  for (const [stateKey, stateValue] of Object.entries(rawStates)) {
+    result[stateKey] = {
+      trigger: stateKey, // 使用 state key 作为触发器名
+      override:
+        stateValue.front || stateValue.detail
+          ? {
+              front: stateValue.front,
+              detail: stateValue.detail,
+            }
+          : undefined,
+    };
+  }
+  return result;
+}
+
+/**
+ * 标准化卡片数据，兼容两种格式
+ *
+ * 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
+ * 格式B (C1-CF): { id, title, type, content(string), flavorText, rarity, foreshadowId }
+ *
+ * @param raw 原始卡片数据
+ * @returns 标准化的卡片数据
+ */
+function normalizeCard(raw: IRawCard): ICard {
+  // 判断是哪种格式：如果有 name 和 front 字段，则是格式A
+  const isFormatA = raw.name !== undefined && raw.front !== undefined;
+
+  if (isFormatA) {
+    // 格式A: 直接使用原字段
+    return {
+      id: raw.id,
+      name: raw.name!,
+      type: raw.type as CardType,
+      chapter: (raw.chapter || 'C0') as ChapterID,
+      zone: raw.zone || '',
+      front: raw.front!,
+      detail: raw.detail || [],
+      fx: transformCardFx(raw.fx),
+      states: transformCardStates(raw.states),
+    };
+  } else {
+    // 格式B: 转换字段
+    // content 是多行字符串，需要转换为数组
+    const contentLines = raw.content
+      ? raw.content
+          .split('\n')
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0)
+      : [];
+
+    // front 取内容前2-3行作为简介，detail 取完整内容
+    const frontLines = contentLines.slice(0, Math.min(3, contentLines.length));
+
+    // detail 包含完整内容 + flavorText（如果有）
+    const detailLines = [...contentLines];
+    if (raw.flavorText) {
+      detailLines.push('——');
+      detailLines.push(raw.flavorText);
+    }
+
+    // 从 id 解析 chapter（例如 CARD_C1_PERMIT -> C1）
+    const chapterMatch = raw.id.match(/CARD_(C[0-5F]|CF|RV)_/i);
+    const chapter = chapterMatch ? chapterMatch[1].toUpperCase() : 'C0';
+
+    return {
+      id: raw.id,
+      name: raw.title || raw.id,
+      type: raw.type as CardType,
+      chapter: chapter as ChapterID,
+      zone: raw.zone || '',
+      front: frontLines,
+      detail: detailLines,
+      fx: transformCardFx(raw.fx),
+      states: transformCardStates(raw.states),
+    };
+  }
+}
+
+/**
  * 加载卡片数据
+ * 支持两种YAML格式：
+ * - 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
+ * - 格式B (C1-CF): { id, title, type, content(string), flavorText, rarity, foreshadowId }
  */
 export function loadCards(yamlContent: string): ICard[] {
   try {
@@ -143,21 +452,7 @@ export function loadCards(yamlContent: string): ICard[] {
 
     return Object.values(data.cards).map((raw: unknown) => {
       const card = raw as IRawCard;
-      return {
-        id: card.id,
-        name: card.name,
-        type: card.type as CardType,
-        chapter: card.chapter as ChapterID,
-        zone: card.zone,
-        front: card.front,
-        detail: card.detail,
-        fx: card.fx?.map((f) => ({
-          type: f.type,
-          value: f.value,
-          condition: f.condition ? transformCondition(f.condition) : undefined,
-        })),
-        states: card.states,
-      } as ICard;
+      return normalizeCard(card);
     });
   } catch (error) {
     logger.error('解析卡片数据失败:', error);
@@ -220,6 +515,67 @@ function transformStageConfig(raw: IRawStageConfig): IForeshadow['stages']['plan
 // ==================== 批量加载 ====================
 
 /**
+ * 所有对话文件列表（47个）
+ */
+const ALL_DIALOGUE_FILES = [
+  // C0 序章 (4个)
+  'c0_z1',
+  'c0_z2',
+  'c0_z3',
+  'c0_z4',
+  // C1 第一章 (6个)
+  'c1_z1',
+  'c1_z2',
+  'c1_z3',
+  'c1_z4',
+  'c1_z5',
+  'c1_z6',
+  // C2 第二章 (7个)
+  'c2_z1',
+  'c2_z2',
+  'c2_z3',
+  'c2_z4',
+  'c2_z5',
+  'c2_z6',
+  'c2_z7',
+  // C3 第三章 (7个)
+  'c3_z1',
+  'c3_z2',
+  'c3_z3',
+  'c3_z4',
+  'c3_z5',
+  'c3_z6',
+  'c3_z7',
+  // C4 第四章 (8个)
+  'c4_z1',
+  'c4_z2',
+  'c4_z3',
+  'c4_z4',
+  'c4_z5',
+  'c4_z6',
+  'c4_z7',
+  'c4_z8',
+  // C5 第五章 (7个)
+  'c5_z1',
+  'c5_z2',
+  'c5_z3',
+  'c5_z4',
+  'c5_z5',
+  'c5_z6',
+  'c5_z7',
+  // CF 终章 (6个)
+  'cf_z1',
+  'cf_z2',
+  'cf_z3',
+  'cf_z4',
+  'cf_z5',
+  'cf_z6',
+  // 特殊对话 (2个)
+  'rv_dialogues',
+  'ngplus_dialogues',
+];
+
+/**
  * 加载所有叙事数据
  */
 export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
@@ -231,24 +587,38 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
   const cards: ICard[] = [];
   const foreshadows: IForeshadow[] = [];
 
-  // 加载对话文件
-  const dialogueFiles = ['c0_z1', 'c0_z2', 'c0_z3', 'c0_z4'];
+  let loadedFileCount = 0;
+  let failedFileCount = 0;
 
-  for (const file of dialogueFiles) {
+  // 加载所有47个对话文件
+  for (const file of ALL_DIALOGUE_FILES) {
     try {
       const content = scene.cache.text.get(`dialogue_${file}`);
       if (content) {
-        dialogues.push(...loadDialogues(content));
+        const parsed = loadDialogues(content);
+        dialogues.push(...parsed);
+        loadedFileCount++;
+        logger.debug(`加载对话文件成功: ${file} (${parsed.length}条对话)`);
+      } else {
+        logger.debug(`对话文件未在缓存中: ${file}`);
       }
     } catch (error) {
+      failedFileCount++;
       logger.warn(`加载对话文件失败: ${file}`, error);
     }
   }
 
-  // 加载卡片文件
+  // 加载卡片文件（所有章节）
   const cardFiles = [
-    'c0_cards',
-    // 添加更多卡片文件...
+    'c0_cards', // C0 序章: 9 张
+    'c1_cards', // C1 第一章: 6 张
+    'c2_cards', // C2 第二章: 7 张
+    'c3_cards', // C3 第三章: 9 张
+    'c4_cards', // C4 第四章: 10 张
+    'c5_cards', // C5 第五章: 10 张
+    'cf_cards', // CF 终章: 12 张
+    'rv_cards', // RV 重返变体: 12 张
+    // 总计: 75 张
   ];
 
   for (const file of cardFiles) {
@@ -272,11 +642,133 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
     logger.warn('加载伏笔文件失败', error);
   }
 
-  logger.info('数据加载完成:', {
-    dialogues: dialogues.length,
+  // 注册数据到 NarrativeEngine
+  registerDataToNarrativeEngine(dialogues, cards, foreshadows);
+
+  logger.info('叙事数据加载完成:', {
+    dialogueFiles: `${loadedFileCount}/${ALL_DIALOGUE_FILES.length}`,
+    failedFiles: failedFileCount,
+    totalDialogues: dialogues.length,
     cards: cards.length,
     foreshadows: foreshadows.length,
   });
 
   return { dialogues, cards, foreshadows };
+}
+
+/**
+ * 将加载的数据注册到 NarrativeEngine
+ */
+function registerDataToNarrativeEngine(
+  dialogues: IDialogue[],
+  cards: ICard[],
+  foreshadows: IForeshadow[]
+): void {
+  // 转换 IDialogue 为 NarrativeEngine 期望的 IDialogueData 格式
+  for (const dialogue of dialogues) {
+    narrativeEngine.registerDialogue({
+      id: dialogue.id,
+      lines: [
+        {
+          speaker: dialogue.speaker,
+          text: dialogue.text,
+          portrait: dialogue.expression,
+          emotion: dialogue.expression,
+        },
+      ],
+      choices: dialogue.choices?.map((c) => ({
+        id: c.label,
+        text: c.label,
+        nextDialogueId: c.next || undefined,
+        condition: c.condition
+          ? {
+              hasCard: c.condition.hasCard,
+              rMin: c.condition.rMin,
+            }
+          : undefined,
+        effects: c.effect
+          ? {
+              rDelta: c.effect.r,
+              pDelta: c.effect.p,
+            }
+          : undefined,
+      })),
+      onComplete: dialogue.trigger
+        ? [
+            dialogue.trigger.card
+              ? { type: 'card' as const, cardId: dialogue.trigger.card }
+              : null,
+            dialogue.trigger.foreshadow
+              ? {
+                  type: 'foreshadow' as const,
+                  foreshadowId: dialogue.trigger.foreshadow[0],
+                  foreshadowStage: dialogue.trigger.foreshadow[1] as
+                    | 'plant'
+                    | 'deepen'
+                    | 'misread'
+                    | 'collect',
+                }
+              : null,
+            dialogue.trigger.ability
+              ? { type: 'ability' as const, abilityType: dialogue.trigger.ability }
+              : null,
+          ].filter(Boolean) as import('@/systems/narrative').IDialogueAction[]
+        : undefined,
+    });
+  }
+
+  // 注册卡片
+  for (const card of cards) {
+    narrativeEngine.registerCard({
+      id: card.id,
+      title: card.name,
+      subtitle: '',
+      category: card.type as unknown as import('@/systems/narrative').CardCategory,
+      content: card.front?.join('\n') || '',
+      chapter: card.chapter,
+      zone: card.zone,
+      image: undefined,
+      effects: card.fx?.map((f) => ({
+        type: f.type as 'taint' | 'flash' | 'glitch' | 'redact',
+        target: f.target,
+        intensity: f.duration,
+      })),
+    });
+  }
+
+  // 注册伏笔
+  for (const foreshadow of foreshadows) {
+    narrativeEngine.registerForeshadow({
+      id: foreshadow.id,
+      name: foreshadow.name,
+      description: '',
+      stages: {
+        plant: {
+          zone: foreshadow.stages.plant.zone,
+          trigger: foreshadow.stages.plant.trigger,
+          description: foreshadow.stages.plant.description,
+        },
+        deepen: {
+          zone: foreshadow.stages.deepen.zone,
+          trigger: foreshadow.stages.deepen.trigger,
+          description: foreshadow.stages.deepen.description,
+        },
+        misread: foreshadow.stages.misread,
+        collect: {
+          zone: foreshadow.stages.resolve.zone,
+          trigger: foreshadow.stages.resolve.trigger,
+          description: foreshadow.stages.resolve.description,
+        },
+      },
+    });
+  }
+
+  logger.info(`数据已注册到 NarrativeEngine: ${dialogues.length} 对话, ${cards.length} 卡片, ${foreshadows.length} 伏笔`);
+}
+
+/**
+ * 获取所有对话文件列表
+ */
+export function getAllDialogueFiles(): string[] {
+  return [...ALL_DIALOGUE_FILES];
 }

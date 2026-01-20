@@ -12,26 +12,59 @@ const logger = createLogger('ForeshadowManager');
 import { worldState } from '@/systems/world';
 import { UI_FONT_SIZE } from '@/config/ui.config';
 
+/**
+ * 伏笔阶段（统一命名）
+ * - plant: 首次投放
+ * - deepen: 加深
+ * - mislead: 误读（可选）
+ * - reveal: 回收/揭示
+ */
 export enum ForeshadowStage {
   /** 首次投放 */
   PLANT = 'plant',
   /** 加深 */
   DEEPEN = 'deepen',
   /** 误读（可选） */
-  MISREAD = 'misread',
-  /** 回收 */
-  COLLECT = 'collect',
+  MISLEAD = 'mislead',
+  /** 回收/揭示 */
+  REVEAL = 'reveal',
 }
 
+/**
+ * YAML 中的伏笔阶段配置
+ */
+interface IForeshadowStageConfig {
+  zone: string;
+  description: string;
+}
+
+/**
+ * YAML 中的伏笔定义
+ */
+interface IForeshadowYamlData {
+  id: string;
+  name: string;
+  description: string;
+  stages: {
+    plant?: IForeshadowStageConfig;
+    deepen?: IForeshadowStageConfig;
+    mislead?: IForeshadowStageConfig;
+    reveal?: IForeshadowStageConfig;
+  };
+}
+
+/**
+ * 运行时伏笔数据
+ */
 interface IForeshadow {
   id: string;
   name: string;
   description: string;
   stages: {
-    plant?: string;
-    deepen?: string;
-    misread?: string;
-    collect?: string;
+    plant?: IForeshadowStageConfig;
+    deepen?: IForeshadowStageConfig;
+    mislead?: IForeshadowStageConfig;
+    reveal?: IForeshadowStageConfig;
   };
   currentStage: ForeshadowStage;
   isCollected: boolean;
@@ -43,145 +76,64 @@ interface IForeshadowManagerConfig {
 
 /**
  * 伏笔管理器
- * 追踪20+伏笔的状态
+ * 追踪26+伏笔的状态
  */
 export class ForeshadowManager {
   private _scene: Phaser.Scene;
   private _foreshadows: Map<string, IForeshadow> = new Map();
   private _notificationContainer!: Phaser.GameObjects.Container;
-
-  // 核心伏笔定义
-  private static readonly FORESHADOW_DEFINITIONS: Omit<
-    IForeshadow,
-    'currentStage' | 'isCollected'
-  >[] = [
-    {
-      id: 'F01',
-      name: '岑回的例外性质',
-      description: '为什么岑回能看到别人看不到的',
-      stages: {
-        plant: 'C0-Z3',
-        deepen: 'C2-Z2',
-        collect: 'CF-Z3',
-      },
-    },
-    {
-      id: 'F02',
-      name: '顾临的真实立场',
-      description: '他是敌是友',
-      stages: {
-        plant: 'C0-Z4',
-        deepen: 'C3-Z1',
-        misread: 'C4-Z2',
-        collect: 'CF-Z6',
-      },
-    },
-    {
-      id: 'F03',
-      name: '宋岚的记录使命',
-      description: '她为什么要记录',
-      stages: {
-        plant: 'C1-Z2',
-        deepen: 'C2-Z2',
-        collect: 'CF-Z6',
-      },
-    },
-    {
-      id: 'F04',
-      name: '阿棠的漂移原因',
-      description: '她为什么对不上',
-      stages: {
-        plant: 'C1-Z3',
-        deepen: 'RV-01',
-        collect: 'RV-07',
-      },
-    },
-    {
-      id: 'F05',
-      name: '牧平的预言来源',
-      description: '他的话从哪来',
-      stages: {
-        plant: 'C2-Z4',
-        deepen: 'RV-05',
-        collect: 'RV-09',
-      },
-    },
-    {
-      id: 'F06',
-      name: '陈匠的坚守原因',
-      description: '对象不存在仍坚持',
-      stages: {
-        plant: 'C3-Z5',
-        deepen: 'C4-Z5',
-        collect: 'RV-12',
-      },
-    },
-    {
-      id: 'F08',
-      name: '栖蓝的存在价值',
-      description: '多余者的意义',
-      stages: {
-        plant: 'C2-Z3',
-        deepen: 'RV-02',
-        collect: 'CF-Z2',
-      },
-    },
-    {
-      id: 'F15',
-      name: '祷文首字链',
-      description: '四张祷文的秘密',
-      stages: {
-        plant: 'C2-Z4',
-        deepen: 'C3-Z4',
-        collect: 'CF-Z6',
-      },
-    },
-    {
-      id: 'F21',
-      name: '无意义判词',
-      description: '此行为在当前模型中无意义',
-      stages: {
-        plant: 'C5-Z1',
-        deepen: 'C5-Z5',
-        collect: 'C5-Z7',
-      },
-    },
-    {
-      id: 'F22',
-      name: '冗余信息不可关闭',
-      description: '底部字段条',
-      stages: {
-        plant: 'CF-Z1',
-        deepen: 'CF-Z2',
-        collect: 'CF-Z3',
-      },
-    },
-    {
-      id: 'F23',
-      name: '非最优被保存',
-      description: '世界承认多余',
-      stages: {
-        plant: 'C5-Z5',
-        deepen: 'CF-Z2',
-        collect: 'CF-Z4',
-      },
-    },
-  ];
+  private _isLoaded: boolean = false;
 
   constructor(config: IForeshadowManagerConfig) {
     this._scene = config.scene;
-    this._initializeForeshadows();
     this._createNotificationUI();
     this._setupEventListeners();
   }
 
   /**
-   * 初始化伏笔数据
+   * 从 YAML 加载伏笔数据
+   * 应在场景 create 阶段调用
    */
-  private _initializeForeshadows(): void {
-    ForeshadowManager.FORESHADOW_DEFINITIONS.forEach((def) => {
-      this._foreshadows.set(def.id, {
-        ...def,
+  public async loadFromYaml(): Promise<void> {
+    if (this._isLoaded) {
+      logger.warn('伏笔数据已加载，跳过重复加载');
+      return;
+    }
+
+    try {
+      // 从 Phaser 缓存获取已加载的 YAML 数据
+      const yamlData = this._scene.cache.json.get('foreshadows');
+
+      if (yamlData && yamlData.foreshadows) {
+        this._initializeForeshadowsFromYaml(yamlData.foreshadows);
+        this._isLoaded = true;
+        logger.info(`成功加载 ${this._foreshadows.size} 个伏笔定义`);
+      } else {
+        logger.warn('未找到伏笔数据，使用空配置');
+      }
+    } catch (error) {
+      logger.error('加载伏笔数据失败:', error);
+    }
+  }
+
+  /**
+   * 从 YAML 数据初始化伏笔
+   */
+  private _initializeForeshadowsFromYaml(
+    foreshadowsData: Record<string, IForeshadowYamlData>
+  ): void {
+    Object.entries(foreshadowsData).forEach(([key, data]) => {
+      // 跳过预留位（zone 为 TBD 的）
+      if (data.stages.plant?.zone === 'TBD') {
+        logger.debug(`跳过预留伏笔: ${key}`);
+        return;
+      }
+
+      this._foreshadows.set(data.id, {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        stages: data.stages,
         currentStage: ForeshadowStage.PLANT,
         isCollected: false,
       });
@@ -211,6 +163,13 @@ export class ForeshadowManager {
    */
   private _onForeshadowTriggered(data: { foreshadowId: string; stage: string }): void {
     const { foreshadowId, stage } = data;
+    this._handleForeshadowInternal(foreshadowId, stage);
+  }
+
+  /**
+   * 内部伏笔处理逻辑
+   */
+  private _handleForeshadowInternal(foreshadowId: string, stage: string): void {
     const foreshadow = this._foreshadows.get(foreshadowId);
 
     if (!foreshadow) {
@@ -218,29 +177,65 @@ export class ForeshadowManager {
       return;
     }
 
+    // 统一阶段命名映射（兼容旧版 misread -> mislead, collect -> reveal）
+    const normalizedStage = this._normalizeStage(stage);
+
     // 更新阶段
-    const newStage = stage as ForeshadowStage;
     const stageOrder = [
       ForeshadowStage.PLANT,
       ForeshadowStage.DEEPEN,
-      ForeshadowStage.MISREAD,
-      ForeshadowStage.COLLECT,
+      ForeshadowStage.MISLEAD,
+      ForeshadowStage.REVEAL,
     ];
     const currentIndex = stageOrder.indexOf(foreshadow.currentStage);
-    const newIndex = stageOrder.indexOf(newStage);
+    const newIndex = stageOrder.indexOf(normalizedStage);
 
     if (newIndex > currentIndex) {
-      foreshadow.currentStage = newStage;
+      foreshadow.currentStage = normalizedStage;
 
-      if (newStage === ForeshadowStage.COLLECT) {
+      if (normalizedStage === ForeshadowStage.REVEAL) {
         foreshadow.isCollected = true;
         this._showCollectNotification(foreshadow);
       } else {
-        this._showProgressNotification(foreshadow, newStage);
+        this._showProgressNotification(foreshadow, normalizedStage);
       }
 
       // 保存到世界状态
-      worldState.setFlag(`FORESHADOW_${foreshadowId}_${newStage.toUpperCase()}`, true);
+      worldState.setFlag(`FORESHADOW_${foreshadowId}_${normalizedStage.toUpperCase()}`, true);
+
+      // 转发事件到 NarrativeEngine（桥接事件系统）
+      this._scene.events.emit('foreshadow_triggered', {
+        id: foreshadowId,
+        stage: normalizedStage,
+        foreshadow: {
+          name: foreshadow.name,
+          description: foreshadow.description,
+        },
+      });
+
+      logger.info(`伏笔 ${foreshadowId} 进入阶段: ${normalizedStage}`);
+    }
+  }
+
+  /**
+   * 阶段名称标准化（兼容旧版命名）
+   */
+  private _normalizeStage(stage: string): ForeshadowStage {
+    switch (stage.toLowerCase()) {
+      case 'plant':
+        return ForeshadowStage.PLANT;
+      case 'deepen':
+        return ForeshadowStage.DEEPEN;
+      case 'misread':
+      case 'mislead':
+        return ForeshadowStage.MISLEAD;
+      case 'collect':
+      case 'reveal':
+      case 'resolve':
+        return ForeshadowStage.REVEAL;
+      default:
+        logger.warn(`未知伏笔阶段: ${stage}，默认为 PLANT`);
+        return ForeshadowStage.PLANT;
     }
   }
 
@@ -256,7 +251,8 @@ export class ForeshadowManager {
     this._notificationContainer.add(bg);
 
     // 图标
-    const icon = this._scene.add.text(-170, 0, stage === ForeshadowStage.DEEPEN ? '◇' : '◆', {
+    const iconChar = stage === ForeshadowStage.DEEPEN ? '◇' : '◆';
+    const icon = this._scene.add.text(-170, 0, iconChar, {
       fontFamily: 'monospace',
       fontSize: UI_FONT_SIZE.ICON,
       color: '#aaaaff',
@@ -265,7 +261,14 @@ export class ForeshadowManager {
     this._notificationContainer.add(icon);
 
     // 文本
-    const stageText = stage === ForeshadowStage.DEEPEN ? '伏笔加深' : '伏笔误读';
+    const stageLabels: Record<ForeshadowStage, string> = {
+      [ForeshadowStage.PLANT]: '伏笔投放',
+      [ForeshadowStage.DEEPEN]: '伏笔加深',
+      [ForeshadowStage.MISLEAD]: '伏笔误读',
+      [ForeshadowStage.REVEAL]: '伏笔回收',
+    };
+    const stageText = stageLabels[stage] || '伏笔进展';
+
     const text = this._scene.add.text(0, -10, stageText, {
       fontFamily: 'monospace',
       fontSize: UI_FONT_SIZE.TINY,
@@ -365,9 +368,20 @@ export class ForeshadowManager {
 
   /**
    * 触发伏笔
+   * @param foreshadowId 伏笔ID
+   * @param stage 阶段
    */
   public triggerForeshadow(foreshadowId: string, stage: ForeshadowStage): void {
+    // 通过 EventBus 发送事件
     eventBus.emit(GameEvent.FORESHADOW_TRIGGERED, { foreshadowId, stage });
+  }
+
+  /**
+   * 直接触发伏笔（不通过事件总线）
+   * 同时通知 NarrativeEngine
+   */
+  public triggerForeshadowDirect(foreshadowId: string, stage: string): void {
+    this._handleForeshadowInternal(foreshadowId, stage);
   }
 
   /**
@@ -390,6 +404,20 @@ export class ForeshadowManager {
   public getProgress(): { collected: number; total: number } {
     const collected = this.getCollectedForeshadows().length;
     return { collected, total: this._foreshadows.size };
+  }
+
+  /**
+   * 获取所有伏笔
+   */
+  public getAllForeshadows(): IForeshadow[] {
+    return Array.from(this._foreshadows.values());
+  }
+
+  /**
+   * 检查伏笔是否已加载
+   */
+  public isLoaded(): boolean {
+    return this._isLoaded;
   }
 
   /**

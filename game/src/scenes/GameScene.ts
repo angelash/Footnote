@@ -32,6 +32,7 @@ import {
   TouchControls,
   TutorialManager,
   AchievementManager,
+  newGamePlusManager,
 } from '@/systems';
 import { AudioManager } from '@/systems/audio/AudioManager';
 import { narrativeEngine } from '@/systems/narrative';
@@ -145,6 +146,9 @@ export class GameScene extends Phaser.Scene {
 
     // 初始化音频系统
     this._initAudioSystem();
+
+    // 初始化辅助系统（存档、成就、教程、NG+）
+    this._initAuxiliarySystems();
 
     this._sceneAssembler = new SceneAssembler(this, {
       onAction: (action) => this._handleSceneAction(action),
@@ -381,6 +385,51 @@ export class GameScene extends Phaser.Scene {
     this._audioManager.loadConfigs(AUDIO_CONFIG.bgm, AUDIO_CONFIG.sfx, AUDIO_CONFIG.ambience);
 
     logger.info('音频系统初始化完成');
+  }
+
+  /**
+   * 初始化辅助系统（存档、成就、教程、NG+）
+   */
+  private _initAuxiliarySystems(): void {
+    // 1. 存档系统初始化（异步，不阻塞）
+    saveManager.initialize().then(() => {
+      logger.info('存档系统初始化完成');
+    }).catch((error) => {
+      logger.error('存档系统初始化失败:', error);
+    });
+
+    // 2. 成就系统初始化
+    this._achievementManager = new AchievementManager({ scene: this });
+    logger.info('成就系统初始化完成');
+
+    // 3. 教程系统初始化
+    this._tutorialManager = new TutorialManager({ scene: this });
+    logger.info('教程系统初始化完成');
+
+    // 4. New Game+ 系统初始化
+    newGamePlusManager.initialize().then(() => {
+      logger.info('NG+系统初始化完成');
+
+      // 如果是NG+，应用继承内容
+      if (newGamePlusManager.isNewGamePlus()) {
+        logger.info('检测到NG+模式，应用继承奖励');
+        // NG+奖励在 startNewGamePlus 中已应用，这里只做记录
+      }
+    }).catch((error) => {
+      logger.error('NG+系统初始化失败:', error);
+    });
+
+    // 5. 检查是否需要显示教程（仅新游戏且非NG+时）
+    if (this._isNewGame && !newGamePlusManager.isNewGamePlus()) {
+      // 延迟显示第一个教程，等待场景稳定
+      this.time.delayedCall(1500, () => {
+        if (!this._tutorialManager.isAllCompleted()) {
+          this._tutorialManager.checkAndShowNext();
+        }
+      });
+    }
+
+    logger.info('辅助系统初始化完成');
   }
 
   /**
@@ -679,6 +728,9 @@ export class GameScene extends Phaser.Scene {
 
     // 监听播放音效
     eventBus.on(GameEvent.PLAY_SFX, this._onPlaySfx.bind(this));
+
+    // 监听对话结束，处理结局触发
+    eventBus.onTyped(GameEvent.DIALOGUE_END, this._onDialogueEnd.bind(this));
   }
 
   /**
@@ -692,6 +744,7 @@ export class GameScene extends Phaser.Scene {
     eventBus.removeAllListeners(GameEvent.ABILITY_UNLOCK);
     eventBus.removeAllListeners(GameEvent.ZONE_TRANSITION);
     eventBus.removeAllListeners(GameEvent.PLAY_SFX);
+    eventBus.removeAllListeners(GameEvent.DIALOGUE_END);
   }
 
   /**
@@ -706,6 +759,34 @@ export class GameScene extends Phaser.Scene {
    */
   private _onPlaySfx(payload: { key: string }): void {
     this.playSfx(payload.key);
+  }
+
+  /**
+   * 对话结束回调 - 处理结局触发
+   */
+  private _onDialogueEnd(payload: { dialogueId: string }): void {
+    const { dialogueId } = payload;
+
+    // 检查是否是结局确认对话
+    if (dialogueId.startsWith('CFZ5_CONFIRM_ENDING_')) {
+      const endingLetter = dialogueId.charAt(dialogueId.length - 1); // A, B, 或 C
+
+      // 检查结局是否可选
+      const available = this._endingEffects.getAvailableEndings();
+
+      if (available.includes(endingLetter)) {
+        // 设置结局FLAG，触发结局演出
+        worldState.setFlag(`FLAG_ENDING_${endingLetter}`, true);
+        logger.info(`触发结局 ${endingLetter}`);
+      } else {
+        // 结局不可选，显示提示
+        const requirement = this._endingEffects.getEndingRequirement(endingLetter);
+        const counters = worldState.getCounters();
+        this._toastManager?.showWarning(
+          `结局${endingLetter}当前不可选\n条件: ${requirement}\n当前: R=${counters.R}, W=${counters.W}`
+        );
+      }
+    }
   }
 
   /**

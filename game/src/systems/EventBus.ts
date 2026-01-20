@@ -56,6 +56,7 @@ export enum GameEvent {
   LOAD_ERROR = 'load:error',
   SAVE_DELETE = 'save:delete',
   AUTOSAVE_TRIGGER = 'autosave:trigger',
+  TIME_NODE_CREATED = 'time:node:created',
 
   // ==================== 云存档事件 ====================
   CLOUD_SAVE_UPLOAD = 'cloud:save:upload',
@@ -98,6 +99,14 @@ export enum GameEvent {
   SYSTEM_PAUSE = 'system:pause',
   MODEL_REWRITE = 'model:rewrite',
   SETTINGS_UPDATE = 'settings:update',
+
+  // ==================== R值阈值事件 ====================
+  /** R≥3: 系统语气停顿 */
+  R_THRESHOLD_3 = 'r:threshold:3',
+  /** R≥6: 首次判定句 */
+  R_THRESHOLD_6 = 'r:threshold:6',
+  /** R≥10: 结局C路径开启 */
+  R_THRESHOLD_10 = 'r:threshold:10',
 
   // ==================== 国际化事件 ====================
   LOCALE_CHANGED = 'locale:changed',
@@ -165,6 +174,9 @@ export interface IEventPayloads {
   [GameEvent.LOAD_ERROR]: { slot: number; error: unknown };
   [GameEvent.SAVE_DELETE]: { slot: number };
   [GameEvent.AUTOSAVE_TRIGGER]: { reason: string };
+  [GameEvent.TIME_NODE_CREATED]: {
+    node: { id: string; zoneId: string; timestamp: number; saveSlot: number; index: number };
+  };
 
   // 云存档事件
   [GameEvent.CLOUD_SAVE_UPLOAD]: { slot: number; success: boolean };
@@ -206,6 +218,11 @@ export interface IEventPayloads {
   [GameEvent.SYSTEM_PAUSE]: { rValue: number };
   [GameEvent.MODEL_REWRITE]: { rValue: number };
   [GameEvent.SETTINGS_UPDATE]: { settings: Record<string, unknown> };
+
+  // R值阈值事件payload
+  [GameEvent.R_THRESHOLD_3]: { rValue: number };
+  [GameEvent.R_THRESHOLD_6]: { rValue: number };
+  [GameEvent.R_THRESHOLD_10]: { rValue: number };
 
   // 国际化事件
   [GameEvent.LOCALE_CHANGED]: { locale: string; previousLocale: string };

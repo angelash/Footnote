@@ -7,6 +7,8 @@
 import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { UI_FONT_SIZE } from '@/config/ui.config';
+import { worldState } from '@/systems/world';
+import { newGamePlusManager } from '@/systems/game/NewGamePlus';
 
 export enum EndingType {
   /** 结局A：继续收敛（平面稳定） */
@@ -50,6 +52,79 @@ export class EndingEffects {
    */
   private _setupEventListeners(): void {
     eventBus.on(GameEvent.ENDING_TRIGGERED, this._onEndingTriggered, this);
+    // 监听结局FLAG设置
+    eventBus.on(GameEvent.FLAG_SET, this._onFlagSet, this);
+  }
+
+  /**
+   * 监听FLAG设置事件，自动触发结局
+   */
+  private _onFlagSet(data: { flagName: string; value: boolean }): void {
+    if (!data.value) return;
+
+    // 检查是否是结局FLAG
+    if (data.flagName === 'FLAG_ENDING_A') {
+      this.triggerEnding(EndingType.CONVERGENCE);
+    } else if (data.flagName === 'FLAG_ENDING_B') {
+      this.triggerEnding(EndingType.RELEASE);
+    } else if (data.flagName === 'FLAG_ENDING_C') {
+      this.triggerEnding(EndingType.CARRIER);
+    }
+  }
+
+  /**
+   * 判定可选结局
+   * @param R 无收益残差值
+   * @param W 世界可读性值
+   * @returns 可选结局列表
+   */
+  public determineAvailableEndings(R: number, W: number): string[] {
+    const available: string[] = [];
+
+    // 结局A: 继续收敛 - R < 6 且 W > 60
+    if (R < 6 && W > 60) available.push('A');
+
+    // 结局B: 释放表示 - R >= 6 且 40 < W <= 60
+    if (R >= 6 && W > 40 && W <= 60) available.push('B');
+
+    // 结局C: 承载字段 - R >= 10 且 W <= 40
+    if (R >= 10 && W <= 40) available.push('C');
+
+    // 如果没有满足条件的结局，默认可选A
+    if (available.length === 0) available.push('A');
+
+    return available;
+  }
+
+  /**
+   * 获取当前可选结局（基于当前世界状态）
+   */
+  public getAvailableEndings(): string[] {
+    const counters = worldState.getCounters();
+    return this.determineAvailableEndings(counters.R, counters.W);
+  }
+
+  /**
+   * 检查结局是否可选
+   */
+  public isEndingAvailable(ending: string): boolean {
+    return this.getAvailableEndings().includes(ending);
+  }
+
+  /**
+   * 获取结局不可选的原因
+   */
+  public getEndingRequirement(ending: string): string {
+    switch (ending) {
+      case 'A':
+        return 'R < 6 且 W > 60';
+      case 'B':
+        return 'R ≥ 6 且 40 < W ≤ 60';
+      case 'C':
+        return 'R ≥ 10 且 W ≤ 40';
+      default:
+        return '未知条件';
+    }
   }
 
   /**
@@ -184,7 +259,7 @@ export class EndingEffects {
 
     // 结束后跳转
     this._scene.time.delayedCall(7000, () => {
-      this._transitionToEpilogue();
+      this._transitionToEpilogue(EndingType.CONVERGENCE);
     });
   }
 
@@ -290,7 +365,7 @@ export class EndingEffects {
 
     // 结束后跳转
     this._scene.time.delayedCall(7000, () => {
-      this._transitionToEpilogue();
+      this._transitionToEpilogue(EndingType.RELEASE);
     });
   }
 
@@ -427,20 +502,26 @@ export class EndingEffects {
 
     // 结束后跳转
     this._scene.time.delayedCall(8000, () => {
-      this._transitionToEpilogue();
+      this._transitionToEpilogue(EndingType.CARRIER);
     });
   }
 
   /**
    * 过渡到尾声
    */
-  private _transitionToEpilogue(): void {
+  private _transitionToEpilogue(endingType?: EndingType): void {
     this._scene.tweens.add({
       targets: this._container,
       alpha: 0,
       duration: 1000,
       onComplete: () => {
         this._isPlaying = false;
+
+        // 记录通关（如果有结局类型）
+        if (endingType) {
+          newGamePlusManager.recordCompletion(endingType);
+        }
+
         eventBus.emit(GameEvent.ZONE_TRANSITION, { targetZone: 'CF-Z6' });
       },
     });
@@ -458,6 +539,7 @@ export class EndingEffects {
    */
   public destroy(): void {
     eventBus.off(GameEvent.ENDING_TRIGGERED, this._onEndingTriggered, this);
+    eventBus.off(GameEvent.FLAG_SET, this._onFlagSet, this);
     this._container?.destroy();
   }
 }

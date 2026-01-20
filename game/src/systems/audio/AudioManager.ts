@@ -63,8 +63,45 @@ export class AudioManager {
   private _dialogueActive: boolean = false;
   private _dialogueVolumeMultiplier: number = 0.5;
 
+  // 音频解锁状态（iOS/微信等环境需要用户手势后才能播放）
+  private _audioUnlocked: boolean = false;
+
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
+  }
+
+  /**
+   * 解锁音频播放（iOS/微信等环境需要用户首次交互后调用）
+   * 在移动端浏览器中，音频需要用户手势触发后才能播放
+   * 通常在首次点击/触摸时调用此方法
+   */
+  public unlockAudio(): void {
+    if (this._audioUnlocked) return;
+
+    // Phaser 内置的解锁机制
+    if (this.scene.sound.locked) {
+      this.scene.sound.unlock();
+      logger.info('Audio context unlocking triggered');
+    }
+
+    // 监听解锁完成
+    this.scene.sound.once('unlocked', () => {
+      this._audioUnlocked = true;
+      logger.info('Audio context unlocked successfully');
+    });
+
+    // 如果已经解锁，直接标记
+    if (!this.scene.sound.locked) {
+      this._audioUnlocked = true;
+      logger.info('Audio context already unlocked');
+    }
+  }
+
+  /**
+   * 检查音频是否已解锁
+   */
+  public isAudioUnlocked(): boolean {
+    return this._audioUnlocked || !this.scene.sound.locked;
   }
 
   /**

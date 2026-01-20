@@ -11,9 +11,15 @@ import { eventBus, GameEvent } from '@/systems/EventBus';
 const logger = createLogger('ForeshadowManager');
 import { worldState } from '@/systems/world';
 import { UI_FONT_SIZE } from '@/config/ui.config';
+import type {
+  IForeshadow as IForeshadowBase,
+  IForeshadowStageConfig,
+  ForeshadowStageLegacy,
+} from '@/types';
+import { normalizeForeshadowStage } from '@/types';
 
 /**
- * 伏笔阶段（统一命名）
+ * 伏笔阶段枚举（统一命名）
  * - plant: 首次投放
  * - deepen: 加深
  * - mislead: 误读（可选）
@@ -31,42 +37,31 @@ export enum ForeshadowStage {
 }
 
 /**
- * YAML 中的伏笔阶段配置
- */
-interface IForeshadowStageConfig {
-  zone: string;
-  description: string;
-}
-
-/**
- * YAML 中的伏笔定义
+ * YAML 中的伏笔定义（兼容多种格式）
  */
 interface IForeshadowYamlData {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   stages: {
     plant?: IForeshadowStageConfig;
     deepen?: IForeshadowStageConfig;
     mislead?: IForeshadowStageConfig;
+    /** @deprecated 使用 mislead */
+    misread?: IForeshadowStageConfig;
     reveal?: IForeshadowStageConfig;
+    /** @deprecated 使用 reveal */
+    resolve?: IForeshadowStageConfig;
   };
 }
 
 /**
- * 运行时伏笔数据
+ * 运行时伏笔数据（扩展基础类型）
  */
-interface IForeshadow {
-  id: string;
-  name: string;
-  description: string;
-  stages: {
-    plant?: IForeshadowStageConfig;
-    deepen?: IForeshadowStageConfig;
-    mislead?: IForeshadowStageConfig;
-    reveal?: IForeshadowStageConfig;
-  };
+interface IForeshadow extends IForeshadowBase {
+  /** 当前阶段 */
   currentStage: ForeshadowStage;
+  /** 是否已回收 */
   isCollected: boolean;
 }
 
@@ -117,23 +112,33 @@ export class ForeshadowManager {
   }
 
   /**
-   * 从 YAML 数据初始化伏笔
+   * 从 YAML 数据初始化伏笔（统一 Schema）
    */
   private _initializeForeshadowsFromYaml(
     foreshadowsData: Record<string, IForeshadowYamlData>
   ): void {
     Object.entries(foreshadowsData).forEach(([key, data]) => {
       // 跳过预留位（zone 为 TBD 的）
-      if (data.stages.plant?.zone === 'TBD') {
+      const plantZone = data.stages.plant?.zone;
+      if (plantZone === 'TBD') {
         logger.debug(`跳过预留伏笔: ${key}`);
         return;
       }
 
+      // 统一阶段命名：misread -> mislead, resolve -> reveal
+      const misleadStage = data.stages.mislead || data.stages.misread;
+      const revealStage = data.stages.reveal || data.stages.resolve;
+
       this._foreshadows.set(data.id, {
         id: data.id,
         name: data.name,
-        description: data.description,
-        stages: data.stages,
+        description: data.description || '',
+        stages: {
+          plant: data.stages.plant || { zone: '', description: '' },
+          deepen: data.stages.deepen || { zone: '', description: '' },
+          mislead: misleadStage,
+          reveal: revealStage || { zone: '', description: '' },
+        },
         currentStage: ForeshadowStage.PLANT,
         isCollected: false,
       });
@@ -219,19 +224,18 @@ export class ForeshadowManager {
 
   /**
    * 阶段名称标准化（兼容旧版命名）
+   * 使用统一的 normalizeForeshadowStage 函数
    */
   private _normalizeStage(stage: string): ForeshadowStage {
-    switch (stage.toLowerCase()) {
+    const normalized = normalizeForeshadowStage(stage as ForeshadowStageLegacy);
+    switch (normalized) {
       case 'plant':
         return ForeshadowStage.PLANT;
       case 'deepen':
         return ForeshadowStage.DEEPEN;
-      case 'misread':
       case 'mislead':
         return ForeshadowStage.MISLEAD;
-      case 'collect':
       case 'reveal':
-      case 'resolve':
         return ForeshadowStage.REVEAL;
       default:
         logger.warn(`未知伏笔阶段: ${stage}，默认为 PLANT`);
@@ -326,7 +330,7 @@ export class ForeshadowManager {
     nameText.setOrigin(0.5);
     this._notificationContainer.add(nameText);
 
-    const descText = this._scene.add.text(0, 28, foreshadow.description, {
+    const descText = this._scene.add.text(0, 28, foreshadow.description || '', {
       fontFamily: 'monospace',
       fontSize: UI_FONT_SIZE.TINY,
       color: '#aaaaaa',

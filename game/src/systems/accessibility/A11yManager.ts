@@ -244,6 +244,8 @@ class A11yManager {
 
   /**
    * 创建色盲模式滤镜
+   * SA-005: 使用 DOM API 替代 innerHTML
+   * 注意：此处滤镜数据为静态常量，不包含用户输入
    */
   private _createColorBlindFilters(): void {
     const svgNS = 'http://www.w3.org/2000/svg';
@@ -255,36 +257,37 @@ class A11yManager {
     svg.id = filterId;
     svg.style.cssText = 'position: absolute; width: 0; height: 0;';
 
-    // 红色盲（Protanopia）
-    svg.innerHTML = `
-      <defs>
-        <filter id="protanopia-filter">
-          <feColorMatrix type="matrix" values="
-            0.567, 0.433, 0,     0, 0
-            0.558, 0.442, 0,     0, 0
-            0,     0.242, 0.758, 0, 0
-            0,     0,     0,     1, 0
-          "/>
-        </filter>
-        <filter id="deuteranopia-filter">
-          <feColorMatrix type="matrix" values="
-            0.625, 0.375, 0,   0, 0
-            0.7,   0.3,   0,   0, 0
-            0,     0.3,   0.7, 0, 0
-            0,     0,     0,   1, 0
-          "/>
-        </filter>
-        <filter id="tritanopia-filter">
-          <feColorMatrix type="matrix" values="
-            0.95, 0.05,  0,     0, 0
-            0,    0.433, 0.567, 0, 0
-            0,    0.475, 0.525, 0, 0
-            0,    0,     0,     1, 0
-          "/>
-        </filter>
-      </defs>
-    `;
+    const defs = document.createElementNS(svgNS, 'defs');
 
+    // 滤镜配置数据（静态常量，安全）
+    const filterConfigs = [
+      {
+        id: 'protanopia-filter',
+        values: '0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0',
+      },
+      {
+        id: 'deuteranopia-filter',
+        values: '0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0',
+      },
+      {
+        id: 'tritanopia-filter',
+        values: '0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0',
+      },
+    ];
+
+    for (const config of filterConfigs) {
+      const filter = document.createElementNS(svgNS, 'filter');
+      filter.id = config.id;
+
+      const feColorMatrix = document.createElementNS(svgNS, 'feColorMatrix');
+      feColorMatrix.setAttribute('type', 'matrix');
+      feColorMatrix.setAttribute('values', config.values);
+
+      filter.appendChild(feColorMatrix);
+      defs.appendChild(filter);
+    }
+
+    svg.appendChild(defs);
     document.body.appendChild(svg);
   }
 

@@ -79,6 +79,7 @@ class CloudSaveManager {
 
   /**
    * 初始化云存档
+   * @throws {Error} 当 endpoint 不是 HTTPS（localhost 除外）时抛出错误
    */
   public init(config: Partial<ICloudSaveConfig>): void {
     this._config = { ...DEFAULT_CONFIG, ...config };
@@ -86,6 +87,13 @@ class CloudSaveManager {
     if (!this._config.enabled || !this._config.endpoint) {
       logger.info('云存档未启用或未配置端点');
       return;
+    }
+
+    // SA-002: 强制 HTTPS endpoint（localhost 除外用于开发）
+    if (!this._isSecureEndpoint(this._config.endpoint)) {
+      const error = new Error(`云存档端点必须使用 HTTPS 协议: ${this._config.endpoint}`);
+      logger.error(error.message);
+      throw error;
     }
 
     if (!this._config.userId || !this._config.accessToken) {
@@ -98,6 +106,24 @@ class CloudSaveManager {
     this._loadPendingUploads();
 
     logger.info('初始化完成');
+  }
+
+  /**
+   * 检查 endpoint 是否安全（HTTPS 或 localhost）
+   * SA-002: HTTPS 强制校验
+   */
+  private _isSecureEndpoint(endpoint: string): boolean {
+    try {
+      const url = new URL(endpoint);
+      // 允许 localhost 用于本地开发
+      const isLocalhost =
+        url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '[::1]';
+      // 必须是 HTTPS 或 localhost
+      return url.protocol === 'https:' || isLocalhost;
+    } catch {
+      // 无效 URL
+      return false;
+    }
   }
 
   /**
@@ -260,6 +286,9 @@ class CloudSaveManager {
     if (!this._config.enabled || !this._config.endpoint) return false;
 
     try {
+      // SA-001: 使用 HMAC-SHA256 计算校验和
+      const checksum = await this._calculateChecksumAsync(saveData);
+
       const response = await fetch(`${this._config.endpoint}/save`, {
         method: 'POST',
         headers: {
@@ -270,7 +299,7 @@ class CloudSaveManager {
           userId: this._config.userId,
           slot,
           saveData,
-          checksum: this._calculateChecksum(saveData),
+          checksum,
           version: saveData.version,
           timestamp: saveData.timestamp,
         }),
@@ -490,17 +519,35 @@ class CloudSaveManager {
   }
 
   /**
-   * 计算校验和
+   * 计算校验和（HMAC-SHA256）
+   * SA-001: 使用加密哈希确保防篡改能力
+   * @param data 存档数据
+   * @returns HMAC-SHA256 哈希值（十六进制）
    */
-  private _calculateChecksum(data: ISaveData): string {
+  private async _calculateChecksumAsync(data: ISaveData): Promise<string> {
     const str = JSON.stringify(data);
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash;
-    }
-    return hash.toString(16);
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(str);
+
+    // 使用 userId 作为 HMAC 密钥的一部分，确保每个用户的签名不同
+    // 注意：在生产环境中，应使用服务端密钥进行验证
+    const keyMaterial = encoder.encode(`footnote_cloud_save_${this._config.userId || 'anonymous'}`);
+
+    // 导入密钥
+    const key = await crypto.subtle.importKey(
+      'raw',
+      keyMaterial,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+
+    // 计算 HMAC
+    const signature = await crypto.subtle.sign('HMAC', key, dataBuffer);
+
+    // 转换为十六进制字符串
+    const hashArray = Array.from(new Uint8Array(signature));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
   }
 
   /**

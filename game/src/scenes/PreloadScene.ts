@@ -443,6 +443,8 @@ export class PreloadScene extends Phaser.Scene {
       'cf_z6',
       // 重返变体
       'rv_dialogues',
+      // NG+对话
+      'ngplus_dialogues',
     ];
     dialogueFiles.forEach((file) => {
       this.load.text(`dialogue_${file}`, `src/data/dialogues/${file}.yaml`);

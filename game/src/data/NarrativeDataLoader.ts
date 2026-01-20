@@ -9,7 +9,14 @@ import { parse as parseYaml } from 'yaml';
 import { narrativeEngine } from '@/systems/narrative';
 
 const logger = createLogger('NarrativeDataLoader');
-import type { IDialogue, ICard, IForeshadow, ICardStateOverride } from '@/types';
+import type {
+  IDialogue,
+  ICard,
+  IForeshadow,
+  ICardStateOverride,
+  ForeshadowStage,
+  IForeshadowStageConfig,
+} from '@/types';
 import type { CardType, ChapterID, AbilityType } from '@/config/game.config';
 
 // ==================== 类型定义 ====================
@@ -134,6 +141,9 @@ interface IRawCard {
   >;
 }
 
+/**
+ * YAML 中的伏笔原始数据（兼容多种格式）
+ */
 interface IRawForeshadow {
   id: string;
   name: string;
@@ -141,18 +151,35 @@ interface IRawForeshadow {
   stages: {
     plant: IRawStageConfig;
     deepen: IRawStageConfig;
-    misread?: {
-      expected: string;
-      truth: string;
-    };
-    resolve: IRawStageConfig;
+    /** 误读阶段（可能是对象或描述格式） */
+    mislead?:
+      | IRawStageConfig
+      | { expected?: string; truth?: string; zone?: string; description?: string };
+    /** @deprecated 旧版 misread，使用 mislead */
+    misread?: { expected?: string; truth?: string; zone?: string; description?: string };
+    /** 回收阶段（统一命名） */
+    reveal?: IRawStageConfig;
+    /** @deprecated 旧版 resolve，使用 reveal */
+    resolve?: IRawStageConfig;
+    /** @deprecated 旧版 collect，使用 reveal */
+    collect?: IRawStageConfig;
   };
   assets?: string[];
 }
 
+/**
+ * YAML 中的阶段配置（兼容新旧格式）
+ */
 interface IRawStageConfig {
-  zoneId: string;
+  /** 新格式：zoneId */
+  zoneId?: string;
+  /** 旧格式：zone */
+  zone?: string;
+  /** 对话ID */
   dialogueId?: string;
+  /** 描述 */
+  description?: string;
+  /** 条件 */
   condition?: IRawCondition;
 }
 
@@ -189,9 +216,7 @@ function normalizeOldFormatDialogue(raw: IRawDialogueOld): IDialogue {
     trigger: raw.trigger
       ? {
           card: raw.trigger.card,
-          foreshadow: raw.trigger.foreshadow as
-            | [string, 'plant' | 'deepen' | 'resolve']
-            | undefined,
+          foreshadow: raw.trigger.foreshadow as [string, ForeshadowStage] | undefined,
           ability: raw.trigger.ability as AbilityType | undefined,
           event: raw.trigger.event,
         }
@@ -229,10 +254,7 @@ function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
         card: line.action.cardId,
         foreshadow:
           line.action.foreshadowId && line.action.foreshadowStage
-            ? ([line.action.foreshadowId, line.action.foreshadowStage] as [
-                string,
-                'plant' | 'deepen' | 'resolve',
-              ])
+            ? ([line.action.foreshadowId, line.action.foreshadowStage] as [string, ForeshadowStage])
             : undefined,
         ability: line.action.abilityType as AbilityType | undefined,
       };
@@ -266,7 +288,7 @@ function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
         if (action.type === 'foreshadow' && action.foreshadowId && action.foreshadowStage) {
           trigger.foreshadow = [action.foreshadowId, action.foreshadowStage] as [
             string,
-            'plant' | 'deepen' | 'resolve',
+            ForeshadowStage,
           ];
         }
         if (action.type === 'ability' && action.abilityType) {
@@ -463,7 +485,10 @@ export function loadCards(yamlContent: string): ICard[] {
 }
 
 /**
- * 加载伏笔数据
+ * 加载伏笔数据（统一 Schema）
+ * 支持新旧格式：
+ * - 新格式：plant/deepen/mislead/reveal
+ * - 旧格式：plant/deepen/misread/resolve 或 collect
  */
 export function loadForeshadows(yamlContent: string): IForeshadow[] {
   try {
@@ -472,14 +497,22 @@ export function loadForeshadows(yamlContent: string): IForeshadow[] {
 
     return Object.values(data.foreshadows).map((raw: unknown) => {
       const fs = raw as IRawForeshadow;
+
+      // 获取回收阶段配置（兼容 reveal/resolve/collect）
+      const revealConfig = fs.stages.reveal || fs.stages.resolve || fs.stages.collect;
+
+      // 获取误读阶段配置（兼容 mislead/misread）
+      const misleadConfig = fs.stages.mislead || fs.stages.misread;
+
       return {
         id: fs.id,
         name: fs.name,
+        description: fs.description,
         stages: {
           plant: transformStageConfig(fs.stages.plant),
           deepen: transformStageConfig(fs.stages.deepen),
-          misread: fs.stages.misread ?? { expected: '', truth: '' },
-          resolve: transformStageConfig(fs.stages.resolve),
+          mislead: misleadConfig ? transformMisleadConfig(misleadConfig) : undefined,
+          reveal: revealConfig ? transformStageConfig(revealConfig) : { zone: '', description: '' },
         },
         assets: fs.assets,
       } as IForeshadow;
@@ -488,6 +521,25 @@ export function loadForeshadows(yamlContent: string): IForeshadow[] {
     logger.error('解析伏笔数据失败:', error);
     return [];
   }
+}
+
+/**
+ * 转换误读阶段配置（支持两种格式）
+ */
+function transformMisleadConfig(
+  raw: IRawStageConfig | { expected?: string; truth?: string; zone?: string; description?: string }
+): IForeshadow['stages']['mislead'] {
+  // 如果是旧版 expected/truth 格式
+  if ('expected' in raw || 'truth' in raw) {
+    return {
+      expected: raw.expected,
+      truth: raw.truth,
+      zone: raw.zone,
+      description: raw.description,
+    };
+  }
+  // 如果是新版阶段配置格式
+  return transformStageConfig(raw as IRawStageConfig);
 }
 
 // ==================== 辅助函数 ====================
@@ -505,12 +557,16 @@ function transformCondition(raw: IRawCondition): IDialogue['condition'] {
   };
 }
 
+/**
+ * 转换阶段配置（兼容新旧字段名）
+ */
 function transformStageConfig(raw: IRawStageConfig): IForeshadow['stages']['plant'] {
   return {
-    zone: raw.zoneId,
+    zone: raw.zoneId || raw.zone || '',
+    dialogueId: raw.dialogueId,
     trigger: raw.dialogueId ?? '',
-    description: '',
-    requires: raw.condition ? [] : undefined,
+    description: raw.description || '',
+    condition: raw.condition ? JSON.stringify(raw.condition) : undefined,
   };
 }
 
@@ -736,28 +792,41 @@ function registerDataToNarrativeEngine(
     });
   }
 
-  // 注册伏笔
+  // 注册伏笔（使用统一 Schema）
   for (const foreshadow of foreshadows) {
     narrativeEngine.registerForeshadow({
       id: foreshadow.id,
       name: foreshadow.name,
-      description: '',
+      description: foreshadow.description || '',
       stages: {
         plant: {
-          zone: foreshadow.stages.plant.zone,
-          trigger: foreshadow.stages.plant.trigger,
-          description: foreshadow.stages.plant.description,
+          zone: foreshadow.stages.plant.zone || '',
+          trigger: foreshadow.stages.plant.trigger || foreshadow.stages.plant.dialogueId || '',
+          description: foreshadow.stages.plant.description || '',
         },
         deepen: {
-          zone: foreshadow.stages.deepen.zone,
-          trigger: foreshadow.stages.deepen.trigger,
-          description: foreshadow.stages.deepen.description,
+          zone: foreshadow.stages.deepen.zone || '',
+          trigger: foreshadow.stages.deepen.trigger || foreshadow.stages.deepen.dialogueId || '',
+          description: foreshadow.stages.deepen.description || '',
         },
-        misread: foreshadow.stages.misread,
-        collect: {
-          zone: foreshadow.stages.resolve.zone,
-          trigger: foreshadow.stages.resolve.trigger,
-          description: foreshadow.stages.resolve.description,
+        // 误读阶段（兼容旧版 misread）
+        mislead: foreshadow.stages.mislead
+          ? 'expected' in foreshadow.stages.mislead
+            ? foreshadow.stages.mislead
+            : {
+                zone: (foreshadow.stages.mislead as IForeshadowStageConfig).zone || '',
+                trigger:
+                  (foreshadow.stages.mislead as IForeshadowStageConfig).trigger ||
+                  (foreshadow.stages.mislead as IForeshadowStageConfig).dialogueId ||
+                  '',
+                description: foreshadow.stages.mislead.description || '',
+              }
+          : undefined,
+        // 回收阶段（统一使用 reveal）
+        reveal: {
+          zone: foreshadow.stages.reveal.zone || '',
+          trigger: foreshadow.stages.reveal.trigger || foreshadow.stages.reveal.dialogueId || '',
+          description: foreshadow.stages.reveal.description || '',
         },
       },
     });

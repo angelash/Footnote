@@ -7,6 +7,22 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#0A0A0F" />
     
+    <!-- SA-004 & SA-006: Content Security Policy -->
+    <!-- 限制资源来源，防止 XSS 攻击 -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: blob:;
+      media-src 'self' blob:;
+      connect-src 'self' https: wss: ws://localhost:* http://localhost:*;
+      worker-src 'self' blob:;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+    " />
+    
     <title>备注 / Footnote</title>
     <meta name="description" content="叙事驱动的2D系统策略冒险游戏 - 你生活在一个二维世界，但你能短暂触碰更高维度" />
     
@@ -14,11 +30,12 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
     
-    <!-- 预连接 -->
+    <!-- 预连接 - SA-006: 已在 CSP 中限制到 fonts.googleapis.com 和 fonts.gstatic.com -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     
-    <!-- 字体 -->
+    <!-- 字体 - SA-006: 外部字体已在 CSP 中明确允许 -->
+    <!-- 注意：生产环境可考虑字体自托管以提高性能和隐私 -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
     
     <style>
@@ -46,11 +63,24 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        /* 安全区适配 - 避免刘海屏/圆角屏遮挡内容 */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
       }
       
       #game-container canvas {
         max-width: 100%;
         max-height: 100%;
+      }
+      
+      /* CSS 变量暴露安全区值，供 JS 读取 */
+      :root {
+        --safe-area-top: env(safe-area-inset-top);
+        --safe-area-bottom: env(safe-area-inset-bottom);
+        --safe-area-left: env(safe-area-inset-left);
+        --safe-area-right: env(safe-area-inset-right);
       }
       
       /* 加载屏幕 */

@@ -26,8 +26,10 @@ export default defineConfig({
   },
 
   // 构建配置
+  // 目标浏览器与 browserslist 对齐: iOS >= 14, Android >= 10, Chrome >= 90, Safari >= 14
+  // es2020 特性在这些浏览器中均已支持
   build: {
-    target: 'es2020',
+    target: ['es2020', 'safari14', 'chrome90'],
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: true,

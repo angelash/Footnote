@@ -293,6 +293,8 @@ export class PerformanceMonitor {
 
   /**
    * 更新显示
+   * SA-005: 使用 DOM API 替代 innerHTML
+   * 注意：此处所有数据均来自内部性能指标，不包含用户输入，但仍使用安全的 DOM API
    */
   private _updateDisplay(): void {
     if (!this._overlay) return;
@@ -304,21 +306,53 @@ export class PerformanceMonitor {
     if (m.fps < 30) fpsColor = '#ff4444';
     else if (m.fps < 50) fpsColor = '#ffaa00';
 
-    this._overlay.innerHTML = `
-      <div style="color: ${fpsColor}; font-weight: bold;">
-        FPS: ${m.fps} (avg: ${m.avgFps})
-      </div>
-      <div style="color: #888; font-size: 10px;">
-        min: ${m.minFps} / max: ${m.maxFps}
-      </div>
-      <div style="margin-top: 4px; border-top: 1px solid #333; padding-top: 4px;">
-        <div>Frame: ${m.frameTime}ms</div>
-        <div>Objects: ${m.gameObjects}</div>
-        <div>Textures: ${m.textures}</div>
-        <div>Sounds: ${m.sounds}</div>
-        ${m.heapUsed > 0 ? `<div>Memory: ${m.heapUsed}/${m.heapTotal}MB</div>` : ''}
-      </div>
-    `;
+    // 清空现有内容
+    this._overlay.textContent = '';
+
+    // FPS 主行
+    const fpsLine = document.createElement('div');
+    fpsLine.style.cssText = `color: ${fpsColor}; font-weight: bold;`;
+    fpsLine.textContent = `FPS: ${m.fps} (avg: ${m.avgFps})`;
+    this._overlay.appendChild(fpsLine);
+
+    // FPS 极值行
+    const extremesLine = document.createElement('div');
+    extremesLine.style.cssText = 'color: #888; font-size: 10px;';
+    extremesLine.textContent = `min: ${m.minFps} / max: ${m.maxFps}`;
+    this._overlay.appendChild(extremesLine);
+
+    // 详细信息容器
+    const detailsDiv = document.createElement('div');
+    detailsDiv.style.cssText = 'margin-top: 4px; border-top: 1px solid #333; padding-top: 4px;';
+
+    // 帧时间
+    const frameLine = document.createElement('div');
+    frameLine.textContent = `Frame: ${m.frameTime}ms`;
+    detailsDiv.appendChild(frameLine);
+
+    // 对象数
+    const objectsLine = document.createElement('div');
+    objectsLine.textContent = `Objects: ${m.gameObjects}`;
+    detailsDiv.appendChild(objectsLine);
+
+    // 纹理数
+    const texturesLine = document.createElement('div');
+    texturesLine.textContent = `Textures: ${m.textures}`;
+    detailsDiv.appendChild(texturesLine);
+
+    // 声音数
+    const soundsLine = document.createElement('div');
+    soundsLine.textContent = `Sounds: ${m.sounds}`;
+    detailsDiv.appendChild(soundsLine);
+
+    // 内存（如果可用）
+    if (m.heapUsed > 0) {
+      const memoryLine = document.createElement('div');
+      memoryLine.textContent = `Memory: ${m.heapUsed}/${m.heapTotal}MB`;
+      detailsDiv.appendChild(memoryLine);
+    }
+
+    this._overlay.appendChild(detailsDiv);
   }
 
   /**

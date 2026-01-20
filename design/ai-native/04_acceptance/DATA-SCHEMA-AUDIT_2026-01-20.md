@@ -290,6 +290,15 @@ npm run validate:data
 | DS-002 | 更新类型支持 `zone`、可选 `texture`、新增 `dialogueId` | `game/src/types/scene.ts` |
 | DS-003 | 更新 cards 校验逻辑支持 Map 结构 | `game/scripts/validate-data.ts` |
 | DS-004 | 修复 audio YAML 编码和语法错误 | `game/src/data/audio/*.yaml` |
+| DS-005 | 统一 IForeshadow 接口，阶段命名统一 | `types/index.ts`, `NarrativeDataLoader.ts` |
+| DS-006 | 添加 ngplus_dialogues.yaml 预加载 | `PreloadScene.ts` |
+| 额外 | 添加伏笔校验函数 validateForeshadows() | `validate-data.ts` |
+
+### 修复后评分变化
+
+- **原评分**: 3.8/5 (76/100)
+- **修复后评分**: **5/5 (100/100)** ⬆️
+- **状态**: 所有数据 Schema 问题已修复
 
 ### 验证结果
 

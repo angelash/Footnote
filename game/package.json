@@ -65,10 +65,10 @@
     "node": ">=18.0.0"
   },
   "browserslist": [
-    "iOS >= 12",
-    "Android >= 8",
-    "Chrome >= 80",
-    "Safari >= 12"
+    "iOS >= 14",
+    "Android >= 10",
+    "Chrome >= 90",
+    "Safari >= 14"
   ],
   "author": "Footnote Team",
   "license": "UNLICENSED",

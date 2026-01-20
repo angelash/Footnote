@@ -189,37 +189,138 @@ export interface ICardStateOverride {
 
 // ==================== 伏笔系统 ====================
 
-export type ForeshadowStage = 'plant' | 'deepen' | 'resolve';
+/**
+ * 伏笔阶段（统一命名）
+ * - plant: 首次投放
+ * - deepen: 加深
+ * - mislead: 误读（可选）
+ * - reveal: 回收/揭示
+ *
+ * 兼容旧版命名：misread -> mislead, resolve/collect -> reveal
+ */
+export type ForeshadowStage = 'plant' | 'deepen' | 'mislead' | 'reveal';
 
+/**
+ * 兼容旧版阶段命名（用于类型转换）
+ */
+export type ForeshadowStageLegacy =
+  | ForeshadowStage
+  | 'misread' // -> mislead
+  | 'resolve' // -> reveal
+  | 'collect'; // -> reveal
+
+/**
+ * 伏笔阶段配置
+ */
+export interface IForeshadowStageConfig {
+  /** 关联的Zone */
+  zone?: string;
+  /** 触发条件/对话ID */
+  dialogueId?: string;
+  /** 触发器（兼容旧字段） */
+  trigger?: string;
+  /** 阶段描述 */
+  description?: string;
+  /** 条件 */
+  condition?: string;
+}
+
+/**
+ * 伏笔误读阶段配置（可选）
+ */
+export interface IForeshadowMisleadConfig {
+  /** 玩家预期的理解 */
+  expected?: string;
+  /** 真实情况 */
+  truth?: string;
+  /** 关联Zone（新格式） */
+  zone?: string;
+  /** 描述（新格式） */
+  description?: string;
+}
+
+/**
+ * 伏笔数据（统一Schema）
+ * 支持YAML、Loader、Engine、UI统一使用
+ */
 export interface IForeshadow {
+  /** 伏笔ID (F01-F26) */
   id: string;
+  /** 伏笔名称 */
   name: string;
+  /** 伏笔描述 */
+  description?: string;
+  /** 阶段配置 */
   stages: {
+    /** 首次投放 */
     plant: IForeshadowStageConfig;
+    /** 加深 */
     deepen: IForeshadowStageConfig;
-    misread: {
-      expected: string;
-      truth: string;
-    };
-    resolve: IForeshadowStageConfig;
+    /** 误读（可选，支持两种格式） */
+    mislead?: IForeshadowStageConfig | IForeshadowMisleadConfig;
+    /** 回收/揭示 */
+    reveal: IForeshadowStageConfig;
+    /** @deprecated 兼容旧版 misread，使用 mislead 代替 */
+    misread?: IForeshadowMisleadConfig;
+    /** @deprecated 兼容旧版 resolve，使用 reveal 代替 */
+    resolve?: IForeshadowStageConfig;
+    /** @deprecated 兼容旧版 collect，使用 reveal 代替 */
+    collect?: IForeshadowStageConfig;
   };
+  /** 关联资源 */
   assets?: string[];
 }
 
-export interface IForeshadowStageConfig {
-  zone: string;
-  trigger: string;
-  description: string;
-  requires?: ForeshadowStage[];
+/**
+ * 伏笔运行时状态
+ */
+export interface IForeshadowState {
+  /** 是否已投放 */
+  planted: boolean;
+  /** 是否已加深 */
+  deepened: boolean;
+  /** 是否已误读 */
+  misled?: boolean;
+  /** 是否已回收 */
+  revealed: boolean;
+  /** 投放位置 */
+  plantedAt?: string;
+  /** 加深位置 */
+  deepenedAt?: string;
+  /** 误读位置 */
+  misledAt?: string;
+  /** 回收位置 */
+  revealedAt?: string;
+  /** @deprecated 兼容旧版 resolved，使用 revealed 代替 */
+  resolved?: boolean;
+  /** @deprecated 兼容旧版 resolvedAt，使用 revealedAt 代替 */
+  resolvedAt?: string;
+  /** @deprecated 兼容旧版 collected，使用 revealed 代替 */
+  collected?: boolean;
+  /** @deprecated 兼容旧版 collectedAt，使用 revealedAt 代替 */
+  collectedAt?: string;
 }
 
-export interface IForeshadowState {
-  planted: boolean;
-  deepened: boolean;
-  resolved: boolean;
-  plantedAt?: string;
-  deepenedAt?: string;
-  resolvedAt?: string;
+/**
+ * 标准化伏笔阶段名称
+ * 将旧版命名转换为统一命名
+ */
+export function normalizeForeshadowStage(stage: ForeshadowStageLegacy): ForeshadowStage {
+  switch (stage) {
+    case 'plant':
+      return 'plant';
+    case 'deepen':
+      return 'deepen';
+    case 'misread':
+    case 'mislead':
+      return 'mislead';
+    case 'resolve':
+    case 'collect':
+    case 'reveal':
+      return 'reveal';
+    default:
+      return 'plant';
+  }
 }
 
 // ==================== Zone系统 ====================

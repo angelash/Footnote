@@ -30,7 +30,184 @@ const CONFIG = {
   AUTO_SAVE_SLOT: 0,
   /** 存档版本号 */
   SAVE_VERSION: 1,
+  /** SA-003: 存档字段长度限制 */
+  LIMITS: {
+    NAME_MAX_LENGTH: 100,
+    CHAPTER_MAX_LENGTH: 50,
+    ZONE_MAX_LENGTH: 50,
+    SCREENSHOT_MAX_LENGTH: 500000, // ~500KB base64
+    MAX_PLAY_TIME: 999999999, // ~31年，防止溢出
+  },
 };
+
+// ==================== 存档校验 ====================
+
+/**
+ * SA-003: 存档结构校验错误
+ */
+export class SaveValidationError extends Error {
+  constructor(
+    message: string,
+    public readonly field: string,
+    public readonly reason: 'missing' | 'type' | 'range' | 'format'
+  ) {
+    super(message);
+    this.name = 'SaveValidationError';
+  }
+}
+
+/**
+ * SA-003: 校验存档数据结构
+ * 检查字段存在性、类型和范围
+ */
+function validateSaveData(data: unknown): asserts data is ISaveData {
+  if (typeof data !== 'object' || data === null) {
+    throw new SaveValidationError('存档数据必须是对象', 'root', 'type');
+  }
+
+  const save = data as Record<string, unknown>;
+
+  // 必需字段检查
+  const requiredFields: Array<{
+    key: string;
+    type: string;
+    validate?: (v: unknown) => boolean;
+    maxLength?: number;
+  }> = [
+    { key: 'version', type: 'number', validate: (v) => Number.isInteger(v) && (v as number) > 0 },
+    {
+      key: 'slot',
+      type: 'number',
+      validate: (v) =>
+        Number.isInteger(v) && (v as number) >= 0 && (v as number) <= CONFIG.MAX_SLOTS,
+    },
+    {
+      key: 'timestamp',
+      type: 'number',
+      validate: (v) =>
+        Number.isInteger(v) && (v as number) > 0 && (v as number) <= Date.now() + 86400000,
+    },
+    { key: 'name', type: 'string', maxLength: CONFIG.LIMITS.NAME_MAX_LENGTH },
+    {
+      key: 'playTime',
+      type: 'number',
+      validate: (v) =>
+        typeof v === 'number' && (v as number) >= 0 && (v as number) <= CONFIG.LIMITS.MAX_PLAY_TIME,
+    },
+    { key: 'chapter', type: 'string', maxLength: CONFIG.LIMITS.CHAPTER_MAX_LENGTH },
+    { key: 'currentZone', type: 'string', maxLength: CONFIG.LIMITS.ZONE_MAX_LENGTH },
+    { key: 'worldState', type: 'object' },
+    { key: 'narrativeState', type: 'object' },
+  ];
+
+  for (const field of requiredFields) {
+    if (!(field.key in save)) {
+      throw new SaveValidationError(`缺少必需字段: ${field.key}`, field.key, 'missing');
+    }
+
+    const value = save[field.key];
+
+    // 类型检查
+    if (typeof value !== field.type) {
+      throw new SaveValidationError(
+        `字段 ${field.key} 类型错误: 期望 ${field.type}, 实际 ${typeof value}`,
+        field.key,
+        'type'
+      );
+    }
+
+    // 自定义验证
+    if (field.validate && !field.validate(value)) {
+      throw new SaveValidationError(`字段 ${field.key} 值无效`, field.key, 'range');
+    }
+
+    // 字符串长度限制
+    if (field.maxLength && typeof value === 'string' && value.length > field.maxLength) {
+      throw new SaveValidationError(
+        `字段 ${field.key} 超过长度限制 (${value.length}/${field.maxLength})`,
+        field.key,
+        'range'
+      );
+    }
+  }
+
+  // 可选字段检查: screenshot
+  if ('screenshot' in save && save.screenshot !== undefined) {
+    if (typeof save.screenshot !== 'string') {
+      throw new SaveValidationError('screenshot 必须是字符串', 'screenshot', 'type');
+    }
+    if ((save.screenshot as string).length > CONFIG.LIMITS.SCREENSHOT_MAX_LENGTH) {
+      throw new SaveValidationError(
+        `screenshot 超过长度限制 (${(save.screenshot as string).length}/${CONFIG.LIMITS.SCREENSHOT_MAX_LENGTH})`,
+        'screenshot',
+        'range'
+      );
+    }
+  }
+
+  // 校验 worldState 结构
+  validateWorldState(save.worldState);
+
+  // 校验 narrativeState 结构
+  validateNarrativeState(save.narrativeState);
+}
+
+/**
+ * SA-003: 校验 worldState 结构
+ */
+function validateWorldState(data: unknown): void {
+  if (typeof data !== 'object' || data === null) {
+    throw new SaveValidationError('worldState 必须是对象', 'worldState', 'type');
+  }
+
+  const state = data as Record<string, unknown>;
+
+  // 检查必需的 worldState 字段
+  const requiredFields = ['currentChapter', 'currentZone'];
+  for (const field of requiredFields) {
+    if (!(field in state)) {
+      throw new SaveValidationError(
+        `worldState 缺少必需字段: ${field}`,
+        `worldState.${field}`,
+        'missing'
+      );
+    }
+  }
+}
+
+/**
+ * SA-003: 校验 narrativeState 结构
+ */
+function validateNarrativeState(data: unknown): void {
+  if (typeof data !== 'object' || data === null) {
+    throw new SaveValidationError('narrativeState 必须是对象', 'narrativeState', 'type');
+  }
+
+  const state = data as Record<string, unknown>;
+
+  // 检查数组类型字段
+  const arrayFields = ['obtainedCards', 'viewedCards', 'dialogueHistory'];
+  for (const field of arrayFields) {
+    if (field in state && !Array.isArray(state[field])) {
+      throw new SaveValidationError(
+        `narrativeState.${field} 必须是数组`,
+        `narrativeState.${field}`,
+        'type'
+      );
+    }
+  }
+
+  // 检查 foreshadowStates 是否为对象
+  if ('foreshadowStates' in state) {
+    if (typeof state.foreshadowStates !== 'object' || state.foreshadowStates === null) {
+      throw new SaveValidationError(
+        'narrativeState.foreshadowStates 必须是对象',
+        'narrativeState.foreshadowStates',
+        'type'
+      );
+    }
+  }
+}
 
 // ==================== 类型定义 ====================
 
@@ -192,6 +369,7 @@ class SaveManager {
 
   /**
    * 加载存档
+   * SA-003: 加载前进行结构校验
    */
   async load(slot: number): Promise<boolean> {
     try {
@@ -199,6 +377,16 @@ class SaveManager {
       if (!saveData) {
         logger.warn(`槽位${slot}没有存档`);
         return false;
+      }
+
+      // SA-003: 结构校验
+      try {
+        validateSaveData(saveData);
+      } catch (validationError) {
+        if (validationError instanceof SaveValidationError) {
+          logger.error(`存档校验失败 [${validationError.field}]: ${validationError.message}`);
+        }
+        throw validationError;
       }
 
       // 版本迁移（如需要）

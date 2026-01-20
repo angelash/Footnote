@@ -77,11 +77,36 @@ export class TouchControls {
 
   /**
    * 检测是否为移动设备
+   * 使用多重策略确保准确判定：
+   * 1. navigator.maxTouchPoints - 最可靠的触控支持检测
+   * 2. pointer: coarse 媒体查询 - 检测粗精度指针设备（触摸屏）
+   * 3. ontouchstart 事件支持 - 传统触控检测
+   * 4. userAgent 正则 - 兜底方案
    */
   private _checkMobile(): void {
+    // 策略1: maxTouchPoints（最可靠）
+    const hasTouchPoints = navigator.maxTouchPoints > 0;
+
+    // 策略2: pointer: coarse 媒体查询（检测粗精度指针，即触摸屏）
+    const hasCoarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+
+    // 策略3: ontouchstart 事件支持
+    const hasTouchEvent = 'ontouchstart' in window;
+
+    // 策略4: userAgent 正则（兜底）
+    const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+    // 综合判定：任意一种策略检测到触控即认为是移动设备
+    // 但排除同时具有精确指针的设备（如带触摸屏的笔记本）
+    const hasFinePointer = window.matchMedia?.('(pointer: fine)').matches ?? false;
+
+    // 如果只有 coarse pointer（无 fine pointer），或者 userAgent 明确是移动设备
     this._isMobile =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-      'ontouchstart' in window;
+      (hasCoarsePointer && !hasFinePointer) || // 纯触控设备
+      (hasTouchPoints && mobileUserAgent) || // 有触控且 UA 匹配
+      (hasTouchEvent && mobileUserAgent); // 有触摸事件且 UA 匹配
   }
 
   /**

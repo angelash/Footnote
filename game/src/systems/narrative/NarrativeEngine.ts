@@ -117,52 +117,42 @@ export interface ICardEffect {
   intensity?: number;
 }
 
+// 从统一类型定义导入
+import type {
+  IForeshadow as IForeshadowBase,
+  IForeshadowState as IForeshadowStateBase,
+  IForeshadowStageConfig as IForeshadowStageConfigBase,
+  ForeshadowStage as ForeshadowStageType,
+  ForeshadowStageLegacy,
+} from '@/types';
+import { normalizeForeshadowStage } from '@/types';
+
 /**
- * 伏笔阶段
+ * 伏笔阶段（导出类型别名，兼容旧版命名）
  * 统一命名：plant/deepen/mislead/reveal
  * 兼容旧版：misread -> mislead, collect -> reveal
  */
-export type ForeshadowStage = 'plant' | 'deepen' | 'mislead' | 'reveal' | 'misread' | 'collect';
+export type ForeshadowStage = ForeshadowStageLegacy;
 
 /**
- * 伏笔数据
+ * 伏笔数据（使用统一 Schema）
  */
-export interface IForeshadow {
-  id: string;
-  name: string;
-  description: string;
-  stages: {
-    plant: IForeshadowStageConfig;
-    deepen: IForeshadowStageConfig;
-    misread?: {
-      expected: string;
-      truth: string;
-    };
-    mislead?: IForeshadowStageConfig;
-    collect?: IForeshadowStageConfig;
-    reveal?: IForeshadowStageConfig;
-  };
+export interface IForeshadow extends IForeshadowBase {
+  // 扩展字段（如果需要）
 }
 
 /**
- * 伏笔阶段配置
+ * 伏笔阶段配置（使用统一 Schema）
  */
-export interface IForeshadowStageConfig {
-  zone: string;
-  trigger: string;
-  description: string;
+export interface IForeshadowStageConfig extends IForeshadowStageConfigBase {
+  // 扩展字段（如果需要）
 }
 
 /**
- * 伏笔状态
+ * 伏笔状态（扩展统一 Schema，兼容旧版字段）
  */
-export interface IForeshadowState {
-  planted: boolean;
-  deepened: boolean;
-  collected: boolean;
-  plantedAt?: string;
-  deepenedAt?: string;
-  collectedAt?: string;
+export interface IForeshadowState extends IForeshadowStateBase {
+  // 运行时兼容字段
 }
 
 /**
@@ -756,14 +746,18 @@ class NarrativeEngine {
   // ==================== 伏笔系统 ====================
 
   /**
-   * 注册伏笔
+   * 注册伏笔（使用统一 Schema）
    */
   registerForeshadow(foreshadow: IForeshadow): void {
     this._foreshadowRegistry.set(foreshadow.id, foreshadow);
     this._foreshadowStates.set(foreshadow.id, {
       planted: false,
       deepened: false,
+      misled: false,
+      revealed: false,
+      // 兼容旧版字段
       collected: false,
+      resolved: false,
     });
   }
 
@@ -775,12 +769,12 @@ class NarrativeEngine {
   }
 
   /**
-   * 触发伏笔
+   * 触发伏笔（统一 Schema）
    * 支持新旧阶段命名：
    * - plant: 投放
    * - deepen: 加深
    * - mislead/misread: 误读
-   * - reveal/collect: 回收
+   * - reveal/collect/resolve: 回收
    */
   triggerForeshadow(foreshadowId: string, stage: ForeshadowStage): boolean {
     const state = this._foreshadowStates.get(foreshadowId);
@@ -814,8 +808,10 @@ class NarrativeEngine {
         break;
 
       case 'mislead':
-        // mislead 是可选阶段，不影响 collected 状态
-        if (state.planted && !state.collected) {
+        // mislead 是可选阶段，不影响 revealed 状态
+        if (state.planted && !state.revealed) {
+          state.misled = true;
+          state.misledAt = currentZone;
           eventBus.emit(GameEvent.FORESHADOW_TRIGGERED, {
             foreshadowId,
             stage: 'mislead',
@@ -826,9 +822,14 @@ class NarrativeEngine {
         break;
 
       case 'reveal':
-        if (state.planted && !state.collected) {
+        if (state.planted && !state.revealed) {
+          state.revealed = true;
+          state.revealedAt = currentZone;
+          // 兼容旧版字段
           state.collected = true;
           state.collectedAt = currentZone;
+          state.resolved = true;
+          state.resolvedAt = currentZone;
           eventBus.emit(GameEvent.FORESHADOW_COLLECT, { foreshadowId, zoneId: currentZone });
           return true;
         }
@@ -840,33 +841,22 @@ class NarrativeEngine {
 
   /**
    * 标准化阶段名称（兼容旧版命名）
+   * 使用统一的 normalizeForeshadowStage 函数
    */
-  private _normalizeStage(stage: ForeshadowStage): 'plant' | 'deepen' | 'mislead' | 'reveal' {
-    switch (stage) {
-      case 'plant':
-        return 'plant';
-      case 'deepen':
-        return 'deepen';
-      case 'misread':
-      case 'mislead':
-        return 'mislead';
-      case 'collect':
-      case 'reveal':
-        return 'reveal';
-      default:
-        return 'plant';
-    }
+  private _normalizeStage(stage: ForeshadowStage): ForeshadowStageType {
+    return normalizeForeshadowStage(stage as ForeshadowStageLegacy);
   }
 
   /**
    * 获取伏笔状态
-   * 返回统一命名：plant/deepen/reveal
+   * 返回统一命名：plant/deepen/mislead/reveal
    */
-  getForeshadowState(foreshadowId: string): ForeshadowStage | null {
+  getForeshadowState(foreshadowId: string): ForeshadowStageType | null {
     const state = this._foreshadowStates.get(foreshadowId);
     if (!state) return null;
 
-    if (state.collected) return 'reveal';
+    if (state.revealed) return 'reveal';
+    if (state.misled) return 'mislead';
     if (state.deepened) return 'deepen';
     if (state.planted) return 'plant';
     return null;
@@ -876,7 +866,9 @@ class NarrativeEngine {
    * 检查伏笔是否已回收
    */
   isForeshadowCollected(foreshadowId: string): boolean {
-    return this._foreshadowStates.get(foreshadowId)?.collected ?? false;
+    const state = this._foreshadowStates.get(foreshadowId);
+    // 兼容新旧字段
+    return state?.revealed ?? state?.collected ?? false;
   }
 
   /**
@@ -888,6 +880,7 @@ class NarrativeEngine {
     if (!state) return false;
 
     const normalizedStage = this._normalizeStage(stage);
+    const isRevealed = state.revealed ?? state.collected ?? false;
 
     switch (normalizedStage) {
       case 'plant':
@@ -895,9 +888,9 @@ class NarrativeEngine {
       case 'deepen':
         return state.planted && !state.deepened;
       case 'mislead':
-        return state.planted && !state.collected;
+        return state.planted && !isRevealed;
       case 'reveal':
-        return state.planted && !state.collected;
+        return state.planted && !isRevealed;
       default:
         return false;
     }
@@ -956,10 +949,17 @@ class NarrativeEngine {
     this._foreshadowStates.forEach((state) => {
       state.planted = false;
       state.deepened = false;
-      state.collected = false;
+      state.misled = false;
+      state.revealed = false;
       state.plantedAt = undefined;
       state.deepenedAt = undefined;
+      state.misledAt = undefined;
+      state.revealedAt = undefined;
+      // 兼容旧版字段
+      state.collected = false;
       state.collectedAt = undefined;
+      state.resolved = false;
+      state.resolvedAt = undefined;
     });
     this._currentDialogue = null;
     this._currentLineIndex = 0;

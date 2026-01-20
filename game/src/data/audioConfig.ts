@@ -267,6 +267,42 @@ export const SFX_CONFIGS: ISfxConfig[] = [
     volume: 0.6,
   },
 
+  // UI交互音效（通用）
+  {
+    id: 'sfx_ui_click',
+    name: 'UI点击',
+    file: 'assets/audio/sfx/ui/sfx_button_click.mp3', // 复用按钮点击音效
+    volume: 0.5,
+  },
+  {
+    id: 'sfx_achievement',
+    name: '成就解锁',
+    file: 'assets/audio/sfx/ui/sfx_notification.mp3', // 复用通知音效
+    volume: 0.7,
+  },
+
+  // 时间能力音效
+  {
+    id: 'sfx_time_rewind',
+    name: '时间回溯',
+    file: 'assets/audio/sfx/game/sfx_time_intervention.mp3', // 复用时间干预音效
+    volume: 0.7,
+  },
+
+  // 版本系统音效
+  {
+    id: 'sfx_version_conflict',
+    name: '版本冲突',
+    file: 'assets/audio/sfx/game/sfx_system_correct.mp3', // 复用系统修正音效
+    volume: 0.7,
+  },
+  {
+    id: 'sfx_version_select',
+    name: '版本选择',
+    file: 'assets/audio/sfx/ui/sfx_choice_select.mp3', // 复用选项选择音效
+    volume: 0.6,
+  },
+
   // 环境音效
   {
     id: 'sfx_crack',

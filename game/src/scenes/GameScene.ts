@@ -35,6 +35,7 @@ import {
   newGamePlusManager,
   performanceMonitor,
   ControlHints,
+  InteractionPrompt,
 } from '@/systems';
 import { AudioManager } from '@/systems/audio/AudioManager';
 import { narrativeEngine } from '@/systems/narrative';
@@ -100,6 +101,11 @@ export class GameScene extends Phaser.Scene {
 
   // 操作指引
   private _controlHints!: ControlHints;
+
+  // 交互提示
+  private _interactionPrompt!: InteractionPrompt;
+  private _nearestInteractable: Phaser.GameObjects.Container | null = null;
+  private readonly _interactionRange: number = 100; // 交互范围
 
   // UI元素
   private _zoneTitle!: Phaser.GameObjects.Text;
@@ -200,6 +206,84 @@ export class GameScene extends Phaser.Scene {
 
     // 更新能力系统
     this._abilitySystem?.update(delta);
+
+    // 更新交互提示（检测附近可交互物品）
+    this._updateInteractionPrompt();
+  }
+
+  /**
+   * 更新交互提示
+   * 检测玩家附近是否有可交互物品
+   */
+  private _updateInteractionPrompt(): void {
+    // 如果UI打开，隐藏交互提示
+    if (
+      this._dialogueUI?.isVisible() ||
+      this._cardUI?.isVisible() ||
+      this._pauseMenu?.isVisible() ||
+      this._inventoryUI?.isVisible()
+    ) {
+      this._interactionPrompt?.hide();
+      this._nearestInteractable = null;
+      return;
+    }
+
+    // 查找最近的可交互对象
+    let nearest: Phaser.GameObjects.Container | null = null;
+    let nearestDist = Infinity;
+    const playerX = this._player.x;
+    const playerY = this._player.y;
+
+    // 检查 SceneAssembler 创建的可交互对象
+    if (this._assembledScene) {
+      for (const obj of this._assembledScene.objects) {
+        // 只检查有交互数据的对象
+        if (obj instanceof Phaser.GameObjects.Container && obj.getData('action')) {
+          const dist = Phaser.Math.Distance.Between(playerX, playerY, obj.x, obj.y);
+          if (dist < this._interactionRange && dist < nearestDist) {
+            nearestDist = dist;
+            nearest = obj;
+          }
+        }
+      }
+    }
+
+    // 检查旧的交互点数组
+    for (const interactable of this._interactables) {
+      const dist = Phaser.Math.Distance.Between(playerX, playerY, interactable.x, interactable.y);
+      if (dist < this._interactionRange && dist < nearestDist) {
+        nearestDist = dist;
+        nearest = interactable;
+      }
+    }
+
+    // 更新交互提示
+    if (nearest) {
+      if (this._nearestInteractable !== nearest) {
+        this._nearestInteractable = nearest;
+        // 获取标签名称
+        const label = nearest.name || nearest.getData('label') || '交互';
+        this._interactionPrompt?.show({
+          object: nearest,
+          label: label,
+          x: nearest.x,
+          y: nearest.y,
+        });
+      } else {
+        // 更新位置（对象可能移动）
+        this._interactionPrompt?.show({
+          object: nearest,
+          label: nearest.name || nearest.getData('label') || '交互',
+          x: nearest.x,
+          y: nearest.y,
+        });
+      }
+    } else {
+      if (this._nearestInteractable) {
+        this._nearestInteractable = null;
+        this._interactionPrompt?.hide();
+      }
+    }
   }
 
   shutdown(): void {
@@ -229,6 +313,9 @@ export class GameScene extends Phaser.Scene {
 
     // 清理操作指引
     this._controlHints?.destroy();
+
+    // 清理交互提示
+    this._interactionPrompt?.destroy();
 
     // 清理音频系统
     this._audioManager?.destroy();
@@ -452,6 +539,14 @@ export class GameScene extends Phaser.Scene {
       position: 'top-left',
     });
     logger.info('操作指引初始化完成');
+
+    // 7. 初始化交互提示
+    this._interactionPrompt = new InteractionPrompt({
+      scene: this,
+      onInteract: () => this._tryInteract(),
+    });
+    this._interactionPrompt.setMobileMode(this._touchControls?.isMobile() ?? false);
+    logger.info('交互提示初始化完成');
 
     logger.info('辅助系统初始化完成');
   }

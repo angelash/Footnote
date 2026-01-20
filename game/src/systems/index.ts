@@ -75,6 +75,10 @@ export type { ITouchControlsConfig } from './input/TouchControls';
 export { ControlHints } from './ui/ControlHints';
 export type { IControlHintsConfig } from './ui/ControlHints';
 
+// 交互提示
+export { InteractionPrompt } from './ui/InteractionPrompt';
+export type { IInteractionPromptConfig } from './ui/InteractionPrompt';
+
 // 国际化
 export { i18n, t, LOCALE_NAMES } from './i18n/I18nManager';
 export type { SupportedLocale } from './i18n/I18nManager';

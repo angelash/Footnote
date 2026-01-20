@@ -34,6 +34,7 @@ import {
   AchievementManager,
   newGamePlusManager,
   performanceMonitor,
+  ControlHints,
 } from '@/systems';
 import { AudioManager } from '@/systems/audio/AudioManager';
 import { narrativeEngine } from '@/systems/narrative';
@@ -96,6 +97,9 @@ export class GameScene extends Phaser.Scene {
   // 教程和成就系统
   private _tutorialManager!: TutorialManager;
   private _achievementManager!: AchievementManager;
+
+  // 操作指引
+  private _controlHints!: ControlHints;
 
   // UI元素
   private _zoneTitle!: Phaser.GameObjects.Text;
@@ -222,6 +226,9 @@ export class GameScene extends Phaser.Scene {
     // 清理教程和成就系统
     this._tutorialManager?.destroy();
     this._achievementManager?.destroy();
+
+    // 清理操作指引
+    this._controlHints?.destroy();
 
     // 清理音频系统
     this._audioManager?.destroy();
@@ -436,6 +443,15 @@ export class GameScene extends Phaser.Scene {
         }
       });
     }
+
+    // 6. 初始化操作指引（常驻显示）
+    this._controlHints = new ControlHints({
+      scene: this,
+      isMobile: this._touchControls?.isMobile(),
+      visible: true,
+      position: 'top-left',
+    });
+    logger.info('操作指引初始化完成');
 
     logger.info('辅助系统初始化完成');
   }

@@ -71,6 +71,10 @@ export { TutorialManager, TutorialStep } from './game/TutorialManager';
 export { TouchControls } from './input/TouchControls';
 export type { ITouchControlsConfig } from './input/TouchControls';
 
+// 操作指引
+export { ControlHints } from './ui/ControlHints';
+export type { IControlHintsConfig } from './ui/ControlHints';
+
 // 国际化
 export { i18n, t, LOCALE_NAMES } from './i18n/I18nManager';
 export type { SupportedLocale } from './i18n/I18nManager';

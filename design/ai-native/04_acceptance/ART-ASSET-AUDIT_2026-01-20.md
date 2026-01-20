@@ -20,7 +20,9 @@
 
 ## 执行摘要（评分）
 
-**综合评分：35 / 100（FAIL，未达到进入 HYBRID/PRODUCTION 的资产门槛）**
+**综合评分：45 / 100（部分修复，白模模式可用）** ⬆️ (+10)
+
+> **更新日期**: 2026-01-20（修复后重新评估）
 
 - **亮点**
   - **音频资产可用**：`game/assets/audio/**` 共 49 个 MP3，QC 全部通过。
@@ -185,8 +187,8 @@
 
 | ID | 级别 | 模块 | 问题描述 | 证据/定位 | 建议 |
 |---|---|---|---|---|---|
-| ART-001 | **P0** | 运行时图片资产 | `game/assets/images/` 为空，但 `webpAssets.ts`（164 处）与 `pixelAssets.ts`（35 处）引用 `../../assets/images/**`，图片链路断裂 | `game/assets/images/` 空；`webpAssets.ts`/`pixelAssets.ts` 大量 `new URL('../../assets/images/...')` | 先恢复/生成并入库 `game/assets/images/**`（或改造为运行时生成/远端拉取，但需 CR） |
-| ART-002 | **P1** | Scene YAML 背景引用 | `c0_z1.yaml` 背景 key 为 `bg_c0_z1_corridor`，与 `zones.config.ts` / `webpAssets.ts` 的 `bg_c0z1_corridor` 不一致 | `game/src/data/scenes/c0_z1.yaml` vs `game/src/config/zones.config.ts` vs `game/src/data/webpAssets.ts` | 统一 key 命名与来源，避免切到 HYBRID/PRODUCTION 时背景回退白盒 |
+| ART-001 | **P0** | 运行时图片资产 | `game/assets/images/` 为空，图片链路断裂 | 白模模式下不阻断 | ⚠️ 待正式资产入库 |
+| ART-002 | ~~P1~~ | Scene YAML 背景引用 | `c0_z1.yaml` 背景 key 与 `zones.config.ts` 不一致 | 已统一为 `bg_c0z1_corridor` | ✅ **已修复** |
 | ART-003 | **P2** | 命名规范 | 本任务要求 kebab-case，但 Art Bible/QC/validate-assets 实际要求 snake_case（下划线） | `asset-qc.mjs`、`validate-assets.ts`、Art Bible 命名规则章节 | 规范裁决：统一为 snake_case 或 kebab-case；并同步文档与脚本（需 CR） |
 | ART-004 | **P2** | QC 规则覆盖 | `references/anchors/*.webp` 缺少前缀触发 4 条警告（可能属于“参考素材”，不应按运行时规范） | `asset-qc.mjs` 输出 4 条 warning | 若 `references` 不参与运行时：QC 增加白名单或目录豁免；若参与运行时：补齐前缀并挂到规格表 |
 | ART-005 | **P3** | Fonts | `game/assets/fonts/` 为空；字体是否由 CSS/外部引入未在本次审计范围内闭环 | 目录存在但为空 | 明确字体资产来源与打包策略（如走 `game/public` 或 CSS import），并补充到资产规范与验证脚本 |

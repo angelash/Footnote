@@ -317,7 +317,7 @@ export class CardUI {
       .setOrigin(0.5);
 
     this._closeButton.add([closeCircle, closeX]);
-    this._closeButton.setSize(32, 32);
+    this._closeButton.setSize(UI.BUTTON.MIN_TOUCH_SIZE, UI.BUTTON.MIN_TOUCH_SIZE);
     this._closeButton
       .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {

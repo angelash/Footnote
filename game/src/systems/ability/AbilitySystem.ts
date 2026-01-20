@@ -251,7 +251,7 @@ export class AbilitySystem {
     if (!this._depthPerceptionCharging) return;
 
     const elapsed = Date.now() - this._depthPerceptionChargeStartTime;
-    
+
     // 检查是否达到蓄力时间
     if (elapsed >= CONFIG.DEPTH_PERCEPTION_CHARGE_TIME) {
       const state = this._states.get('DEPTH_PERCEPTION' as AbilityType);
@@ -631,7 +631,9 @@ export class AbilitySystem {
     // 停用能力
     this.deactivateAbility('DEPTH_INTERVENTION' as AbilityType);
 
-    logger.info(`深度介入完成: ${objectId} @ ${zoneId}, P值消耗: ${CONFIG.DEPTH_INTERVENTION_P_COST}`);
+    logger.info(
+      `深度介入完成: ${objectId} @ ${zoneId}, P值消耗: ${CONFIG.DEPTH_INTERVENTION_P_COST}`
+    );
   }
 
   // ==================== 时间干预 ====================
@@ -784,15 +786,10 @@ export class AbilitySystem {
       bg.strokeRoundedRect(-200, -25, 400, 50, 8);
 
       const text = this._scene.add
-        .text(
-          0,
-          0,
-          `${node.zoneId} (消耗${cost}P)`,
-          {
-            fontSize: UI_FONT_SIZE.SMALL,
-            color: '#FFFFFF',
-          }
-        )
+        .text(0, 0, `${node.zoneId} (消耗${cost}P)`, {
+          fontSize: UI_FONT_SIZE.SMALL,
+          color: '#FFFFFF',
+        })
         .setOrigin(0.5);
 
       container.add([bg, text]);

@@ -484,7 +484,7 @@ export class ScenePreviewScene extends BasePreviewScene {
       const labelText = this.add
         .text(obj.x, obj.y - bounds.height / 2 - 15, label, {
           fontFamily: 'Noto Sans SC',
-          fontSize: '10px',
+          fontSize: this.FONT_SIZE.TINY,
           color: `#${color.toString(16).padStart(6, '0')}`,
         })
         .setOrigin(0.5);
@@ -494,7 +494,7 @@ export class ScenePreviewScene extends BasePreviewScene {
       const idText = this.add
         .text(obj.x, obj.y + bounds.height / 2 + 5, obj.id, {
           fontFamily: 'Noto Sans SC',
-          fontSize: '9px',
+          fontSize: this.FONT_SIZE.TINY,
           color: '#4A4A4A',
         })
         .setOrigin(0.5, 0);
@@ -519,7 +519,7 @@ export class ScenePreviewScene extends BasePreviewScene {
     const legendTitle = this.add
       .text(width - 80, height - 170, '📋 图例', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#A8A6A3',
         fontStyle: 'bold',
       })
@@ -546,7 +546,7 @@ export class ScenePreviewScene extends BasePreviewScene {
       const text = this.add
         .text(width - 120, y, item.label, {
           fontFamily: 'Noto Sans SC',
-          fontSize: '10px',
+          fontSize: this.FONT_SIZE.TINY,
           color: '#A8A6A3',
         })
         .setOrigin(0, 0.5);
@@ -569,7 +569,7 @@ export class ScenePreviewScene extends BasePreviewScene {
     const shortcuts = this.add
       .text(width / 2, height - 25, 'ESC 返回 | D 切换调试 | ← → 切换Zone', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#4A4A4A',
       })
       .setOrigin(0.5);
@@ -579,14 +579,14 @@ export class ScenePreviewScene extends BasePreviewScene {
     const prevBtn = this.add
       .text(100, height - 25, '← 上一个', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
-        color: '#686868',
+        fontSize: this.FONT_SIZE.TINY,
+        color: '#888888',
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
     prevBtn.on('pointerover', () => prevBtn.setColor('#00FFAA'));
-    prevBtn.on('pointerout', () => prevBtn.setColor('#686868'));
+    prevBtn.on('pointerout', () => prevBtn.setColor('#888888'));
     prevBtn.on('pointerdown', () => this._navigateZone(-1));
     this._prefabViewContainer.add(prevBtn);
 
@@ -594,14 +594,14 @@ export class ScenePreviewScene extends BasePreviewScene {
     const nextBtn = this.add
       .text(width - 100, height - 25, '下一个 →', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
-        color: '#686868',
+        fontSize: this.FONT_SIZE.TINY,
+        color: '#888888',
       })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
     nextBtn.on('pointerover', () => nextBtn.setColor('#00FFAA'));
-    nextBtn.on('pointerout', () => nextBtn.setColor('#686868'));
+    nextBtn.on('pointerout', () => nextBtn.setColor('#888888'));
     nextBtn.on('pointerdown', () => this._navigateZone(1));
     this._prefabViewContainer.add(nextBtn);
   }
@@ -675,7 +675,7 @@ export class ScenePreviewScene extends BasePreviewScene {
     // 动作类型
     const actionType = this.add.text(40, height - 160, `类型: ${action.type}`, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '12px',
+      fontSize: this.FONT_SIZE.TINY,
       color: '#A8A6A3',
     });
     this._interactionPanel.add(actionType);
@@ -696,8 +696,8 @@ export class ScenePreviewScene extends BasePreviewScene {
 
     const detail = this.add.text(40, height - 140, detailText, {
       fontFamily: 'Noto Sans SC',
-      fontSize: '11px',
-      color: '#686868',
+      fontSize: this.FONT_SIZE.TINY,
+      color: '#888888',
       wordWrap: { width: width - 80 },
     });
     this._interactionPanel.add(detail);

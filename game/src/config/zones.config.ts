@@ -1,6 +1,6 @@
 /**
  * Zone场景配置文件
- * 
+ *
  * 定义游戏中所有Zone的信息和背景资产映射
  */
 
@@ -8,25 +8,25 @@
  * 章节ID枚举
  */
 export enum ChapterId {
-  C0 = 'c0',   // 序章
-  C1 = 'c1',   // 第1章
-  C2 = 'c2',   // 第2章
-  C3 = 'c3',   // 第3章
-  C4 = 'c4',   // 第4章
-  C5 = 'c5',   // 第5章
-  CF = 'cf',   // 终章
+  C0 = 'c0', // 序章
+  C1 = 'c1', // 第1章
+  C2 = 'c2', // 第2章
+  C3 = 'c3', // 第3章
+  C4 = 'c4', // 第4章
+  C5 = 'c5', // 第5章
+  CF = 'cf', // 终章
 }
 
 /**
  * Zone信息接口
  */
 export interface IZoneInfo {
-  id: string;           // Zone ID (如 C0-Z1)
-  chapter: ChapterId;   // 所属章节
-  name: string;         // Zone名称
-  description: string;  // Zone描述
+  id: string; // Zone ID (如 C0-Z1)
+  chapter: ChapterId; // 所属章节
+  name: string; // Zone名称
+  description: string; // Zone描述
   backgroundKey: string; // 背景纹理键名
-  ambience?: string;    // 环境音效ID
+  ambience?: string; // 环境音效ID
   unlockCondition?: string; // 解锁条件描述
 }
 
@@ -394,7 +394,7 @@ export function getZoneBackgroundKey(zoneId: string): string {
  * @returns Zone数组
  */
 export function getZonesByChapter(chapterId: ChapterId): IZoneInfo[] {
-  return Object.values(ZONES).filter(zone => zone.chapter === chapterId);
+  return Object.values(ZONES).filter((zone) => zone.chapter === chapterId);
 }
 
 /**
@@ -405,4 +405,3 @@ export function getZonesByChapter(chapterId: ChapterId): IZoneInfo[] {
 export function getZoneCountByChapter(chapterId: ChapterId): number {
   return getZonesByChapter(chapterId).length;
 }
-

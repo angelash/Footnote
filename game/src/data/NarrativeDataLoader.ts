@@ -189,7 +189,9 @@ function normalizeOldFormatDialogue(raw: IRawDialogueOld): IDialogue {
     trigger: raw.trigger
       ? {
           card: raw.trigger.card,
-          foreshadow: raw.trigger.foreshadow as [string, 'plant' | 'deepen' | 'resolve'] | undefined,
+          foreshadow: raw.trigger.foreshadow as
+            | [string, 'plant' | 'deepen' | 'resolve']
+            | undefined,
           ability: raw.trigger.ability as AbilityType | undefined,
           event: raw.trigger.event,
         }
@@ -694,10 +696,8 @@ function registerDataToNarrativeEngine(
           : undefined,
       })),
       onComplete: dialogue.trigger
-        ? [
-            dialogue.trigger.card
-              ? { type: 'card' as const, cardId: dialogue.trigger.card }
-              : null,
+        ? ([
+            dialogue.trigger.card ? { type: 'card' as const, cardId: dialogue.trigger.card } : null,
             dialogue.trigger.foreshadow
               ? {
                   type: 'foreshadow' as const,
@@ -712,7 +712,7 @@ function registerDataToNarrativeEngine(
             dialogue.trigger.ability
               ? { type: 'ability' as const, abilityType: dialogue.trigger.ability }
               : null,
-          ].filter(Boolean) as import('@/systems/narrative').IDialogueAction[]
+          ].filter(Boolean) as import('@/systems/narrative').IDialogueAction[])
         : undefined,
     });
   }
@@ -763,7 +763,9 @@ function registerDataToNarrativeEngine(
     });
   }
 
-  logger.info(`数据已注册到 NarrativeEngine: ${dialogues.length} 对话, ${cards.length} 卡片, ${foreshadows.length} 伏笔`);
+  logger.info(
+    `数据已注册到 NarrativeEngine: ${dialogues.length} 对话, ${cards.length} 卡片, ${foreshadows.length} 伏笔`
+  );
 }
 
 /**

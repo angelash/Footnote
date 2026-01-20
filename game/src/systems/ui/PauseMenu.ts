@@ -359,7 +359,7 @@ export class PauseMenu {
     // 滑块手柄
     const handleX = trackX + value * CONFIG.SLIDER_WIDTH;
     const handle = this._scene.add
-      .rectangle(handleX, y, 16, 20, COLORS.ACCENT)
+      .rectangle(handleX, y, 24, UI.BUTTON.MIN_TOUCH_SIZE, COLORS.ACCENT)
       .setInteractive({ useHandCursor: true, draggable: true });
     this._settingsContainer.add(handle);
 
@@ -457,7 +457,7 @@ export class PauseMenu {
       .setOrigin(0, 0.5);
 
     container.add([circle, label]);
-    container.setSize(60, 24);
+    container.setSize(60, UI.BUTTON.MIN_TOUCH_SIZE);
     container.setInteractive({ useHandCursor: true }).on('pointerdown', callback);
 
     return container;
@@ -514,7 +514,7 @@ export class PauseMenu {
     updateToggle(value);
 
     container.add([track, handle]);
-    container.setSize(50, 24);
+    container.setSize(50, UI.BUTTON.MIN_TOUCH_SIZE);
     container.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
       const newValue = !container.getData('value');
       container.setData('value', newValue);

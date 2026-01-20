@@ -1,208 +1,208 @@
-﻿# 銆婂娉?/ Footnote銆嬫父鎴忛煶鏁堥厤缃?
-# 鏍煎紡: YAML
-# 鐘舵€? 寰呯敓鎴愰煶棰戞枃浠讹紙閰嶇疆鍏堣锛?
+# 《备注 / Footnote》游戏音效配置
+# 格式: YAML
+# 状态: 待生成音频文件（配置先行）
 
 # ==========================================
-# 娓告垙闊虫晥鍒楄〃 (20涓?
+# 游戏音效列表 (20个)
 # ==========================================
 
 sfx_game:
   # ------------------------------------------
-  # 鑳藉姏绯荤粺
+  # 能力系统
   # ------------------------------------------
   - id: sfx_depth_perception_activate
-    name: "娣卞害鎰熺煡婵€娲?
+    name: "深度感知激活"
     file: assets/audio/sfx/game/sfx_depth_perception_activate.mp3
     description: |
-      娣卞害鎰熺煡鑳藉姏寮€鍚?
-      椋庢牸: 鐢靛瓙鏅朵綋闊?+ 绌洪棿灞曞紑鎰?
+      深度感知能力开启
+      风格: 电子晶体音 + 空间展开感
     duration: 0.8
     volume: 0.6
     tags: [ability, depth, perception]
     
   - id: sfx_depth_perception_deactivate
-    name: "娣卞害鎰熺煡鍏抽棴"
+    name: "深度感知关闭"
     file: assets/audio/sfx/game/sfx_depth_perception_deactivate.mp3
-    description: "娣卞害鎰熺煡鑳藉姏鍏抽棴"
+    description: "深度感知能力关闭"
     duration: 0.5
     volume: 0.5
     tags: [ability, depth, perception]
     
   - id: sfx_depth_intervention
-    name: "娣卞害浠嬪叆"
+    name: "深度介入"
     file: assets/audio/sfx/game/sfx_depth_intervention.mp3
     description: |
-      娣卞害浠嬪叆鑳藉姏浣跨敤
-      椋庢牸: 缁撴瀯鎾曡 + 鑳介噺閲婃斁
+      深度介入能力使用
+      风格: 结构撕裂 + 能量释放
     duration: 1.2
     volume: 0.7
     tags: [ability, depth, intervention]
     
   - id: sfx_scar_create
-    name: "浼ょ棔浜х敓"
+    name: "伤痕产生"
     file: assets/audio/sfx/game/sfx_scar_create.mp3
-    description: "娣卞害浠嬪叆鍚庣暀涓嬩激鐥?
+    description: "深度介入后留下伤痕"
     duration: 0.6
     volume: 0.55
     tags: [scar, damage, consequence]
     
   - id: sfx_time_intervention
-    name: "鏃堕棿骞查"
+    name: "时间干预"
     file: assets/audio/sfx/game/sfx_time_intervention.mp3
     description: |
-      鏃堕棿骞查鑳藉姏浣跨敤
-      椋庢牸: 鍊掓斁 + 鏃堕挓榻胯疆 + 鎵洸
+      时间干预能力使用
+      风格: 倒放 + 时钟齿轮 + 扭曲
     duration: 1.5
     volume: 0.7
     tags: [ability, time, intervention]
     
   - id: sfx_time_contamination
-    name: "鏃堕棿姹℃煋"
+    name: "时间污染"
     file: assets/audio/sfx/game/sfx_time_contamination.mp3
-    description: "鏃堕棿骞查鍚庝骇鐢熸薄鏌?
+    description: "时间干预后产生污染"
     duration: 0.8
     volume: 0.6
     tags: [time, contamination, consequence]
     
   # ------------------------------------------
-  # 绯荤粺鍙嶉
+  # 系统反馈
   # ------------------------------------------
   - id: sfx_system_correct
-    name: "绯荤粺鏇存"
+    name: "系统更正"
     file: assets/audio/sfx/game/sfx_system_correct.mp3
     description: |
-      鏀舵暃杩愯鏃舵洿姝?
-      椋庢牸: 鏁版嵁澶勭悊 + 杞诲井鐢垫祦
+      收敛运行时更正
+      风格: 数据处理 + 轻微电流
     duration: 0.4
     volume: 0.45
     tags: [system, correct, align]
     
   - id: sfx_system_align
-    name: "瀵归綈瀹屾垚"
+    name: "对齐完成"
     file: assets/audio/sfx/game/sfx_system_align.mp3
-    description: "绯荤粺瀹屾垚瀵归綈鎿嶄綔"
+    description: "系统完成对齐操作"
     duration: 0.5
     volume: 0.5
     tags: [system, align]
     
   - id: sfx_system_warning
-    name: "绯荤粺璀﹀憡"
+    name: "系统警告"
     file: assets/audio/sfx/game/sfx_system_warning.mp3
-    description: "绯荤粺鍙戝嚭璀﹀憡淇″彿"
+    description: "系统发出警告信号"
     duration: 0.6
     volume: 0.6
     tags: [system, warning]
     
   - id: sfx_field_new
-    name: "鏂板瓧娈靛嚭鐜?
+    name: "新字段出现"
     file: assets/audio/sfx/game/sfx_field_new.mp3
     description: |
-      缁堝眬鏃舵柊瀛楁琚垱寤?
-      椋庢牸: 绁炵 + 绐佺牬鎰?
+      终局时新字段被创建
+      风格: 神秘 + 突破感
     duration: 1.0
     volume: 0.7
     tags: [field, new, breakthrough]
     
   # ------------------------------------------
-  # 浜や簰闊虫晥
+  # 交互音效
   # ------------------------------------------
   - id: sfx_interact
-    name: "浜や簰"
+    name: "交互"
     file: assets/audio/sfx/game/sfx_interact.mp3
-    description: "涓庣墿浣?NPC浜や簰"
+    description: "与物体/NPC交互"
     duration: 0.2
     volume: 0.4
     tags: [interact, object]
     
   - id: sfx_door_open
-    name: "闂ㄦ墦寮€"
+    name: "门打开"
     file: assets/audio/sfx/game/sfx_door_open.mp3
-    description: "鎵撳紑闂?
+    description: "打开门"
     duration: 0.5
     volume: 0.5
     tags: [door, open]
     
   - id: sfx_zone_enter
-    name: "杩涘叆鍖哄煙"
+    name: "进入区域"
     file: assets/audio/sfx/game/sfx_zone_enter.mp3
-    description: "鍒囨崲鍒版柊Zone"
+    description: "切换到新Zone"
     duration: 0.6
     volume: 0.5
     tags: [zone, enter, transition]
     
   - id: sfx_item_pickup
-    name: "鎷惧彇鐗╁搧"
+    name: "拾取物品"
     file: assets/audio/sfx/game/sfx_item_pickup.mp3
-    description: "鑾峰緱閬撳叿"
+    description: "获得道具"
     duration: 0.3
     volume: 0.5
     tags: [item, pickup]
     
   # ------------------------------------------
-  # 婕傜Щ/寮傚父
+  # 漂移/异常
   # ------------------------------------------
   - id: sfx_drift
-    name: "婕傜Щ鍙戠敓"
+    name: "漂移发生"
     file: assets/audio/sfx/game/sfx_drift.mp3
     description: |
-      璁板繂/鐘舵€佹紓绉?
-      椋庢牸: 澶辩湡 + 纰庣墖鍖?
+      记忆/状态漂移
+      风格: 失真 + 碎片化
     duration: 0.7
     volume: 0.55
     tags: [drift, anomaly]
     
   - id: sfx_memory_fragment
-    name: "璁板繂纰庣墖"
+    name: "记忆碎片"
     file: assets/audio/sfx/game/sfx_memory_fragment.mp3
-    description: "鑾峰緱鎴栬Е鍙戣蹇嗙鐗?
+    description: "获得或触发记忆碎片"
     duration: 0.8
     volume: 0.5
     tags: [memory, fragment]
     
   # ------------------------------------------
-  # 鐜浜や簰
+  # 环境交互
   # ------------------------------------------
   - id: sfx_crack
-    name: "瑁傜紳"
+    name: "裂缝"
     file: assets/audio/sfx/game/sfx_crack.mp3
-    description: "缁撴瀯瑁傜紳鍙戝０"
+    description: "结构裂缝发声"
     duration: 0.4
     volume: 0.45
     tags: [crack, structure]
     
   - id: sfx_collapse
-    name: "鍧嶅"
+    name: "坍塌"
     file: assets/audio/sfx/game/sfx_collapse.mp3
-    description: "缁撴瀯鍧嶅"
+    description: "结构坍塌"
     duration: 1.0
     volume: 0.7
     tags: [collapse, danger]
     
   # ------------------------------------------
-  # 鐗规畩闊虫晥
+  # 特殊音效
   # ------------------------------------------
   - id: sfx_foreshadow_trigger
-    name: "浼忕瑪瑙﹀彂"
+    name: "伏笔触发"
     file: assets/audio/sfx/game/sfx_foreshadow_trigger.mp3
     description: |
-      浼忕瑪琚縺娲?鍥炴敹
-      椋庢牸: 寰鐨勮鐭ユ彁绀?
+      伏笔被激活/回收
+      风格: 微妙的认知提示
     duration: 0.5
     volume: 0.4
     tags: [foreshadow, trigger]
     
   - id: sfx_r_increment
-    name: "R鍊煎鍔?
+    name: "R值增加"
     file: assets/audio/sfx/game/sfx_r_increment.mp3
     description: |
-      鏃犳敹鐩婃畫宸疮绉?
-      椋庢牸: 寰急浣嗗潥瀹氱殑闊宠皟
+      无收益残差累积
+      风格: 微弱但坚定的音调
     duration: 0.3
     volume: 0.3
     tags: [counter, r, increment]
 
 # ==========================================
-# 闊虫晥缁勯厤缃?
+# 音效组配置
 # ==========================================
 
 groups:
@@ -235,5 +235,3 @@ groups:
   special:
     - sfx_foreshadow_trigger
     - sfx_r_increment
-
-

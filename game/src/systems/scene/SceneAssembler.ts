@@ -161,6 +161,11 @@ export class SceneAssembler {
   private _createObject(obj: ISceneObjectConfig): Phaser.GameObjects.GameObject[] {
     const created: Phaser.GameObjects.GameObject[] = [];
 
+    // zone 类型没有 texture，直接返回空（zone 由其他系统处理）
+    if (obj.type === 'zone' || !obj.texture) {
+      return created;
+    }
+
     // 检查是否使用正式资源
     const useProduction = useProductionAsset('objects') && this._scene.textures.exists(obj.texture);
 
@@ -179,15 +184,17 @@ export class SceneAssembler {
 
   /**
    * 创建正式资源物件
+   * 注意：调用此方法前必须确保 obj.texture 存在
    */
   private _createProductionObject(obj: ISceneObjectConfig): Phaser.GameObjects.GameObject[] {
     const created: Phaser.GameObjects.GameObject[] = [];
+    const texture = obj.texture!; // 已在 _createObject 中验证
 
     type DisplayObject = Phaser.GameObjects.Image | Phaser.GameObjects.Sprite;
     let display: DisplayObject;
 
     if (obj.type === 'sprite') {
-      const sprite = this._scene.add.sprite(obj.x, obj.y, obj.texture, obj.frame ?? 0);
+      const sprite = this._scene.add.sprite(obj.x, obj.y, texture, obj.frame ?? 0);
       display = sprite;
 
       // 动画
@@ -195,10 +202,10 @@ export class SceneAssembler {
         const animKey = obj.animation.key;
         if (!this._scene.anims.exists(animKey)) {
           const frames = obj.animation.frameNumbers
-            ? this._scene.anims.generateFrameNumbers(obj.texture, {
+            ? this._scene.anims.generateFrameNumbers(texture, {
                 frames: obj.animation.frameNumbers,
               })
-            : this._scene.anims.generateFrameNumbers(obj.texture, {
+            : this._scene.anims.generateFrameNumbers(texture, {
                 start: obj.animation.frames?.start ?? 0,
                 end: obj.animation.frames?.end ?? 0,
               });
@@ -212,7 +219,7 @@ export class SceneAssembler {
         sprite.play(animKey);
       }
     } else {
-      display = this._scene.add.image(obj.x, obj.y, obj.texture);
+      display = this._scene.add.image(obj.x, obj.y, texture);
     }
 
     // 通用属性
@@ -260,9 +267,11 @@ export class SceneAssembler {
 
   /**
    * 创建白盒Billboard物件
+   * 注意：调用此方法前必须确保 obj.texture 存在
    */
   private _createWhiteboxObject(obj: ISceneObjectConfig): Phaser.GameObjects.GameObject[] {
     const created: Phaser.GameObjects.GameObject[] = [];
+    const texture = obj.texture!; // 已在 _createObject 中验证
 
     // 推断物件类型
     const objectType = this._inferObjectType(obj);
@@ -280,7 +289,7 @@ export class SceneAssembler {
     };
 
     // 使用资源解析器创建Billboard
-    const resolved = assetResolver.resolveObject(this._scene, billboardConfig, obj.texture);
+    const resolved = assetResolver.resolveObject(this._scene, billboardConfig, texture);
     const container = resolved.gameObject as Phaser.GameObjects.Container;
 
     // 设置位置
@@ -350,7 +359,7 @@ export class SceneAssembler {
    * 推断物件子类型（用于选择图标）
    */
   private _inferObjectSubtype(obj: ISceneObjectConfig): string | undefined {
-    const textureKey = obj.texture.toLowerCase();
+    const textureKey = (obj.texture ?? '').toLowerCase();
 
     // 从纹理名称推断
     const subtypePatterns: Record<string, string[]> = {

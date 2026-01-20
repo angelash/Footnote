@@ -1,13 +1,13 @@
 /**
  * UI 统一配置
- * 
+ *
  * 集中管理所有UI相关的常量，包括：
  * - 字体大小
  * - 间距
  * - 尺寸
  * - 动画
  * - 样式
- * 
+ *
  * 使用方式：
  * import { UI } from '@/config/ui.config';
  * fontSize: UI.FONT_SIZE.NORMAL
@@ -16,7 +16,7 @@
 /**
  * 字体大小常量
  * 基于 1080x1920 分辨率设计
- * 
+ *
  * 规则：
  * - TINY 是最小可用字体，不得小于此值
  * - 所有UI文字必须使用这些常量，禁止硬编码
@@ -337,7 +337,7 @@ export const UI_TEXT_STYLES = {
   /** 正文 */
   BODY: createFontStyle(UI_FONT_SIZE.NORMAL, '#E8E6E3', { lineSpacing: UI_LINE_SPACING.LOOSE }),
   /** 对话文字 */
-  DIALOGUE: createFontStyle(UI_FONT_SIZE.NORMAL, '#E8E6E3', { 
+  DIALOGUE: createFontStyle(UI_FONT_SIZE.NORMAL, '#E8E6E3', {
     lineSpacing: UI_LINE_SPACING.NORMAL,
     wordWrap: { width: UI_DIALOGUE.CONTENT_WIDTH, useAdvancedWrap: true },
   }),
@@ -348,7 +348,7 @@ export const UI_TEXT_STYLES = {
   /** 标签文字 */
   LABEL: createFontStyle(UI_FONT_SIZE.SMALL, '#A8A6A3'),
   /** 辅助文字 */
-  HELPER: createFontStyle(UI_FONT_SIZE.TINY, '#686868'),
+  HELPER: createFontStyle(UI_FONT_SIZE.TINY, '#888888'),
   /** 系统提示 */
   SYSTEM: createFontStyle(UI_FONT_SIZE.SMALL, '#4A9EFF'),
   /** 强调文字 */
@@ -360,6 +360,5 @@ export const UI_TEXT_STYLES = {
 } as const;
 
 // 类型导出
-export type UIFontSize = typeof UI_FONT_SIZE[keyof typeof UI_FONT_SIZE];
-export type UISpacing = typeof UI_SPACING[keyof typeof UI_SPACING];
-
+export type UIFontSize = (typeof UI_FONT_SIZE)[keyof typeof UI_FONT_SIZE];
+export type UISpacing = (typeof UI_SPACING)[keyof typeof UI_SPACING];

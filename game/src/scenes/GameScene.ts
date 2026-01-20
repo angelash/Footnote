@@ -392,11 +392,14 @@ export class GameScene extends Phaser.Scene {
    */
   private _initAuxiliarySystems(): void {
     // 1. 存档系统初始化（异步，不阻塞）
-    saveManager.initialize().then(() => {
-      logger.info('存档系统初始化完成');
-    }).catch((error) => {
-      logger.error('存档系统初始化失败:', error);
-    });
+    saveManager
+      .initialize()
+      .then(() => {
+        logger.info('存档系统初始化完成');
+      })
+      .catch((error) => {
+        logger.error('存档系统初始化失败:', error);
+      });
 
     // 2. 成就系统初始化
     this._achievementManager = new AchievementManager({ scene: this });
@@ -407,17 +410,20 @@ export class GameScene extends Phaser.Scene {
     logger.info('教程系统初始化完成');
 
     // 4. New Game+ 系统初始化
-    newGamePlusManager.initialize().then(() => {
-      logger.info('NG+系统初始化完成');
+    newGamePlusManager
+      .initialize()
+      .then(() => {
+        logger.info('NG+系统初始化完成');
 
-      // 如果是NG+，应用继承内容
-      if (newGamePlusManager.isNewGamePlus()) {
-        logger.info('检测到NG+模式，应用继承奖励');
-        // NG+奖励在 startNewGamePlus 中已应用，这里只做记录
-      }
-    }).catch((error) => {
-      logger.error('NG+系统初始化失败:', error);
-    });
+        // 如果是NG+，应用继承内容
+        if (newGamePlusManager.isNewGamePlus()) {
+          logger.info('检测到NG+模式，应用继承奖励');
+          // NG+奖励在 startNewGamePlus 中已应用，这里只做记录
+        }
+      })
+      .catch((error) => {
+        logger.error('NG+系统初始化失败:', error);
+      });
 
     // 5. 检查是否需要显示教程（仅新游戏且非NG+时）
     if (this._isNewGame && !newGamePlusManager.isNewGamePlus()) {

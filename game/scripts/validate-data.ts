@@ -96,9 +96,14 @@ function validateCards() {
       const content = fs.readFileSync(path.join(CARD_DIR, file), 'utf-8');
       const data = YAML.parse(content);
       
-      if (!data.cards || !Array.isArray(data.cards)) return;
+      if (!data.cards) return;
 
-      data.cards.forEach((c: any, idx: number) => {
+      // Cards can be Array or Object (Map)
+      const cards = Array.isArray(data.cards) 
+        ? data.cards 
+        : Object.values(data.cards);
+
+      cards.forEach((c: any, idx: number) => {
         if (!c.id) error(`${file} entry ${idx}: Missing id`);
         if (!c.name && !c.title) error(`${file} entry ${c.id || idx}: Missing name/title`);
         

@@ -507,7 +507,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
     const expressionTip = this.add
       .text(width / 2, height - 30, '💡 这是使用 DialogueUI 组件渲染的真实对话框', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '11px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#4A4A4A',
       })
       .setOrigin(0.5);

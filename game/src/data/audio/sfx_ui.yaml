@@ -1,177 +1,177 @@
-﻿# 銆婂娉?/ Footnote銆婾I闊虫晥閰嶇疆
-# 鏍煎紡: YAML
-# 鐘舵€? 寰呯敓鎴愰煶棰戞枃浠讹紙閰嶇疆鍏堣锛?
+# 《备注 / Footnote》UI音效配置
+# 格式: YAML
+# 状态: 待生成音频文件（配置先行）
 
 # ==========================================
-# UI闊虫晥鍒楄〃 (18涓?
+# UI音效列表 (18个)
 # ==========================================
 
 sfx_ui:
   # ------------------------------------------
-  # 鍩虹浜や簰
+  # 基础交互
   # ------------------------------------------
   - id: sfx_button_hover
-    name: "鎸夐挳鎮仠"
+    name: "按钮悬停"
     file: assets/audio/sfx/ui/sfx_button_hover.mp3
-    description: "榧犳爣鎮仠鍦ㄦ寜閽笂"
+    description: "鼠标悬停在按钮上"
     duration: 0.1
     volume: 0.3
     tags: [button, hover]
     
   - id: sfx_button_click
-    name: "鎸夐挳鐐瑰嚮"
+    name: "按钮点击"
     file: assets/audio/sfx/ui/sfx_button_click.mp3
-    description: "鐐瑰嚮鎸夐挳纭"
+    description: "点击按钮确认"
     duration: 0.15
     volume: 0.5
     tags: [button, click, confirm]
     
   - id: sfx_button_back
-    name: "杩斿洖/鍙栨秷"
+    name: "返回/取消"
     file: assets/audio/sfx/ui/sfx_button_back.mp3
-    description: "杩斿洖涓婁竴绾ф垨鍙栨秷鎿嶄綔"
+    description: "返回上一级或取消操作"
     duration: 0.2
     volume: 0.4
     tags: [button, back, cancel]
     
   # ------------------------------------------
-  # 鑿滃崟/闈㈡澘
+  # 菜单/面板
   # ------------------------------------------
   - id: sfx_menu_open
-    name: "鑿滃崟鎵撳紑"
+    name: "菜单打开"
     file: assets/audio/sfx/ui/sfx_menu_open.mp3
-    description: "鎵撳紑鑿滃崟闈㈡澘"
+    description: "打开菜单面板"
     duration: 0.3
     volume: 0.4
     tags: [menu, open, panel]
     
   - id: sfx_menu_close
-    name: "鑿滃崟鍏抽棴"
+    name: "菜单关闭"
     file: assets/audio/sfx/ui/sfx_menu_close.mp3
-    description: "鍏抽棴鑿滃崟闈㈡澘"
+    description: "关闭菜单面板"
     duration: 0.25
     volume: 0.35
     tags: [menu, close, panel]
     
   # ------------------------------------------
-  # 瀵硅瘽绯荤粺
+  # 对话系统
   # ------------------------------------------
   - id: sfx_dialogue_appear
-    name: "瀵硅瘽妗嗗嚭鐜?
+    name: "对话框出现"
     file: assets/audio/sfx/ui/sfx_dialogue_appear.mp3
-    description: "瀵硅瘽妗嗗脊鍑?
+    description: "对话框弹出"
     duration: 0.2
     volume: 0.4
     tags: [dialogue, appear]
     
   - id: sfx_dialogue_text
-    name: "鏂囧瓧鎵撳瓧"
+    name: "文字打字"
     file: assets/audio/sfx/ui/sfx_dialogue_text.mp3
-    description: "鏂囧瓧閫愬瓧鍑虹幇鐨勬墦瀛楅煶锛堝惊鐜煭闊筹級"
+    description: "文字逐字出现的打字音（循环短音）"
     duration: 0.05
     volume: 0.2
     loop: true
     tags: [dialogue, text, typing]
     
   - id: sfx_dialogue_complete
-    name: "瀵硅瘽瀹屾垚"
+    name: "对话完成"
     file: assets/audio/sfx/ui/sfx_dialogue_complete.mp3
-    description: "涓€娈靛璇濇枃瀛楁樉绀哄畬鎴?
+    description: "一段对话文字显示完成"
     duration: 0.1
     volume: 0.3
     tags: [dialogue, complete]
     
   - id: sfx_choice_appear
-    name: "閫夐」鍑虹幇"
+    name: "选项出现"
     file: assets/audio/sfx/ui/sfx_choice_appear.mp3
-    description: "瀵硅瘽閫夐」灞曞紑"
+    description: "对话选项展开"
     duration: 0.25
     volume: 0.4
     tags: [choice, appear]
     
   - id: sfx_choice_select
-    name: "閫夐」閫夋嫨"
+    name: "选项选择"
     file: assets/audio/sfx/ui/sfx_choice_select.mp3
-    description: "纭閫夋嫨瀵硅瘽閫夐」"
+    description: "确认选择对话选项"
     duration: 0.2
     volume: 0.5
     tags: [choice, select, confirm]
     
   # ------------------------------------------
-  # 鍗＄墖绯荤粺
+  # 卡片系统
   # ------------------------------------------
   - id: sfx_card_get
-    name: "鍗＄墖鑾峰彇"
+    name: "卡片获取"
     file: assets/audio/sfx/ui/sfx_card_get.mp3
-    description: "鑾峰緱鏂板崱鐗?
+    description: "获得新卡片"
     duration: 0.5
     volume: 0.6
     tags: [card, get, reward]
     
   - id: sfx_card_flip
-    name: "鍗＄墖缈昏浆"
+    name: "卡片翻转"
     file: assets/audio/sfx/ui/sfx_card_flip.mp3
-    description: "闀挎寜鏌ョ湅鍗＄墖璇︽儏"
+    description: "长按查看卡片详情"
     duration: 0.3
     volume: 0.4
     tags: [card, flip, detail]
     
   - id: sfx_card_archive
-    name: "鍗＄墖褰掓。"
+    name: "卡片归档"
     file: assets/audio/sfx/ui/sfx_card_archive.mp3
-    description: "鍗＄墖鏀惧叆鏀惰棌"
+    description: "卡片放入收藏"
     duration: 0.25
     volume: 0.35
     tags: [card, archive]
     
   # ------------------------------------------
-  # 瀛樻。绯荤粺
+  # 存档系统
   # ------------------------------------------
   - id: sfx_save
-    name: "瀛樻。"
+    name: "存档"
     file: assets/audio/sfx/ui/sfx_save.mp3
-    description: "娓告垙淇濆瓨鎴愬姛"
+    description: "游戏保存成功"
     duration: 0.4
     volume: 0.5
     tags: [save, success]
     
   - id: sfx_load
-    name: "璇绘。"
+    name: "读档"
     file: assets/audio/sfx/ui/sfx_load.mp3
-    description: "鍔犺浇瀛樻。"
+    description: "加载存档"
     duration: 0.5
     volume: 0.5
     tags: [load]
     
   # ------------------------------------------
-  # 閫氱煡/鎻愮ず
+  # 通知/提示
   # ------------------------------------------
   - id: sfx_notification
-    name: "閫氱煡鎻愮ず"
+    name: "通知提示"
     file: assets/audio/sfx/ui/sfx_notification.mp3
-    description: "涓€鑸€氱煡寮瑰嚭"
+    description: "一般通知弹出"
     duration: 0.3
     volume: 0.45
     tags: [notification, info]
     
   - id: sfx_warning
-    name: "璀﹀憡鎻愮ず"
+    name: "警告提示"
     file: assets/audio/sfx/ui/sfx_warning.mp3
-    description: "璀﹀憡鎴栧嵄闄╂彁绀?
+    description: "警告或危险提示"
     duration: 0.35
     volume: 0.55
     tags: [warning, danger]
     
   - id: sfx_error
-    name: "閿欒鎻愮ず"
+    name: "错误提示"
     file: assets/audio/sfx/ui/sfx_error.mp3
-    description: "鎿嶄綔澶辫触鎴栭敊璇?
+    description: "操作失败或错误"
     duration: 0.25
     volume: 0.5
     tags: [error, fail]
 
 # ==========================================
-# 闊虫晥缁勯厤缃?
+# 音效组配置
 # ==========================================
 
 groups:
@@ -198,5 +198,3 @@ groups:
     - sfx_notification
     - sfx_warning
     - sfx_error
-
-

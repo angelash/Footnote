@@ -186,7 +186,7 @@ export class InventoryUI {
       .setOrigin(0.5);
 
     container.add([bg, x]);
-    container.setSize(36, 36);
+    container.setSize(UI.BUTTON.MIN_TOUCH_SIZE, UI.BUTTON.MIN_TOUCH_SIZE);
     container
       .setInteractive({ useHandCursor: true })
       .on('pointerover', () => {
@@ -240,7 +240,7 @@ export class InventoryUI {
   ): Phaser.GameObjects.Container {
     const container = this._scene.add.container(x, y);
     const tabWidth = 90;
-    const tabHeight = 32;
+    const tabHeight = UI.BUTTON.MIN_TOUCH_SIZE;
 
     const bg = this._scene.add.graphics();
     bg.setName('bg');
@@ -273,9 +273,9 @@ export class InventoryUI {
       bg.clear();
       if (isActive) {
         bg.fillStyle(COLORS.ACCENT, 0.2);
-        bg.fillRoundedRect(-45, -16, 90, 32, 6);
+        bg.fillRoundedRect(-45, -22, 90, UI.BUTTON.MIN_TOUCH_SIZE, 6);
         bg.lineStyle(1, COLORS.ACCENT, 1);
-        bg.strokeRoundedRect(-45, -16, 90, 32, 6);
+        bg.strokeRoundedRect(-45, -22, 90, UI.BUTTON.MIN_TOUCH_SIZE, 6);
         text.setColor('#00FFAA');
       } else {
         text.setColor('#A8A6A3');

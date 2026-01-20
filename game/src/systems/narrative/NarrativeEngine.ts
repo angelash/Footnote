@@ -281,11 +281,11 @@ class NarrativeEngine {
       }
 
       const yamlContent = await response.text();
-      
+
       // 使用动态导入加载yaml解析器
       const { parse: parseYaml } = await import('yaml');
       const data = parseYaml(yamlContent);
-      
+
       if (!data?.dialogues) {
         logger.debug(`对话文件无有效数据: ${yamlFile}.yaml`);
         return null;
@@ -349,7 +349,7 @@ class NarrativeEngine {
 
     for (const [_key, raw] of Object.entries(dialoguesData)) {
       const dialogue = raw as Record<string, unknown>;
-      
+
       if ('lines' in dialogue && Array.isArray(dialogue.lines)) {
         // 新格式：直接使用
         result.push(dialogue as unknown as IDialogueData);
@@ -381,8 +381,10 @@ class NarrativeEngine {
             effects: c.effect ? { rDelta: c.effect.r, pDelta: c.effect.p } : undefined,
           })),
           onComplete: oldFormat.trigger
-            ? [
-                oldFormat.trigger.card ? { type: 'card' as const, cardId: oldFormat.trigger.card } : null,
+            ? ([
+                oldFormat.trigger.card
+                  ? { type: 'card' as const, cardId: oldFormat.trigger.card }
+                  : null,
                 oldFormat.trigger.foreshadow
                   ? {
                       type: 'foreshadow' as const,
@@ -390,7 +392,7 @@ class NarrativeEngine {
                       foreshadowStage: oldFormat.trigger.foreshadow[1] as ForeshadowStage,
                     }
                   : null,
-              ].filter(Boolean) as IDialogueAction[]
+              ].filter(Boolean) as IDialogueAction[])
             : undefined,
         });
       }

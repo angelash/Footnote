@@ -78,13 +78,16 @@ export class MenuScene extends Phaser.Scene {
    */
   private _initializeSaveSystem(): void {
     // 异步初始化存档系统，不阻塞主菜单渲染
-    saveManager.initialize().then(() => {
-      logger.info('存档系统初始化完成');
-      // 重新获取设置（如果存档系统加载了新设置）
-      this._settings = saveManager.getSettings();
-    }).catch((error) => {
-      logger.error('存档系统初始化失败:', error);
-    });
+    saveManager
+      .initialize()
+      .then(() => {
+        logger.info('存档系统初始化完成');
+        // 重新获取设置（如果存档系统加载了新设置）
+        this._settings = saveManager.getSettings();
+      })
+      .catch((error) => {
+        logger.error('存档系统初始化失败:', error);
+      });
   }
 
   private _createTitle(width: number, height: number): void {

@@ -338,7 +338,7 @@ export class UIPreviewScene extends BasePreviewScene {
     const playerLabel = this.add
       .text(width / 2, height / 2 + 35, '玩家', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '10px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#00FFAA',
       })
       .setOrigin(0.5);
@@ -380,7 +380,7 @@ export class UIPreviewScene extends BasePreviewScene {
     const tip = this.add
       .text(this.scale.width / 2, 120, '💡 点击对话框可推进对话，点击选项可选择', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#FFD700',
       })
       .setOrigin(0.5);
@@ -424,7 +424,7 @@ export class UIPreviewScene extends BasePreviewScene {
     const tip = this.add
       .text(this.scale.width / 2, 120, '💡 展示卡片获得动画，点击可关闭', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#FFD700',
       })
       .setOrigin(0.5);
@@ -495,7 +495,7 @@ export class UIPreviewScene extends BasePreviewScene {
     const tip = this.add
       .text(width / 2, panelY + panelHeight + 20, '💡 这是 PauseMenu 的完整界面预览', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#FFD700',
       })
       .setOrigin(0.5);
@@ -550,8 +550,8 @@ export class UIPreviewScene extends BasePreviewScene {
       const tabText = this.add
         .text(tabX + 40, panelY + 69, tab, {
           fontFamily: 'Noto Sans SC',
-          fontSize: '12px',
-          color: isActive ? '#00FFAA' : '#686868',
+          fontSize: this.FONT_SIZE.TINY,
+          color: isActive ? '#00FFAA' : '#888888',
         })
         .setOrigin(0.5);
       this._uiPreviewContainer.add(tabText);
@@ -587,7 +587,7 @@ export class UIPreviewScene extends BasePreviewScene {
         const cardName = this.add
           .text(cardX + cardWidth / 2, cardY + 100, `卡片 ${i + 1}`, {
             fontFamily: 'Noto Sans SC',
-            fontSize: '11px',
+            fontSize: this.FONT_SIZE.TINY,
             color: '#A8A6A3',
           })
           .setOrigin(0.5);
@@ -607,7 +607,7 @@ export class UIPreviewScene extends BasePreviewScene {
     const tip = this.add
       .text(width / 2, height - 50, '💡 这是 InventoryUI 的完整界面预览', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#FFD700',
       })
       .setOrigin(0.5);
@@ -685,7 +685,7 @@ export class UIPreviewScene extends BasePreviewScene {
       const keyHint = this.add
         .text(x, abilityBarY + 15, ability.key, {
           fontFamily: 'Noto Sans SC',
-          fontSize: '11px',
+          fontSize: this.FONT_SIZE.TINY,
           color: '#4A4A4A',
         })
         .setOrigin(0.5);
@@ -705,7 +705,7 @@ export class UIPreviewScene extends BasePreviewScene {
     const tip = this.add
       .text(width / 2, 250, '💡 HUD元素：R/P/W计数器 + 能力栏', {
         fontFamily: 'Noto Sans SC',
-        fontSize: '12px',
+        fontSize: this.FONT_SIZE.TINY,
         color: '#FFD700',
       })
       .setOrigin(0.5);

@@ -1,6 +1,6 @@
 import type Phaser from 'phaser';
 
-export type SceneObjectType = 'image' | 'sprite';
+export type SceneObjectType = 'image' | 'sprite' | 'zone';
 
 export type SceneActionType = 'dialogue' | 'card' | 'gotoZone' | 'none';
 
@@ -9,6 +9,7 @@ export interface ISceneAction {
   // dialogue
   speaker?: string;
   text?: string;
+  dialogueId?: string;
   // card
   cardId?: string;
   // gotoZone
@@ -32,9 +33,14 @@ export interface ISceneObjectAnimation {
 export interface ISceneObjectConfig {
   id: string;
   type: SceneObjectType;
-  texture: string;
+  /** texture 对于 'zone' 类型是可选的 */
+  texture?: string;
   x: number;
   y: number;
+  /** zone 类型专用：区域宽度 */
+  width?: number;
+  /** zone 类型专用：区域高度 */
+  height?: number;
   scale?: number;
   depth?: number;
   alpha?: number;

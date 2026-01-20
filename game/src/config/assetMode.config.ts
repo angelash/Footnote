@@ -20,7 +20,7 @@ export enum AssetMode {
 export interface IAssetModeConfig {
   /** 当前模式 */
   mode: AssetMode;
-  
+
   /** 各类资源是否使用正式版 */
   useProductionAssets: {
     backgrounds: boolean;
@@ -30,7 +30,7 @@ export interface IAssetModeConfig {
     effects: boolean;
     audio: boolean;
   };
-  
+
   /** Billboard 配置 */
   billboard: {
     /** 是否显示类型标签 */
@@ -42,7 +42,7 @@ export interface IAssetModeConfig {
     /** 背景透明度 */
     bgAlpha: number;
   };
-  
+
   /** 调试选项 */
   debug: {
     /** 显示碰撞框 */
@@ -60,28 +60,28 @@ export interface IAssetModeConfig {
 
 /** 角色标识色 */
 export const CHARACTER_BILLBOARD_COLORS: Record<string, number> = {
-  cenhui: 0x00FFAA,    // 主角 - 标志绿
-  gulin: 0x4A9EFF,     // 顾临 - 冷静蓝
-  songlan: 0xFFD700,   // 宋岚 - 档案金
-  xucheng: 0x00CED1,   // 许澄 - 医疗青
-  atang: 0xFF69B4,     // 阿棠 - 漂移粉
-  muping: 0x9370DB,    // 牧平 - 神秘紫
-  qilan: 0x98FB98,     // 栖蓝 - 温暖绿
-  chenjiang: 0xFFA500, // 陈匠 - 灯火橙
-  system: 0x4A9EFF,    // 系统 - 蓝色
-  unknown: 0x686868,   // 未知 - 灰色
+  cenhui: 0x00ffaa, // 主角 - 标志绿
+  gulin: 0x4a9eff, // 顾临 - 冷静蓝
+  songlan: 0xffd700, // 宋岚 - 档案金
+  xucheng: 0x00ced1, // 许澄 - 医疗青
+  atang: 0xff69b4, // 阿棠 - 漂移粉
+  muping: 0x9370db, // 牧平 - 神秘紫
+  qilan: 0x98fb98, // 栖蓝 - 温暖绿
+  chenjiang: 0xffa500, // 陈匠 - 灯火橙
+  system: 0x4a9eff, // 系统 - 蓝色
+  unknown: 0x686868, // 未知 - 灰色
 };
 
 /** Zone类型背景色 */
 export const ZONE_TYPE_COLORS: Record<string, { bg: number; border: number }> = {
-  life: { bg: 0x2D2D33, border: 0x4A4A52 },           // 生活区 - 暖灰色
-  municipal: { bg: 0x1E2836, border: 0x3A5070 },     // 市政区 - 冷蓝灰
-  archive: { bg: 0x2D2818, border: 0x5A5030 },       // 档案区 - 暗黄色
-  clinic: { bg: 0x1E2D2D, border: 0x305A5A },        // 诊所 - 青色
-  temple: { bg: 0x2D2818, border: 0x5A5030 },        // 神殿 - 金色调
-  edge: { bg: 0x2D1E1E, border: 0x5A3030 },          // 边缘区 - 暗红色
-  anomaly: { bg: 0x251E2D, border: 0x4A3060 },       // 异常区 - 紫色
-  default: { bg: 0x1E1E24, border: 0x3A3A40 },       // 默认 - 暗灰色
+  life: { bg: 0x2d2d33, border: 0x4a4a52 }, // 生活区 - 暖灰色
+  municipal: { bg: 0x1e2836, border: 0x3a5070 }, // 市政区 - 冷蓝灰
+  archive: { bg: 0x2d2818, border: 0x5a5030 }, // 档案区 - 暗黄色
+  clinic: { bg: 0x1e2d2d, border: 0x305a5a }, // 诊所 - 青色
+  temple: { bg: 0x2d2818, border: 0x5a5030 }, // 神殿 - 金色调
+  edge: { bg: 0x2d1e1e, border: 0x5a3030 }, // 边缘区 - 暗红色
+  anomaly: { bg: 0x251e2d, border: 0x4a3060 }, // 异常区 - 紫色
+  default: { bg: 0x1e1e24, border: 0x3a3a40 }, // 默认 - 暗灰色
 };
 
 /** 物件类型图标 */
@@ -93,13 +93,13 @@ export const OBJECT_TYPE_ICONS: Record<string, string> = {
   blocker: '🚧',
   door: '🚪',
   exit: '🚶',
-  
+
   // 物品类型
   item: '💎',
   card: '📄',
   save_point: '💾',
   npc_spot: '💬',
-  
+
   // 场景物件
   bed: '🛏️',
   desk: '🪑',
@@ -114,7 +114,7 @@ export const OBJECT_TYPE_ICONS: Record<string, string> = {
   chair: '🪑',
   candle: '🕯️',
   rune: '✨',
-  
+
   // 默认
   unknown: '❓',
 };
@@ -160,7 +160,7 @@ export const HYBRID_CONFIG: IAssetModeConfig = {
   billboard: {
     showTypeLabel: true,
     showBoundingBox: false,
-    fontSize: 12,
+    fontSize: 14,
     bgAlpha: 0.6,
   },
   debug: {
@@ -185,7 +185,7 @@ export const PRODUCTION_CONFIG: IAssetModeConfig = {
   billboard: {
     showTypeLabel: false,
     showBoundingBox: false,
-    fontSize: 12,
+    fontSize: 14,
     bgAlpha: 0,
   },
   debug: {
@@ -200,7 +200,7 @@ export const PRODUCTION_CONFIG: IAssetModeConfig = {
 
 /**
  * 当前使用的资源模式配置
- * 
+ *
  * 开发时修改这里来切换模式：
  * - WHITEBOX_CONFIG: 白盒开发模式
  * - HYBRID_CONFIG: 混合模式（逐步替换）
@@ -244,4 +244,3 @@ export function getZoneTypeColors(zoneType: string): { bg: number; border: numbe
 export function getObjectIcon(type: string, subtype?: string): string {
   return OBJECT_TYPE_ICONS[subtype ?? ''] ?? OBJECT_TYPE_ICONS[type] ?? OBJECT_TYPE_ICONS.unknown;
 }
-

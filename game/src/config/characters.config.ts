@@ -1,6 +1,6 @@
 /**
  * 角色配置文件
- * 
+ *
  * 定义游戏中所有角色的基本信息和头像映射
  */
 
@@ -8,13 +8,13 @@
  * 角色ID枚举
  */
 export enum CharacterId {
-  CENHUI = 'cenhui',     // 岑回 - 主角/例外处理器
-  GULIN = 'gulin',       // 顾临 - 维修局主管
-  SONGLAN = 'songlan',   // 宋岚 - 层下记录者
-  XUCHENG = 'xucheng',   // 许澄 - 医生
-  ATANG = 'atang',       // 阿棠 - 漂移者
-  MUPING = 'muping',     // 牧平 - 平面信徒
-  QILAN = 'qilan',       // 栖蓝 - 多余者代表
+  CENHUI = 'cenhui', // 岑回 - 主角/例外处理器
+  GULIN = 'gulin', // 顾临 - 维修局主管
+  SONGLAN = 'songlan', // 宋岚 - 层下记录者
+  XUCHENG = 'xucheng', // 许澄 - 医生
+  ATANG = 'atang', // 阿棠 - 漂移者
+  MUPING = 'muping', // 牧平 - 平面信徒
+  QILAN = 'qilan', // 栖蓝 - 多余者代表
   CHENJIANG = 'chenjiang', // 陈匠 - 点灯者
 }
 
@@ -23,42 +23,42 @@ export enum CharacterId {
  */
 export type ExpressionType =
   // 通用表情
-  | 'neutral'       // 中性
-  | 'sad'           // 悲伤
-  | 'angry'         // 愤怒
-  | 'surprised'     // 惊讶
-  | 'thinking'      // 思考
-  | 'worried'       // 担忧
-  | 'smiling'       // 微笑
+  | 'neutral' // 中性
+  | 'sad' // 悲伤
+  | 'angry' // 愤怒
+  | 'surprised' // 惊讶
+  | 'thinking' // 思考
+  | 'worried' // 担忧
+  | 'smiling' // 微笑
   // 岑回特有
-  | 'stressed'      // 压力
+  | 'stressed' // 压力
   // 顾临特有
-  | 'stern'         // 严厉
-  | 'displeased'    // 不悦
-  | 'tired'         // 疲惫
+  | 'stern' // 严厉
+  | 'displeased' // 不悦
+  | 'tired' // 疲惫
   // 宋岚特有
-  | 'serious'       // 严肃
-  | 'warm'          // 温和
-  | 'curious'       // 好奇
-  | 'kind'          // 和蔼
+  | 'serious' // 严肃
+  | 'warm' // 温和
+  | 'curious' // 好奇
+  | 'kind' // 和蔼
   // 许澄特有
-  | 'comforting'    // 安慰
-  | 'concerned'     // 关切
-  | 'professional'  // 专业
+  | 'comforting' // 安慰
+  | 'concerned' // 关切
+  | 'professional' // 专业
   | 'understanding' // 理解
-  | 'determined'    // 坚定
+  | 'determined' // 坚定
   // 阿棠特有
-  | 'dreamy'        // 梦幻
-  | 'confused'      // 困惑
-  | 'excited'       // 兴奋
-  | 'scared'        // 害怕
+  | 'dreamy' // 梦幻
+  | 'confused' // 困惑
+  | 'excited' // 兴奋
+  | 'scared' // 害怕
   // 牧平特有
-  | 'mysterious'    // 神秘
-  | 'serene'        // 宁静
-  | 'wise'          // 智慧
+  | 'mysterious' // 神秘
+  | 'serene' // 宁静
+  | 'wise' // 智慧
   // 陈匠特有
-  | 'focused'       // 专注
-  | 'hopeful';      // 希望
+  | 'focused' // 专注
+  | 'hopeful'; // 希望
 
 /**
  * 表情类型别名（向后兼容）
@@ -70,12 +70,12 @@ export type CharacterExpression = ExpressionType;
  */
 export interface ICharacterInfo {
   id: CharacterId;
-  name: string;           // 中文名
-  nameEn: string;         // 英文名
-  title: string;          // 称号
-  description: string;    // 简介
+  name: string; // 中文名
+  nameEn: string; // 英文名
+  title: string; // 称号
+  description: string; // 简介
   defaultExpression: ExpressionType;
-  expressions: ExpressionType[];  // 可用表情列表
+  expressions: ExpressionType[]; // 可用表情列表
 }
 
 /**
@@ -98,7 +98,16 @@ export const CHARACTERS: Record<CharacterId, ICharacterInfo> = {
     title: '维修局主管',
     description: '维修局的主管，收敛主义者，坚信系统稳定高于一切。',
     defaultExpression: 'stern',
-    expressions: ['neutral', 'stern', 'displeased', 'thinking', 'surprised', 'angry', 'tired', 'worried'],
+    expressions: [
+      'neutral',
+      'stern',
+      'displeased',
+      'thinking',
+      'surprised',
+      'angry',
+      'tired',
+      'worried',
+    ],
   },
   [CharacterId.SONGLAN]: {
     id: CharacterId.SONGLAN,
@@ -116,7 +125,17 @@ export const CHARACTERS: Record<CharacterId, ICharacterInfo> = {
     title: '医生',
     description: '诊疗台的医生，在对齐与减伤之间寻找平衡的边界人。',
     defaultExpression: 'neutral',
-    expressions: ['neutral', 'comforting', 'concerned', 'sad', 'thinking', 'professional', 'understanding', 'determined', 'worried'],
+    expressions: [
+      'neutral',
+      'comforting',
+      'concerned',
+      'sad',
+      'thinking',
+      'professional',
+      'understanding',
+      'determined',
+      'worried',
+    ],
   },
   [CharacterId.ATANG]: {
     id: CharacterId.ATANG,
@@ -162,7 +181,10 @@ export const CHARACTERS: Record<CharacterId, ICharacterInfo> = {
  * @param expression 表情类型
  * @returns 纹理键名（用于Phaser texture key）
  */
-export function getPortraitKey(characterId: CharacterId, expression: ExpressionType = 'neutral'): string {
+export function getPortraitKey(
+  characterId: CharacterId,
+  expression: ExpressionType = 'neutral'
+): string {
   return `portrait_${characterId}_${expression}`;
 }
 
@@ -173,7 +195,7 @@ export function getPortraitKey(characterId: CharacterId, expression: ExpressionT
  */
 export function getAllPortraitKeys(characterId: CharacterId): string[] {
   const character = CHARACTERS[characterId];
-  return character.expressions.map(expr => getPortraitKey(characterId, expr));
+  return character.expressions.map((expr) => getPortraitKey(characterId, expr));
 }
 
 /**
@@ -182,7 +204,7 @@ export function getAllPortraitKeys(characterId: CharacterId): string[] {
  * @returns 角色ID或undefined
  */
 export function getCharacterIdByName(name: string): CharacterId | undefined {
-  const entry = Object.values(CHARACTERS).find(c => c.name === name);
+  const entry = Object.values(CHARACTERS).find((c) => c.name === name);
   return entry?.id;
 }
 
@@ -195,4 +217,3 @@ export function getDefaultPortraitKey(characterId: CharacterId): string {
   const character = CHARACTERS[characterId];
   return getPortraitKey(characterId, character.defaultExpression);
 }
-

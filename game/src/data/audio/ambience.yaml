@@ -1,22 +1,22 @@
-﻿# 銆婂娉?/ Footnote銆嬬幆澧冮煶鏁堥厤缃?
-# 鏍煎紡: YAML
-# 鐘舵€? 寰呯敓鎴愰煶棰戞枃浠讹紙閰嶇疆鍏堣锛?
+# 《备注 / Footnote》环境音效配置
+# 格式: YAML
+# 状态: 待生成音频文件（配置先行）
 
 # ==========================================
-# 鐜闊虫晥鍒楄〃 (12涓?
+# 环境音效列表 (12个)
 # ==========================================
 
 ambience:
   # ------------------------------------------
-  # 鍩庡競/鏃ュ父
+  # 城市/日常
   # ------------------------------------------
   - id: amb_city_day
-    name: "鍩庡競鐧藉ぉ"
+    name: "城市白天"
     file: assets/audio/ambience/amb_city_day.mp3
     description: |
-      鍩庡競鏃ュ父鐜闊?
-      鍐呭: 杩滃浜哄０銆佹満姊拌繍杞€佸伓灏旇剼姝?
-      鎯呯华: 鏃ュ父銆佹満姊般€佹湁搴?
+      城市日常环境音
+      内容: 远处人声、机械运转、偶尔脚步
+      情绪: 日常、机械、有序
     duration: 60
     volume: 0.3
     loop: true
@@ -25,12 +25,12 @@ ambience:
     tags: [city, day, outdoor]
     
   - id: amb_city_night
-    name: "鍩庡競澶滄櫄"
+    name: "城市夜晚"
     file: assets/audio/ambience/amb_city_night.mp3
     description: |
-      鍩庡競澶滈棿鐜闊?
-      鍐呭: 杩滃鍡￠福銆佺█鐤忚剼姝ャ€佸伓灏旂伅鍏夊棥鍡?
-      鎯呯华: 瀹夐潤銆佺暐寰笉瀹?
+      城市夜间环境音
+      内容: 远处嗡鸣、稀疏脚步、偶尔灯光嗡嗡
+      情绪: 安静、略微不安
     duration: 60
     volume: 0.25
     loop: true
@@ -39,15 +39,15 @@ ambience:
     tags: [city, night, outdoor]
     
   # ------------------------------------------
-  # 瀹ゅ唴
+  # 室内
   # ------------------------------------------
   - id: amb_indoor_office
-    name: "瀹ゅ唴鍔炲叕"
+    name: "室内办公"
     file: assets/audio/ambience/amb_indoor_office.mp3
     description: |
-      缁翠慨灞€绛夊鍐呭姙鍏幆澧?
-      鍐呭: 绌鸿皟澹般€侀敭鐩樺０銆佸伓灏旇剼姝?
-      鎯呯华: 涓撲笟銆佹満鏋勬劅
+      维修局等室内办公环境
+      内容: 空调声、键盘声、偶尔脚步
+      情绪: 专业、机构感
     duration: 45
     volume: 0.25
     loop: true
@@ -56,12 +56,12 @@ ambience:
     tags: [indoor, office, bureau]
     
   - id: amb_indoor_archive
-    name: "妗ｆ瀹?
+    name: "档案室"
     file: assets/audio/ambience/amb_indoor_archive.mp3
     description: |
-      妗ｆ瀹ょ幆澧冮煶
-      鍐呭: 绾稿紶娌欐矙銆佸伓灏旂炕椤点€佽€佹棫绌鸿皟
-      鎯呯华: 瀹夐潤銆佺绉樸€佷笓娉?
+      档案室环境音
+      内容: 纸张沙沙、偶尔翻页、老旧空调
+      情绪: 安静、神秘、专注
     duration: 50
     volume: 0.2
     loop: true
@@ -70,12 +70,12 @@ ambience:
     tags: [indoor, archive, quiet]
     
   - id: amb_indoor_medical
-    name: "鍖荤枟绔?
+    name: "医疗站"
     file: assets/audio/ambience/amb_indoor_medical.mp3
     description: |
-      鍖荤枟绔?璇婂鐜
-      鍐呭: 浠櫒鍡￠福銆佸伓灏旀淮绛斻€佹秷姣掓皵鍛宠仈鎯?
-      鎯呯华: 涓村簥銆佺暐甯︾揣寮?
+      医疗站/诊室环境
+      内容: 仪器嗡鸣、偶尔滴答、消毒气味联想
+      情绪: 临床、略带紧张
     duration: 40
     volume: 0.25
     loop: true
@@ -84,15 +84,15 @@ ambience:
     tags: [indoor, medical, clinic]
     
   # ------------------------------------------
-  # 寮傚父鍖哄煙
+  # 异常区域
   # ------------------------------------------
   - id: amb_anomaly_zone
-    name: "寮傚父鍖哄煙"
+    name: "异常区域"
     file: assets/audio/ambience/amb_anomaly_zone.mp3
     description: |
-      缁撴瀯寮傚父鍖哄煙鐜
-      鍐呭: 浣庨鍡￠福銆佸伓灏旇鍝嶃€佺┖闂存壄鏇叉劅
-      鎯呯华: 涓嶅畨銆佸嵄闄┿€佹壄鏇?
+      结构异常区域环境
+      内容: 低频嗡鸣、偶尔裂响、空间扭曲感
+      情绪: 不安、危险、扭曲
     duration: 55
     volume: 0.35
     loop: true
@@ -101,12 +101,12 @@ ambience:
     tags: [anomaly, danger, distortion]
     
   - id: amb_collapse_area
-    name: "鍧嶅鍖?
+    name: "坍塌区"
     file: assets/audio/ambience/amb_collapse_area.mp3
     description: |
-      鍧嶅/鏂彛鍖哄煙
-      鍐呭: 纰庣煶鍋跺皵婊氳惤銆侀澹般€佺粨鏋勫惐鍢?
-      鎯呯华: 鍗遍櫓銆佸簾澧熴€佷笉绋冲畾
+      坍塌/断口区域
+      内容: 碎石偶尔滚落、风声、结构吱嘎
+      情绪: 危险、废墟、不稳定
     duration: 45
     volume: 0.3
     loop: true
@@ -115,15 +115,15 @@ ambience:
     tags: [collapse, danger, ruin]
     
   # ------------------------------------------
-  # 娣卞害/鏃堕棿寮傚父
+  # 深度/时间异常
   # ------------------------------------------
   - id: amb_depth_active
-    name: "娣卞害鎰熺煡涓?
+    name: "深度感知中"
     file: assets/audio/ambience/amb_depth_active.mp3
     description: |
-      娣卞害鎰熺煡婵€娲绘椂鐨勭幆澧冨眰
-      鍐呭: 鏅朵綋鍏遍福銆佺┖闂村眰鍙犮€侀€忚鎰?
-      鎯呯华: 瓒呯劧銆佺湅绌裤€佽鐭ユ墿灞?
+      深度感知激活时的环境层
+      内容: 晶体共鸣、空间层叠、透视感
+      情绪: 超然、看穿、认知扩展
     duration: 30
     volume: 0.3
     loop: true
@@ -132,12 +132,12 @@ ambience:
     tags: [depth, perception, overlay]
     
   - id: amb_time_distortion
-    name: "鏃堕棿鎵洸"
+    name: "时间扭曲"
     file: assets/audio/ambience/amb_time_distortion.mp3
     description: |
-      鏃堕棿寮傚父/骞查鏃剁殑鐜灞?
-      鍐呭: 鏃堕挓婊寸瓟锛堜笉瑙勫垯锛夈€佸€掓斁閲囨牱銆佸洖鍝?
-      鎯呯华: 鎵洸銆佷笉杩炵画銆佹椂闂存劅閿欎贡
+      时间异常/干预时的环境层
+      内容: 时钟滴答（不规则）、倒放采样、回响
+      情绪: 扭曲、不连续、时间感错乱
     duration: 35
     volume: 0.35
     loop: true
@@ -146,15 +146,15 @@ ambience:
     tags: [time, distortion, overlay]
     
   # ------------------------------------------
-  # 鐗规畩鍦烘櫙
+  # 特殊场景
   # ------------------------------------------
   - id: amb_drifter_area
-    name: "婕傜Щ鑰呰仛闆嗗尯"
+    name: "漂移者聚集区"
     file: assets/audio/ambience/amb_drifter_area.mp3
     description: |
-      婕傜Щ鑰呰仛闆嗙殑鍖哄煙
-      鍐呭: 妯＄硦浜哄０銆佽蹇嗙鐗囧洖鍝嶃€佽糠澶辨劅
-      鎯呯华: 杩疯尗銆佹偛浼ゃ€佺鐗囧寲
+      漂移者聚集的区域
+      内容: 模糊人声、记忆碎片回响、迷失感
+      情绪: 迷茫、悲伤、碎片化
     duration: 50
     volume: 0.25
     loop: true
@@ -163,12 +163,12 @@ ambience:
     tags: [drifter, memory, sad]
     
   - id: amb_prayer_hall
-    name: "绀煎爞/绁峰憡鍖?
+    name: "礼堂/祷告区"
     file: assets/audio/ambience/amb_prayer_hall.mp3
     description: |
-      骞抽潰淇″緬绁峰憡鍖哄煙
-      鍐呭: 浣庢矇鍚熷敱銆佺儧鐏０銆佸簞涓ュ洖鍝?
-      鎯呯华: 搴勯噸銆佷俊浠般€佸钩闈?
+      平面信徒祷告区域
+      内容: 低沉吟唱、烛火声、庄严回响
+      情绪: 庄重、信仰、平面
     duration: 55
     volume: 0.25
     loop: true
@@ -177,12 +177,12 @@ ambience:
     tags: [prayer, faith, solemn]
     
   - id: amb_finale
-    name: "缁堝眬绌洪棿"
+    name: "终局空间"
     file: assets/audio/ambience/amb_finale.mp3
     description: |
-      缁堢珷/瀵硅绌洪棿
-      鍐呭: 娣辩┖鍡￠福銆佹牸寮忓寲澹伴煶銆佽秴瓒婃劅
-      鎯呯华: 搴勪弗銆佸懡杩愩€佽秴瓒婁汉绫诲昂搴?
+      终章/对话空间
+      内容: 深空嗡鸣、格式化声音、超越感
+      情绪: 庄严、命运、超越人类尺度
     duration: 60
     volume: 0.35
     loop: true
@@ -191,17 +191,17 @@ ambience:
     tags: [finale, transcendent, epic]
 
 # ==========================================
-# Zone-鐜闊虫槧灏?
+# Zone-环境音映射
 # ==========================================
 
 zone_mapping:
-  # 搴忕珷
+  # 序章
   C0-Z1: amb_city_day
-  C0-Z2: amb_indoor_office  # 钖勫灞嬪唴
+  C0-Z2: amb_indoor_office  # 薄墙屋内
   C0-Z3: amb_indoor_office
   C0-Z4: amb_drifter_area
   
-  # 绗竴绔?
+  # 第一章
   C1-Z1: amb_indoor_archive
   C1-Z2: amb_indoor_archive
   C1-Z3: amb_indoor_medical
@@ -209,29 +209,27 @@ zone_mapping:
   C1-Z5: amb_city_night
   C1-Z6: amb_collapse_area
   
-  # 绗簩绔?
+  # 第二章
   C2-Z1: amb_indoor_office
-  # C2鍏朵粬Zone鏍规嵁绫诲瀷閰嶇疆
+  # C2其他Zone根据类型配置
   
-  # 缁堢珷
+  # 终章
   CF-Z1: amb_finale
   CF-Z2: amb_finale
   CF-Z3: amb_finale
 
 # ==========================================
-# 灞傚彔閰嶇疆
+# 层叠配置
 # ==========================================
 
 layering:
-  # 娣卞害鎰熺煡鏃跺彔鍔?
+  # 深度感知时叠加
   depth_perception_overlay: amb_depth_active
-  depth_perception_base_reduction: 0.5  # 鍩虹鐜闊抽檷浣庡埌50%
+  depth_perception_base_reduction: 0.5  # 基础环境音降低到50%
   
-  # 鏃堕棿骞查鏃跺彔鍔?
+  # 时间干预时叠加
   time_intervention_overlay: amb_time_distortion
   time_intervention_base_reduction: 0.4
   
-  # 鏈€澶у悓鏃舵挱鏀剧幆澧冮煶鏁伴噺
+  # 最大同时播放环境音数量
   max_concurrent_layers: 2
-
-

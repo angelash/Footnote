@@ -1,7 +1,7 @@
 id: C0-Z1
 title: 宿舍走廊
 background:
-  texture: bg_c0_z1_corridor  # 使用WebP背景
+  texture: bg_c0z1_corridor  # 使用WebP背景，key与zones.config.ts保持一致
   x: 0
   y: 0
   origin: [0, 0]

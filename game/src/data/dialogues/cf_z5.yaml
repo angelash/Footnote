@@ -136,6 +136,57 @@ dialogues:
       - speaker: 岑回
         text: （再想想……）
 
+  # ==================== 结局确认入口对白 ====================
+  # 这些是场景中按钮点击时触发的对话，引导到对应结局
+  
+  # 结局A确认入口
+  CFZ5_CONFIRM_ENDING_A:
+    id: CFZ5_CONFIRM_ENDING_A
+    lines:
+      - speaker: ""
+        text: 你选择了【继续收敛】
+      - speaker: 系统
+        text: 确认维持现有可读性？
+    choices:
+      - id: confirm
+        text: 确认
+        nextDialogueId: CFZ5_ENDING_A
+      - id: cancel
+        text: 返回
+        nextDialogueId: CFZ5_CANCEL
+
+  # 结局B确认入口
+  CFZ5_CONFIRM_ENDING_B:
+    id: CFZ5_CONFIRM_ENDING_B
+    lines:
+      - speaker: ""
+        text: 你选择了【释放表示】
+      - speaker: 系统
+        text: 确认松开压缩？这将降低可读性。
+    choices:
+      - id: confirm
+        text: 确认
+        nextDialogueId: CFZ5_ENDING_B
+      - id: cancel
+        text: 返回
+        nextDialogueId: CFZ5_CANCEL
+
+  # 结局C确认入口
+  CFZ5_CONFIRM_ENDING_C:
+    id: CFZ5_CONFIRM_ENDING_C
+    lines:
+      - speaker: ""
+        text: 你选择了【承载字段】
+      - speaker: 系统
+        text: 确认由你承担字段◦◦◦的代价？
+    choices:
+      - id: confirm
+        text: 确认
+        nextDialogueId: CFZ5_ENDING_C
+      - id: cancel
+        text: 返回
+        nextDialogueId: CFZ5_CANCEL
+
 
 
 

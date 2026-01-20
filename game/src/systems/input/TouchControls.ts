@@ -216,7 +216,7 @@ export class TouchControls {
       const hint = this._scene.add.text(0, -35, `${index + 1}`, {
         fontFamily: 'monospace',
         fontSize: UI_FONT_SIZE.TINY,
-        color: '#666666',
+        color: '#888888',
       });
       hint.setOrigin(0.5);
       btn.add(hint);

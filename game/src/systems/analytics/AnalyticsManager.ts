@@ -6,6 +6,7 @@
 
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('Analytics');
 
@@ -348,13 +349,11 @@ class AnalyticsManager {
    * 保存到本地
    */
   private _saveToLocal(events: IAnalyticsEvent[]): void {
-    try {
-      const key = `analytics_${this._sessionId}`;
-      const existing = JSON.parse(localStorage.getItem(key) || '[]');
-      const updated = [...existing, ...events].slice(-500); // 最多保留 500 条
-      localStorage.setItem(key, JSON.stringify(updated));
-    } catch (error) {
-      logger.warn('本地存储失败:', error);
+    const key = this._sessionId;
+    const existing = safeStorage.get<IAnalyticsEvent[]>(key, [], 'analytics') || [];
+    const updated = [...existing, ...events].slice(-500); // 最多保留 500 条
+    if (!safeStorage.set(key, updated, 'analytics')) {
+      logger.warn('本地存储失败');
     }
   }
 
@@ -428,29 +427,15 @@ class AnalyticsManager {
    * 获取本地存储的所有会话
    */
   public getStoredSessions(): string[] {
-    const sessions: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith('analytics_')) {
-        sessions.push(key.replace('analytics_', ''));
-      }
-    }
-    return sessions;
+    return safeStorage.getKeys('analytics');
   }
 
   /**
    * 清除本地存储
    */
   public clearStoredData(): void {
-    const keys: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith('analytics_')) {
-        keys.push(key);
-      }
-    }
-    keys.forEach((key) => localStorage.removeItem(key));
-    logger.info('已清除本地数据');
+    const count = safeStorage.clearPrefix('analytics');
+    logger.info(`已清除 ${count} 条本地数据`);
   }
 
   /**

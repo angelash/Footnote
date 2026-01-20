@@ -6,6 +6,7 @@ import Phaser from 'phaser';
 import { SCENES } from '@/config/game.config';
 import { createLogger } from '@/utils/Logger';
 import { preloadCurrentLocaleTranslations } from '@/data/locales';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('BootScene');
 
@@ -73,18 +74,19 @@ export class BootScene extends Phaser.Scene {
   }
 
   private _checkStorageSupport(): void {
-    // 检查IndexedDB支持
-    if (!window.indexedDB) {
-      logger.error('IndexedDB不可用，存档功能将无法使用');
-      // 可以考虑回退到localStorage
+    // 使用 SafeStorage 进行统一的存储能力检测
+    const capabilities = safeStorage.getCapabilities();
+
+    if (!capabilities.indexedDB) {
+      logger.warn('IndexedDB不可用，将使用回退存储');
     }
 
-    // 检查localStorage支持
-    try {
-      localStorage.setItem('__test__', '1');
-      localStorage.removeItem('__test__');
-    } catch (e) {
-      logger.warn('localStorage不可用');
+    if (!capabilities.localStorage) {
+      logger.warn('localStorage不可用，将使用内存存储');
+    }
+
+    if (capabilities.isDegraded) {
+      logger.warn(`存储降级模式: ${capabilities.activeBackend}`);
     }
   }
 

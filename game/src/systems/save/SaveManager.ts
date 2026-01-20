@@ -6,6 +6,7 @@
 
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('SaveManager');
 import { worldState } from '@/systems/world';
@@ -544,7 +545,7 @@ class SaveManager {
 
   private async _deleteSave(slot: number): Promise<void> {
     if (!this._db) {
-      localStorage.removeItem(`footnote_save_${slot}`);
+      safeStorage.remove(`save_${slot}`);
       return;
     }
 
@@ -625,20 +626,13 @@ class SaveManager {
   }
 
   private _writeToLocalStorage(key: string, data: unknown): void {
-    try {
-      localStorage.setItem(`footnote_${key}`, JSON.stringify(data));
-    } catch (error) {
-      logger.error('LocalStorage写入失败:', error);
+    if (!safeStorage.set(key, data)) {
+      logger.error('LocalStorage写入失败');
     }
   }
 
   private _readFromLocalStorage<T>(key: string): T | null {
-    try {
-      const data = localStorage.getItem(`footnote_${key}`);
-      return data ? JSON.parse(data) : null;
-    } catch {
-      return null;
-    }
+    return safeStorage.get<T>(key);
   }
 
   // ==================== 私有方法 - 版本迁移 ====================

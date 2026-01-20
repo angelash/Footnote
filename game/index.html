@@ -36,7 +36,8 @@
     
     <!-- 字体 - SA-006: 外部字体已在 CSP 中明确允许 -->
     <!-- 注意：生产环境可考虑字体自托管以提高性能和隐私 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- CJK 字体支持：简体中文、繁体中文、日文 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
     
     <style>
       * {
@@ -50,11 +51,23 @@
         height: 100%;
         overflow: hidden;
         background-color: #0A0A0F;
-        font-family: 'Noto Sans SC', sans-serif;
+        /* CJK 字体栈：按语言优先级排列，确保各语言正确显示 */
+        font-family: 'Noto Sans SC', 'Noto Sans TC', 'Noto Sans JP', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;
+      }
+      
+      /* 按语言设置特定字体 */
+      html[lang="zh-TW"] body,
+      html[lang="zh-HK"] body {
+        font-family: 'Noto Sans TC', 'Noto Sans SC', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+      }
+      
+      html[lang="ja-JP"] body,
+      html[lang="ja"] body {
+        font-family: 'Noto Sans JP', 'Noto Sans SC', 'Yu Gothic', 'Hiragino Kaku Gothic ProN', sans-serif;
       }
       
       #game-container {

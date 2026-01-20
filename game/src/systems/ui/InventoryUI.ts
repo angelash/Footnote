@@ -1,6 +1,7 @@
 /**
  * 物品栏UI
  * 展示已收集的卡片和物品
+ * 支持键盘导航和屏幕阅读器
  * @module systems/ui/InventoryUI
  */
 
@@ -8,6 +9,7 @@ import Phaser from 'phaser';
 import { narrativeEngine, CardCategory } from '@/systems/narrative';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
+import { a11yManager } from '@/systems/accessibility/A11yManager';
 import type { ICard as INarrativeCard } from '@/systems/narrative';
 
 // ==================== 配置常量 ====================
@@ -38,6 +40,10 @@ type TabType = 'all' | 'archive' | 'item' | 'prayer' | 'verdict';
 
 // ==================== InventoryUI类 ====================
 
+/** 焦点组ID */
+const FOCUS_GROUP_TABS = 'inventory-tabs';
+const FOCUS_GROUP_CARDS = 'inventory-cards';
+
 /**
  * 物品栏UI
  */
@@ -48,6 +54,11 @@ export class InventoryUI {
   private _currentTab: TabType = 'all';
   private _callbacks: IInventoryUIConfig;
   private _tabButtons: Map<TabType, Phaser.GameObjects.Container> = new Map();
+
+  // 键盘导航
+  private _keyDownHandler: ((event: KeyboardEvent) => void) | null = null;
+  private _cardThumbnails: Phaser.GameObjects.Container[] = [];
+  private _currentFocusMode: 'tabs' | 'cards' = 'tabs';
 
   constructor(config: IInventoryUIConfig) {
     this._scene = config.scene;
@@ -72,12 +83,25 @@ export class InventoryUI {
       duration: 200,
       ease: 'Power2',
     });
+
+    // 设置键盘导航
+    this._setupKeyboardNavigation();
+    this._setupTabsFocusGroup();
+
+    // 播报物品栏打开
+    a11yManager.announceUIState('卡片收藏', 'opened');
   }
 
   /**
    * 隐藏物品栏
    */
   hide(): void {
+    // 移除键盘导航
+    this._removeKeyboardNavigation();
+
+    // 播报物品栏关闭
+    a11yManager.announceUIState('卡片收藏', 'closed');
+
     this._scene.tweens.add({
       targets: this._container,
       alpha: 0,
@@ -101,6 +125,7 @@ export class InventoryUI {
    * 销毁
    */
   destroy(): void {
+    this._removeKeyboardNavigation();
     this._container.destroy();
   }
 
@@ -304,6 +329,7 @@ export class InventoryUI {
   private _refreshCards(): void {
     // 清除现有卡片
     this._cardsContainer.removeAll(true);
+    this._cardThumbnails = [];
 
     // 获取卡片
     let cards: INarrativeCard[];
@@ -328,6 +354,9 @@ export class InventoryUI {
         })
         .setOrigin(0.5);
       this._cardsContainer.add(emptyText);
+
+      // 播报空状态
+      a11yManager.announce('暂无卡片');
       return;
     }
 
@@ -343,8 +372,16 @@ export class InventoryUI {
       const y = startY + row * (CONFIG.CARD_THUMB_HEIGHT + CONFIG.CARD_SPACING);
 
       const cardThumb = this._createCardThumbnail(card, x, y);
+      cardThumb.setData('card', card); // 保存卡片数据
+      this._cardThumbnails.push(cardThumb);
       this._cardsContainer.add(cardThumb);
     });
+
+    // 设置卡片焦点组
+    this._setupCardsFocusGroup();
+
+    // 播报卡片数量
+    a11yManager.announce(`共 ${cards.length} 张卡片`);
   }
 
   private _createCardThumbnail(
@@ -498,5 +535,243 @@ export class InventoryUI {
       [CardCategory.DIARY]: '📖',
     };
     return icons[category] || '📄';
+  }
+
+  // ==================== 私有方法 - 键盘导航 ====================
+
+  /**
+   * 设置键盘导航
+   */
+  private _setupKeyboardNavigation(): void {
+    if (this._keyDownHandler) return;
+
+    this._keyDownHandler = (event: KeyboardEvent): void => {
+      if (!this.isVisible()) return;
+
+      // 构建按键标识
+      let keyCode = event.code;
+      if (event.shiftKey && keyCode === 'Tab') {
+        keyCode = 'ShiftTab';
+      }
+
+      // 让 A11yManager 处理导航
+      if (a11yManager.handleKeyboardNavigation(keyCode)) {
+        event.preventDefault();
+        return;
+      }
+
+      // ESC 关闭
+      if (event.code === 'Escape') {
+        this.hide();
+        event.preventDefault();
+        return;
+      }
+
+      // 切换标签/卡片模式
+      if (event.code === 'ArrowDown' && this._currentFocusMode === 'tabs') {
+        this._switchToCardsFocus();
+        event.preventDefault();
+        return;
+      }
+
+      if (event.code === 'ArrowUp' && this._currentFocusMode === 'cards') {
+        this._switchToTabsFocus();
+        event.preventDefault();
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', this._keyDownHandler);
+  }
+
+  /**
+   * 移除键盘导航
+   */
+  private _removeKeyboardNavigation(): void {
+    if (this._keyDownHandler) {
+      window.removeEventListener('keydown', this._keyDownHandler);
+      this._keyDownHandler = null;
+    }
+
+    // 销毁焦点组
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_TABS);
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_CARDS);
+  }
+
+  /**
+   * 设置标签焦点组
+   */
+  private _setupTabsFocusGroup(): void {
+    const focusGroup = a11yManager.createFocusGroup(FOCUS_GROUP_TABS, {
+      wrapAround: true,
+      autoFocus: true,
+      groupName: '分类标签',
+    });
+
+    const tabs: { type: TabType; label: string }[] = [
+      { type: 'all', label: '全部' },
+      { type: 'archive', label: '档案' },
+      { type: 'item', label: '物品' },
+      { type: 'prayer', label: '祷词' },
+      { type: 'verdict', label: '判决' },
+    ];
+
+    tabs.forEach((tab) => {
+      const button = this._tabButtons.get(tab.type);
+      if (button) {
+        focusGroup.add({
+          id: `tab-${tab.type}`,
+          label: tab.label,
+          role: 'tab',
+          enabled: true,
+          onFocus: () => this._highlightTab(tab.type, true),
+          onBlur: () => this._highlightTab(tab.type, false),
+          onActivate: () => {
+            this._currentTab = tab.type;
+            this._updateTabStyles();
+            this._refreshCards();
+            this._setupCardsFocusGroup();
+          },
+        });
+      }
+    });
+
+    a11yManager.setActiveFocusGroup(FOCUS_GROUP_TABS);
+    this._currentFocusMode = 'tabs';
+  }
+
+  /**
+   * 设置卡片焦点组
+   */
+  private _setupCardsFocusGroup(): void {
+    // 先销毁旧的卡片焦点组
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_CARDS);
+
+    if (this._cardThumbnails.length === 0) return;
+
+    const focusGroup = a11yManager.createFocusGroup(FOCUS_GROUP_CARDS, {
+      wrapAround: true,
+      autoFocus: false,
+      groupName: '卡片列表',
+    });
+
+    this._cardThumbnails.forEach((card, index) => {
+      const cardData = card.getData('card') as INarrativeCard | undefined;
+      if (cardData) {
+        focusGroup.add({
+          id: `card-${index}`,
+          label: cardData.title,
+          role: 'listitem',
+          enabled: true,
+          onFocus: () => this._highlightCard(index, true),
+          onBlur: () => this._highlightCard(index, false),
+          onActivate: () => this._callbacks.onCardSelect?.(cardData.id),
+        });
+      }
+    });
+  }
+
+  /**
+   * 切换到卡片焦点
+   */
+  private _switchToCardsFocus(): void {
+    if (this._cardThumbnails.length === 0) return;
+
+    this._currentFocusMode = 'cards';
+    a11yManager.setActiveFocusGroup(FOCUS_GROUP_CARDS);
+    const focusGroup = a11yManager.getFocusGroup(FOCUS_GROUP_CARDS);
+    focusGroup?.focusFirst();
+  }
+
+  /**
+   * 切换到标签焦点
+   */
+  private _switchToTabsFocus(): void {
+    this._currentFocusMode = 'tabs';
+    a11yManager.setActiveFocusGroup(FOCUS_GROUP_TABS);
+  }
+
+  /**
+   * 高亮标签
+   */
+  private _highlightTab(type: TabType, highlight: boolean): void {
+    const btn = this._tabButtons.get(type);
+    if (!btn) return;
+
+    const bg = btn.getByName('bg') as Phaser.GameObjects.Graphics;
+    const text = btn.getByName('text') as Phaser.GameObjects.Text;
+    const isActive = type === this._currentTab;
+
+    bg.clear();
+    if (highlight || isActive) {
+      bg.fillStyle(COLORS.ACCENT, highlight ? 0.4 : 0.2);
+      bg.fillRoundedRect(-45, -22, 90, UI.BUTTON.MIN_TOUCH_SIZE, 6);
+      bg.lineStyle(highlight ? 2 : 1, COLORS.ACCENT, 1);
+      bg.strokeRoundedRect(-45, -22, 90, UI.BUTTON.MIN_TOUCH_SIZE, 6);
+      text.setColor('#00FFAA');
+    } else {
+      text.setColor('#A8A6A3');
+    }
+  }
+
+  /**
+   * 高亮卡片
+   */
+  private _highlightCard(index: number, highlight: boolean): void {
+    const container = this._cardThumbnails[index];
+    if (!container) return;
+
+    const bg = container.list[0] as Phaser.GameObjects.Graphics;
+    const cardData = container.getData('card') as INarrativeCard | undefined;
+    const cardColor = cardData ? this._getCardColor(cardData.category) : COLORS.BG_TERTIARY;
+
+    bg.clear();
+    if (highlight) {
+      bg.fillStyle(cardColor, 1);
+      bg.fillRoundedRect(
+        -CONFIG.CARD_THUMB_WIDTH / 2,
+        -CONFIG.CARD_THUMB_HEIGHT / 2,
+        CONFIG.CARD_THUMB_WIDTH,
+        CONFIG.CARD_THUMB_HEIGHT,
+        8
+      );
+      bg.lineStyle(2, COLORS.ACCENT, 1);
+      bg.strokeRoundedRect(
+        -CONFIG.CARD_THUMB_WIDTH / 2,
+        -CONFIG.CARD_THUMB_HEIGHT / 2,
+        CONFIG.CARD_THUMB_WIDTH,
+        CONFIG.CARD_THUMB_HEIGHT,
+        8
+      );
+
+      this._scene.tweens.add({
+        targets: container,
+        scale: 1.05,
+        duration: 100,
+      });
+    } else {
+      bg.fillStyle(cardColor, 0.9);
+      bg.fillRoundedRect(
+        -CONFIG.CARD_THUMB_WIDTH / 2,
+        -CONFIG.CARD_THUMB_HEIGHT / 2,
+        CONFIG.CARD_THUMB_WIDTH,
+        CONFIG.CARD_THUMB_HEIGHT,
+        8
+      );
+      bg.lineStyle(1, COLORS.BORDER, 1);
+      bg.strokeRoundedRect(
+        -CONFIG.CARD_THUMB_WIDTH / 2,
+        -CONFIG.CARD_THUMB_HEIGHT / 2,
+        CONFIG.CARD_THUMB_WIDTH,
+        CONFIG.CARD_THUMB_HEIGHT,
+        8
+      );
+
+      this._scene.tweens.add({
+        targets: container,
+        scale: 1,
+        duration: 100,
+      });
+    }
   }
 }

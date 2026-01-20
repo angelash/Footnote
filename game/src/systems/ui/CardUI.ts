@@ -1,6 +1,7 @@
 /**
  * 卡片UI系统
  * 处理卡片获取弹窗、卡片详情展示、卡片收藏界面
+ * 支持键盘导航和屏幕阅读器
  * @module systems/ui/CardUI
  */
 
@@ -8,6 +9,7 @@ import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
+import { a11yManager } from '@/systems/accessibility/A11yManager';
 import type { ICard } from '@/types';
 
 // ==================== 配置常量 ====================
@@ -103,6 +105,9 @@ export class CardUI {
       },
     });
 
+    // 播报卡片获取
+    a11yManager.announce(`获得卡片：${card.name}。${card.front.join(' ')}`, 'assertive');
+
     eventBus.emit(GameEvent.CARD_VIEW, { cardId: card.id });
   }
 
@@ -174,6 +179,12 @@ export class CardUI {
       onComplete: () => {
         this._isShowingFront = !this._isShowingFront;
         this._updateCardDisplay();
+
+        // 播报翻转后的内容
+        const content = this._isShowingFront
+          ? this._currentCard!.front.join(' ')
+          : this._currentCard!.detail.join(' ');
+        a11yManager.announce(`${this._isShowingFront ? '正面' : '背面'}：${content}`);
 
         this._scene.tweens.add({
           targets: this._cardContainer,

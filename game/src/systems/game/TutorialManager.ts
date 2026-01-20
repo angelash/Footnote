@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('TutorialManager');
 import { worldState } from '@/systems/world';
@@ -143,14 +144,9 @@ export class TutorialManager {
    * 加载进度
    */
   private _loadProgress(): void {
-    try {
-      const stored = localStorage.getItem('footnote_tutorial_progress');
-      if (stored) {
-        const steps = JSON.parse(stored) as TutorialStep[];
-        steps.forEach((step) => this._completedSteps.add(step));
-      }
-    } catch (error) {
-      logger.warn('加载教程进度失败:', error);
+    const stored = safeStorage.get<TutorialStep[]>('tutorial_progress');
+    if (stored) {
+      stored.forEach((step) => this._completedSteps.add(step));
     }
   }
 
@@ -158,13 +154,8 @@ export class TutorialManager {
    * 保存进度
    */
   private _saveProgress(): void {
-    try {
-      localStorage.setItem(
-        'footnote_tutorial_progress',
-        JSON.stringify(Array.from(this._completedSteps))
-      );
-    } catch (error) {
-      logger.error('保存教程进度失败:', error);
+    if (!safeStorage.set('tutorial_progress', Array.from(this._completedSteps))) {
+      logger.error('保存教程进度失败');
     }
   }
 
@@ -462,7 +453,7 @@ export class TutorialManager {
    */
   public resetProgress(): void {
     this._completedSteps.clear();
-    localStorage.removeItem('footnote_tutorial_progress');
+    safeStorage.remove('tutorial_progress');
   }
 
   /**

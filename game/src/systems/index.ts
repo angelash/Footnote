@@ -108,6 +108,10 @@ export { AbilitySystem } from './ability';
 export { saveManager } from './save';
 export type { IGameSettings, ISaveData, ISaveMetadata } from './save';
 
+// 安全存储
+export { safeStorage, safeGet, safeSet, safeRemove } from './storage';
+export type { IStorageCapabilities, ISafeStorageConfig, StorageBackend } from './storage';
+
 // 资源管理器
 export { assetManager, AssetGroup } from './assets';
 

@@ -13,6 +13,7 @@
 
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '../EventBus';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('I18n');
 
@@ -162,6 +163,7 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       overwrite: '覆盖存档？',
       loadConfirm: '确定读取此存档？',
       deleteConfirm: '确定删除此存档？',
+      playTime: '游玩',
     },
     achievement: {
       title: '成就',
@@ -261,6 +263,7 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       overwrite: '覆蓋存檔？',
       loadConfirm: '確定讀取此存檔？',
       deleteConfirm: '確定刪除此存檔？',
+      playTime: '遊玩',
     },
     achievement: {
       title: '成就',
@@ -360,6 +363,7 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       overwrite: 'Overwrite save?',
       loadConfirm: 'Load this save?',
       deleteConfirm: 'Delete this save?',
+      playTime: 'Played',
     },
     achievement: {
       title: 'Achievements',
@@ -459,6 +463,7 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       overwrite: '上書きしますか？',
       loadConfirm: 'このセーブをロードしますか？',
       deleteConfirm: 'このセーブを削除しますか？',
+      playTime: 'プレイ',
     },
     achievement: {
       title: '実績',
@@ -525,6 +530,9 @@ class I18nManager {
 
     // 检测系统语言
     this._detectLocale();
+
+    // 初始化时更新 HTML lang 属性
+    this._updateDocumentLang(this._currentLocale);
   }
 
   /**
@@ -546,7 +554,7 @@ class I18nManager {
    */
   private _detectLocale(): void {
     // 先检查本地存储
-    const stored = localStorage.getItem('footnote_locale');
+    const stored = safeStorage.get<string>('locale');
     if (stored && this._isValidLocale(stored)) {
       this._currentLocale = stored as SupportedLocale;
       return;
@@ -994,7 +1002,10 @@ class I18nManager {
 
     const previousLocale = this._currentLocale;
     this._currentLocale = locale;
-    localStorage.setItem('footnote_locale', locale);
+    safeStorage.set('locale', locale);
+
+    // 更新 HTML lang 属性（用于辅助功能和 SEO）
+    this._updateDocumentLang(locale);
 
     // 通过 EventBus 发出事件
     eventBus.emitTyped(GameEvent.LOCALE_CHANGED, {
@@ -1006,6 +1017,20 @@ class I18nManager {
     this._listeners.forEach((listener) => listener());
 
     logger.info(`语言切换为: ${LOCALE_NAMES[locale]}`);
+  }
+
+  /**
+   * 更新 HTML 文档的 lang 属性
+   * 这对于辅助功能（屏幕阅读器）和搜索引擎优化很重要
+   */
+  private _updateDocumentLang(locale: SupportedLocale): void {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = locale;
+      // 对于 CJK 语言，可以添加额外的属性
+      if (locale === 'ja-JP') {
+        document.documentElement.setAttribute('xml:lang', locale);
+      }
+    }
   }
 
   /**

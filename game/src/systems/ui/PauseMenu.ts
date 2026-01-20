@@ -1,6 +1,7 @@
 /**
  * 暂停菜单UI
  * 包含继续游戏、设置、存档、读档、返回主菜单等功能
+ * 支持键盘导航和屏幕阅读器
  * @module systems/ui/PauseMenu
  */
 
@@ -10,6 +11,7 @@ import { saveManager } from '@/systems/save';
 import { TEXT_STYLES, COLORS, SCENES } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 import { i18n, LOCALE_NAMES, type SupportedLocale } from '@/systems/i18n/I18nManager';
+import { a11yManager, type IFocusableElement } from '@/systems/accessibility/A11yManager';
 import type { IGameSettings } from '@/systems/save';
 
 // ==================== 配置常量 ====================
@@ -41,6 +43,10 @@ interface IPauseMenuConfig {
 
 // ==================== PauseMenu类 ====================
 
+/** 焦点组ID */
+const FOCUS_GROUP_MAIN_MENU = 'pause-main-menu';
+const FOCUS_GROUP_SETTINGS = 'pause-settings';
+
 /**
  * 暂停菜单
  */
@@ -61,6 +67,12 @@ export class PauseMenu {
   // 国际化
   private _unsubscribeI18n?: () => void;
   private _i18nTexts: Map<string, Phaser.GameObjects.Text> = new Map();
+
+  // 键盘导航
+  private _keyDownHandler: ((event: KeyboardEvent) => void) | null = null;
+  private _mainMenuButtons: Phaser.GameObjects.Container[] = [];
+  private _currentFocusIndex: number = -1;
+  private _isInSettings: boolean = false;
 
   constructor(config: IPauseMenuConfig) {
     this._scene = config.scene;
@@ -105,6 +117,7 @@ export class PauseMenu {
     // 显示主菜单，隐藏设置面板
     this._mainMenuContainer.setVisible(true);
     this._settingsContainer.setVisible(false);
+    this._isInSettings = false;
 
     this._container.setVisible(true);
     this._container.setAlpha(0);
@@ -116,6 +129,13 @@ export class PauseMenu {
       ease: 'Power2',
     });
 
+    // 设置键盘导航
+    this._setupKeyboardNavigation();
+    this._setupMainMenuFocusGroup();
+
+    // 播报菜单打开
+    a11yManager.announceUIState('暂停菜单', 'opened');
+
     eventBus.emitTyped(GameEvent.GAME_PAUSE, {});
   }
 
@@ -123,6 +143,12 @@ export class PauseMenu {
    * 隐藏暂停菜单
    */
   hide(): void {
+    // 移除键盘导航
+    this._removeKeyboardNavigation();
+
+    // 播报菜单关闭
+    a11yManager.announceUIState('暂停菜单', 'closed');
+
     this._scene.tweens.add({
       targets: this._container,
       alpha: 0,
@@ -146,6 +172,7 @@ export class PauseMenu {
    * 销毁
    */
   destroy(): void {
+    this._removeKeyboardNavigation();
     this._unsubscribeI18n?.();
     this._i18nTexts.clear();
     this._container.destroy();
@@ -193,9 +220,12 @@ export class PauseMenu {
       { key: 'pause.mainMenu', callback: () => this._onQuit() },
     ];
 
+    this._mainMenuButtons = [];
     buttons.forEach((btn, index) => {
       const y = -80 + index * (CONFIG.BUTTON_HEIGHT + CONFIG.BUTTON_SPACING);
       const button = this._createButton(0, y, i18n.t(btn.key), btn.callback, btn.key);
+      button.setName(`menu-btn-${index}`);
+      this._mainMenuButtons.push(button);
       this._mainMenuContainer.add(button);
     });
 
@@ -748,11 +778,27 @@ export class PauseMenu {
   private _showSettings(): void {
     this._mainMenuContainer.setVisible(false);
     this._settingsContainer.setVisible(true);
+    this._isInSettings = true;
+
+    // 切换焦点组
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_MAIN_MENU);
+    this._setupSettingsFocusGroup();
+
+    // 播报设置面板打开
+    a11yManager.announceUIState('设置面板', 'opened');
   }
 
   private _hideSettings(): void {
     this._settingsContainer.setVisible(false);
     this._mainMenuContainer.setVisible(true);
+    this._isInSettings = false;
+
+    // 切换焦点组
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_SETTINGS);
+    this._setupMainMenuFocusGroup();
+
+    // 播报设置面板关闭
+    a11yManager.announceUIState('设置面板', 'closed');
   }
 
   private async _saveSettings(): Promise<void> {
@@ -775,5 +821,178 @@ export class PauseMenu {
   private _onQuit(): void {
     this._callbacks.onQuit?.();
     this._scene.scene.start(SCENES.MENU);
+  }
+
+  // ==================== 私有方法 - 键盘导航 ====================
+
+  /**
+   * 设置键盘导航
+   */
+  private _setupKeyboardNavigation(): void {
+    if (this._keyDownHandler) return;
+
+    this._keyDownHandler = (event: KeyboardEvent): void => {
+      if (!this.isVisible()) return;
+
+      // 构建按键标识
+      let keyCode = event.code;
+      if (event.shiftKey && keyCode === 'Tab') {
+        keyCode = 'ShiftTab';
+      }
+
+      // 让 A11yManager 处理导航
+      if (a11yManager.handleKeyboardNavigation(keyCode)) {
+        event.preventDefault();
+        return;
+      }
+
+      // ESC 键处理
+      if (event.code === 'Escape') {
+        if (this._isInSettings) {
+          this._hideSettings();
+        } else {
+          this._onResume();
+        }
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', this._keyDownHandler);
+  }
+
+  /**
+   * 移除键盘导航
+   */
+  private _removeKeyboardNavigation(): void {
+    if (this._keyDownHandler) {
+      window.removeEventListener('keydown', this._keyDownHandler);
+      this._keyDownHandler = null;
+    }
+
+    // 销毁焦点组
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_MAIN_MENU);
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_SETTINGS);
+  }
+
+  /**
+   * 设置主菜单焦点组
+   */
+  private _setupMainMenuFocusGroup(): void {
+    const focusGroup = a11yManager.createFocusGroup(FOCUS_GROUP_MAIN_MENU, {
+      wrapAround: true,
+      autoFocus: true,
+      groupName: '暂停菜单',
+    });
+
+    const buttonLabels = ['继续游戏', '设置', '保存', '读取', '返回主菜单'];
+    const buttonCallbacks = [
+      () => this._onResume(),
+      () => this._showSettings(),
+      () => this._onSave(),
+      () => this._onLoad(),
+      () => this._onQuit(),
+    ];
+
+    this._mainMenuButtons.forEach((_button, index) => {
+      const focusableElement: IFocusableElement = {
+        id: `menu-btn-${index}`,
+        label: buttonLabels[index],
+        role: 'menuitem',
+        enabled: true,
+        onFocus: () => this._highlightMenuButton(index, true),
+        onBlur: () => this._highlightMenuButton(index, false),
+        onActivate: () => buttonCallbacks[index](),
+      };
+      focusGroup.add(focusableElement);
+    });
+
+    a11yManager.setActiveFocusGroup(FOCUS_GROUP_MAIN_MENU);
+  }
+
+  /**
+   * 设置设置面板焦点组
+   */
+  private _setupSettingsFocusGroup(): void {
+    const focusGroup = a11yManager.createFocusGroup(FOCUS_GROUP_SETTINGS, {
+      wrapAround: true,
+      autoFocus: true,
+      groupName: '设置面板',
+    });
+
+    // 添加返回按钮作为可聚焦元素
+    focusGroup.add({
+      id: 'settings-back',
+      label: '返回',
+      role: 'button',
+      enabled: true,
+      onFocus: () => {
+        // 高亮返回按钮
+      },
+      onBlur: () => {
+        // 取消高亮
+      },
+      onActivate: () => this._hideSettings(),
+    });
+
+    a11yManager.setActiveFocusGroup(FOCUS_GROUP_SETTINGS);
+  }
+
+  /**
+   * 高亮菜单按钮
+   */
+  private _highlightMenuButton(index: number, highlight: boolean): void {
+    const button = this._mainMenuButtons[index];
+    if (!button) return;
+
+    const bg = button.list[0] as Phaser.GameObjects.Graphics;
+    const label = button.list[1] as Phaser.GameObjects.Text;
+    const buttonWidth = CONFIG.MENU_WIDTH;
+
+    bg.clear();
+    if (highlight) {
+      bg.fillStyle(COLORS.BG_SECONDARY, 1);
+      bg.fillRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.BUTTON_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.BUTTON_HEIGHT,
+        8
+      );
+      bg.lineStyle(2, COLORS.ACCENT, 1);
+      bg.strokeRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.BUTTON_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.BUTTON_HEIGHT,
+        8
+      );
+      label.setColor('#00FFAA');
+      this._currentFocusIndex = index;
+    } else {
+      bg.fillStyle(COLORS.BG_TERTIARY, 1);
+      bg.fillRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.BUTTON_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.BUTTON_HEIGHT,
+        8
+      );
+      bg.lineStyle(1, COLORS.BORDER, 1);
+      bg.strokeRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.BUTTON_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.BUTTON_HEIGHT,
+        8
+      );
+      label.setColor('#E8E6E3');
+    }
+  }
+
+  /**
+   * 获取当前焦点索引（用于测试/调试）
+   */
+  public getCurrentFocusIndex(): number {
+    return this._currentFocusIndex;
   }
 }

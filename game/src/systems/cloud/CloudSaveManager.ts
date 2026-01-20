@@ -6,6 +6,7 @@
 
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('CloudSave');
 import { saveManager } from '@/systems/save';
@@ -225,16 +226,9 @@ class CloudSaveManager {
    * 加载待上传队列
    */
   private _loadPendingUploads(): void {
-    try {
-      const stored = localStorage.getItem('cloud_pending_uploads');
-      if (stored) {
-        const pending = JSON.parse(stored);
-        this._pendingUploads = new Map(
-          Object.entries(pending).map(([k, v]) => [Number(k), v as ISaveData])
-        );
-      }
-    } catch (error) {
-      logger.warn('加载待上传队列失败:', error);
+    const stored = safeStorage.get<Record<string, ISaveData>>('pending_uploads', null, 'cloud');
+    if (stored) {
+      this._pendingUploads = new Map(Object.entries(stored).map(([k, v]) => [Number(k), v]));
     }
   }
 
@@ -242,11 +236,9 @@ class CloudSaveManager {
    * 保存待上传队列
    */
   private _savePendingUploads(): void {
-    try {
-      const obj = Object.fromEntries(this._pendingUploads);
-      localStorage.setItem('cloud_pending_uploads', JSON.stringify(obj));
-    } catch (error) {
-      logger.warn('保存待上传队列失败:', error);
+    const obj = Object.fromEntries(this._pendingUploads);
+    if (!safeStorage.set('pending_uploads', obj, 'cloud')) {
+      logger.warn('保存待上传队列失败');
     }
   }
 

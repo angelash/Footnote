@@ -37,7 +37,12 @@
     "sync:check:colors": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --constants",
     "sync:check:json": "node ../workflows/project/tools/doc-code-sync/sync-checker.mjs --json",
     "size": "size-limit",
-    "size:why": "size-limit --why"
+    "size:why": "size-limit --why",
+    "test:perf": "vitest run tests/unit/performance/",
+    "test:perf:baseline": "vitest run tests/unit/performance/performance-baseline.test.ts",
+    "lighthouse": "lhci autorun",
+    "lighthouse:collect": "lhci collect",
+    "lighthouse:assert": "lhci assert"
   },
   "dependencies": {
     "idb": "^8.0.0",
@@ -45,6 +50,7 @@
     "yaml": "^2.3.4"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.13.0",
     "@playwright/test": "^1.40.0",
     "@size-limit/preset-app": "^11.0.0",
     "@types/node": "^20.10.0",

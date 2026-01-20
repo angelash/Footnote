@@ -367,10 +367,11 @@ export class MenuScene extends Phaser.Scene {
       })
       .setOrigin(1, 0);
 
-    // 游玩时长
+    // 游玩时长（国际化）
     const playTimeStr = this._formatPlayTime(save.playTime);
+    const playTimeLabel = i18n.t('save.playTime') || 'Played';
     const playTimeText = this.add
-      .text(180, 10, `游玩: ${playTimeStr}`, {
+      .text(180, 10, `${playTimeLabel}: ${playTimeStr}`, {
         ...TEXT_STYLES.MUTED,
         fontSize: UI_FONT_SIZE.TINY,
       })
@@ -401,13 +402,36 @@ export class MenuScene extends Phaser.Scene {
     return container;
   }
 
+  /**
+   * 格式化游玩时长（国际化）
+   * 使用 Intl API 进行本地化格式化
+   */
   private _formatPlayTime(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) {
-      return `${hours}小时${minutes}分钟`;
+    const locale = i18n.getLocale();
+
+    // 使用 Intl.NumberFormat 格式化数字
+    const numFmt = new Intl.NumberFormat(locale);
+
+    // 根据语言返回本地化格式
+    if (locale.startsWith('zh')) {
+      if (hours > 0) {
+        return `${numFmt.format(hours)}小时${numFmt.format(minutes)}分钟`;
+      }
+      return `${numFmt.format(minutes)}分钟`;
+    } else if (locale.startsWith('ja')) {
+      if (hours > 0) {
+        return `${numFmt.format(hours)}時間${numFmt.format(minutes)}分`;
+      }
+      return `${numFmt.format(minutes)}分`;
+    } else {
+      // English and others
+      if (hours > 0) {
+        return `${numFmt.format(hours)}h ${numFmt.format(minutes)}m`;
+      }
+      return `${numFmt.format(minutes)}m`;
     }
-    return `${minutes}分钟`;
   }
 
   private _hideSaveList(): void {

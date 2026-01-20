@@ -284,11 +284,29 @@ export const UI_LINE_SPACING = {
 } as const;
 
 /**
+ * CJK 字体栈常量
+ * 用于确保中日韩文字正确显示
+ */
+export const UI_FONT_FAMILY = {
+  /** 默认字体栈（CJK 优化） */
+  DEFAULT: "'Noto Sans SC', 'Noto Sans TC', 'Noto Sans JP', 'Microsoft YaHei', sans-serif",
+  /** 简体中文字体栈 */
+  ZH_CN: "'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif",
+  /** 繁体中文字体栈 */
+  ZH_TW: "'Noto Sans TC', 'Microsoft JhengHei', 'PingFang TC', sans-serif",
+  /** 日文字体栈 */
+  JA_JP: "'Noto Sans JP', 'Yu Gothic', 'Hiragino Kaku Gothic ProN', sans-serif",
+  /** 英文字体栈 */
+  EN: "'Noto Sans SC', Arial, sans-serif",
+} as const;
+
+/**
  * 统一导出对象（方便使用）
  */
 export const UI = {
   FONT_SIZE: UI_FONT_SIZE,
   FONT_SIZE_NUM: UI_FONT_SIZE_NUM,
+  FONT_FAMILY: UI_FONT_FAMILY,
   SPACING: UI_SPACING,
   RADIUS: UI_RADIUS,
   BUTTON: UI_BUTTON,
@@ -317,7 +335,7 @@ export function createFontStyle(
   } = {}
 ): Phaser.Types.GameObjects.Text.TextStyle {
   return {
-    fontFamily: options.fontFamily ?? 'Noto Sans SC',
+    fontFamily: options.fontFamily ?? UI_FONT_FAMILY.DEFAULT,
     fontSize: size,
     color,
     fontStyle: options.fontStyle,

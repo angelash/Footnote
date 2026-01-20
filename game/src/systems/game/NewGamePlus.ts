@@ -6,6 +6,7 @@
 
 import { createLogger } from '@/utils/Logger';
 import { worldState } from '@/systems/world';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('NewGamePlus');
 import { saveManager } from '@/systems/save';
@@ -64,14 +65,10 @@ class NewGamePlusManager {
    * 初始化NG+状态
    */
   public async initialize(): Promise<void> {
-    try {
-      const stored = localStorage.getItem('footnote_ngplus');
-      if (stored) {
-        this._state = JSON.parse(stored);
-        logger.info('加载NG+状态:', this._state);
-      }
-    } catch (error) {
-      logger.warn('加载NG+状态失败:', error);
+    const stored = safeStorage.get<INewGamePlusState>('ngplus');
+    if (stored) {
+      this._state = stored;
+      logger.info('加载NG+状态:', this._state);
     }
   }
 
@@ -228,10 +225,8 @@ class NewGamePlusManager {
    * 保存NG+状态
    */
   private _save(): void {
-    try {
-      localStorage.setItem('footnote_ngplus', JSON.stringify(this._state));
-    } catch (error) {
-      logger.error('保存失败:', error);
+    if (!safeStorage.set('ngplus', this._state)) {
+      logger.error('保存失败');
     }
   }
 

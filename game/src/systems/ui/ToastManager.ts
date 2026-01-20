@@ -1,6 +1,7 @@
 /**
  * Toast提示管理器
  * 处理临时通知、提示、成就解锁等消息
+ * 支持屏幕阅读器播报
  * @module systems/ui/ToastManager
  */
 
@@ -8,6 +9,7 @@ import Phaser from 'phaser';
 import { BaseUIComponent, type IBaseUIConfig } from './BaseUIComponent';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
+import { a11yManager } from '@/systems/accessibility/A11yManager';
 
 // ==================== 配置常量 ====================
 
@@ -185,6 +187,9 @@ export class ToastManager extends BaseUIComponent {
     const toast: IToast = { id, container, type, timer };
     this._toasts.push(toast);
 
+    // 播报给屏幕阅读器
+    a11yManager.announceToast(message, type as 'info' | 'success' | 'warning' | 'error');
+
     return id;
   }
 
@@ -226,6 +231,9 @@ export class ToastManager extends BaseUIComponent {
 
     const toast: IToast = { id, container, type: 'achievement', timer };
     this._toasts.push(toast);
+
+    // 播报成就解锁给屏幕阅读器
+    a11yManager.announceAchievement(title, description);
 
     return id;
   }

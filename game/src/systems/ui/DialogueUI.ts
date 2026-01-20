@@ -1,6 +1,7 @@
 /**
  * 对话UI系统
  * 处理对话显示、打字机效果、选项、立绘等
+ * 支持键盘导航和屏幕阅读器
  * @module systems/ui/DialogueUI
  */
 
@@ -8,6 +9,7 @@ import Phaser from 'phaser';
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { i18n } from '@/systems/i18n/I18nManager';
+import { a11yManager, type IFocusableElement } from '@/systems/accessibility/A11yManager';
 
 const logger = createLogger('DialogueUI');
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
@@ -59,6 +61,9 @@ interface IDialogueState {
 
 // ==================== DialogueUI类 ====================
 
+/** 焦点组ID前缀 */
+const FOCUS_GROUP_PREFIX = 'dialogue-choices-';
+
 /**
  * 对话UI管理器
  */
@@ -82,6 +87,11 @@ export class DialogueUI {
 
   // 国际化
   private _unsubscribeI18n?: () => void;
+
+  // 键盘导航
+  private _focusGroupId: string | null = null;
+  private _keyDownHandler: ((event: KeyboardEvent) => void) | null = null;
+  private _currentFocusIndex: number = -1;
 
   constructor(config: IDialogueUIConfig) {
     this._scene = config.scene;
@@ -156,6 +166,12 @@ export class DialogueUI {
     // 开始打字机效果
     this._startTypewriter();
 
+    // 设置键盘导航
+    this._setupKeyboardNavigation();
+
+    // 播报对话内容给屏幕阅读器
+    a11yManager.announceDialogue(dialogue.speaker, dialogue.text);
+
     // 发送事件
     eventBus.emit(GameEvent.DIALOGUE_START, { dialogueId: dialogue.id });
   }
@@ -165,6 +181,9 @@ export class DialogueUI {
    */
   hideDialogue(): void {
     this._stopTypewriter();
+
+    // 移除键盘导航
+    this._removeKeyboardNavigation();
 
     this._scene.tweens.add({
       targets: this._container,
@@ -247,6 +266,7 @@ export class DialogueUI {
    */
   destroy(): void {
     this._stopTypewriter();
+    this._removeKeyboardNavigation();
     this._unsubscribeI18n?.();
     this._container.destroy();
   }
@@ -397,6 +417,14 @@ export class DialogueUI {
 
     const startY = -((choices.length - 1) * (CONFIG.CHOICE_HEIGHT + CONFIG.CHOICE_SPACING)) / 2;
 
+    // 创建焦点组
+    this._focusGroupId = `${FOCUS_GROUP_PREFIX}${Date.now()}`;
+    const focusGroup = a11yManager.createFocusGroup(this._focusGroupId, {
+      wrapAround: true,
+      autoFocus: true,
+      groupName: '对话选项',
+    });
+
     choices.forEach((choice, index) => {
       const button = this._createChoiceButton(
         choice.label,
@@ -405,7 +433,22 @@ export class DialogueUI {
       );
       this._choiceButtons.push(button);
       this._choicesContainer.add(button);
+
+      // 添加到焦点组
+      const focusableElement: IFocusableElement = {
+        id: `choice-${index}`,
+        label: `${index + 1}. ${choice.label}`,
+        role: 'option',
+        enabled: true,
+        onFocus: () => this._highlightChoice(index, true),
+        onBlur: () => this._highlightChoice(index, false),
+        onActivate: () => this.selectChoice(index),
+      };
+      focusGroup.add(focusableElement);
     });
+
+    // 激活焦点组
+    a11yManager.setActiveFocusGroup(this._focusGroupId);
 
     this._choicesContainer.setVisible(true);
     this._choicesContainer.setAlpha(0);
@@ -416,12 +459,74 @@ export class DialogueUI {
       duration: 200,
       ease: 'Power2',
     });
+
+    // 播报选项给屏幕阅读器
+    a11yManager.announceChoice(choices.map((c) => c.label));
+  }
+
+  /**
+   * 高亮选项（键盘导航时使用）
+   */
+  private _highlightChoice(index: number, highlight: boolean): void {
+    const button = this._choiceButtons[index];
+    if (!button) return;
+
+    const bg = button.list[0] as Phaser.GameObjects.Graphics;
+    const label = button.list[1] as Phaser.GameObjects.Text;
+    const buttonWidth = CONFIG.BOX_WIDTH - 100;
+
+    bg.clear();
+    if (highlight) {
+      bg.fillStyle(COLORS.BG_SECONDARY, 1);
+      bg.fillRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.CHOICE_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.CHOICE_HEIGHT,
+        8
+      );
+      bg.lineStyle(2, COLORS.ACCENT, 1);
+      bg.strokeRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.CHOICE_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.CHOICE_HEIGHT,
+        8
+      );
+      label.setColor('#00FFAA');
+      this._currentFocusIndex = index;
+    } else {
+      bg.fillStyle(COLORS.BG_PRIMARY, 0.9);
+      bg.fillRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.CHOICE_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.CHOICE_HEIGHT,
+        8
+      );
+      bg.lineStyle(1, COLORS.BORDER, 1);
+      bg.strokeRoundedRect(
+        -buttonWidth / 2,
+        -CONFIG.CHOICE_HEIGHT / 2,
+        buttonWidth,
+        CONFIG.CHOICE_HEIGHT,
+        8
+      );
+      label.setColor('#E8E6E3');
+    }
   }
 
   private _hideChoices(): void {
+    // 销毁焦点组
+    if (this._focusGroupId) {
+      a11yManager.destroyFocusGroup(this._focusGroupId);
+      this._focusGroupId = null;
+    }
+
     this._choiceButtons.forEach((btn) => btn.destroy());
     this._choiceButtons = [];
     this._choicesContainer.setVisible(false);
+    this._currentFocusIndex = -1;
   }
 
   private _createChoiceButton(
@@ -610,11 +715,97 @@ export class DialogueUI {
       this.advance();
     });
 
-    // 空格键推进
+    // 空格键推进（通过 Phaser 事件）
     this._scene.input.keyboard?.on('keydown-SPACE', () => {
-      if (this.isVisible()) {
+      if (this.isVisible() && !this._choicesContainer.visible) {
         this.advance();
       }
     });
+  }
+
+  // ==================== 私有方法 - 键盘导航 ====================
+
+  /**
+   * 设置键盘导航
+   */
+  private _setupKeyboardNavigation(): void {
+    if (this._keyDownHandler) return;
+
+    this._keyDownHandler = (event: KeyboardEvent): void => {
+      if (!this.isVisible()) return;
+
+      // 如果有选项显示，处理选项导航
+      if (this._choicesContainer.visible) {
+        // 构建按键标识
+        let keyCode = event.code;
+        if (event.shiftKey && keyCode === 'Tab') {
+          keyCode = 'ShiftTab';
+        }
+
+        // 数字键直选 (1-9)
+        if (/^Digit[1-9]$/.test(event.code)) {
+          const index = parseInt(event.code.replace('Digit', ''), 10) - 1;
+          if (index < this._choiceButtons.length) {
+            this.selectChoice(index);
+            event.preventDefault();
+            return;
+          }
+        }
+
+        // 小键盘数字键 (1-9)
+        if (/^Numpad[1-9]$/.test(event.code)) {
+          const index = parseInt(event.code.replace('Numpad', ''), 10) - 1;
+          if (index < this._choiceButtons.length) {
+            this.selectChoice(index);
+            event.preventDefault();
+            return;
+          }
+        }
+
+        // 让 A11yManager 处理其他导航键
+        if (a11yManager.handleKeyboardNavigation(keyCode)) {
+          event.preventDefault();
+          return;
+        }
+      } else {
+        // 没有选项时，空格/回车推进对话
+        if (event.code === 'Space' || event.code === 'Enter') {
+          this.advance();
+          event.preventDefault();
+          return;
+        }
+      }
+
+      // ESC 关闭对话（如果没有选项）
+      if (event.code === 'Escape' && !this._choicesContainer.visible) {
+        this.hideDialogue();
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('keydown', this._keyDownHandler);
+  }
+
+  /**
+   * 移除键盘导航
+   */
+  private _removeKeyboardNavigation(): void {
+    if (this._keyDownHandler) {
+      window.removeEventListener('keydown', this._keyDownHandler);
+      this._keyDownHandler = null;
+    }
+
+    // 清除焦点组
+    if (this._focusGroupId) {
+      a11yManager.destroyFocusGroup(this._focusGroupId);
+      this._focusGroupId = null;
+    }
+  }
+
+  /**
+   * 获取当前焦点索引（用于测试/调试）
+   */
+  public getCurrentFocusIndex(): number {
+    return this._currentFocusIndex;
   }
 }

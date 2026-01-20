@@ -7,6 +7,7 @@
 import Phaser from 'phaser';
 import { createLogger } from '@/utils/Logger';
 import { eventBus, GameEvent } from '@/systems/EventBus';
+import { safeStorage } from '@/systems/storage';
 
 const logger = createLogger('AchievementManager');
 import { worldState } from '@/systems/world';
@@ -391,16 +392,11 @@ export class AchievementManager {
    * 加载成就状态
    */
   private _loadStates(): void {
-    try {
-      const stored = localStorage.getItem('footnote_achievements');
-      if (stored) {
-        const data = JSON.parse(stored) as Record<string, IAchievementState>;
-        Object.entries(data).forEach(([id, state]) => {
-          this._states.set(id, state);
-        });
-      }
-    } catch (error) {
-      logger.warn('加载成就状态失败:', error);
+    const stored = safeStorage.get<Record<string, IAchievementState>>('achievements');
+    if (stored) {
+      Object.entries(stored).forEach(([id, state]) => {
+        this._states.set(id, state);
+      });
     }
   }
 
@@ -408,14 +404,12 @@ export class AchievementManager {
    * 保存成就状态
    */
   private _saveStates(): void {
-    try {
-      const data: Record<string, IAchievementState> = {};
-      this._states.forEach((state, id) => {
-        data[id] = state;
-      });
-      localStorage.setItem('footnote_achievements', JSON.stringify(data));
-    } catch (error) {
-      logger.error('保存成就状态失败:', error);
+    const data: Record<string, IAchievementState> = {};
+    this._states.forEach((state, id) => {
+      data[id] = state;
+    });
+    if (!safeStorage.set('achievements', data)) {
+      logger.error('保存成就状态失败');
     }
   }
 

@@ -1,11 +1,16 @@
 /**
  * UI组件基类
- * 提供通用的显示/隐藏、深度管理、销毁等功能
+ * 提供通用的显示/隐藏、深度管理、销毁、键盘导航等功能
  * @module systems/ui/BaseUIComponent
  */
 
 import Phaser from 'phaser';
 import { createLogger } from '@/utils/Logger';
+import {
+  a11yManager,
+  type IFocusableElement,
+  type IFocusManagerConfig,
+} from '@/systems/accessibility/A11yManager';
 
 const logger = createLogger('BaseUIComponent');
 import { UI } from '@/config/ui.config';
@@ -35,7 +40,14 @@ export interface IBaseUIConfig {
   depth?: number;
   /** 动画配置 */
   animation?: Partial<IAnimationConfig>;
+  /** 是否启用键盘导航 */
+  enableKeyboardNav?: boolean;
+  /** 组件名称（用于无障碍播报） */
+  componentName?: string;
 }
+
+// Re-export for convenience
+export type { IFocusableElement, IFocusManagerConfig };
 
 // ==================== 默认配置 ====================
 
@@ -71,10 +83,24 @@ export abstract class BaseUIComponent {
   /** 当前运行的动画 */
   private _currentTween: Phaser.Tweens.Tween | null = null;
 
+  /** 是否启用键盘导航 */
+  protected _enableKeyboardNav: boolean;
+
+  /** 组件名称 */
+  protected _componentName: string;
+
+  /** 焦点组 ID */
+  protected _focusGroupId: string | null = null;
+
+  /** 键盘事件处理函数引用 */
+  private _keyDownHandler: ((event: KeyboardEvent) => void) | null = null;
+
   constructor(config: IBaseUIConfig) {
     this._scene = config.scene;
     this._depth = config.depth ?? 1000;
     this._animation = { ...DEFAULT_ANIMATION, ...config.animation };
+    this._enableKeyboardNav = config.enableKeyboardNav ?? false;
+    this._componentName = config.componentName ?? '界面';
 
     // 初始化容器
     this._initContainer();
@@ -151,6 +177,14 @@ export abstract class BaseUIComponent {
     // 停止当前动画
     this._stopCurrentTween();
 
+    // 设置键盘导航
+    if (this._enableKeyboardNav) {
+      this._setupKeyboardNavigation();
+    }
+
+    // 播报 UI 打开
+    a11yManager.announceUIState(this._componentName, 'opened');
+
     if (animate) {
       this._container.setVisible(true);
       this._container.setAlpha(0);
@@ -186,6 +220,14 @@ export abstract class BaseUIComponent {
 
     // 停止当前动画
     this._stopCurrentTween();
+
+    // 移除键盘导航
+    if (this._enableKeyboardNav) {
+      this._removeKeyboardNavigation();
+    }
+
+    // 播报 UI 关闭
+    a11yManager.announceUIState(this._componentName, 'closed');
 
     if (animate) {
       this._currentTween = this._scene.tweens.add({
@@ -271,6 +313,16 @@ export abstract class BaseUIComponent {
 
     // 停止当前动画
     this._stopCurrentTween();
+
+    // 移除键盘导航
+    if (this._enableKeyboardNav) {
+      this._removeKeyboardNavigation();
+    }
+
+    // 销毁焦点组
+    if (this._focusGroupId) {
+      a11yManager.destroyFocusGroup(this._focusGroupId);
+    }
 
     // 销毁容器（会自动销毁所有子对象）
     if (this._container) {
@@ -376,6 +428,95 @@ export abstract class BaseUIComponent {
       this._scene.input.keyboard?.off('keydown-ESC', onEsc);
       originalOnBeforeDestroy();
     };
+  }
+
+  /**
+   * 设置键盘导航
+   * 子类可以覆盖此方法来自定义键盘导航行为
+   */
+  protected _setupKeyboardNavigation(): void {
+    if (this._keyDownHandler) return; // 已经设置过
+
+    this._keyDownHandler = (event: KeyboardEvent): void => {
+      if (!this.isVisible()) return;
+
+      // 构建按键标识
+      let keyCode = event.code;
+      if (event.shiftKey && keyCode === 'Tab') {
+        keyCode = 'ShiftTab';
+      }
+
+      // 先尝试让 A11yManager 处理
+      if (a11yManager.handleKeyboardNavigation(keyCode)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+      // 子类可以通过覆盖 _handleKeyDown 来处理其他按键
+      if (this._handleKeyDown(event)) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    window.addEventListener('keydown', this._keyDownHandler);
+  }
+
+  /**
+   * 移除键盘导航
+   */
+  protected _removeKeyboardNavigation(): void {
+    if (this._keyDownHandler) {
+      window.removeEventListener('keydown', this._keyDownHandler);
+      this._keyDownHandler = null;
+    }
+
+    // 清除活动焦点组
+    if (this._focusGroupId) {
+      a11yManager.clearActiveFocusGroup();
+    }
+  }
+
+  /**
+   * 处理键盘按下事件
+   * 子类可以覆盖此方法来处理特定的按键
+   * @returns 是否已处理该事件
+   */
+  protected _handleKeyDown(_event: KeyboardEvent): boolean {
+    // 默认不处理任何按键，由子类覆盖
+    return false;
+  }
+
+  /**
+   * 创建焦点组
+   * 子类调用此方法来创建焦点组
+   */
+  protected _createFocusGroup(
+    groupId: string,
+    config?: IFocusManagerConfig
+  ): ReturnType<typeof a11yManager.createFocusGroup> {
+    this._focusGroupId = groupId;
+    return a11yManager.createFocusGroup(groupId, config);
+  }
+
+  /**
+   * 激活焦点组
+   */
+  protected _activateFocusGroup(): void {
+    if (this._focusGroupId) {
+      a11yManager.setActiveFocusGroup(this._focusGroupId);
+    }
+  }
+
+  /**
+   * 获取焦点组
+   */
+  protected _getFocusGroup(): ReturnType<typeof a11yManager.getFocusGroup> {
+    if (this._focusGroupId) {
+      return a11yManager.getFocusGroup(this._focusGroupId);
+    }
+    return undefined;
   }
 
   // ==================== 私有方法 ====================

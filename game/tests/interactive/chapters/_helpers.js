@@ -234,6 +234,7 @@ function advanceDialogue() {
  * 完成整个对话（自动推进直到结束）
  * @param maxLines 最大行数限制，防止无限循环
  * @param preferredChoice 优先选择包含此文本的选项
+ * @returns 包含对话内容记录的结果对象
  */
 async function completeDialogue(maxLines = 20, preferredChoice = null) {
   const scene = getScene();
@@ -242,6 +243,8 @@ async function completeDialogue(maxLines = 20, preferredChoice = null) {
 
   let linesAdvanced = 0;
   let choicesMade = [];
+  let dialogueTexts = [];  // 记录每行对话内容
+  let speakers = [];       // 记录说话者
   
   for (let i = 0; i < maxLines; i++) {
     // 等待一小段时间让 UI 更新
@@ -250,6 +253,14 @@ async function completeDialogue(maxLines = 20, preferredChoice = null) {
     // 检查对话是否还在显示
     if (!ui._container?.visible) {
       break;
+    }
+    
+    // 记录当前对话内容
+    const currentText = ui._dialogueText?.text || '';
+    const currentSpeaker = ui._speakerText?.text || '';
+    if (currentText && !dialogueTexts.includes(currentText)) {
+      dialogueTexts.push(currentText);
+      speakers.push(currentSpeaker);
     }
     
     // 检查是否有选项
@@ -285,7 +296,24 @@ async function completeDialogue(maxLines = 20, preferredChoice = null) {
     await wait(300);
   }
   
-  return { success: true, linesAdvanced, choicesMade };
+  // 检查最后一行（对话可能在 isWaitingToClose 状态）
+  if (ui._container?.visible) {
+    const finalText = ui._dialogueText?.text || '';
+    const finalSpeaker = ui._speakerText?.text || '';
+    if (finalText && !dialogueTexts.includes(finalText)) {
+      dialogueTexts.push(finalText);
+      speakers.push(finalSpeaker);
+    }
+  }
+  
+  return { 
+    success: true, 
+    linesAdvanced, 
+    choicesMade,
+    dialogueTexts,    // 所有对话文本
+    speakers,         // 对应的说话者
+    totalLines: dialogueTexts.length  // 实际显示的行数
+  };
 }
 
 /**
@@ -571,6 +599,9 @@ async function executeTest(test, options = {}) {
       // 自动完成对话（推进所有对话行直到结束）
       const dialogueResult = await completeDialogue();
       result.steps.push({ action: 'completeDialogue', result: dialogueResult });
+      
+      // 保存对话结果供后续验证
+      result.dialogueResult = dialogueResult;
     }
 
     // 5. 获取最终状态并验证
@@ -625,6 +656,47 @@ async function executeTest(test, options = {}) {
       const currentZone = getGameState().currentZone;
       const passed = currentZone === expected.nextZone;
       result.verifications.push({ type: 'zoneTransition', expected: expected.nextZone, actual: currentZone, passed });
+    }
+
+    // 6.1 验证对话行数（新增）
+    if (expected.expectedLines !== undefined && result.dialogueResult) {
+      const actualLines = result.dialogueResult.totalLines || 0;
+      const passed = actualLines === expected.expectedLines;
+      result.verifications.push({ 
+        type: 'dialogueLines', 
+        expected: expected.expectedLines, 
+        actual: actualLines, 
+        passed,
+        dialogueTexts: result.dialogueResult.dialogueTexts
+      });
+    }
+
+    // 6.2 验证对话内容包含指定文本（新增）
+    if (expected.dialogueContains?.length > 0 && result.dialogueResult) {
+      const allText = (result.dialogueResult.dialogueTexts || []).join(' ');
+      for (const text of expected.dialogueContains) {
+        const passed = allText.includes(text);
+        result.verifications.push({ 
+          type: 'dialogueContains', 
+          expected: text, 
+          passed,
+          note: passed ? 'found' : 'not found in dialogue'
+        });
+      }
+    }
+
+    // 6.3 验证对话不包含指定文本（新增，用于检测错误显示）
+    if (expected.dialogueNotContains?.length > 0 && result.dialogueResult) {
+      const allText = (result.dialogueResult.dialogueTexts || []).join(' ');
+      for (const text of expected.dialogueNotContains) {
+        const passed = !allText.includes(text);
+        result.verifications.push({ 
+          type: 'dialogueNotContains', 
+          expected: `should not contain: ${text}`, 
+          passed,
+          note: passed ? 'correctly absent' : 'unexpectedly found'
+        });
+      }
     }
 
     // 7. 判定整体结果

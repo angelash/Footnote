@@ -47,6 +47,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '无法感知断裂',
+      expectedLines: 1,
+      dialogueContains: ['无法感知断裂'],
     },
   },
 
@@ -79,6 +81,8 @@ const TESTS = [
       pDelta: 2,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 8,
+      dialogueContains: ['介入', '加固', '增加结构负担', '写入稳定结构', '路面暂时稳固', '结构负担上升'],
     },
   },
 
@@ -111,6 +115,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 7,
+      dialogueContains: ['介入', '找到了一条稳定的骨架路径', '不会新增伤痕', '绕过了伤痕'],
     },
   },
 
@@ -142,6 +148,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '前方断裂阻挡',
+      expectedLines: 1,
+      dialogueContains: ['前方断裂阻挡'],
     },
   },
 
@@ -174,6 +182,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: 'C4-Z1',
+      expectedLines: 5,
+      dialogueContains: ['穿过了断裂走廊', '不知道还能撑多久', '承受越来越多的"写入"'],
     },
   },
 
@@ -211,6 +221,8 @@ const TESTS = [
       pDelta: 2,
       foreshadow: null,
       nextZone: 'C4-Z1',
+      expectedLines: 13,
+      dialogueContains: ['介入', '加固', '结构负担上升', '穿过了断裂走廊', '承受越来越多的"写入"'],
     },
   },
 
@@ -248,6 +260,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: 'C4-Z1',
+      expectedLines: 12,
+      dialogueContains: ['介入', '找到了一条稳定的骨架路径', '穿过了断裂走廊', '承受越来越多的"写入"'],
     },
   },
 ];

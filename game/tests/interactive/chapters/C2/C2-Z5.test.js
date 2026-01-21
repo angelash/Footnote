@@ -40,7 +40,8 @@ const C2Z5_TESTS = {
         rDelta: 1,
         pDelta: 0,
         dialogueId: 'C2Z5_ATANG_YESTERDAY',
-        dialogueContent: '昨天...我不记得了',
+        expectedLines: 3,
+        dialogueContains: ['你也不确定，对吧', '我们可能都不确定'],
         foreshadow: null,
         nextZone: null
       },
@@ -75,7 +76,9 @@ const C2Z5_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z5_ATANG_NORMAL',
+        dialogueId: 'C2Z5_ATANG_KNOW',
+        expectedLines: 3,
+        dialogueContains: ['你也不确定，对吧', '她没有解释更多'],
         foreshadow: null,
         nextZone: null
       },
@@ -107,7 +110,8 @@ const C2Z5_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z5_ATANG_NOTE',
-        dialogueContent: '碎片日记...记录着混乱的时间线',
+        expectedLines: 6,
+        dialogueContains: ['地上掉落一张纸条', '有人把今天折了一下', '我捡到了一次重复'],
         foreshadow: null,
         nextZone: null
       },
@@ -137,8 +141,9 @@ const C2Z5_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z5_MEDICAL_DEVICE',
-        dialogueContent: '诊疗设备，用于对齐治疗',
+        dialogueId: 'C2Z5_XUCHENG_DOOR',
+        expectedLines: 7,
+        dialogueContains: ['诊室门开了，许澄走出来', '她的叙述会让你焦虑', '你只需要把今天过完'],
         foreshadow: null,
         nextZone: null
       },

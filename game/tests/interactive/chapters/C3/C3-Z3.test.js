@@ -47,6 +47,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 9,
+      dialogueContains: ['三张不同版本的地图', '门影区域', 'V1：一个小空白', 'V3：空白位置被写成', '一直在"更正"'],
     },
   },
 
@@ -78,6 +80,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '需要先了解版本差异',
+      expectedLines: 1,
+      dialogueContains: ['需要先了解版本差异'],
     },
   },
 
@@ -109,6 +113,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F12', action: 'plant' },
       nextZone: null,
+      expectedLines: 6,
+      dialogueContains: ['差异已保存', '奖励：无', '每一个被记录的差异', '对"唯一版本"的反驳'],
     },
   },
 
@@ -146,6 +152,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F12', action: 'plant' },
       nextZone: null,
+      expectedLines: 15,
+      dialogueContains: ['三张不同版本的地图', '门影区域', '差异已保存', '每一个被记录的差异'],
     },
   },
 ];

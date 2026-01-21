@@ -48,6 +48,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '无法感知',
+      expectedLines: 1,
+      dialogueContains: ['无法感知'],
     },
   },
 
@@ -79,6 +81,8 @@ const TESTS = [
       pDelta: 3,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 8,
+      dialogueContains: ['深度介入', '将改写结构', '留下永久伤痕', '结构在你的意识下重组', '伤痕已记录'],
     },
   },
 
@@ -109,6 +113,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 0,
+      dialogueContains: [],
     },
   },
 
@@ -141,6 +147,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 7,
+      dialogueContains: ['你看得到这里', '灯点起来', '不存在的地方，也会冷', '旧灯芯'],
     },
   },
 
@@ -172,6 +180,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '不能丢下他',
+      expectedLines: 1,
+      dialogueContains: ['不能丢下他'],
     },
   },
 
@@ -203,6 +213,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['带着陈匠离开', '不存在', '救援完成'],
     },
   },
 ];

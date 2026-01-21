@@ -43,9 +43,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '一面薄墙。表面看起来正常',
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z3_THIN_WALL(2)
+      expectedLines: 2,
+      dialogueContains: ['一面薄墙', '看起来正常', '长按'],
     },
   },
 
@@ -74,9 +76,11 @@ const TESTS = [
       flags: { FLAG_HEARD_WALL_ECHO: true },
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '低频回声在墙内回荡……里面是空的',
       foreshadow: { id: 'F01', action: 'plant' },
       nextZone: null,
+      // 对话验证: C0Z3_WALL_ECHO(6)
+      expectedLines: 6,
+      dialogueContains: ['低频回声', '回荡', '里面是空的', '不该是这样的', '结构正常'],
     },
   },
 
@@ -104,9 +108,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '路标歪了。暂时不能修，不在任务范围内',
       foreshadow: null,
       nextZone: null,
+      // 对话验证: 歪斜路标对话(1)
+      expectedLines: 1,
+      dialogueContains: ['路标歪了', '不能修', '任务范围'],
     },
   },
 
@@ -140,6 +146,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z3_NAIL_PICKUP(2) + C0Z3_NAIL_TAKEN(2) = 4
+      expectedLines: 4,
+      dialogueContains: ['旧钉子', '生锈', '收好了', '以后能用到'],
     },
   },
 
@@ -173,6 +182,10 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z3_NAIL_PICKUP(2) + C0Z3_NAIL_LEFT(2) = 4
+      expectedLines: 4,
+      dialogueContains: ['旧钉子', '生锈', '任务范围内', '留着吧'],
+      dialogueNotContains: ['收好了'],
     },
   },
 

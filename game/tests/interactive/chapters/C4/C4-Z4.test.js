@@ -45,6 +45,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 许澄对话
+      expectedLines: 3,
+      dialogueContains: ['修补', '看见', '别骗自己', '回去了'],
     },
   },
 
@@ -76,6 +79,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 症状清单+症状完成
+      expectedLines: 7,
+      dialogueContains: ['新增症状选项', '事件重复感', '解释变得费力', '正常的反应', '减少回溯次数'],
     },
   },
 
@@ -106,6 +112,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 问诊台普通对话
+      expectedLines: 2,
+      dialogueContains: ['问诊台', '症状清单更新了'],
     },
   },
 
@@ -137,6 +146,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F14', action: 'plant' },
       nextZone: null,
+      // 对话验证 - 病例卡获取
+      expectedLines: 6,
+      dialogueContains: ['第二张病例卡', '编号', '断口', '建议减少回溯', '补丁痕迹敏感性'],
     },
   },
 
@@ -167,7 +179,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
-      dialogueContent: '需要先完成症状检查',
+      // 对话验证 - 条件不满足提示
+      expectedLines: 1,
+      dialogueContains: ['需要先完成症状检查'],
     },
   },
 ];

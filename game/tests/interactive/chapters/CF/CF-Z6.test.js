@@ -50,6 +50,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['维修局走廊', '城还能继续被读', '读不下去的东西'],
     },
   },
 
@@ -80,6 +82,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['版本库', '最底层多了一格', '没删掉'],
     },
   },
 
@@ -110,6 +114,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['诊室', '人们稳定了', '不再敢说这叫痊愈'],
     },
   },
 
@@ -140,6 +146,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['礼堂', '纸还在', '折痕'],
     },
   },
 
@@ -170,6 +178,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['窗边长椅', '还是会漂', '不再全是错'],
     },
   },
 
@@ -200,6 +210,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['街角', '它还在', '这就够了'],
     },
   },
 
@@ -231,6 +243,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['还有角色', '未访问'],
     },
   },
 
@@ -274,6 +288,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 10,
+      dialogueContains: ['通关', '多余的事', '改变了世界', '字段模式'],
     },
   },
 ];

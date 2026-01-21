@@ -40,7 +40,8 @@ const C2Z4_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z4_CROOKED_SIGN',
-        dialogueContent: '路标歪了，需要钉子才能修好',
+        expectedLines: 2,
+        dialogueContains: ['路标歪斜着，指向一条几乎无人问津的小路', '确实歪得很厉害'],
         foreshadow: null,
         nextZone: null
       },
@@ -72,7 +73,9 @@ const C2Z4_TESTS = {
         flags: { FLAG_C2Z4_HAS_NAIL: true },
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z4_NAIL_PICKUP',
+        dialogueId: 'C2Z4_GOT_NAIL',
+        expectedLines: 2,
+        dialogueContains: ['你捡起了一枚旧钉子', '可以用来修路标了'],
         foreshadow: null,
         nextZone: null
       },
@@ -107,7 +110,9 @@ const C2Z4_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z4_NAIL_SKIP',
+        dialogueId: 'C2Z4_IGNORE_NAIL',
+        expectedLines: 1,
+        dialogueContains: ['不管它了'],
         foreshadow: null,
         nextZone: null
       },
@@ -140,6 +145,8 @@ const C2Z4_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z4_QILAN_HELP',
+        expectedLines: 2,
+        dialogueContains: ['谢谢', '钉子掉了，找一枚就行'],
         foreshadow: null,
         nextZone: null
       },
@@ -174,7 +181,9 @@ const C2Z4_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z4_QILAN_DECLINE',
+        dialogueId: 'C2Z4_QILAN_BUSY',
+        expectedLines: 2,
+        dialogueContains: ['那就更应该快点做完', '反正也花不了多少时间'],
         foreshadow: null,
         nextZone: null
       },
@@ -209,6 +218,8 @@ const C2Z4_TESTS = {
         rDelta: 2,
         pDelta: 0,
         dialogueId: 'C2Z4_COMPLETE_REPAIR',
+        expectedLines: 7,
+        dialogueContains: ['你用钉子固定好了路标', '路标立起来了', '无可用收益', '做完了，感觉好一点'],
         foreshadow: { id: 'F05', action: 'plant' },
         nextZone: null
       },
@@ -241,8 +252,9 @@ const C2Z4_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z4_REPAIR_BLOCKED',
-        dialogueContent: '需要钉子才能修好',
+        dialogueId: 'C2Z4_NAIL_HOLE',
+        expectedLines: 3,
+        dialogueContains: ['地上有一个旧钉子孔', '钉子从这里脱落的', '附近地面上闪着微光'],
         foreshadow: null,
         nextZone: null
       },

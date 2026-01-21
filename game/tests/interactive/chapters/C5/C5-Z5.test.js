@@ -51,6 +51,8 @@ const TESTS = [
       dialogueId: 'C5Z5_CHAIR',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['椅子原本的位置', '什么都没有了', '对象：不存在'],
     },
   },
 
@@ -85,6 +87,8 @@ const TESTS = [
       dialogueId: 'C5Z5_QILAN',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 7,
+      dialogueContains: ['连"拿走"都不需要', '更正一句', '我留下', '工具箱在旁边'],
     },
   },
 
@@ -118,6 +122,8 @@ const TESTS = [
       dialogueId: 'C5Z5_TOOLBOX',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 1,
+      dialogueContains: ['栖蓝的工具箱', '粉笔', '木板'],
     },
   },
 
@@ -151,6 +157,8 @@ const TESTS = [
       dialogueId: 'C5Z5_CHALK',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['拿起粉笔', '椅脚印处描边', '第1步完成'],
     },
   },
 
@@ -186,6 +194,8 @@ const TESTS = [
       dialogueId: 'C5Z5_WOOD',
       foreshadow: { id: 'F23', action: 'deepen' },
       nextZone: null,
+      expectedLines: 12,
+      dialogueContains: ['木板摆在描边的位置', '占着位置', '无可用收益', '解释成本↑'],
     },
     critical: true,
     rValueTest: true,

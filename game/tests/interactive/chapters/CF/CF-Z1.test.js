@@ -48,6 +48,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F22', action: 'plant' },
       nextZone: null,
+      expectedLines: 11,
+      dialogueContains: ['进入冗余字段区', '条目：观测', '收敛：失败', '字段：＿', '建议：降阶'],
     },
   },
 
@@ -79,6 +81,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['异常点A', '空白字段', '深度视野', '字段补全失败'],
     },
   },
 
@@ -110,6 +114,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['异常点B', '重复事件', '双影符号', '无法合并'],
     },
   },
 
@@ -143,6 +149,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['异常点C', '无收益残差', '点击标注', '不可结算'],
     },
   },
 
@@ -173,6 +181,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['未完成', '异常点'],
     },
   },
 
@@ -203,6 +213,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: 'CF-Z2',
+      expectedLines: 2,
+      dialogueContains: ['离开', '冗余字段区'],
     },
   },
 ];

@@ -47,6 +47,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['街角空椅', '稳定存在', '描边不再被清除', '条目：保留'],
     },
   },
 
@@ -77,6 +79,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['未选择', '空椅仪式'],
     },
   },
 
@@ -108,6 +112,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['版本库底层', '封条', '抄录内容保持', '条目：保留'],
     },
   },
 
@@ -138,6 +144,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['未选择', '封存仪式'],
     },
   },
 
@@ -169,6 +177,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['弱灯', '持续亮着', '对象不存在', '条目：保留'],
     },
   },
 
@@ -199,6 +209,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['未选择', '点灯仪式'],
     },
   },
 ];

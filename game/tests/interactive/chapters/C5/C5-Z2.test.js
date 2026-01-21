@@ -48,6 +48,8 @@ const TESTS = [
       dialogueId: 'C5Z2_SUBMIT',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 10,
+      dialogueContains: ['版本冲突记录', '待结算', '字段：＿', '解释成本↑'],
     },
   },
 
@@ -82,6 +84,8 @@ const TESTS = [
       dialogueId: 'C5Z2_GULIN',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 7,
+      dialogueContains: ['不太好结算', '系统里停很久', '那就别结算', '系统不会等'],
     },
     critical: true,
     rValueTest: true,

@@ -46,6 +46,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 地图卷
+      expectedLines: 5,
+      dialogueContains: ['展开地图', '已不存在的巷子', '版本号', '消失了吗'],
     },
   },
 
@@ -77,6 +80,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 抹胶
+      expectedLines: 2,
+      dialogueContains: ['地图背面抹上糨糊', '第1步完成'],
     },
   },
 
@@ -107,6 +113,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 墙面位置普通描述
+      expectedLines: 2,
+      dialogueContains: ['破墙面', '平整的区域', '贴下一张地图'],
     },
   },
 
@@ -138,6 +147,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 压平
+      expectedLines: 2,
+      dialogueContains: ['贴在墙上', '用工具压平', '第2步完成'],
     },
   },
 
@@ -168,6 +180,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 栖蓝普通对话
+      expectedLines: 3,
+      dialogueContains: ['没用', '不想让它消失', '费点力气'],
     },
   },
 
@@ -200,6 +215,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F21', action: 'plant' },
       nextZone: null,
+      // 对话验证 - 完成
+      expectedLines: 9,
+      dialogueContains: ['地图贴好了', '被抹去的地方', '无可用收益', '无法纳入当前模型', '谢谢'],
     },
   },
 
@@ -230,7 +248,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
-      dialogueContent: '地图还没修复完成',
+      // 对话验证 - 条件不满足提示
+      expectedLines: 1,
+      dialogueContains: ['地图还没修复完成'],
     },
   },
 ];

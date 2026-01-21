@@ -51,6 +51,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z2_MENU(2) + C0Z2_ORDER_STANDARD(3) = 5
+      expectedLines: 5,
+      dialogueContains: ['固定套餐', '今日特别', '老样子', '省事'],
     },
   },
 
@@ -86,6 +89,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z2_MENU(2) + C0Z2_ORDER_SPECIAL(6) = 8
+      expectedLines: 8,
+      dialogueContains: ['固定套餐', '今日特别', '几乎没人点', '等一会儿', '无可用收益'],
     },
   },
 
@@ -113,9 +119,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '靠窗的位置，光线充足',
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z2_SEAT_WINDOW(2)
+      expectedLines: 2,
+      dialogueContains: ['靠窗的位置', '光线充足', '快速用餐'],
     },
   },
 
@@ -143,9 +151,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '角落的位置，旁边有一把空椅子',
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z2_SEAT_CORNER(3)
+      expectedLines: 3,
+      dialogueContains: ['角落的位置', '空椅子', '干净', '没人会坐'],
     },
   },
 
@@ -172,9 +182,11 @@ const TESTS = [
       flags: { FLAG_MET_QILAN_C0: true },
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '没人坐的椅子，也得擦干净',
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z2_QILAN_PASSBY(3)
+      expectedLines: 3,
+      dialogueContains: ['没人坐的椅子', '擦干净', '走远了'],
     },
   },
 

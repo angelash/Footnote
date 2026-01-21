@@ -45,9 +45,11 @@ const TESTS = [
       flags: { FLAG_C0Z4_CHECKED_IN: true },
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '外勤报到？来领任务单',
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z4_RECEPTION(4)
+      expectedLines: 4,
+      dialogueContains: ['外勤报到', '任务单', '既定路线', '顾主管'],
     },
   },
 
@@ -76,9 +78,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '巡检任务单。路线：既定路线A',
       foreshadow: { id: 'F03', action: 'deepen' },
       nextZone: null,
+      // 对话验证: C0Z4_TASKBOARD(5)
+      expectedLines: 5,
+      dialogueContains: ['巡检任务单', '路线A', '标注异常', '更正'],
     },
   },
 
@@ -114,6 +118,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z4_GULIN_TALK(3) + C0Z4_GULIN_OBEY(2) = 5
+      expectedLines: 5,
+      dialogueContains: ['既定走', '流程解决', '例外', '复杂度', '记录在案'],
     },
   },
 
@@ -150,6 +157,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z4_GULIN_TALK(3) + C0Z4_GULIN_DATE(4) = 7
+      expectedLines: 7,
+      dialogueContains: ['既定走', '流程解决', '记录就好', '主观', '事实', '记录为准'],
     },
   },
 
@@ -186,6 +196,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证: C0Z4_GULIN_TALK(3) + C0Z4_GULIN_WALL(5) = 8
+      expectedLines: 8,
+      dialogueContains: ['既定走', '流程解决', '听到', '感知异常', '结构异常', '系统判定'],
     },
   },
 
@@ -213,9 +226,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '维修局行为准则',
       foreshadow: null,
       nextZone: null,
+      // 对话验证: 规章制度对话(1)
+      expectedLines: 1,
+      dialogueContains: ['维修局行为准则'],
     },
   },
 
@@ -303,9 +318,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '还没接到任务',
       foreshadow: null,
       nextZone: null, // 不跳转
+      // 对话验证: 阻止提示(1)
+      expectedLines: 1,
+      dialogueContains: ['还没接到任务'],
     },
   },
 ];

@@ -44,6 +44,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 阿棠对话
+      expectedLines: 4,
+      dialogueContains: ['回来得更快', '不属于任何原因', '痕', '看得见了'],
     },
   },
 
@@ -75,6 +78,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 阿棠纸条
+      expectedLines: 4,
+      dialogueContains: ['递给你一张纸条', '塞回墙缝里', '怀疑它从没存在过'],
     },
   },
 
@@ -105,6 +111,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 坐下普通对话
+      expectedLines: 2,
+      dialogueContains: ['长椅', '窗外的光线'],
     },
   },
 
@@ -137,6 +146,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 塞纸条完成
+      expectedLines: 5,
+      dialogueContains: ['塞进了墙缝', '无可用收益', '轻轻点了点头'],
     },
   },
 
@@ -167,7 +179,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
-      dialogueContent: '一道窄窄的墙缝',
+      // 对话验证 - 墙缝普通描述
+      expectedLines: 1,
+      dialogueContains: ['墙上有一道细小的裂缝'],
     },
   },
 ];

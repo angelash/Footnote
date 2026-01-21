@@ -46,6 +46,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 警报线圈
+      expectedLines: 3,
+      dialogueContains: ['触碰了警报线圈', '警报已触发', '倒计时开始'],
     },
   },
 
@@ -77,6 +80,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 坍塌封死
+      expectedLines: 5,
+      dialogueContains: ['跑向前方', '坍塌点崩落', '路被封死', '路径不可达', '选择稳定节点'],
     },
   },
 
@@ -107,6 +113,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 阈值门普通描述
+      expectedLines: 2,
+      dialogueContains: ['阈值门', '必须通过这里'],
     },
   },
 
@@ -139,6 +148,9 @@ const TESTS = [
       pDelta: 3,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 回溯成功
+      expectedLines: 8,
+      dialogueContains: ['已执行回溯', '回到了触发警报之前', '补丁标记', '墙没有恢复', '安全开关'],
     },
   },
 
@@ -169,6 +181,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 无可用路径提示
+      expectedLines: 2,
+      dialogueContains: ['当前时间线无可用路径'],
     },
   },
 
@@ -200,6 +215,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 安全开关完成
+      expectedLines: 4,
+      dialogueContains: ['未来的知识', '安全开关', '警报线圈失效', '应该能过去了'],
     },
   },
 
@@ -230,7 +248,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
-      dialogueContent: '需要先完成回溯',
+      // 对话验证 - 条件不满足提示
+      expectedLines: 1,
+      dialogueContains: ['需要先完成回溯'],
     },
   },
 ];

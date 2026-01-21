@@ -49,6 +49,8 @@ const TESTS = [
       foreshadow: { id: 'F23', action: 'deepen' },
       dialogueContent: '如果不写，人会被抹掉',
       nextZone: null,
+      expectedLines: 8,
+      dialogueContains: ['看见只是风，写入才是墨', '墨多了，纸会裂', '让这页纸变厚', '如果不写，人会被抹掉'],
     },
   },
 
@@ -80,6 +82,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '需要先与牧平确认',
+      expectedLines: 1,
+      dialogueContains: ['需要先与牧平确认'],
     },
   },
 
@@ -111,6 +115,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['坐在前排', '听完了牧平的话', '把这个带上', '抄本'],
     },
   },
 
@@ -142,6 +148,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 5,
+      dialogueContains: ['椅子歪了', '把椅子扶正了', '没有人注意到', '也没有奖励', '摆好了'],
     },
   },
 
@@ -174,6 +182,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['椅子歪了', '算了'],
     },
   },
 
@@ -218,6 +228,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F23', action: 'deepen' },
       nextZone: null,
+      expectedLines: 17,
+      dialogueContains: ['看见只是风，写入才是墨', '把这个带上', '椅子歪了', '扶正了'],
     },
   },
 ];

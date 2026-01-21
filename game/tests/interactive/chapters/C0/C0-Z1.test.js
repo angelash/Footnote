@@ -45,6 +45,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证（新增）
+      expectedLines: 2,
+      dialogueContains: ['身份识别卡', '岑回'],
     },
   },
 
@@ -77,6 +80,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F02', action: 'plant' },
       nextZone: null,
+      // 对话验证（新增）- 选择仔细查看后有2行额外对话
+      expectedLines: 5, // 3行(公告板)+2行(仔细查看后)
+      dialogueContains: ['公告板', '第274周期', '第275周期', '维修配额'],
     },
   },
 
@@ -140,6 +146,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证（新增）- 关键！必须显示两行对话
+      expectedLines: 2,
+      dialogueContains: ['工具包已经准备好了', '早餐券也在这里'],
     },
   },
 
@@ -170,6 +179,10 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证（新增）
+      expectedLines: 1,
+      dialogueContains: ['工具包已经取过了'],
+      dialogueNotContains: ['早餐券'], // 不应该再提到餐票
     },
   },
 
@@ -197,9 +210,11 @@ const TESTS = [
       flags: {},
       rDelta: 0,
       pDelta: 0,
-      dialogueContent: '邻居的门紧闭着',
       foreshadow: null,
       nextZone: null,
+      // 对话验证（新增）
+      expectedLines: 2,
+      dialogueContains: ['邻居的门紧闭着', '7750'],
     },
   },
 

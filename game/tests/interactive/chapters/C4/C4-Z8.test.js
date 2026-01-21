@@ -45,6 +45,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 顾临限制对话
+      expectedLines: 4,
+      dialogueContains: ['用得太频繁', '解释成本上升', '不是在惩罚你', '继续被读下去'],
     },
   },
 
@@ -76,6 +79,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 权限面板
+      expectedLines: 6,
+      dialogueContains: ['写入权限', '暂挂审核', '解释成本超阈值', '减少干预', '某些区域会受限'],
     },
   },
 
@@ -106,6 +112,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 介入禁用演示
+      expectedLines: 3,
+      dialogueContains: ['深度视野', '介入', '变灰', '待审'],
     },
   },
 
@@ -137,6 +146,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 离开完成章节
+      expectedLines: 5,
+      dialogueContains: ['去吧', '权限收紧', '仍然能选择', '会更难'],
     },
   },
 
@@ -167,7 +179,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
-      dialogueContent: '还需要完成权限确认',
+      // 对话验证 - 条件不满足提示
+      expectedLines: 1,
+      dialogueContains: ['还需要完成权限确认'],
     },
   },
 ];

@@ -49,6 +49,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 12,
+      dialogueContains: ['空椅仪式', '给椅脚印描边', '无可用收益', '字段：＿（待定义）'],
     },
   },
 
@@ -83,6 +85,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 11,
+      dialogueContains: ['封存仪式', '翻出抄录卡', '不可归档', '残差保留'],
     },
   },
 
@@ -118,6 +122,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 12,
+      dialogueContains: ['点灯仪式', '放入旧灯芯', '灯光很弱', '对象：不存在'],
     },
   },
 
@@ -149,6 +155,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['已完成', '仪式'],
     },
   },
 ];

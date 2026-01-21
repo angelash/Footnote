@@ -47,6 +47,8 @@ const TESTS = [
       dialogueId: 'C5Z4_MUPING',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 5,
+      dialogueContains: ['风不是越来越大', '背面还有东西', '更正会变慢', '删选项'],
     },
   },
 
@@ -80,6 +82,8 @@ const TESTS = [
       dialogueId: 'C5Z4_PRAYER',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['祈祷', '牧平'],
     },
   },
 ];

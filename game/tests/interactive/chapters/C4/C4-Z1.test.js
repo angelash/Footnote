@@ -43,6 +43,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证
+      expectedLines: 6,
+      dialogueContains: ['昨天你来过', '他昨天根本没出现', '封锁线都没拉'],
     },
   },
 
@@ -74,6 +77,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 帮忙归整分支
+      expectedLines: 5,
+      dialogueContains: ['散落的物品', '帮我收拾', '谢谢', '没有奖励'],
     },
   },
 
@@ -104,6 +110,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 封锁胶带/公告板
+      expectedLines: 4,
+      dialogueContains: ['封锁胶带', '日期标注', '被涂改过'],
     },
   },
 ];

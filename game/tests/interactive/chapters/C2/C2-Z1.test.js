@@ -40,6 +40,8 @@ const C2Z1_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z1_CALIBRATION_A',
+        expectedLines: 6,
+        dialogueContains: ['校准台A：结构样本', '长按屏幕进入深度视野', '状态：稳定'],
         foreshadow: null,
         nextZone: null
       },
@@ -71,6 +73,8 @@ const C2Z1_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z1_CALIBRATION_B',
+        expectedLines: 5,
+        dialogueContains: ['校准台B：空腔样本', '扭曲的空腔轮廓', '状态：扭曲'],
         foreshadow: null,
         nextZone: null
       },
@@ -110,6 +114,8 @@ const C2Z1_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z1_CALIBRATION_C',
+        expectedLines: 5,
+        dialogueContains: ['校准台C：断裂样本', '断裂/缺口线框', '状态：断裂'],
         foreshadow: null,
         nextZone: null
       },
@@ -145,6 +151,8 @@ const C2Z1_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z1_AUTH_TERMINAL',
+        expectedLines: 10,
+        dialogueContains: ['校准完成', '授权：深度感知（只读）', '禁止：写入/介入', '观测将增加解释成本'],
         foreshadow: null,
         nextZone: null
       },
@@ -210,7 +218,9 @@ const C2Z1_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z1_GULIN',
+        dialogueId: 'C2Z1_GULIN_TALK',
+        expectedLines: 6,
+        dialogueContains: ['不该被讨论的东西', '看见就记录。别动', '去完成校准流程吧'],
         foreshadow: null,
         nextZone: null
       },

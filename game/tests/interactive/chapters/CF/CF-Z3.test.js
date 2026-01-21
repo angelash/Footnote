@@ -47,6 +47,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['格式坠落区域①', 'UI语法变化', '标签更短'],
     },
   },
 
@@ -77,6 +79,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['格式坠落区域②', 'UI语法变化', '更原始'],
     },
   },
 
@@ -109,6 +113,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 4,
+      dialogueContains: ['格式坠落区域③', '基础层', '点击底部字段条'],
     },
   },
 
@@ -139,6 +145,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['完成', '格式'],
     },
   },
 
@@ -170,6 +178,8 @@ const TESTS = [
       pDelta: 1,
       foreshadow: { id: 'F22', action: 'collect' },
       nextZone: null,
+      expectedLines: 20,
+      dialogueContains: ['字段刻度板', '添加刻度点', '字段已接受', '非最优解 允许'],
     },
   },
 ];

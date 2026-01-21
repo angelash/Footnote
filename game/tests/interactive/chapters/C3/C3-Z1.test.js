@@ -47,6 +47,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 6,
+      dialogueContains: ['你已经看见了', '今天开始你可以写入', '这是债，不是奖赏'],
     },
   },
 
@@ -78,6 +80,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '需要先获得授权',
+      expectedLines: 1,
+      dialogueContains: ['需要先获得授权'],
     },
   },
 
@@ -112,6 +116,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 10,
+      dialogueContains: ['深度介入许可', '警告：写入会增加解释成本', '签下了自己的名字', '许可已签发'],
     },
   },
 ];

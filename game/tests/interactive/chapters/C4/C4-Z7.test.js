@@ -43,6 +43,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 牧平对话
+      expectedLines: 4,
+      dialogueContains: ['把纸折回去', '折痕还在', '折痕不是惩罚', '记号', '更正不动了'],
     },
   },
 
@@ -74,6 +77,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 祷文抄本领取（根据分支选择，这里使用明白了分支）
+      expectedLines: 2,
+      dialogueContains: ['明白是好的', '做得少一点'],
     },
   },
 
@@ -104,7 +110,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
-      dialogueContent: '需要先与牧平交谈',
+      // 对话验证 - 条件不满足提示
+      expectedLines: 1,
+      dialogueContains: ['需要先与牧平交谈'],
     },
   },
 ];

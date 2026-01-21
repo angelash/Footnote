@@ -45,6 +45,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 顾临教程开始
+      expectedLines: 3,
+      dialogueContains: ['纠正错误', '把错误搬到别处'],
     },
   },
 
@@ -76,6 +79,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 螺丝演示+回溯完成
+      expectedLines: 10,
+      dialogueContains: ['螺丝', '滚落到桌下', '时间堆栈', '螺丝回到了桌面', '代价'],
     },
   },
 
@@ -109,6 +115,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      // 对话验证 - 授权完成
+      expectedLines: 2,
+      dialogueContains: ['时间干预', '已上线', '回溯至稳定节点的权限'],
     },
   },
 
@@ -139,7 +148,9 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
-      dialogueContent: '需要先完成回溯演示',
+      // 对话验证 - 条件不满足提示
+      expectedLines: 1,
+      dialogueContains: ['需要先完成回溯演示'],
     },
   },
 ];

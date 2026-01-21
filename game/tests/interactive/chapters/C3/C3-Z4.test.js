@@ -48,6 +48,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 3,
+      dialogueContains: ['空椅子', '歪斜地靠在墙边', '放在这里很久了'],
     },
   },
 
@@ -79,6 +81,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F23', action: 'plant' },
       nextZone: null,
+      expectedLines: 7,
+      dialogueContains: ['把椅子扶正', '像是在等待某个人', '无可用收益', '心里好像轻了一点'],
     },
   },
 
@@ -109,6 +113,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '需要灯芯',
+      expectedLines: 2,
+      dialogueContains: ['小灯座', '没有灯芯', '如果有灯芯'],
     },
   },
 
@@ -140,6 +146,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 7,
+      dialogueContains: ['旧灯芯放进灯座', '微光亮起', '画面暖了一瞬', '眼眶红了'],
     },
   },
 ];

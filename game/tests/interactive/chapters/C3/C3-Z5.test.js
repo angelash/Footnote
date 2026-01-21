@@ -48,6 +48,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '需要先登记',
+      expectedLines: 1,
+      dialogueContains: ['需要先登记'],
     },
   },
 
@@ -79,6 +81,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 9,
+      dialogueContains: ['重复感', '日期不确定', '空白记忆', '别过度解释自己的状态'],
     },
   },
 
@@ -110,6 +114,8 @@ const TESTS = [
       foreshadow: null,
       nextZone: null,
       dialogueContent: '请先填写症状清单',
+      expectedLines: 1,
+      dialogueContains: ['请先填写症状清单'],
     },
   },
 
@@ -141,6 +147,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F14', action: 'plant' },
       nextZone: null,
+      expectedLines: 6,
+      dialogueContains: ['病例卡', 'MC-□□-17', '建议休息', '对齐：建议'],
     },
   },
 
@@ -179,6 +187,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: { id: 'F14', action: 'plant' },
       nextZone: null,
+      expectedLines: 15,
+      dialogueContains: ['重复感', '日期不确定', '病例卡', 'MC-□□-17'],
     },
   },
 ];

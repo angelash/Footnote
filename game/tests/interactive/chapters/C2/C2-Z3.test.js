@@ -40,7 +40,8 @@ const C2Z3_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z3_FAKE_STAIR',
-        dialogueContent: '这段楼梯...不应该存在',
+        expectedLines: 5,
+        dialogueContains: ['踏上这段楼梯', '脚下突然失去支撑', '这段楼梯……是假的'],
         foreshadow: null,
         nextZone: null
       },
@@ -72,7 +73,9 @@ const C2Z3_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z3_SONGLAN_STAIR',
+        dialogueId: 'C2Z3_SONGLAN_GUIDE',
+        expectedLines: 3,
+        dialogueContains: ['别信你看到的楼梯，信它的骨架', '把差异记下来。差异会救你'],
         foreshadow: null,
         nextZone: null
       },
@@ -107,7 +110,9 @@ const C2Z3_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z3_SONGLAN_NORMAL',
+        dialogueId: 'C2Z3_SONGLAN_PASS',
+        expectedLines: 2,
+        dialogueContains: ['那就用你的眼睛找路', '真实的那条'],
         foreshadow: null,
         nextZone: null
       },
@@ -142,7 +147,9 @@ const C2Z3_TESTS = {
         flags: { FLAG_RECORDED_STAIR_DIFF: true },
         rDelta: 1,
         pDelta: 0,
-        dialogueId: 'C2Z3_RECORD_DIFF',
+        dialogueId: 'C2Z3_RECORD_DONE',
+        expectedLines: 2,
+        dialogueContains: ['差异保存了', '没有奖励。但宋岚说过，这有用'],
         foreshadow: { id: 'F12', action: 'plant' },
         nextZone: null
       },
@@ -181,6 +188,8 @@ const C2Z3_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z3_RECORD_SKIP',
+        expectedLines: 1,
+        dialogueContains: ['算了，没时间做这个'],
         foreshadow: null,
         nextZone: null
       },
@@ -213,8 +222,9 @@ const C2Z3_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z3_RECORD_BLOCKED',
-        dialogueContent: '没有发现需要记录的差异',
+        dialogueId: 'C2Z3_RECORD_DIFF',
+        expectedLines: 1,
+        dialogueContains: ['宋岚说的任务：把踩空的那一段记下来'],
         foreshadow: null,
         nextZone: null
       },

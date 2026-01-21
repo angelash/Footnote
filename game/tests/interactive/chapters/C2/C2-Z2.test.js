@@ -39,7 +39,8 @@ const C2Z2_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z2_THIN_WALL',
-        dialogueContent: '这面薄墙...现在有新能力了',
+        expectedLines: 3,
+        dialogueContains: ['这面墙……我来过这里', '当时我听到了回声', '尝试用深度感知查看'],
         foreshadow: null,
         nextZone: null
       },
@@ -73,8 +74,9 @@ const C2Z2_TESTS = {
         flags: { FLAG_C2Z2_SAW_CAVITY: true },
         rDelta: 0,
         pDelta: 1, // 使用深度感知能力增加P值
-        dialogueId: 'C2Z2_DEPTH_SENSE',
-        dialogueContent: '墙内是空的...一个隐藏的空间',
+        dialogueId: 'C2Z2_DEPTH_VIEW',
+        expectedLines: 7,
+        dialogueContains: ['激活深度感知', '墙面后方出现空腔轮廓', '原来不是我听错', '结构：正常（已更正）'],
         foreshadow: { id: 'F01', action: 'recover' },
         nextZone: null
       },
@@ -107,8 +109,9 @@ const C2Z2_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z2_NO_ABILITY',
-        dialogueContent: '需要深度感知能力',
+        dialogueId: 'C2Z2_NORMAL_VIEW',
+        expectedLines: 2,
+        dialogueContains: ['从表面看，这只是一面普通的墙', '但我记得那回声'],
         foreshadow: null,
         nextZone: null
       },
@@ -143,7 +146,9 @@ const C2Z2_TESTS = {
         flags: { FLAG_REPORTED_CAVITY: true },
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z2_SUBMIT',
+        dialogueId: 'C2Z2_SUBMIT_DONE',
+        expectedLines: 2,
+        dialogueContains: ['记录已提交', '异常已确认'],
         foreshadow: null,
         nextZone: null
       },
@@ -182,6 +187,8 @@ const C2Z2_TESTS = {
         rDelta: 0,
         pDelta: 0,
         dialogueId: 'C2Z2_SUBMIT_SKIP',
+        expectedLines: 1,
+        dialogueContains: ['先不提交'],
         foreshadow: null,
         nextZone: null
       },
@@ -214,8 +221,9 @@ const C2Z2_TESTS = {
         flags: {},
         rDelta: 0,
         pDelta: 0,
-        dialogueId: 'C2Z2_SUBMIT_BLOCKED',
-        dialogueContent: '没有可提交的发现',
+        dialogueId: 'C2Z2_SUBMIT_RECORD',
+        expectedLines: 1,
+        dialogueContains: ['是否提交深度观测记录'],
         foreshadow: null,
         nextZone: null
       },

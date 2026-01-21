@@ -48,6 +48,8 @@ const TESTS = [
       dialogueId: 'C5Z3_TREATMENT',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 8,
+      dialogueContains: ['疗程说明', '稳定疗程', '对齐差异记忆', '差异卡将被覆盖'],
     },
   },
 
@@ -83,6 +85,8 @@ const TESTS = [
       dialogueId: 'C5Z3_CHOICE',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 10,
+      dialogueContains: ['我接受', '接受了稳定疗程', '差异已对齐', '解释成本↓'],
     },
   },
 
@@ -118,6 +122,8 @@ const TESTS = [
       dialogueId: 'C5Z3_CHOICE',
       foreshadow: null,
       nextZone: null,
+      expectedLines: 6,
+      dialogueContains: ['我拒绝', '拒绝了稳定疗程', '保住了一点东西', '私人笔记'],
     },
     critical: true,
     rValueTest: true,

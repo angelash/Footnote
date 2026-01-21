@@ -52,6 +52,8 @@ const TESTS = [
       foreshadow: null,
       ending: 'A',
       nextZone: null,
+      expectedLines: 6,
+      dialogueContains: ['继续收敛', '维持可读性', '读不下去的东西', '也能留下'],
     },
   },
 
@@ -84,6 +86,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['条件不满足', 'R'],
     },
   },
 
@@ -120,6 +124,8 @@ const TESTS = [
       foreshadow: null,
       ending: 'B',
       nextZone: null,
+      expectedLines: 6,
+      dialogueContains: ['释放表示', '松开压缩', '版本不再排队', '意义更自由'],
     },
   },
 
@@ -152,6 +158,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['条件不满足', 'R'],
     },
   },
 
@@ -188,6 +196,8 @@ const TESTS = [
       foreshadow: null,
       ending: 'C',
       nextZone: null,
+      expectedLines: 6,
+      dialogueContains: ['承载字段', '运行时载体', '代价背走', '让某些人多活了一点'],
     },
   },
 
@@ -220,6 +230,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['条件不满足', 'R'],
     },
   },
 
@@ -252,6 +264,8 @@ const TESTS = [
       pDelta: 0,
       foreshadow: null,
       nextZone: null,
+      expectedLines: 2,
+      dialogueContains: ['条件不满足', 'W'],
     },
   },
 ];

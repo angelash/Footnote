@@ -866,6 +866,12 @@ export class GameScene extends Phaser.Scene {
 
     // 监听对话结束，处理结局触发
     eventBus.onTyped(GameEvent.DIALOGUE_END, this._onDialogueEnd.bind(this));
+
+    // 监听对话推进（DialogueUI -> NarrativeEngine 同步）
+    eventBus.onTyped(GameEvent.DIALOGUE_ADVANCE, this._onDialogueAdvance.bind(this));
+
+    // 监听对话选项选择
+    eventBus.onTyped(GameEvent.DIALOGUE_CHOICE, this._onDialogueChoice.bind(this));
   }
 
   /**
@@ -880,6 +886,8 @@ export class GameScene extends Phaser.Scene {
     eventBus.removeAllListeners(GameEvent.ZONE_TRANSITION);
     eventBus.removeAllListeners(GameEvent.PLAY_SFX);
     eventBus.removeAllListeners(GameEvent.DIALOGUE_END);
+    eventBus.removeAllListeners(GameEvent.DIALOGUE_ADVANCE);
+    eventBus.removeAllListeners(GameEvent.DIALOGUE_CHOICE);
   }
 
   /**
@@ -921,6 +929,51 @@ export class GameScene extends Phaser.Scene {
           `结局${endingLetter}当前不可选\n条件: ${requirement}\n当前: R=${counters.R}, W=${counters.W}`
         );
       }
+    }
+  }
+
+  /**
+   * 对话推进回调 - 同步 NarrativeEngine
+   * 当 DialogueUI 推进时，由此方法控制是显示下一行还是结束对话
+   *
+   * 注意：narrativeEngine.advance() 会通过 onAdvance 回调自动调用 showDialogue
+   * 因此这里不需要再次调用 showDialogue，否则会导致重复的打字机效果
+   */
+  private _onDialogueAdvance(_payload: { dialogueId: string; lineIndex: number }): void {
+    // 当 DialogueUI 推进时，也推进 NarrativeEngine
+    if (narrativeEngine.isDialogueActive()) {
+      // 推进 NarrativeEngine 到下一行
+      // 注意：advance() 内部会调用 _showCurrentLine()，
+      // 进而触发 onAdvance 回调来显示新的对话行
+      narrativeEngine.advance();
+
+      // 检查对话是否结束（onComplete 已在 advance 中执行）
+      if (!narrativeEngine.isDialogueActive()) {
+        // NarrativeEngine 已结束对话
+        // 隐藏 DialogueUI（如果 onEnd 回调未处理）
+        this._dialogueUI?.hideDialogue();
+      }
+      // 不再手动调用 showDialogue - 由 onAdvance 回调处理
+    } else {
+      // NarrativeEngine 不活跃，直接隐藏对话
+      this._dialogueUI?.hideDialogue();
+    }
+  }
+
+  /**
+   * 对话选项选择回调 - 同步 NarrativeEngine
+   */
+  private _onDialogueChoice(payload: {
+    dialogueId: string;
+    choiceIndex: number;
+    choiceText: string;
+  }): void {
+    // 当 DialogueUI 选择选项时，同步到 NarrativeEngine
+    if (narrativeEngine.isDialogueActive()) {
+      logger.debug(`选择对话选项: ${payload.dialogueId}, index=${payload.choiceIndex}`);
+
+      // 使用 choiceText 作为 choiceId（因为 NarrativeEngine 使用 text 作为 id）
+      narrativeEngine.selectChoice(payload.choiceText);
     }
   }
 
@@ -1545,16 +1598,33 @@ export class GameScene extends Phaser.Scene {
             id: dialogueId,
             speaker: line.speaker,
             text: line.text,
+            expression: line.emotion as IDialogue['expression'],
           };
           this._dialogueUI.showDialogue(dialogueData);
         }
       },
       onChoice: (choices) => {
-        // 选项由DialogueUI处理
-        logger.debug('对话选项:', choices);
+        // 将 NarrativeEngine 的选项格式转换为 DialogueUI 格式
+        if (this._dialogueUI && choices.length > 0) {
+          // 构造带选项的对话数据
+          const lastLine = narrativeEngine.getCurrentLine();
+          const dialogueData: IDialogue = {
+            id: dialogueId,
+            speaker: lastLine?.speaker ?? '',
+            text: lastLine?.text ?? '',
+            expression: lastLine?.emotion as IDialogue['expression'],
+            choices: choices.map((c) => ({
+              label: c.text,
+              next: c.nextDialogueId ?? '',
+            })),
+          };
+          this._dialogueUI.showDialogue(dialogueData);
+        }
       },
       onEnd: () => {
         logger.debug('对话结束');
+        // 对话结束时隐藏 DialogueUI
+        this._dialogueUI?.hideDialogue();
       },
     });
 

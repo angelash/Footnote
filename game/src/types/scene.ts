@@ -30,6 +30,14 @@ export interface ISceneObjectAnimation {
   frameNumbers?: number[];
 }
 
+/** 场景对象显示条件 */
+export interface ISceneObjectCondition {
+  /** 需要的 flag 为 true 才显示/可交互 */
+  flag?: string;
+  /** 需要的 flag 为 false 才显示/可交互 */
+  flagFalse?: string;
+}
+
 export interface ISceneObjectConfig {
   id: string;
   type: SceneObjectType;
@@ -51,6 +59,10 @@ export interface ISceneObjectConfig {
   labelOffset?: [number, number];
   interactive?: ISceneObjectInteractive;
   animation?: ISceneObjectAnimation;
+  /** 显示/交互条件 */
+  condition?: ISceneObjectCondition;
+  /** 可见性（仅用于运行时检查） */
+  tint?: number;
 }
 
 export interface ISceneBackgroundConfig {

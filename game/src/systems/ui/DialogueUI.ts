@@ -136,6 +136,10 @@ export class DialogueUI {
    * 显示对话
    */
   showDialogue(dialogue: IDialogue): void {
+    // 首先停止任何正在运行的打字机效果
+    // 防止多个定时器同时运行导致字符重复
+    this._stopTypewriter();
+
     this._state.currentDialogue = dialogue;
     this._state.currentLineIndex = 0;
     this._state.fullText = dialogue.text;
@@ -223,17 +227,12 @@ export class DialogueUI {
       return;
     }
 
-    // 如果有下一条对话
-    if (this._state.currentDialogue.next) {
-      // 通知外部加载下一条对话
-      eventBus.emit(GameEvent.DIALOGUE_ADVANCE, {
-        dialogueId: this._state.currentDialogue.id,
-        lineIndex: this._state.currentLineIndex,
-      });
-    } else {
-      // 没有下一条，结束对话
-      this.hideDialogue();
-    }
+    // 总是通知外部，由外部决定是否继续或结束
+    // 这样可以让 NarrativeEngine 控制多行对话的流程
+    eventBus.emit(GameEvent.DIALOGUE_ADVANCE, {
+      dialogueId: this._state.currentDialogue.id,
+      lineIndex: this._state.currentLineIndex,
+    });
   }
 
   /**

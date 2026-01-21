@@ -744,25 +744,54 @@ export async function loadAllNarrativeData(scene: Phaser.Scene): Promise<{
 
 /**
  * 将加载的数据注册到 NarrativeEngine
+ * 注意：新格式对话被 normalizeNewFormatDialogue 拆分成多个单行对话（用 _LINE_ 后缀链接）
+ * 这里需要将它们合并回多行对话
  */
 function registerDataToNarrativeEngine(
   dialogues: IDialogue[],
   cards: ICard[],
   foreshadows: IForeshadow[]
 ): void {
-  // 转换 IDialogue 为 NarrativeEngine 期望的 IDialogueData 格式
+  // 按对话链分组（基础ID -> 所有行）
+  const dialogueChains = new Map<string, IDialogue[]>();
+
   for (const dialogue of dialogues) {
+    // 检查是否是链的一部分（_LINE_N 后缀）
+    const lineMatch = dialogue.id.match(/^(.+)_LINE_(\d+)$/);
+    const baseId = lineMatch ? lineMatch[1] : dialogue.id;
+
+    if (!dialogueChains.has(baseId)) {
+      dialogueChains.set(baseId, []);
+    }
+    dialogueChains.get(baseId)!.push(dialogue);
+  }
+
+  // 转换每个对话链为 IDialogueData
+  for (const [baseId, chain] of dialogueChains) {
+    // 按 ID 排序：基础 ID 在前，然后按 LINE 数字排序
+    chain.sort((a, b) => {
+      const aMatch = a.id.match(/_LINE_(\d+)$/);
+      const bMatch = b.id.match(/_LINE_(\d+)$/);
+      const aNum = aMatch ? parseInt(aMatch[1], 10) : -1;
+      const bNum = bMatch ? parseInt(bMatch[1], 10) : -1;
+      return aNum - bNum;
+    });
+
+    // 构建 lines 数组
+    const lines = chain.map((d) => ({
+      speaker: d.speaker,
+      text: d.text,
+      portrait: d.expression,
+      emotion: d.expression,
+    }));
+
+    // 从最后一行获取 choices 和 trigger
+    const lastDialogue = chain[chain.length - 1];
+
     narrativeEngine.registerDialogue({
-      id: dialogue.id,
-      lines: [
-        {
-          speaker: dialogue.speaker,
-          text: dialogue.text,
-          portrait: dialogue.expression,
-          emotion: dialogue.expression,
-        },
-      ],
-      choices: dialogue.choices?.map((c) => ({
+      id: baseId,
+      lines,
+      choices: lastDialogue.choices?.map((c) => ({
         id: c.label,
         text: c.label,
         nextDialogueId: c.next || undefined,
@@ -770,6 +799,7 @@ function registerDataToNarrativeEngine(
           ? {
               hasCard: c.condition.hasCard,
               rMin: c.condition.rMin,
+              flagTrue: c.condition.dialogueCompleted, // 映射 flagTrue 条件
             }
           : undefined,
         effects: c.effect
@@ -779,22 +809,24 @@ function registerDataToNarrativeEngine(
             }
           : undefined,
       })),
-      onComplete: dialogue.trigger
+      onComplete: lastDialogue.trigger
         ? ([
-            dialogue.trigger.card ? { type: 'card' as const, cardId: dialogue.trigger.card } : null,
-            dialogue.trigger.foreshadow
+            lastDialogue.trigger.card
+              ? { type: 'card' as const, cardId: lastDialogue.trigger.card }
+              : null,
+            lastDialogue.trigger.foreshadow
               ? {
                   type: 'foreshadow' as const,
-                  foreshadowId: dialogue.trigger.foreshadow[0],
-                  foreshadowStage: dialogue.trigger.foreshadow[1] as
+                  foreshadowId: lastDialogue.trigger.foreshadow[0],
+                  foreshadowStage: lastDialogue.trigger.foreshadow[1] as
                     | 'plant'
                     | 'deepen'
                     | 'misread'
                     | 'collect',
                 }
               : null,
-            dialogue.trigger.ability
-              ? { type: 'ability' as const, abilityType: dialogue.trigger.ability }
+            lastDialogue.trigger.ability
+              ? { type: 'ability' as const, abilityType: lastDialogue.trigger.ability }
               : null,
           ].filter(Boolean) as import('@/systems/narrative').IDialogueAction[])
         : undefined,

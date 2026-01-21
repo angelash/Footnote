@@ -138,8 +138,8 @@ export interface IEventPayloads {
   [GameEvent.ZONE_UNLOCK]: { zoneId: string };
 
   [GameEvent.DIALOGUE_START]: { dialogueId: string };
-  [GameEvent.DIALOGUE_ADVANCE]: { lineIndex: number };
-  [GameEvent.DIALOGUE_CHOICE]: { choiceId: string; choiceIndex: number };
+  [GameEvent.DIALOGUE_ADVANCE]: { dialogueId: string; lineIndex: number };
+  [GameEvent.DIALOGUE_CHOICE]: { dialogueId: string; choiceIndex: number; choiceText: string };
   [GameEvent.DIALOGUE_END]: { dialogueId: string };
 
   [GameEvent.CARD_OBTAIN]: { cardId: string; card: ICardBasic };

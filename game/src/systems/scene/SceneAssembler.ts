@@ -15,6 +15,7 @@ import { TEXT_STYLES } from '@/config/game.config';
 import { UI_FONT_SIZE } from '@/config/ui.config';
 import { assetResolver } from '@/systems/whitebox/AssetResolver';
 import { useProductionAsset } from '@/config/assetMode.config';
+import { worldState } from '@/systems/world';
 import type { IZoneBillboardConfig, IBillboardConfig } from '@/systems/whitebox/BillboardFactory';
 
 // ==================== Zone类型映射 ====================
@@ -164,8 +165,15 @@ export class SceneAssembler {
   private _createObject(obj: ISceneObjectConfig): Phaser.GameObjects.GameObject[] {
     const created: Phaser.GameObjects.GameObject[] = [];
 
-    // zone 类型没有 texture，直接返回空（zone 由其他系统处理）
-    if (obj.type === 'zone' || !obj.texture) {
+    // zone 类型是出口/区域交互点，需要特殊处理
+    if (obj.type === 'zone') {
+      const zoneObjects = this._createZoneObject(obj);
+      created.push(...zoneObjects);
+      return created;
+    }
+
+    // 非 zone 类型必须有 texture
+    if (!obj.texture) {
       return created;
     }
 
@@ -402,6 +410,115 @@ export class SceneAssembler {
     }
 
     return undefined;
+  }
+
+  /**
+   * 创建 Zone 类型物件（出口/区域交互点）
+   * Zone 是不可见但可交互的区域，通常用于场景转换
+   */
+  private _createZoneObject(obj: ISceneObjectConfig): Phaser.GameObjects.GameObject[] {
+    const created: Phaser.GameObjects.GameObject[] = [];
+
+    // 获取尺寸（zone 必须有 width/height）
+    const width = obj.width ?? 100;
+    const height = obj.height ?? 100;
+
+    // 创建容器
+    const container = this._scene.add.container(obj.x, obj.y);
+    container.setName(obj.id);
+
+    // 可视化交互区域（白盒模式下显示，正式资源隐藏）
+    const showVisual = !useProductionAsset('objects');
+
+    if (showVisual) {
+      // 背景矩形
+      const bg = this._scene.add.graphics();
+      bg.fillStyle(0x00ff88, 0.15);
+      bg.fillRoundedRect(-width / 2, -height / 2, width, height, 8);
+      bg.lineStyle(2, 0x00ff88, 0.4);
+      bg.strokeRoundedRect(-width / 2, -height / 2, width, height, 8);
+      container.add(bg);
+
+      // 标签文字
+      if (obj.label) {
+        const label = this._scene.add
+          .text(0, 0, obj.label, {
+            ...TEXT_STYLES.MUTED,
+            fontSize: UI_FONT_SIZE.TINY,
+            color: '#00FF88',
+          })
+          .setOrigin(0.5);
+        container.add(label);
+      }
+    }
+
+    // 设置深度
+    container.setDepth(typeof obj.depth === 'number' ? obj.depth : 5);
+
+    // 检查条件（如果有 condition.flag，检查 flag 是否满足）
+    if (obj.condition?.flag) {
+      // 延迟检查 flag，因为 worldState 可能还没准备好
+      // 同时设置定期检查以响应 flag 变化
+      const checkCondition = (): void => {
+        const flagValue = worldState.getFlag(obj.condition!.flag!);
+        if (!flagValue) {
+          // 条件不满足，隐藏或禁用交互
+          container.setAlpha(0.3);
+          container.disableInteractive();
+        } else {
+          // 条件满足，恢复显示和交互
+          container.setAlpha(1);
+          container.setInteractive(
+            new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
+            Phaser.Geom.Rectangle.Contains
+          );
+        }
+      };
+
+      // 初始检查
+      this._scene.time.delayedCall(100, checkCondition);
+
+      // 定期检查（每500ms）以响应 flag 变化
+      this._scene.time.addEvent({
+        delay: 500,
+        callback: checkCondition,
+        loop: true,
+      });
+    }
+
+    // 设置交互
+    if (obj.interactive) {
+      container.setInteractive(
+        new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
+        Phaser.Geom.Rectangle.Contains
+      );
+
+      // Hover 效果
+      if (obj.interactive.cursor) {
+        container.on('pointerover', () => {
+          this._scene.input.setDefaultCursor('pointer');
+        });
+        container.on('pointerout', () => {
+          this._scene.input.setDefaultCursor('default');
+        });
+      }
+
+      // 存储 action 数据
+      if (obj.interactive.action && obj.interactive.action.type !== 'none') {
+        container.setData('action', obj.interactive.action);
+      }
+
+      if (obj.interactive.testid) {
+        container.setData('testid', obj.interactive.testid);
+      }
+
+      if (obj.label) {
+        container.setData('label', obj.label);
+      }
+    }
+
+    created.push(container);
+    return created;
   }
 
   /**

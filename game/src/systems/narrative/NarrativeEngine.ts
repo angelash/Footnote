@@ -445,7 +445,10 @@ class NarrativeEngine {
     if (this._currentLineIndex >= lines.length) {
       this._endDialogue();
     } else {
-      eventBus.emit(GameEvent.DIALOGUE_ADVANCE, { lineIndex: this._currentLineIndex });
+      eventBus.emit(GameEvent.DIALOGUE_ADVANCE, {
+        dialogueId: this._currentDialogue!.id,
+        lineIndex: this._currentLineIndex,
+      });
       this._showCurrentLine();
     }
   }
@@ -483,8 +486,9 @@ class NarrativeEngine {
     if (!choice) return;
 
     eventBus.emit(GameEvent.DIALOGUE_CHOICE, {
-      choiceId,
+      dialogueId: this._currentDialogue.id,
       choiceIndex: this._currentDialogue.choices.indexOf(choice),
+      choiceText: choice.text,
     });
 
     // 应用效果

@@ -297,6 +297,11 @@ function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
         if (action.type === 'ability' && action.abilityType) {
           trigger.ability = action.abilityType as AbilityType;
         }
+        // 处理 flag 类型的 onComplete 动作
+        if (action.type === 'flag' && action.flagName !== undefined) {
+          if (!trigger.flags) trigger.flags = [];
+          trigger.flags.push({ name: action.flagName, value: action.flagValue ?? true });
+        }
       }
     }
 
@@ -323,9 +328,9 @@ function transformConditionNew(
   raw: IRawCondition | { flagTrue?: string }
 ): IDialogue['condition'] | undefined {
   if ('flagTrue' in raw && raw.flagTrue) {
-    // 新格式的flagTrue条件 - 映射到dialogueCompleted（临时方案）
+    // 新格式的flagTrue条件 - 直接使用flagTrue字段（与NarrativeEngine._checkChoiceCondition一致）
     return {
-      dialogueCompleted: raw.flagTrue,
+      flagTrue: raw.flagTrue,
     };
   }
   return transformCondition(raw as IRawCondition);
@@ -843,6 +848,12 @@ function registerDataToNarrativeEngine(
             lastDialogue.trigger.ability
               ? { type: 'ability' as const, abilityType: lastDialogue.trigger.ability }
               : null,
+            // 处理 flag 类型的 onComplete 动作
+            ...(lastDialogue.trigger.flags?.map((f) => ({
+              type: 'flag' as const,
+              flagName: f.name,
+              flagValue: f.value,
+            })) || []),
           ].filter(Boolean) as import('@/systems/narrative').IDialogueAction[])
         : undefined,
     });

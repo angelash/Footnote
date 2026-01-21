@@ -149,6 +149,8 @@ export interface IDialogueTrigger {
   foreshadow?: [string, ForeshadowStage];
   ability?: AbilityType;
   event?: string;
+  /** FLAG 设置动作 */
+  flags?: Array<{ name: string; value: boolean }>;
 }
 
 export interface IDialogueCondition {
@@ -160,6 +162,8 @@ export interface IDialogueCondition {
   abilityUnlocked?: AbilityType;
   zoneVisited?: string;
   dialogueCompleted?: string;
+  /** FLAG 为 true 时条件满足 */
+  flagTrue?: string;
 }
 
 // ==================== 卡片系统 ====================

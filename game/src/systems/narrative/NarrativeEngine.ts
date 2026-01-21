@@ -468,10 +468,10 @@ class NarrativeEngine {
     if (this._currentLineIndex >= lines.length) {
       this._endDialogue();
     } else {
-      eventBus.emit(GameEvent.DIALOGUE_ADVANCE, {
-        dialogueId: this._currentDialogue!.id,
-        lineIndex: this._currentLineIndex,
-      });
+      // 注意：这里不再发出 DIALOGUE_ADVANCE 事件
+      // 因为这个事件是从 DialogueUI 发出的，用于通知 NarrativeEngine 推进
+      // NarrativeEngine 推进后通过 _showCurrentLine() 回调通知 UI 显示新行
+      // 如果这里再发出事件，会导致 GameScene._onDialogueAdvance 再次调用 advance()，形成循环
       this._showCurrentLine();
     }
   }

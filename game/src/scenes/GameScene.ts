@@ -1054,10 +1054,14 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * 卡片获得回调
+   * 当通过对话 onComplete 获得卡片时，显示 Toast 提示
    */
-  private _onCardObtained(payload: { cardId: string }): void {
-    // 显示收集提示已由_showCard处理
+  private _onCardObtained(payload: { cardId: string; card?: { title?: string } }): void {
     logger.debug(`卡片获得事件: ${payload.cardId}`);
+
+    // 显示获得提示（对话 onComplete 获得的卡片需要这个提示）
+    const cardName = payload.card?.title || payload.cardId;
+    this._toastManager?.showSuccess(`获得: ${cardName}`);
   }
 
   /**
@@ -1743,7 +1747,7 @@ export class GameScene extends Phaser.Scene {
         // 新获得卡片
         narrativeEngine.obtainCard(cardId);
         this._cardUI.showCardObtain(card);
-        this._toastManager?.showSuccess(`获得卡片: ${card.name}`);
+        // Toast 提示由 _onCardObtained 事件处理器统一显示
         return true;
       }
     } else {
@@ -1768,7 +1772,7 @@ export class GameScene extends Phaser.Scene {
           this._cardUI.showCard(tempCard);
         } else {
           this._cardUI.showCardObtain(tempCard);
-          this._toastManager?.showSuccess(`获得卡片: ${tempCard.name}`);
+          // Toast 提示由 _onCardObtained 事件处理器统一显示
         }
       } else {
         // 最终回退：显示对话

@@ -1249,10 +1249,16 @@ export class GameScene extends Phaser.Scene {
   private _handleSceneAction(action: ISceneAction): void {
     switch (action.type) {
       case 'dialogue': {
-        this._showDialogue({
-          speaker: action.speaker ?? '系统',
-          text: action.text ?? '',
-        });
+        // 优先使用 dialogueId 从 NarrativeEngine 加载完整对话
+        if (action.dialogueId) {
+          this.showDialogueById(action.dialogueId);
+        } else {
+          // 回退：直接使用 speaker/text（用于简单的内联对话）
+          this._showDialogue({
+            speaker: action.speaker ?? '系统',
+            text: action.text ?? '',
+          });
+        }
         return;
       }
       case 'card': {

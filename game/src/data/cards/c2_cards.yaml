@@ -49,6 +49,18 @@ cards:
     rarity: rare
     foreshadowId: F12
 
+  # C2-Z4 钉子（物品）
+  CARD_C2_NAIL:
+    id: CARD_C2_NAIL
+    title: 旧钉子
+    type: item
+    content: |
+      一枚从钉子孔里捡到的旧钉子
+      
+      可以用来修补路标
+    flavorText: 也许它原本就在那里，等着被找到。
+    rarity: common
+
   # C2-Z4 修补记录
   CARD_C2_REPAIR_RECORD:
     id: CARD_C2_REPAIR_RECORD

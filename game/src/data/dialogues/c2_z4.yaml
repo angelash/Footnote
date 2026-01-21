@@ -91,6 +91,7 @@ dialogues:
           setFlag:
             name: FLAG_C2Z4_HAS_NAIL
             value: true
+          giveCard: CARD_C2_NAIL
         nextDialogueId: C2Z4_GOT_NAIL
       - id: ignore_nail
         text: 忽略

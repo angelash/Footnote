@@ -41,7 +41,7 @@ objects:
         speaker: 系统
         text: 公告板上贴满了通知，日期处有涂改痕迹...仔细看的话，最新的日期下面还有另一个数字。
 
-  # 储物柜（取工具包）
+  # 储物柜（取工具包和早餐券）
   - id: storage_cabinet
     type: image
     texture: obj_filing_cabinet
@@ -51,12 +51,33 @@ objects:
     depth: 9
     label: 储物柜
     labelOffset: [0, 80]
+    # 未取过工具时显示
+    condition:
+      flagFalse: FLAG_C0Z1_GOT_TOOLS
     interactive:
       cursor: true
       action:
         type: dialogue
-        speaker: 岑回
-        text: 工具包已经准备好了。标准配置，和每天一样。
+        dialogueId: C0Z1_STORAGE
+
+  # 储物柜（已取过工具）
+  - id: storage_cabinet_done
+    type: image
+    texture: obj_filing_cabinet
+    x: 350
+    y: 680
+    scale: 0.7
+    depth: 9
+    label: 储物柜
+    labelOffset: [0, 80]
+    # 取过工具后显示
+    condition:
+      flagTrue: FLAG_C0Z1_GOT_TOOLS
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C0Z1_STORAGE_DONE
 
   # 走廊台灯（WebP可动物件动画）
   - id: corridor_lamp

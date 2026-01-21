@@ -106,6 +106,21 @@ cards:
       - 但味道确实不错
 
   # ==================== C0-Z3 薄墙巷口卡片 ====================
+  CARD_C0_NAIL:
+    id: CARD_C0_NAIL
+    name: 旧钉子
+    type: item
+    chapter: C0
+    zone: C0-Z3
+    front:
+      - 一枚旧钉子
+      - 从墙缝里捡到的
+    detail:
+      - 铁质，有些生锈
+      - 但还算完整，能用
+      - ——
+      - 也许以后能派上用场
+
   CARD_C0_ALLEY_RECORD:
     id: CARD_C0_ALLEY_RECORD
     name: 巷口记录

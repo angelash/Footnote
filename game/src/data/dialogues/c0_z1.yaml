@@ -88,6 +88,28 @@ dialogues:
     expression: thinking
     next: null
 
+  # ==================== 储物柜交互 ====================
+  C0Z1_STORAGE:
+    id: C0Z1_STORAGE
+    lines:
+      - speaker: 岑回
+        text: 工具包已经准备好了。标准配置，和每天一样。
+      - speaker: 岑回
+        text: 早餐券也在这里……
+    onComplete:
+      - type: card
+        cardId: CARD_C0_MEAL_TICKET
+      - type: flag
+        flagName: FLAG_C0Z1_GOT_TOOLS
+        flagValue: true
+
+  # 已经取过工具的情况
+  C0Z1_STORAGE_DONE:
+    id: C0Z1_STORAGE_DONE
+    lines:
+      - speaker: 岑回
+        text: 工具包已经取过了。
+
   # ==================== 邻居交互 ====================
   NEIGHBOR_DOOR_KNOCK:
     id: NEIGHBOR_DOOR_KNOCK

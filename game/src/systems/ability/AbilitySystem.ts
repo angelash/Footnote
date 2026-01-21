@@ -153,6 +153,9 @@ export class AbilitySystem {
     state.isActive = true;
     state.lastUsedTime = Date.now();
 
+    // 同步能力激活状态到 FLAG（供 SceneAssembler condition 使用）
+    this._syncAbilityActiveFlag(type, true);
+
     this._onAbilityActivate(type);
     eventBus.emit(GameEvent.ABILITY_ACTIVATE, { abilityType: type });
     this._callbacks.onAbilityActivate?.(type);
@@ -168,9 +171,26 @@ export class AbilitySystem {
     if (!state || !state.isActive) return;
 
     state.isActive = false;
+    // 同步能力激活状态到 FLAG（供 SceneAssembler condition 使用）
+    this._syncAbilityActiveFlag(type, false);
     this._onAbilityDeactivate(type);
     eventBus.emit(GameEvent.ABILITY_DEACTIVATE, { abilityType: type });
     this._callbacks.onAbilityDeactivate?.(type);
+  }
+
+  private _syncAbilityActiveFlag(type: AbilityType, isActive: boolean): void {
+    // 注意：这里不做“解锁判定”，因为 activateAbility 本身已保证 hasAbility。
+    switch (type) {
+      case 'DEPTH_PERCEPTION':
+        worldState.setFlag('FLAG_DEPTH_SENSE_ACTIVE', isActive);
+        break;
+      case 'DEPTH_INTERVENTION':
+        worldState.setFlag('FLAG_DEPTH_INTERVENTION_ACTIVE', isActive);
+        break;
+      case 'TIME_INTERVENTION':
+        worldState.setFlag('FLAG_TIME_INTERVENTION_ACTIVE', isActive);
+        break;
+    }
   }
 
   /**

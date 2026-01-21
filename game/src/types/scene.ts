@@ -32,10 +32,20 @@ export interface ISceneObjectAnimation {
 
 /** 场景对象显示条件 */
 export interface ISceneObjectCondition {
-  /** 需要的 flag 为 true 才显示/可交互 */
+  /**
+   * 需要的 flag 为 true 才显示/可交互（兼容旧字段）
+   * @deprecated 请使用 flagTrue
+   */
   flag?: string;
+  /** 需要的 flag 为 true 才显示/可交互（推荐） */
+  flagTrue?: string;
   /** 需要的 flag 为 false 才显示/可交互 */
   flagFalse?: string;
+  /**
+   * 临时兼容：能力激活条件（将通过 flag 系统实现）
+   * 当前仅保证 depthPerception 可用。
+   */
+  abilityActive?: string;
 }
 
 export interface ISceneObjectConfig {

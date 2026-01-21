@@ -190,15 +190,42 @@ export class SceneAssembler {
     // 检查是否使用正式资源
     const useProduction = useProductionAsset('objects') && this._scene.textures.exists(obj.texture);
 
-    if (useProduction) {
-      // 使用正式资源
-      const productionObjects = this._createProductionObject(obj);
-      created.push(...productionObjects);
-    } else {
-      // 使用白盒Billboard
-      const whiteboxObjects = this._createWhiteboxObject(obj);
-      created.push(...whiteboxObjects);
-    }
+    const createdObjects = useProduction
+      ? this._createProductionObject(obj)
+      : this._createWhiteboxObject(obj);
+    created.push(...createdObjects);
+
+    // 条件检查：所有对象类型都支持（image/sprite/zone）
+    // - image/sprite：条件不满足时直接隐藏
+    // - zone：由 _createZoneObject 处理为“变暗+禁用交互”
+    this._installConditionWatcher(obj, {
+      style: 'hide',
+      visualTargets: createdObjects,
+      interactiveTarget: obj.interactive ? createdObjects[0] : undefined,
+      enableInteractive: () => {
+        if (!obj.interactive) return;
+        const target = createdObjects[0] as Phaser.GameObjects.GameObject | undefined;
+        if (!target) return;
+        if (useProduction) {
+          // 正式资源：Image/Sprite 直接用 useHandCursor
+          (target as Phaser.GameObjects.Image | Phaser.GameObjects.Sprite).setInteractive({
+            useHandCursor: obj.interactive.cursor ?? true,
+          });
+        } else {
+          // 白盒：Container 使用估算尺寸的矩形 hit area
+          const { width, height } = this._estimateObjectSize(obj);
+          (target as Phaser.GameObjects.Container).setInteractive(
+            new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
+            Phaser.Geom.Rectangle.Contains
+          );
+        }
+      },
+      disableInteractive: () => {
+        const target = createdObjects[0] as Phaser.GameObjects.GameObject | undefined;
+        if (!target) return;
+        (target as unknown as { disableInteractive?: () => void }).disableInteractive?.();
+      },
+    });
 
     return created;
   }
@@ -465,37 +492,6 @@ export class SceneAssembler {
     // 设置深度
     container.setDepth(typeof obj.depth === 'number' ? obj.depth : 5);
 
-    // 检查条件（如果有 condition.flag，检查 flag 是否满足）
-    if (obj.condition?.flag) {
-      // 延迟检查 flag，因为 worldState 可能还没准备好
-      // 同时设置定期检查以响应 flag 变化
-      const checkCondition = (): void => {
-        const flagValue = worldState.getFlag(obj.condition!.flag!);
-        if (!flagValue) {
-          // 条件不满足，隐藏或禁用交互
-          container.setAlpha(0.3);
-          container.disableInteractive();
-        } else {
-          // 条件满足，恢复显示和交互
-          container.setAlpha(1);
-          container.setInteractive(
-            new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
-            Phaser.Geom.Rectangle.Contains
-          );
-        }
-      };
-
-      // 初始检查
-      this._scene.time.delayedCall(100, checkCondition);
-
-      // 定期检查（每500ms）以响应 flag 变化
-      this._scene.time.addEvent({
-        delay: 500,
-        callback: checkCondition,
-        loop: true,
-      });
-    }
-
     // 设置交互
     if (obj.interactive) {
       container.setInteractive(
@@ -527,8 +523,124 @@ export class SceneAssembler {
       }
     }
 
+    // 条件检查：zone 类型用“变暗+禁用交互”的方式表达锁定状态
+    this._installConditionWatcher(obj, {
+      style: 'zoneDim',
+      visualTargets: [container],
+      interactiveTarget: obj.interactive ? container : undefined,
+      enableInteractive: () => {
+        container.setInteractive(
+          new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
+          Phaser.Geom.Rectangle.Contains
+        );
+      },
+      disableInteractive: () => container.disableInteractive(),
+    });
+
     created.push(container);
     return created;
+  }
+
+  private _mapAbilityActiveToFlag(abilityActive?: string): string | undefined {
+    if (!abilityActive) return undefined;
+    // abilityActive 暂时通过 flag 实现（兼容历史数据）
+    switch (abilityActive) {
+      case 'depthPerception':
+        return 'FLAG_DEPTH_SENSE_ACTIVE';
+      case 'depthIntervention':
+        return 'FLAG_DEPTH_INTERVENTION_ACTIVE';
+      case 'timeIntervention':
+        return 'FLAG_TIME_INTERVENTION_ACTIVE';
+      default:
+        return undefined;
+    }
+  }
+
+  private _getConditionRequiredTrueFlag(
+    condition: ISceneObjectConfig['condition']
+  ): string | undefined {
+    if (!condition) return undefined;
+    return condition.flagTrue ?? condition.flag ?? this._mapAbilityActiveToFlag(condition.abilityActive);
+  }
+
+  private _installConditionWatcher(
+    obj: ISceneObjectConfig,
+    options: {
+      style: 'hide' | 'zoneDim';
+      visualTargets: Phaser.GameObjects.GameObject[];
+      interactiveTarget?: Phaser.GameObjects.GameObject;
+      enableInteractive?: () => void;
+      disableInteractive?: () => void;
+    }
+  ): void {
+    const condition = obj.condition;
+    if (!condition) return;
+
+    const requiredTrueFlag = this._getConditionRequiredTrueFlag(condition);
+    const requiredFalseFlag = condition.flagFalse;
+    if (!requiredTrueFlag && !requiredFalseFlag) return;
+
+    const configuredAlpha = typeof obj.alpha === 'number' ? obj.alpha : 1;
+    // 对于带 condition 的对象，alpha=0 通常表示“暂时隐藏等待条件”
+    const enabledAlpha = configuredAlpha === 0 ? 1 : configuredAlpha;
+
+    const checkSatisfied = (): boolean => {
+      if (requiredTrueFlag && !worldState.getFlag(requiredTrueFlag)) return false;
+      if (requiredFalseFlag && worldState.getFlag(requiredFalseFlag)) return false;
+      return true;
+    };
+
+    const apply = (satisfied: boolean): void => {
+      if (options.style === 'hide') {
+        for (const target of options.visualTargets) {
+          (target as unknown as { setVisible?: (v: boolean) => void }).setVisible?.(satisfied);
+          if (satisfied) {
+            (target as unknown as { setAlpha?: (v: number) => void }).setAlpha?.(enabledAlpha);
+          }
+        }
+      } else {
+        // zoneDim：保持可见，但用 alpha 表达锁定状态
+        for (const target of options.visualTargets) {
+          (target as unknown as { setVisible?: (v: boolean) => void }).setVisible?.(true);
+          (target as unknown as { setAlpha?: (v: number) => void }).setAlpha?.(
+            satisfied ? enabledAlpha : 0.3
+          );
+        }
+      }
+
+      if (options.interactiveTarget) {
+        if (satisfied) {
+          options.enableInteractive?.();
+        } else {
+          options.disableInteractive?.();
+        }
+      }
+    };
+
+    let last = checkSatisfied();
+    apply(last);
+
+    const timer = this._scene.time.addEvent({
+      delay: 500,
+      loop: true,
+      callback: () => {
+        // 对象被销毁后停止轮询（避免泄漏/访问无效引用）
+        const anyAlive = options.visualTargets.some((t) => {
+          const asAny = t as unknown as { scene?: unknown; active?: boolean };
+          return !!asAny.scene && asAny.active !== false;
+        });
+        if (!anyAlive) {
+          timer.destroy();
+          return;
+        }
+
+        const now = checkSatisfied();
+        if (now !== last) {
+          last = now;
+          apply(now);
+        }
+      },
+    });
   }
 
   /**

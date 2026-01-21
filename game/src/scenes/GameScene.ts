@@ -1348,23 +1348,50 @@ export class GameScene extends Phaser.Scene {
   /**
    * 禁用交互对象（用于一次性物品）
    */
-  private _disableInteractable(obj: Phaser.GameObjects.Container, itemId: string): void {
+  private _disableInteractable(obj: Phaser.GameObjects.GameObject, itemId: string): void {
     // 设置 FLAG 标记物品已被捡取
     worldState.setFlag(`ITEM_TAKEN_${itemId}`, true);
 
     // 禁用交互
-    obj.disableInteractive();
-    obj.setData('action', undefined);
+    const maybeInteractive = obj as Phaser.GameObjects.GameObject & {
+      disableInteractive?: () => void;
+      setData?: (key: string, value: unknown) => void;
+      setVisible?: (value: boolean) => void;
+      setActive?: (value: boolean) => void;
+      destroy?: () => void;
+    };
+    maybeInteractive.disableInteractive?.();
+    maybeInteractive.setData?.('action', undefined);
 
-    // 淡出动画
-    this.tweens.add({
-      targets: obj,
-      alpha: 0.3,
-      duration: 500,
-      ease: 'Power2',
-    });
+    const destroyAndHide = (): void => {
+      // 先隐藏/停用，确保 InteractionPrompt 不再命中
+      maybeInteractive.setActive?.(false);
+      maybeInteractive.setVisible?.(false);
 
-    logger.debug(`物品已捡取并禁用: ${itemId}`);
+      // Container 需要连带销毁子对象（指示器/文字）
+      if (obj instanceof Phaser.GameObjects.Container) {
+        obj.removeAll(true);
+        obj.destroy();
+        return;
+      }
+
+      maybeInteractive.destroy?.();
+    };
+
+    // 先淡出，再隐藏/销毁（卡片拾取后应完全消失）
+    if ('alpha' in (obj as unknown as Record<string, unknown>)) {
+      this.tweens.add({
+        targets: obj as unknown as object,
+        alpha: 0,
+        duration: 450,
+        ease: 'Power2',
+        onComplete: destroyAndHide,
+      });
+    } else {
+      destroyAndHide();
+    }
+
+    logger.debug(`物品已捡取并隐藏: ${itemId}`);
   }
 
   private _createInteractionPoints(zoneId: string): void {

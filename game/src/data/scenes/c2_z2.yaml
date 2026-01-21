@@ -54,8 +54,8 @@ objects:
     interactive:
       cursor: true
       action:
-        type: ability
-        abilityType: depthPerception
+        type: dialogue
+        dialogueId: C2Z2_DEPTH_VIEW
 
   # 提交记录点
   - id: submit_point

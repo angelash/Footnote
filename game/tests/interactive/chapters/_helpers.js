@@ -233,21 +233,42 @@ function advanceDialogue() {
 /**
  * 完成整个对话（自动推进直到结束）
  * @param maxLines 最大行数限制，防止无限循环
+ * @param preferredChoice 优先选择包含此文本的选项
  */
-async function completeDialogue(maxLines = 20) {
+async function completeDialogue(maxLines = 20, preferredChoice = null) {
   const scene = getScene();
   const ui = scene?._dialogueUI;
   if (!ui) return { success: false, error: 'DialogueUI not found' };
 
   let linesAdvanced = 0;
+  let choicesMade = [];
   
   for (let i = 0; i < maxLines; i++) {
     // 等待一小段时间让 UI 更新
     await wait(200);
     
     // 检查对话是否还在显示
-    if (!ui._container?.visible || !ui.isVisible?.()) {
+    if (!ui._container?.visible) {
       break;
+    }
+    
+    // 检查是否有选项
+    if (ui._choiceButtons?.length > 0) {
+      const choiceTexts = ui._choiceButtons.map(b => {
+        const texts = b?.list?.filter(c => c?.text)?.map(c => c.text);
+        return texts?.[0] || '';
+      });
+      
+      let choiceIndex = 0;
+      if (preferredChoice) {
+        const found = choiceTexts.findIndex(t => t.includes(preferredChoice));
+        if (found >= 0) choiceIndex = found;
+      }
+      
+      ui.selectChoice(choiceIndex);
+      choicesMade.push(choiceTexts[choiceIndex]);
+      await wait(500);
+      continue;
     }
     
     // 完成打字机并推进
@@ -264,7 +285,7 @@ async function completeDialogue(maxLines = 20) {
     await wait(300);
   }
   
-  return { success: true, linesAdvanced };
+  return { success: true, linesAdvanced, choicesMade };
 }
 
 /**

@@ -137,6 +137,9 @@ export interface IDialogueChoice {
   effect?: {
     r?: number;
     p?: number;
+    setFlag?: { name: string; value: boolean };
+    giveCard?: string;
+    triggerForeshadow?: { id: string; stage: string };
   };
   condition?: IDialogueCondition;
 }

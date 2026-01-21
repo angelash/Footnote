@@ -368,7 +368,20 @@ class NarrativeEngine {
             id: c.label,
             text: c.label,
             nextDialogueId: c.next,
-            effects: c.effect ? { rDelta: c.effect.r, pDelta: c.effect.p } : undefined,
+            effects: c.effect
+              ? {
+                  rDelta: c.effect.r,
+                  pDelta: c.effect.p,
+                  setFlag: c.effect.setFlag,
+                  giveCard: c.effect.giveCard,
+                  triggerForeshadow: c.effect.triggerForeshadow
+                    ? {
+                        id: c.effect.triggerForeshadow.id,
+                        stage: c.effect.triggerForeshadow.stage as ForeshadowStage,
+                      }
+                    : undefined,
+                }
+              : undefined,
           })),
           onComplete: oldFormat.trigger
             ? ([
@@ -478,12 +491,21 @@ class NarrativeEngine {
 
   /**
    * 选择选项
+   * @param choiceIdOrText 选项ID或选项文本（同时支持两种查找方式）
    */
-  selectChoice(choiceId: string): void {
+  selectChoice(choiceIdOrText: string): void {
     if (!this._currentDialogue?.choices) return;
 
-    const choice = this._currentDialogue.choices.find((c) => c.id === choiceId);
-    if (!choice) return;
+    // 同时支持按 id 和 text 查找选项
+    // 优先按 id 匹配，如果找不到再按 text 匹配
+    let choice = this._currentDialogue.choices.find((c) => c.id === choiceIdOrText);
+    if (!choice) {
+      choice = this._currentDialogue.choices.find((c) => c.text === choiceIdOrText);
+    }
+    if (!choice) {
+      console.warn(`[NarrativeEngine] 选项未找到: ${choiceIdOrText}`);
+      return;
+    }
 
     // 注意：不在这里发送 DIALOGUE_CHOICE 事件
     // 该事件已由 DialogueUI.selectChoice() 发送

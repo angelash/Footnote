@@ -372,18 +372,21 @@ export class DialogueUI {
     this._state.isTyping = true;
     let charIndex = 0;
 
+    // 使用 loop: true 并在完成时手动停止
+    // 这样可以确保 _completeTypewriter 被调用
     this._state.typewriterTimer = this._scene.time.addEvent({
       delay: CONFIG.TYPEWRITER_DELAY,
+      loop: true,
       callback: () => {
         if (charIndex < this._state.fullText.length) {
           this._state.displayedText += this._state.fullText[charIndex];
           this._dialogueText.setText(this._state.displayedText);
           charIndex++;
         } else {
+          // 所有字符已显示，停止定时器并完成打字机效果
           this._completeTypewriter();
         }
       },
-      repeat: this._state.fullText.length - 1,
     });
   }
 

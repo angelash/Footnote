@@ -270,6 +270,9 @@ function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
           ? {
               r: c.effects.rDelta,
               p: c.effects.pDelta,
+              setFlag: c.effects.setFlag,
+              giveCard: c.effects.giveCard,
+              triggerForeshadow: c.effects.triggerForeshadow,
             }
           : undefined,
         condition: c.condition ? transformConditionNew(c.condition) : undefined,
@@ -806,6 +809,18 @@ function registerDataToNarrativeEngine(
           ? {
               rDelta: c.effect.r,
               pDelta: c.effect.p,
+              setFlag: c.effect.setFlag,
+              giveCard: c.effect.giveCard,
+              triggerForeshadow: c.effect.triggerForeshadow
+                ? {
+                    id: c.effect.triggerForeshadow.id,
+                    stage: c.effect.triggerForeshadow.stage as
+                      | 'plant'
+                      | 'deepen'
+                      | 'misread'
+                      | 'collect',
+                  }
+                : undefined,
             }
           : undefined,
       })),

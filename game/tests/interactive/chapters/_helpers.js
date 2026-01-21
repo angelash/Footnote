@@ -210,6 +210,64 @@ function interact() {
 }
 
 /**
+ * 推进对话（点击继续）
+ * 完成打字机效果后推进到下一行
+ */
+function advanceDialogue() {
+  const scene = getScene();
+  const ui = scene?._dialogueUI;
+  if (ui) {
+    // 先完成打字机效果
+    if (ui._completeTypewriter) {
+      ui._completeTypewriter();
+    }
+    // 然后推进对话
+    if (ui.advance) {
+      ui.advance();
+      return { success: true };
+    }
+  }
+  return { success: false };
+}
+
+/**
+ * 完成整个对话（自动推进直到结束）
+ * @param maxLines 最大行数限制，防止无限循环
+ */
+async function completeDialogue(maxLines = 20) {
+  const scene = getScene();
+  const ui = scene?._dialogueUI;
+  if (!ui) return { success: false, error: 'DialogueUI not found' };
+
+  let linesAdvanced = 0;
+  
+  for (let i = 0; i < maxLines; i++) {
+    // 等待一小段时间让 UI 更新
+    await wait(200);
+    
+    // 检查对话是否还在显示
+    if (!ui._container?.visible || !ui.isVisible?.()) {
+      break;
+    }
+    
+    // 完成打字机并推进
+    if (ui._completeTypewriter) {
+      ui._completeTypewriter();
+    }
+    await wait(100);
+    
+    if (ui.advance) {
+      ui.advance();
+      linesAdvanced++;
+    }
+    
+    await wait(300);
+  }
+  
+  return { success: true, linesAdvanced };
+}
+
+/**
  * 选择对话选项
  */
 function selectChoice(choiceIndex) {
@@ -488,6 +546,10 @@ async function executeTest(test, options = {}) {
         }
         await wait(1000);
       }
+
+      // 自动完成对话（推进所有对话行直到结束）
+      const dialogueResult = await completeDialogue();
+      result.steps.push({ action: 'completeDialogue', result: dialogueResult });
     }
 
     // 5. 获取最终状态并验证
@@ -746,6 +808,8 @@ if (typeof module !== 'undefined' && module.exports) {
     getAllObjects,
     interact,
     longPressInteract,
+    advanceDialogue,
+    completeDialogue,
     
     // 对话操作
     selectChoice,

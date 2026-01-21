@@ -367,7 +367,8 @@ export class GameScene extends Phaser.Scene {
       // 使用getData获取存储的action（如果有的话）
       const action = target.getData('action') as ISceneAction | undefined;
       if (action) {
-        this._handleSceneAction(action);
+        // 传递源对象，以便一次性交互可以禁用它
+        this._handleSceneAction(action, target);
       }
     }
   }
@@ -1299,7 +1300,15 @@ export class GameScene extends Phaser.Scene {
     this._assembledScene = this._sceneAssembler.build(cfg);
   }
 
-  private _handleSceneAction(action: ISceneAction): void {
+  /**
+   * 处理场景动作
+   * @param action 动作配置
+   * @param sourceObject 触发动作的源对象（可选，用于一次性交互的禁用）
+   */
+  private _handleSceneAction(
+    action: ISceneAction,
+    sourceObject?: Phaser.GameObjects.Container
+  ): void {
     switch (action.type) {
       case 'dialogue': {
         // 优先使用 dialogueId 从 NarrativeEngine 加载完整对话
@@ -1315,7 +1324,13 @@ export class GameScene extends Phaser.Scene {
         return;
       }
       case 'card': {
-        if (action.cardId) this._showCard(action.cardId);
+        if (action.cardId) {
+          const wasNew = this._showCard(action.cardId, sourceObject);
+          // 如果是新获得的卡片，禁用/隐藏交互对象（一次性物品）
+          if (wasNew && sourceObject) {
+            this._disableInteractable(sourceObject, action.cardId);
+          }
+        }
         return;
       }
       case 'gotoZone': {
@@ -1328,6 +1343,28 @@ export class GameScene extends Phaser.Scene {
       default:
         return;
     }
+  }
+
+  /**
+   * 禁用交互对象（用于一次性物品）
+   */
+  private _disableInteractable(obj: Phaser.GameObjects.Container, itemId: string): void {
+    // 设置 FLAG 标记物品已被捡取
+    worldState.setFlag(`ITEM_TAKEN_${itemId}`, true);
+
+    // 禁用交互
+    obj.disableInteractive();
+    obj.setData('action', undefined);
+
+    // 淡出动画
+    this.tweens.add({
+      targets: obj,
+      alpha: 0.3,
+      duration: 500,
+      ease: 'Power2',
+    });
+
+    logger.debug(`物品已捡取并禁用: ${itemId}`);
   }
 
   private _createInteractionPoints(zoneId: string): void {
@@ -1623,8 +1660,9 @@ export class GameScene extends Phaser.Scene {
       },
       onEnd: () => {
         logger.debug('对话结束');
-        // 对话结束时隐藏 DialogueUI
-        this._dialogueUI?.hideDialogue();
+        // 对话结束时标记等待关闭，让用户有机会阅读最后一行
+        // 用户再次点击时才真正隐藏对话框
+        this._dialogueUI?.markWaitingToClose();
       },
     });
 
@@ -1653,9 +1691,15 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * 显示卡片
+   * @param cardId 卡片ID
+   * @param _sourceObject 触发获取的源对象（预留参数，由调用方处理禁用）
+   * @returns 是否是新获得的卡片
    */
-  private _showCard(cardId: string): void {
+  private _showCard(cardId: string, _sourceObject?: Phaser.GameObjects.Container): boolean {
     logger.info(`显示卡片: ${cardId}`);
+
+    // 检查是否已拥有（提前检查以支持返回值）
+    const alreadyOwned = narrativeEngine.hasCard(cardId);
 
     // 尝试从narrativeEngine获取卡片数据
     const narrativeCard = narrativeEngine.getCard(cardId);
@@ -1664,37 +1708,50 @@ export class GameScene extends Phaser.Scene {
       // 转换NarrativeEngine的ICard到CardUI需要的格式
       const card = this._convertNarrativeCard(narrativeCard);
 
-      // 检查是否已拥有
-      if (narrativeEngine.hasCard(cardId)) {
+      if (alreadyOwned) {
         // 查看已有卡片
         this._cardUI.showCard(card);
+        return false;
       } else {
         // 新获得卡片
         narrativeEngine.obtainCard(cardId);
         this._cardUI.showCardObtain(card);
         this._toastManager?.showSuccess(`获得卡片: ${card.name}`);
+        return true;
       }
     } else {
-      // 回退：使用临时卡片数据
+      // 回退：使用临时卡片数据（即使卡片未注册也要添加到已获得列表）
+      if (!alreadyOwned) {
+        // 强制添加到已获得列表（即使未在注册表中）
+        narrativeEngine.obtainCard(cardId);
+      }
+
       const tempCard: ICard = {
         id: cardId,
-        name: '身份识别卡',
+        name: cardId.replace(/^CARD_/, '').replace(/_/g, ' '),
         type: 'archive',
         chapter: 'C0',
         zone: this._currentZoneId,
-        front: ['维修局外勤身份凭证', '持卡人：岑回', '编号：EX-7749'],
-        detail: ['通行级别：灰', '有效期：本周期内有效', '背面有一道细小的划痕'],
+        front: ['获得了一张卡片', cardId],
+        detail: ['卡片数据加载中...'],
       };
 
       if (this._cardUI) {
-        this._cardUI.showCardObtain(tempCard);
+        if (alreadyOwned) {
+          this._cardUI.showCard(tempCard);
+        } else {
+          this._cardUI.showCardObtain(tempCard);
+          this._toastManager?.showSuccess(`获得卡片: ${tempCard.name}`);
+        }
       } else {
         // 最终回退：显示对话
         this._showDialogue({
           speaker: '获得卡片',
-          text: `身份识别卡：岑回\n通行级别：灰\n所属：维修局外勤`,
+          text: `获得了: ${cardId}`,
         });
       }
+
+      return !alreadyOwned;
     }
   }
 

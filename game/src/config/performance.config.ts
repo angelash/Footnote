@@ -135,23 +135,15 @@ export enum LoadPriority {
 export const LOAD_STRATEGY = {
   /** 核心资源 - 启动时必须加载 */
   CRITICAL_ASSETS: {
-    images: [
-      'placeholder_bg',
-      'placeholder_char',
-      'placeholder_button',
-    ],
+    images: ['placeholder_bg', 'placeholder_char', 'placeholder_button'],
     audio: [],
     data: [],
   },
 
   /** 首屏资源 - 菜单场景必需 */
   FIRST_SCREEN_ASSETS: {
-    images: [
-      'px_bg_placeholder',
-    ],
-    audio: [
-      'bgm_title',
-    ],
+    images: ['px_bg_placeholder'],
+    audio: ['bgm_title'],
     data: [],
   },
 

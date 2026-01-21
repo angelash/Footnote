@@ -732,7 +732,14 @@ export class DialogueUI {
 
     // 创建一个全屏透明点击层（放在容器最底层）
     // 使用透明度 0.01 使其可交互但几乎不可见
-    this._clickLayer = this._scene.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.01);
+    this._clickLayer = this._scene.add.rectangle(
+      width / 2,
+      height / 2,
+      width,
+      height,
+      0x000000,
+      0.01
+    );
     this._clickLayer.setInteractive({ useHandCursor: false });
     this._clickLayer.setDepth(999); // 比对话容器略低，但高于游戏内容
 

@@ -5,13 +5,7 @@
  */
 
 import Phaser from 'phaser';
-import {
-  UI_FONT_SIZE,
-  UI_ALPHA,
-  UI_DEPTH,
-  UI_ANIMATION,
-  UI_FONT_FAMILY,
-} from '@/config/ui.config';
+import { UI_FONT_SIZE, UI_ALPHA, UI_DEPTH, UI_ANIMATION, UI_FONT_FAMILY } from '@/config/ui.config';
 
 export interface IInteractionPromptConfig {
   scene: Phaser.Scene;

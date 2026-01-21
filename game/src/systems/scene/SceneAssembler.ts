@@ -165,6 +165,16 @@ export class SceneAssembler {
   private _createObject(obj: ISceneObjectConfig): Phaser.GameObjects.GameObject[] {
     const created: Phaser.GameObjects.GameObject[] = [];
 
+    // 检查一次性物品是否已被捡取（card 类型交互）
+    if (obj.interactive?.action?.type === 'card' && obj.interactive.action.cardId) {
+      const cardId = obj.interactive.action.cardId;
+      // 检查 FLAG（物品是否已被捡取）
+      if (worldState.getFlag(`ITEM_TAKEN_${cardId}`)) {
+        // 物品已被捡取，不创建可交互对象（或创建但禁用）
+        return created;
+      }
+    }
+
     // zone 类型是出口/区域交互点，需要特殊处理
     if (obj.type === 'zone') {
       const zoneObjects = this._createZoneObject(obj);

@@ -187,7 +187,8 @@ class AnalyticsManager {
 
     eventBus.onTyped(GameEvent.DIALOGUE_CHOICE, (payload) => {
       this.track('choice_selected', 'gameplay', {
-        choiceId: payload.choiceId,
+        dialogueId: payload.dialogueId,
+        choiceText: payload.choiceText,
         choiceIndex: payload.choiceIndex,
       });
     });

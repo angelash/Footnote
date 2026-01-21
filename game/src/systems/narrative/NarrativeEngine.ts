@@ -351,7 +351,17 @@ class NarrativeEngine {
           text: string;
           expression?: string;
           next?: string | null;
-          choices?: Array<{ label: string; next: string; effect?: { r?: number; p?: number } }>;
+          choices?: Array<{
+            label: string;
+            next: string;
+            effect?: {
+              r?: number;
+              p?: number;
+              setFlag?: { name: string; value: boolean };
+              giveCard?: string;
+              triggerForeshadow?: { id: string; stage: string };
+            };
+          }>;
           trigger?: { card?: string; foreshadow?: [string, string]; ability?: string };
         };
 
@@ -516,8 +526,8 @@ class NarrativeEngine {
       this._applyChoiceEffects(choice.effects);
     }
 
-    // 调用处理器
-    this._choiceHandler?.(choiceId);
+    // 调用处理器（使用正确的变量名）
+    this._choiceHandler?.(choice.id);
 
     // 跳转到下一个对话或结束
     if (choice.nextDialogueId) {
@@ -691,6 +701,7 @@ class NarrativeEngine {
 
   /**
    * 获得卡片
+   * 即使卡片数据未注册，也会添加到已获得列表（容错处理）
    */
   obtainCard(cardId: string): boolean {
     if (this._obtainedCards.has(cardId)) {
@@ -699,15 +710,19 @@ class NarrativeEngine {
 
     const card = this._cardRegistry.get(cardId);
     if (!card) {
-      logger.warn(`Card not found: ${cardId}`);
-      return false;
+      // 即使卡片未在注册表中找到，也添加到已获得列表
+      // 这允许场景配置的物品即使数据未加载也能被"获得"
+      logger.warn(`Card not found in registry: ${cardId}, adding to obtained list anyway`);
     }
 
+    // 无论卡片是否在注册表中，都添加到已获得列表
     this._obtainedCards.add(cardId);
 
     eventBus.emit(GameEvent.CARD_OBTAIN, {
       cardId,
-      card: { id: card.id, title: card.title, category: card.category },
+      card: card
+        ? { id: card.id, title: card.title, category: card.category }
+        : { id: cardId, title: cardId, category: CardCategory.ITEM },
     });
 
     return true;

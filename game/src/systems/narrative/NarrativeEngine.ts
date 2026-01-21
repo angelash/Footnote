@@ -485,11 +485,9 @@ class NarrativeEngine {
     const choice = this._currentDialogue.choices.find((c) => c.id === choiceId);
     if (!choice) return;
 
-    eventBus.emit(GameEvent.DIALOGUE_CHOICE, {
-      dialogueId: this._currentDialogue.id,
-      choiceIndex: this._currentDialogue.choices.indexOf(choice),
-      choiceText: choice.text,
-    });
+    // 注意：不在这里发送 DIALOGUE_CHOICE 事件
+    // 该事件已由 DialogueUI.selectChoice() 发送
+    // 如果在这里再次发送会导致无限递归
 
     // 应用效果
     if (choice.effects) {

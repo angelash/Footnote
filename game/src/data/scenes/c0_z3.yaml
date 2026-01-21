@@ -60,6 +60,9 @@ objects:
     depth: 10
     label: 钉子
     labelOffset: [0, 50]
+    # 当已经捡起钉子后，此对象不再显示
+    condition:
+      flagFalse: FLAG_HAS_NAIL
     interactive:
       cursor: true
       testid: wall-nail

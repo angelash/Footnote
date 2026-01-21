@@ -86,7 +86,7 @@ objects:
         type: card
         cardId: CARD_C4_TEMP_NOTICE
 
-  # 散落的物品（可帮助归整）
+  # 散落的物品（可帮助归整，帮助后消失）
   - id: scattered_items
     type: image
     texture: obj_old_books
@@ -96,6 +96,9 @@ objects:
     depth: 8
     label: 散落物品
     labelOffset: [0, 60]
+    # 帮助归整后此对象消失
+    condition:
+      flagFalse: FLAG_HELPED_RESIDENT
     interactive:
       cursor: true
       action:

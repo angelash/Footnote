@@ -134,7 +134,7 @@ objects:
       frameRate: 3
       repeat: -1
 
-  # 记录差异任务点
+  # 记录差异任务点（触发假楼梯后出现，记录后消失）
   - id: record_diff_point
     type: image
     texture: obj_old_books  # WebP物件
@@ -146,6 +146,7 @@ objects:
     labelOffset: [0, 50]
     condition:
       flagTrue: FLAG_C2Z3_TRIGGERED_FAKE
+      flagFalse: FLAG_RECORDED_STAIR_DIFF
     interactive:
       cursor: true
       action:

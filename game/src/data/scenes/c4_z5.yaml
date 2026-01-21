@@ -78,7 +78,7 @@ objects:
         type: dialogue
         dialogueId: C4Z5_WINDOW_PATCH
 
-  # 墙缝（塞纸条用）
+  # 墙缝（塞纸条用，有纸条后出现，塞完后消失）
   - id: wall_crack
     type: image
     texture: obj_crack
@@ -90,6 +90,7 @@ objects:
     labelOffset: [0, 50]
     condition:
       flagTrue: FLAG_C4Z5_HAS_NOTE
+      flagFalse: FLAG_HELPED_ATANG_PAPER
     interactive:
       cursor: true
       action:

@@ -57,7 +57,7 @@ objects:
         type: dialogue
         dialogueId: C2Z2_DEPTH_VIEW
 
-  # 提交记录点
+  # 提交记录点（看到空腔后出现，提交后消失）
   - id: submit_point
     type: image
     texture: px_fx_system_correct
@@ -69,6 +69,7 @@ objects:
     labelOffset: [0, 50]
     condition:
       flagTrue: FLAG_C2Z2_SAW_CAVITY
+      flagFalse: FLAG_REPORTED_CAVITY
     interactive:
       cursor: true
       action:

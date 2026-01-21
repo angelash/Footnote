@@ -807,7 +807,8 @@ function registerDataToNarrativeEngine(
           ? {
               hasCard: c.condition.hasCard,
               rMin: c.condition.rMin,
-              flagTrue: c.condition.dialogueCompleted, // 映射 flagTrue 条件
+              // 直接使用 flagTrue，或兼容旧版 dialogueCompleted
+              flagTrue: c.condition.flagTrue ?? c.condition.dialogueCompleted,
             }
           : undefined,
         effects: c.effect

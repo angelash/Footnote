@@ -57,6 +57,8 @@ interface IDialogueState {
   fullText: string;
   displayedText: string;
   typewriterTimer: Phaser.Time.TimerEvent | null;
+  /** 对话已结束，等待用户点击关闭 */
+  isWaitingToClose: boolean;
 }
 
 // ==================== DialogueUI类 ====================
@@ -105,6 +107,7 @@ export class DialogueUI {
       fullText: '',
       displayedText: '',
       typewriterTimer: null,
+      isWaitingToClose: false,
     };
 
     this._createUI();
@@ -145,6 +148,7 @@ export class DialogueUI {
     this._state.fullText = dialogue.text;
     this._state.displayedText = '';
     this._state.isTyping = true;
+    this._state.isWaitingToClose = false;
 
     // 更新UI
     this._speakerText.setText(dialogue.speaker);
@@ -156,9 +160,10 @@ export class DialogueUI {
     const expression = dialogue.expression || 'neutral';
     this._showPortrait(dialogue.speaker, expression as CharacterExpression);
 
-    // 显示容器
+    // 显示容器和全屏点击层
     this._container.setVisible(true);
     this._container.setAlpha(0);
+    this._clickLayer?.setVisible(true);
 
     this._scene.tweens.add({
       targets: this._container,
@@ -189,6 +194,9 @@ export class DialogueUI {
     // 移除键盘导航
     this._removeKeyboardNavigation();
 
+    // 隐藏全屏点击层
+    this._clickLayer?.setVisible(false);
+
     this._scene.tweens.add({
       targets: this._container,
       alpha: 0,
@@ -206,6 +214,7 @@ export class DialogueUI {
         }
 
         this._state.currentDialogue = null;
+        this._state.isWaitingToClose = false;
       },
     });
   }
@@ -215,6 +224,12 @@ export class DialogueUI {
    */
   advance(): void {
     if (!this._state.currentDialogue) return;
+
+    // 如果正在等待关闭，点击后关闭对话
+    if (this._state.isWaitingToClose) {
+      this.hideDialogue();
+      return;
+    }
 
     // 如果正在打字，直接显示全部文字
     if (this._state.isTyping) {
@@ -233,6 +248,16 @@ export class DialogueUI {
       dialogueId: this._state.currentDialogue.id,
       lineIndex: this._state.currentLineIndex,
     });
+  }
+
+  /**
+   * 标记对话已结束，等待用户点击关闭
+   * 用于让用户有时间阅读最后一行内容
+   */
+  markWaitingToClose(): void {
+    this._state.isWaitingToClose = true;
+    // 显示继续指示器，提示用户点击关闭
+    this._continueIndicator.setVisible(true);
   }
 
   /**
@@ -267,6 +292,7 @@ export class DialogueUI {
     this._stopTypewriter();
     this._removeKeyboardNavigation();
     this._unsubscribeI18n?.();
+    this._clickLayer?.destroy();
     this._container.destroy();
   }
 
@@ -698,14 +724,21 @@ export class DialogueUI {
 
   // ==================== 私有方法 - 输入 ====================
 
-  private _setupInput(): void {
-    // 点击推进对话
-    this._container.setInteractive(
-      new Phaser.Geom.Rectangle(0, 0, this._scene.scale.width, this._scene.scale.height),
-      Phaser.Geom.Rectangle.Contains
-    );
+  /** 全屏点击层引用 */
+  private _clickLayer!: Phaser.GameObjects.Rectangle;
 
-    this._container.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+  private _setupInput(): void {
+    const { width, height } = this._scene.scale;
+
+    // 创建一个全屏透明点击层（放在容器最底层）
+    // 使用透明度 0.01 使其可交互但几乎不可见
+    this._clickLayer = this._scene.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.01);
+    this._clickLayer.setInteractive({ useHandCursor: false });
+    this._clickLayer.setDepth(999); // 比对话容器略低，但高于游戏内容
+
+    this._clickLayer.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (!this.isVisible()) return;
+
       // 如果点击的是选项区域，不处理
       if (this._choicesContainer.visible) {
         const choicesY = this._choicesContainer.y;
@@ -716,6 +749,9 @@ export class DialogueUI {
 
       this.advance();
     });
+
+    // 初始隐藏点击层
+    this._clickLayer.setVisible(false);
 
     // 空格键推进（通过 Phaser 事件）
     this._scene.input.keyboard?.on('keydown-SPACE', () => {

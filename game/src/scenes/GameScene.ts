@@ -950,13 +950,13 @@ export class GameScene extends Phaser.Scene {
       // 检查对话是否结束（onComplete 已在 advance 中执行）
       if (!narrativeEngine.isDialogueActive()) {
         // NarrativeEngine 已结束对话
-        // 隐藏 DialogueUI（如果 onEnd 回调未处理）
-        this._dialogueUI?.hideDialogue();
+        // 不立即隐藏，而是标记为"等待关闭"，让用户有时间阅读最后一行
+        this._dialogueUI?.markWaitingToClose();
       }
       // 不再手动调用 showDialogue - 由 onAdvance 回调处理
     } else {
-      // NarrativeEngine 不活跃，直接隐藏对话
-      this._dialogueUI?.hideDialogue();
+      // NarrativeEngine 不活跃，标记等待关闭
+      this._dialogueUI?.markWaitingToClose();
     }
   }
 

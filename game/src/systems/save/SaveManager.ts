@@ -286,6 +286,15 @@ class SaveManager {
   private _isInitialized: boolean = false;
   private _settings: IGameSettings;
 
+  /** 脏标记：是否有未保存的状态变更 */
+  private _isDirty: boolean = false;
+  /** 脏标记原因：记录导致脏标记的原因 */
+  private _dirtyReason: string = '';
+  /** 自动存档定时器 */
+  private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  /** 自动存档延迟（毫秒） */
+  private readonly _AUTO_SAVE_DELAY: number = 3000;
+
   private constructor() {
     this._settings = this._getDefaultSettings();
   }
@@ -365,7 +374,62 @@ class SaveManager {
    * 自动存档
    */
   async autoSave(): Promise<boolean> {
+    // 清除脏标记
+    this._isDirty = false;
+    this._dirtyReason = '';
     return this.save(CONFIG.AUTO_SAVE_SLOT, '自动存档');
+  }
+
+  /**
+   * 标记状态为脏（需要存档）
+   * 启动 debounce 定时器，延迟后自动存档
+   * @param reason 导致脏标记的原因（用于调试）
+   */
+  markDirty(reason: string): void {
+    this._isDirty = true;
+    this._dirtyReason = reason;
+    logger.debug(`状态已标脏: ${reason}`);
+
+    // 清除之前的定时器（debounce）
+    if (this._autoSaveTimer !== null) {
+      clearTimeout(this._autoSaveTimer);
+    }
+
+    // 启动新的定时器
+    this._autoSaveTimer = setTimeout(() => {
+      this._autoSaveTimer = null;
+      if (this._isDirty) {
+        logger.info(`自动存档触发: ${this._dirtyReason}`);
+        eventBus.emit(GameEvent.AUTOSAVE_TRIGGER, { reason: this._dirtyReason });
+        void this.autoSave();
+      }
+    }, this._AUTO_SAVE_DELAY);
+  }
+
+  /**
+   * 检查是否有未保存的变更
+   */
+  isDirty(): boolean {
+    return this._isDirty;
+  }
+
+  /**
+   * 获取脏标记原因
+   */
+  getDirtyReason(): string {
+    return this._dirtyReason;
+  }
+
+  /**
+   * 清除脏标记（不触发存档）
+   */
+  clearDirty(): void {
+    this._isDirty = false;
+    this._dirtyReason = '';
+    if (this._autoSaveTimer !== null) {
+      clearTimeout(this._autoSaveTimer);
+      this._autoSaveTimer = null;
+    }
   }
 
   /**

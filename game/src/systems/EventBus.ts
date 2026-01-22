@@ -126,6 +126,12 @@ export enum GameEvent {
   FORESHADOW_TRIGGERED = 'foreshadow:triggered',
   /** 结局触发 */
   ENDING_TRIGGERED = 'ending:triggered',
+
+  // ==================== 交互系统事件 ====================
+  /** 交互提交（状态变更完成） */
+  INTERACTION_COMMIT = 'interaction:commit',
+  /** 物品收集 */
+  ITEM_COLLECT = 'item:collect',
 }
 
 /**
@@ -235,6 +241,21 @@ export interface IEventPayloads {
   [GameEvent.PLAY_SFX]: { key: string };
   [GameEvent.FORESHADOW_TRIGGERED]: { foreshadowId: string; stage: string };
   [GameEvent.ENDING_TRIGGERED]: { ending: string };
+
+  // 交互系统事件payload
+  [GameEvent.INTERACTION_COMMIT]: {
+    interactionId: string;
+    zoneId: string;
+    objectId: string;
+    actionType: string;
+    changed: boolean;
+  };
+  [GameEvent.ITEM_COLLECT]: {
+    itemId: string;
+    zoneId: string;
+    objectId: string;
+    cardId?: string;
+  };
 }
 
 // 简化的卡片类型（避免循环依赖）

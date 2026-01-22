@@ -36,6 +36,7 @@ import {
   performanceMonitor,
   ControlHints,
   InteractionPrompt,
+  InteractionSystem,
 } from '@/systems';
 import { AudioManager } from '@/systems/audio/AudioManager';
 import { narrativeEngine } from '@/systems/narrative';
@@ -106,6 +107,9 @@ export class GameScene extends Phaser.Scene {
   private _interactionPrompt!: InteractionPrompt;
   private _nearestInteractable: Phaser.GameObjects.Container | null = null;
   private readonly _interactionRange: number = 100; // 交互范围
+
+  // 交互系统
+  private _interactionSystem!: InteractionSystem;
 
   // UI元素
   private _zoneTitle!: Phaser.GameObjects.Text;
@@ -317,6 +321,9 @@ export class GameScene extends Phaser.Scene {
     // 清理交互提示
     this._interactionPrompt?.destroy();
 
+    // 清理交互系统
+    this._interactionSystem?.destroy();
+
     // 清理音频系统
     this._audioManager?.destroy();
   }
@@ -486,6 +493,74 @@ export class GameScene extends Phaser.Scene {
 
     // 结局演出效果
     this._endingEffects = new EndingEffects({ scene: this });
+
+    // 交互系统
+    this._interactionSystem = new InteractionSystem({
+      scene: this,
+      onCardObtain: (cardId, isNew) => {
+        // 尝试从 narrativeEngine 获取卡片数据
+        const narrativeCard = narrativeEngine.getCard(cardId);
+
+        if (narrativeCard && this._cardUI) {
+          // 转换 NarrativeEngine 的 ICard 到 CardUI 需要的格式
+          const uiCard = this._convertNarrativeCard(narrativeCard);
+          if (isNew) {
+            this._cardUI.showCardObtain(uiCard);
+          } else {
+            this._cardUI.showCard(uiCard);
+          }
+        } else {
+          // 回退：使用临时卡片数据
+          const tempCard: ICard = {
+            id: cardId,
+            name: cardId.replace(/^CARD_/, '').replace(/_/g, ' '),
+            type: 'archive',
+            chapter: 'C0',
+            zone: this._currentZoneId,
+            front: ['获得了一张卡片', cardId],
+            detail: ['卡片数据加载中...'],
+          };
+
+          if (this._cardUI) {
+            if (isNew) {
+              this._cardUI.showCardObtain(tempCard);
+            } else {
+              this._cardUI.showCard(tempCard);
+            }
+          } else {
+            // 最终回退：显示对话
+            this._showDialogue({
+              speaker: '获得卡片',
+              text: `获得了: ${cardId}`,
+            });
+          }
+        }
+      },
+      onShowDialogue: (dialogueId) => {
+        void this.showDialogueById(dialogueId);
+      },
+      onGotoZone: (zoneId) => {
+        this.scene.restart({ zoneId, fromZone: this._currentZoneId });
+      },
+      onPlaySfx: (sfxKey) => {
+        this.playSfx(sfxKey);
+      },
+      onShowToast: (message, type) => {
+        switch (type) {
+          case 'success':
+            this._toastManager?.showSuccess(message);
+            break;
+          case 'warning':
+            this._toastManager?.showWarning(message);
+            break;
+          case 'error':
+            this._toastManager?.showError(message);
+            break;
+          default:
+            this._toastManager?.showInfo(message);
+        }
+      },
+    });
   }
 
   /**
@@ -1306,6 +1381,7 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * 处理场景动作
+   * 使用 InteractionSystem 执行四段式交互循环
    * @param action 动作配置
    * @param sourceObject 触发动作的源对象（可选，用于一次性交互的禁用）
    */
@@ -1313,39 +1389,33 @@ export class GameScene extends Phaser.Scene {
     action: ISceneAction,
     sourceObject?: Phaser.GameObjects.Container
   ): void {
-    switch (action.type) {
-      case 'dialogue': {
-        // 优先使用 dialogueId 从 NarrativeEngine 加载完整对话
-        if (action.dialogueId) {
-          this.showDialogueById(action.dialogueId);
-        } else {
-          // 回退：直接使用 speaker/text（用于简单的内联对话）
-          this._showDialogue({
-            speaker: action.speaker ?? '系统',
-            text: action.text ?? '',
-          });
-        }
-        return;
-      }
-      case 'card': {
-        if (action.cardId) {
-          const wasNew = this._showCard(action.cardId, sourceObject);
-          // 如果是新获得的卡片，禁用/隐藏交互对象（一次性物品）
-          if (wasNew && sourceObject) {
-            this._disableInteractable(sourceObject, action.cardId);
-          }
-        }
-        return;
-      }
-      case 'gotoZone': {
-        if (action.zoneId) {
-          this.scene.restart({ zoneId: action.zoneId, fromZone: this._currentZoneId });
-        }
-        return;
-      }
-      case 'none':
-      default:
-        return;
+    // 构建交互上下文
+    const context = {
+      zoneId: this._currentZoneId,
+      objectId: sourceObject?.name || 'unknown',
+      sourceObject,
+    };
+
+    // 使用 InteractionSystem 执行交互
+    const result = this._interactionSystem.execute(action, context);
+
+    // 处理交互结果
+    if (!result.ok) {
+      logger.debug(`交互被阻止: ${result.error}`);
+      return;
+    }
+
+    // 处理特殊情况：内联对话（没有 dialogueId 的简单对话）
+    if (action.type === 'dialogue' && !action.dialogueId && action.text) {
+      this._showDialogue({
+        speaker: action.speaker ?? '系统',
+        text: action.text,
+      });
+    }
+
+    // 处理一次性物品的禁用
+    if (result.isNewCard && sourceObject && action.cardId) {
+      this._disableInteractable(sourceObject, action.cardId);
     }
   }
 
@@ -1717,72 +1787,6 @@ export class GameScene extends Phaser.Scene {
           this._dialogueBox.setVisible(false);
         },
       });
-    }
-  }
-
-  /**
-   * 显示卡片
-   * @param cardId 卡片ID
-   * @param _sourceObject 触发获取的源对象（预留参数，由调用方处理禁用）
-   * @returns 是否是新获得的卡片
-   */
-  private _showCard(cardId: string, _sourceObject?: Phaser.GameObjects.Container): boolean {
-    logger.info(`显示卡片: ${cardId}`);
-
-    // 检查是否已拥有（提前检查以支持返回值）
-    const alreadyOwned = narrativeEngine.hasCard(cardId);
-
-    // 尝试从narrativeEngine获取卡片数据
-    const narrativeCard = narrativeEngine.getCard(cardId);
-
-    if (narrativeCard && this._cardUI) {
-      // 转换NarrativeEngine的ICard到CardUI需要的格式
-      const card = this._convertNarrativeCard(narrativeCard);
-
-      if (alreadyOwned) {
-        // 查看已有卡片
-        this._cardUI.showCard(card);
-        return false;
-      } else {
-        // 新获得卡片
-        narrativeEngine.obtainCard(cardId);
-        this._cardUI.showCardObtain(card);
-        // Toast 提示由 _onCardObtained 事件处理器统一显示
-        return true;
-      }
-    } else {
-      // 回退：使用临时卡片数据（即使卡片未注册也要添加到已获得列表）
-      if (!alreadyOwned) {
-        // 强制添加到已获得列表（即使未在注册表中）
-        narrativeEngine.obtainCard(cardId);
-      }
-
-      const tempCard: ICard = {
-        id: cardId,
-        name: cardId.replace(/^CARD_/, '').replace(/_/g, ' '),
-        type: 'archive',
-        chapter: 'C0',
-        zone: this._currentZoneId,
-        front: ['获得了一张卡片', cardId],
-        detail: ['卡片数据加载中...'],
-      };
-
-      if (this._cardUI) {
-        if (alreadyOwned) {
-          this._cardUI.showCard(tempCard);
-        } else {
-          this._cardUI.showCardObtain(tempCard);
-          // Toast 提示由 _onCardObtained 事件处理器统一显示
-        }
-      } else {
-        // 最终回退：显示对话
-        this._showDialogue({
-          speaker: '获得卡片',
-          text: `获得了: ${cardId}`,
-        });
-      }
-
-      return !alreadyOwned;
     }
   }
 

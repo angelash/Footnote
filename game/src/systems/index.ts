@@ -131,3 +131,11 @@ export type {
   IZoneBillboardConfig,
   IResolvedAsset,
 } from './whitebox';
+
+// 交互系统
+export { InteractionSystem } from './interaction';
+export type {
+  IInteractionContext,
+  IInteractionResult,
+  IInteractionSystemConfig,
+} from './interaction';

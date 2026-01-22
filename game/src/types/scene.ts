@@ -4,8 +4,34 @@ export type SceneObjectType = 'image' | 'sprite' | 'zone';
 
 export type SceneActionType = 'dialogue' | 'card' | 'gotoZone' | 'none';
 
+/**
+ * 交互效果类型
+ * 用于定义交互产生的副作用（设置flag、修改计数器、获得卡片、播放音效）
+ */
+export interface IInteractionEffect {
+  type: 'flag' | 'counter' | 'card' | 'sound';
+  /** flag 类型使用：flag名称 */
+  flagName?: string;
+  /** flag 类型使用：flag值 */
+  flagValue?: boolean;
+  /** counter 类型使用：计数器类型 */
+  counter?: 'R' | 'P';
+  /** counter 类型使用：变化量 */
+  delta?: number;
+  /** card 类型使用：卡片ID */
+  cardId?: string;
+  /** sound 类型使用：音效key */
+  sfxKey?: string;
+}
+
 export interface ISceneAction {
   type: SceneActionType;
+  /** 交互唯一标识（用于追踪一次性交互） */
+  id?: string;
+  /** 是否一次性交互（card类型默认为true） */
+  once?: boolean;
+  /** 交互效果列表 */
+  effects?: IInteractionEffect[];
   // dialogue
   speaker?: string;
   text?: string;

@@ -91,6 +91,20 @@ export interface IConditionConfig {
 }
 
 /**
+ * 交互完成记录
+ */
+export interface IInteractionRecord {
+  /** 交互ID */
+  id: string;
+  /** 完成时间 */
+  timestamp: number;
+  /** 所在Zone */
+  zoneId?: string;
+  /** 额外元数据 */
+  meta?: Record<string, unknown>;
+}
+
+/**
  * 世界状态序列化数据
  */
 export interface IWorldStateData {
@@ -102,6 +116,8 @@ export interface IWorldStateData {
   contaminations: IContamination[];
   currentZoneId: string;
   currentChapter: ChapterID;
+  /** 已完成的交互记录 */
+  completedInteractions?: IInteractionRecord[];
 }
 
 interface IZoneStateData {
@@ -159,6 +175,9 @@ class WorldState {
   private _currentZoneId: string = '';
   private _currentChapter: ChapterID = 'C0';
   private _playTime: number = 0;
+
+  /** 已完成的交互记录（用于一次性交互追踪） */
+  private _completedInteractions: Map<string, IInteractionRecord> = new Map();
 
   // 计数器
   private _scarIdCounter: number = 0;
@@ -376,6 +395,45 @@ class WorldState {
       result[key] = value;
     });
     return result;
+  }
+
+  // ==================== 交互记录操作 ====================
+
+  /**
+   * 检查交互是否已完成
+   * @param interactionId 交互唯一标识
+   */
+  hasInteraction(interactionId: string): boolean {
+    return this._completedInteractions.has(interactionId);
+  }
+
+  /**
+   * 标记交互已完成
+   * @param interactionId 交互唯一标识
+   * @param meta 可选的额外元数据
+   */
+  markInteractionDone(interactionId: string, meta?: Record<string, unknown>): void {
+    if (this._completedInteractions.has(interactionId)) {
+      logger.debug(`交互已存在: ${interactionId}`);
+      return;
+    }
+
+    const record: IInteractionRecord = {
+      id: interactionId,
+      timestamp: Date.now(),
+      zoneId: this._currentZoneId,
+      meta,
+    };
+
+    this._completedInteractions.set(interactionId, record);
+    logger.info(`交互完成: ${interactionId}`);
+  }
+
+  /**
+   * 获取所有已完成的交互记录
+   */
+  getCompletedInteractions(): IInteractionRecord[] {
+    return Array.from(this._completedInteractions.values());
   }
 
   // ==================== Zone状态操作 ====================
@@ -654,6 +712,7 @@ class WorldState {
       contaminations: [...this._contaminations],
       currentZoneId: this._currentZoneId,
       currentChapter: this._currentChapter,
+      completedInteractions: this.getCompletedInteractions(),
     };
   }
 
@@ -711,6 +770,14 @@ class WorldState {
     if (data.currentChapter) {
       this._currentChapter = data.currentChapter;
     }
+
+    // 恢复交互记录
+    if (data.completedInteractions) {
+      this._completedInteractions.clear();
+      for (const record of data.completedInteractions) {
+        this._completedInteractions.set(record.id, record);
+      }
+    }
   }
 
   /**
@@ -734,6 +801,9 @@ class WorldState {
     this._rThreshold3Triggered = false;
     this._rThreshold6Triggered = false;
     this._rThreshold10Triggered = false;
+
+    // 重置交互记录
+    this._completedInteractions.clear();
 
     this._initializeDefaultZones();
   }

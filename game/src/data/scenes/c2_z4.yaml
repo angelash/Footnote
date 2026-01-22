@@ -75,7 +75,7 @@ objects:
         type: dialogue
         dialogueId: C2Z4_NAIL_HOLE
 
-  # 栖蓝
+  # 栖蓝（未同意帮忙时）
   - id: qilan
     type: image
     texture: portrait_qilan_neutral
@@ -85,12 +85,32 @@ objects:
     depth: 12
     label: 栖蓝
     labelOffset: [0, 80]
+    condition:
+      flagFalse: FLAG_C2Z4_AGREED_HELP
     interactive:
       cursor: true
       testid: qilan
       action:
         type: dialogue
         dialogueId: C2Z4_QILAN_TALK
+
+  # 栖蓝（已同意帮忙后）
+  - id: qilan_helping
+    type: image
+    texture: portrait_qilan_neutral
+    x: 200
+    y: 420
+    scale: 0.4
+    depth: 12
+    label: 栖蓝
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C2Z4_AGREED_HELP
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C2Z4_QILAN_HELPING
 
   # 修补摊物品
   - id: repair_items

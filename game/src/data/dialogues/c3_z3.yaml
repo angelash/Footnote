@@ -126,6 +126,15 @@ dialogues:
     effects:
       rDelta: 1
 
+  # 已提交差异后
+  C3Z3_ANNOTATION_DONE:
+    id: C3Z3_ANNOTATION_DONE
+    lines:
+      - speaker: ""
+        text: 标注台上显示：「差异已提交」
+      - speaker: 岑回
+        text: 已经标注过了。
+
 
 
 

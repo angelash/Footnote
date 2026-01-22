@@ -79,7 +79,7 @@ objects:
         type: dialogue
         dialogueId: C5Z5_CHALK
 
-  # 木板
+  # 木板（未放置时可交互）
   - id: wood_plank
     type: image
     texture: px_tiles_platform
@@ -91,6 +91,7 @@ objects:
     labelOffset: [0, 55]
     condition:
       flagTrue: FLAG_C5Z5_OUTLINED
+      flagFalse: FLAG_CHAIR_PLACEHOLDER
     interactive:
       cursor: true
       action:

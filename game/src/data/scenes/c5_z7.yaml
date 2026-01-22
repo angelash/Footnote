@@ -9,7 +9,7 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 微任务A：空白标签
+  # 微任务A：空白标签（未完成）
   - id: blank_label
     type: image
     texture: px_fx_field_accept
@@ -19,6 +19,8 @@ objects:
     depth: 10
     label: 空白标签
     labelOffset: [0, 50]
+    condition:
+      flagFalse: FLAG_C5Z7_TASK_A_DONE
     interactive:
       cursor: true
       testid: blank-label
@@ -26,7 +28,25 @@ objects:
         type: dialogue
         dialogueId: C5Z7_TASK_A
 
-  # 微任务B：椅脚印描边
+  # 微任务A：空白标签（已完成）
+  - id: blank_label_done
+    type: image
+    texture: px_fx_field_accept
+    x: 250
+    y: 400
+    scale: 0.4
+    depth: 10
+    label: 空白标签
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C5Z7_TASK_A_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z7_TASK_A_ALREADY
+
+  # 微任务B：椅脚印描边（未完成）
   - id: chair_outline
     type: image
     texture: px_fx_scar
@@ -37,13 +57,34 @@ objects:
     alpha: 0.5
     label: 椅脚印
     labelOffset: [0, 55]
+    condition:
+      flagFalse: FLAG_C5Z7_TASK_B_DONE
     interactive:
       cursor: true
       action:
         type: dialogue
         dialogueId: C5Z7_TASK_B
 
-  # 微任务C：版本卡
+  # 微任务B：椅脚印描边（已完成）
+  - id: chair_outline_done
+    type: image
+    texture: px_fx_scar
+    x: 400
+    y: 450
+    scale: 0.5
+    depth: 9
+    alpha: 0.8
+    label: 椅脚印
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_C5Z7_TASK_B_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z7_TASK_B_ALREADY
+
+  # 微任务C：版本卡（未完成）
   - id: version_card_slot
     type: image
     texture: px_item_archive
@@ -53,11 +94,31 @@ objects:
     depth: 10
     label: 版本库底层
     labelOffset: [0, 55]
+    condition:
+      flagFalse: FLAG_C5Z7_TASK_C_DONE
     interactive:
       cursor: true
       action:
         type: dialogue
         dialogueId: C5Z7_TASK_C
+
+  # 微任务C：版本卡（已完成）
+  - id: version_card_slot_done
+    type: image
+    texture: px_item_archive
+    x: 520
+    y: 380
+    scale: 0.45
+    depth: 10
+    label: 版本库底层
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_C5Z7_TASK_C_DONE
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C5Z7_TASK_C_ALREADY
 
   # 墙面（贴标签位置）
   - id: wall_surface

@@ -26,7 +26,7 @@ objects:
         type: dialogue
         dialogueId: C3Z3_MAP_WALL
 
-  # 差异标注台
+  # 差异标注台（未提交）
   - id: annotation_desk
     type: image
     texture: obj_desk
@@ -38,11 +38,30 @@ objects:
     labelOffset: [0, 70]
     condition:
       flagTrue: FLAG_C3Z3_SAW_MAPS
+      flagFalse: FLAG_VERSION_DIFF_SUBMITTED
     interactive:
       cursor: true
       action:
         type: dialogue
         dialogueId: C3Z3_ANNOTATION_DESK
+
+  # 差异标注台（已提交）
+  - id: annotation_desk_done
+    type: image
+    texture: obj_desk
+    x: 250
+    y: 500
+    scale: 0.6
+    depth: 9
+    label: 标注台
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_VERSION_DIFF_SUBMITTED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C3Z3_ANNOTATION_DONE
 
   # 宋岚
   - id: songlan

@@ -56,6 +56,15 @@ dialogues:
       - speaker: 栖蓝
         text: 反正也花不了多少时间。
 
+  # 已同意帮忙后再次对话
+  C2Z4_QILAN_HELPING:
+    id: C2Z4_QILAN_HELPING
+    lines:
+      - speaker: 栖蓝
+        text: 钉子掉了，找一枚就行。
+      - speaker: 栖蓝
+        text: 地上那个孔……钉子应该就在附近。
+
   # 歪斜路标
   C2Z4_CROOKED_SIGN:
     id: C2Z4_CROOKED_SIGN

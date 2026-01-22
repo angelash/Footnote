@@ -24,7 +24,7 @@ objects:
         type: card
         cardId: CARD_C0_IDENTITY
 
-  # 公告板（发现日期涂改痕迹）
+  # 公告板（未检查过）
   - id: notice_board
     type: image
     texture: obj_sign  # WebP物件：标识牌
@@ -34,12 +34,31 @@ objects:
     depth: 10
     label: 公告板
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C0Z1_NOTICE_EXAMINED
     interactive:
       cursor: true
       action:
         type: dialogue
-        speaker: 系统
-        text: 公告板上贴满了通知，日期处有涂改痕迹...仔细看的话，最新的日期下面还有另一个数字。
+        dialogueId: NOTICE_BOARD_DETAIL
+
+  # 公告板（已检查过）
+  - id: notice_board_done
+    type: image
+    texture: obj_sign
+    x: 520
+    y: 520
+    scale: 0.8
+    depth: 10
+    label: 公告板
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C0Z1_NOTICE_EXAMINED
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: NOTICE_BOARD_DONE
 
   # 储物柜（取工具包和早餐券）
   - id: storage_cabinet

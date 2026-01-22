@@ -97,6 +97,27 @@ dialogues:
       - speaker: 岑回
         text: （……算了）
 
+  # 任务A已完成后
+  C5Z7_TASK_A_ALREADY:
+    id: C5Z7_TASK_A_ALREADY
+    lines:
+      - speaker: ""
+        text: 标签已经贴回去了。
+
+  # 任务B已完成后
+  C5Z7_TASK_B_ALREADY:
+    id: C5Z7_TASK_B_ALREADY
+    lines:
+      - speaker: ""
+        text: 椅脚印描边已经补好了。
+
+  # 任务C已完成后
+  C5Z7_TASK_C_ALREADY:
+    id: C5Z7_TASK_C_ALREADY
+    lines:
+      - speaker: ""
+        text: 版本卡已经放进去了。
+
   # F21触发
   C5Z7_F21_TRIGGER:
     id: C5Z7_F21_TRIGGER

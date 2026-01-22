@@ -9,7 +9,7 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 菜单板
+  # 菜单板（未用餐时可选择）
   - id: menu_board
     type: image
     texture: px_item_archive
@@ -19,12 +19,33 @@ objects:
     depth: 10
     label: 菜单板
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C0Z2_EATEN
     interactive:
       cursor: true
       testid: menu-board
       action:
         type: dialogue
         dialogueId: C0Z2_MENU
+
+  # 菜单板（已用餐后不可重复选择）
+  - id: menu_board_done
+    type: image
+    texture: px_item_archive
+    x: 200
+    y: 350
+    scale: 0.6
+    depth: 10
+    label: 菜单板
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C0Z2_EATEN
+    interactive:
+      cursor: true
+      testid: menu-board-done
+      action:
+        type: dialogue
+        dialogueId: C0Z2_MENU_DONE
 
   # 座位A（靠窗）- 固定套餐
   - id: seat_window

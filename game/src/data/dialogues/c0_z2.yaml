@@ -1,6 +1,6 @@
 # C0-Z2 早餐小店对话数据
 dialogues:
-  # 菜单板
+  # 菜单板（未用餐时）
   C0Z2_MENU:
     id: C0Z2_MENU
     lines:
@@ -24,6 +24,13 @@ dialogues:
             name: FLAG_R_SOURCE_BREAKFAST
             value: true
         nextDialogueId: C0Z2_ORDER_SPECIAL
+
+  # 菜单板（已用餐后）- 不可重复选择
+  C0Z2_MENU_DONE:
+    id: C0Z2_MENU_DONE
+    lines:
+      - speaker: 岑回
+        text: 已经吃过了。
 
   # 固定套餐对话
   C0Z2_ORDER_STANDARD:

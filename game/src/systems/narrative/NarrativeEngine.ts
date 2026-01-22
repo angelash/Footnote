@@ -263,8 +263,9 @@ class NarrativeEngine {
     }
 
     try {
-      // 动态fetch YAML文件
-      const response = await fetch(`/assets/data/dialogues/${yamlFile}.yaml`);
+      // 动态fetch YAML文件（开发环境使用 /src/data，生产环境使用 /assets/data）
+      const basePath = import.meta.env.DEV ? '/src/data/dialogues' : '/assets/data/dialogues';
+      const response = await fetch(`${basePath}/${yamlFile}.yaml`);
       if (!response.ok) {
         logger.debug(`对话文件不存在: ${yamlFile}.yaml`);
         return null;

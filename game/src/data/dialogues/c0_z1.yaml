@@ -115,9 +115,13 @@ dialogues:
         text: 工具包已经准备好了。标准配置，和每天一样。
       - speaker: 岑回
         text: 早餐券也在这里……
+      - speaker: 岑回
+        text: 还有今天的工单。
     onComplete:
       - type: card
         cardId: CARD_C0_MEAL_TICKET
+      - type: card
+        cardId: CARD_C0_WORK_ORDER
       - type: flag
         flagName: FLAG_C0Z1_GOT_TOOLS
         flagValue: true
@@ -139,6 +143,64 @@ dialogues:
   NEIGHBOR_DOOR_KNOCK_2:
     id: NEIGHBOR_DOOR_KNOCK_2
     speaker: 岑回
-    text: 7750...从没见过这户人。
+    text: 103号？不对，我记得这里应该是102号……
+    expression: confused
     next: null
+
+  # ==================== 身份卡长按细节（F06伏笔）====================
+  C0Z1_IDENTITY_DETAIL:
+    id: C0Z1_IDENTITY_DETAIL
+    lines:
+      - speaker: 岑回
+        text: （仔细查看身份卡背面……）
+      - speaker: ""
+        text: 生效日下方有一行极淡的小字。
+      - speaker: ""
+        text: 「更正：03/17 → 03/16」
+        delay: 500
+      - speaker: 岑回
+        text: 什么时候改的？我怎么不记得……
+        expression: confused
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F06
+        foreshadowStage: plant
+      - type: flag
+        flagName: FLAG_SEEN_IDENTITY_CORRECTION
+        flagValue: true
+
+  # ==================== 祷词台交互 ====================
+  C0Z1_PRAYER_BOARD:
+    id: C0Z1_PRAYER_BOARD
+    lines:
+      - speaker: ""
+        text: 墙上贴着一张晨间祷词，边角已经泛黄。
+      - speaker: 岑回
+        text: 「平面永恒，收敛是福」……每天都要念的。
+    choices:
+      - id: take_prayer
+        text: 取下祷词
+        effects:
+          setFlag:
+            name: FLAG_C0Z1_GOT_PRAYER
+            value: true
+          giveCard: CARD_C0_MORNING_PRAYER
+        nextDialogueId: C0Z1_PRAYER_TAKEN
+      - id: leave_prayer
+        text: 算了
+        nextDialogueId: null
+
+  C0Z1_PRAYER_TAKEN:
+    id: C0Z1_PRAYER_TAKEN
+    lines:
+      - speaker: 岑回
+        text: （收好了祷词）
+      - speaker: 岑回
+        text: 背面有人用铅笔写了两个字：「真的吗？」
+
+  C0Z1_PRAYER_BOARD_DONE:
+    id: C0Z1_PRAYER_BOARD_DONE
+    lines:
+      - speaker: 岑回
+        text: 祷词台空了。我已经取走了那张祷词。
 

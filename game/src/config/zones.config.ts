@@ -45,9 +45,9 @@ export const ZONES: Record<string, IZoneInfo> = {
   'C0-Z2': {
     id: 'C0-Z2',
     chapter: ChapterId.C0,
-    name: '岑回房间',
-    description: '岑回的宿舍房间，简单的陈设。',
-    backgroundKey: 'bg_c0z2_cenhui_room',
+    name: '早餐小店',
+    description: '巷口食堂，维修局员工的早餐去处。',
+    backgroundKey: 'bg_c0z2_breakfast_shop',
   },
   'C0-Z3': {
     id: 'C0-Z3',
@@ -59,9 +59,9 @@ export const ZONES: Record<string, IZoneInfo> = {
   'C0-Z4': {
     id: 'C0-Z4',
     chapter: ChapterId.C0,
-    name: '档案室',
-    description: '堆满旧文件的档案储存室。',
-    backgroundKey: 'bg_c0z4_archive',
+    name: '维修局前台',
+    description: '维修局行政办事前台，秩序井然。',
+    backgroundKey: 'bg_c0z4_bureau_reception',
   },
   'C0-Z5': {
     id: 'C0-Z5',

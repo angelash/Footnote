@@ -26,7 +26,7 @@ objects:
         type: dialogue
         dialogueId: C0Z4_RECEPTION
 
-  # 任务板
+  # 任务板（需要先报到才能查看）
   - id: task_board
     type: image
     texture: px_item_archive
@@ -36,12 +36,32 @@ objects:
     depth: 9
     label: 任务板
     labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C0Z4_CHECKED_IN
     interactive:
       cursor: true
       testid: task-board
       action:
         type: dialogue
         dialogueId: C0Z4_TASKBOARD
+
+  # 任务板（未报到时不可交互）
+  - id: task_board_locked
+    type: image
+    texture: px_item_archive
+    x: 180
+    y: 350
+    scale: 0.6
+    depth: 9
+    label: 任务板
+    labelOffset: [0, 80]
+    condition:
+      flagFalse: FLAG_C0Z4_CHECKED_IN
+    interactive:
+      cursor: true
+      action:
+        type: dialogue
+        dialogueId: C0Z4_TASKBOARD_LOCKED
 
   # 顾临办公室门口
   - id: gulin_door

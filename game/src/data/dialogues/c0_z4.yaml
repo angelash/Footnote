@@ -17,6 +17,13 @@ dialogues:
         flagName: FLAG_C0Z4_CHECKED_IN
         flagValue: true
 
+  # 任务板（未报到时）
+  C0Z4_TASKBOARD_LOCKED:
+    id: C0Z4_TASKBOARD_LOCKED
+    lines:
+      - speaker: 岑回
+        text: 应该先去前台报到。
+
   # 任务板
   C0Z4_TASKBOARD:
     id: C0Z4_TASKBOARD
@@ -62,7 +69,7 @@ dialogues:
       - id: response_date
         text: 昨晚公告板日期不对。
         condition:
-          flagTrue: FLAG_SEEN_NOTICE
+          flagTrue: FLAG_C0Z1_NOTICE_EXAMINED
         nextDialogueId: C0Z4_GULIN_DATE
       - id: response_wall
         text: 我听到墙里是空的。
@@ -78,6 +85,9 @@ dialogues:
         text: 嗯。
         portrait: gulin_neutral
       - speaker: 顾临
+        text: 对了，这个月的警告通知。
+        portrait: gulin_neutral
+      - speaker: 顾临
         text: 去吧。有问题记录在案，不要自己处理。
         portrait: gulin_neutral
     onComplete:
@@ -87,6 +97,8 @@ dialogues:
       - type: flag
         flagName: FLAG_C0_END
         flagValue: true
+      - type: card
+        cardId: CARD_C0_WARNING
 
   # 顾临回应 - 日期问题
   C0Z4_GULIN_DATE:
@@ -101,6 +113,9 @@ dialogues:
       - speaker: 顾临
         text: 事实以记录为准。
         portrait: gulin_neutral
+      - speaker: 顾临
+        text: 对了，这个月的警告通知。
+        portrait: gulin_neutral
       - speaker: 岑回
         text: ……明白了。
     onComplete:
@@ -113,6 +128,8 @@ dialogues:
       - type: flag
         flagName: FLAG_QUESTIONED_DATE
         flagValue: true
+      - type: card
+        cardId: CARD_C0_WARNING
 
   # 顾临回应 - 墙壁问题
   C0Z4_GULIN_WALL:
@@ -130,6 +147,9 @@ dialogues:
       - speaker: 顾临
         text: 系统判定正常，就是正常。
         portrait: gulin_neutral
+      - speaker: 顾临
+        text: 对了，这个月的警告通知。
+        portrait: gulin_neutral
       - speaker: 岑回
         text: ……明白了。
     onComplete:
@@ -142,6 +162,8 @@ dialogues:
       - type: flag
         flagName: FLAG_QUESTIONED_WALL
         flagValue: true
+      - type: card
+        cardId: CARD_C0_WARNING
 
 
 

@@ -46,6 +46,8 @@ dialogues:
       - type: flag
         flagName: FLAG_C0Z2_EATEN
         flagValue: true
+      - type: card
+        cardId: CARD_C0_RECEIPT_STANDARD
 
   # 今日特别对话
   C0Z2_ORDER_SPECIAL:
@@ -71,6 +73,8 @@ dialogues:
       - type: flag
         flagName: FLAG_C0Z2_SPECIAL
         flagValue: true
+      - type: card
+        cardId: CARD_C0_RECEIPT_SPECIAL
 
   # 靠窗座位
   C0Z2_SEAT_WINDOW:

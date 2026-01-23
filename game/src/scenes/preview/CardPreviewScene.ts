@@ -18,12 +18,13 @@ const CARD_TYPE_CONFIG: Record<string, { name: string; color: string; icon: stri
   diary: { name: '日记', color: '#FF8C00', icon: '📔' },
 };
 
-// 示例卡片数据
+// 示例卡片数据（统一格式）
 interface ICardData {
   id: string;
   type: string;
-  title: string;
-  content: string;
+  name: string;
+  front: string[];
+  detail: string[];
   chapter: string;
 }
 
@@ -122,43 +123,49 @@ export class CardPreviewScene extends BasePreviewScene {
       {
         id: 'CARD_C0_01',
         type: 'archive',
-        title: '维修局员工证',
-        content: '岑回的员工证，编号位置有明显的涂改痕迹。',
+        name: '维修局员工证',
+        front: ['岑回的员工证', '编号位置有明显的涂改痕迹'],
+        detail: ['持证人：岑回', '编号：EX-7749', '——', '背面有一道细小的划痕'],
         chapter: 'C0',
       },
       {
         id: 'CARD_C1_01',
         type: 'item',
-        title: '旧钥匙',
-        content: '一把锈迹斑斑的钥匙，不知道能打开什么。',
+        name: '旧钥匙',
+        front: ['一把锈迹斑斑的钥匙', '不知道能打开什么'],
+        detail: ['材质：铜', '——', '似乎很久没人用过了'],
         chapter: 'C1',
       },
       {
         id: 'CARD_C2_01',
-        type: 'map',
-        title: '边缘区地图',
-        content: '宋岚手绘的边缘区地图，标注了多个危险位置。',
+        type: 'archive',
+        name: '边缘区地图',
+        front: ['宋岚手绘的边缘区地图', '标注了多个危险位置'],
+        detail: ['版本：V-A', '注：与官方版本存在差异', '——', '差异被记录下来'],
         chapter: 'C2',
       },
       {
         id: 'CARD_C3_01',
         type: 'prayer',
-        title: '栖蓝的祈祷',
-        content: '愿那些被遗忘的名字，在某个角落仍被记得。',
+        name: '栖蓝的祈祷',
+        front: ['愿那些被遗忘的名字', '在某个角落仍被记得'],
+        detail: ['——', '这不是祈求，只是希望'],
         chapter: 'C3',
       },
       {
         id: 'CARD_C4_01',
         type: 'verdict',
-        title: '系统判决书',
-        content: '对象：阿棠\n判定：对账失败\n处理：等待收敛',
+        name: '系统判决书',
+        front: ['对象：阿棠', '判定：对账失败'],
+        detail: ['处理：等待收敛', '——', '系统从不解释"为什么"'],
         chapter: 'C4',
       },
       {
         id: 'CARD_C5_01',
         type: 'diary',
-        title: '岑回的日记',
-        content: '今天又梦到了那个声音。它说：你是例外。',
+        name: '岑回的日记',
+        front: ['今天又梦到了那个声音', '它说：你是例外'],
+        detail: ['日期：?/?/?', '——', '我不确定这是梦还是记忆'],
         chapter: 'C5',
       },
     ];
@@ -242,7 +249,7 @@ export class CardPreviewScene extends BasePreviewScene {
 
     // 卡片标题
     const title = this.add
-      .text(width / 2, 90, card.title, {
+      .text(width / 2, 90, card.name, {
         fontFamily: 'Noto Sans SC',
         fontSize: this.FONT_SIZE.NORMAL,
         color: '#E8E6E3',
@@ -272,8 +279,8 @@ export class CardPreviewScene extends BasePreviewScene {
     divider.lineBetween(20, 165, width - 20, 165);
     container.add(divider);
 
-    // 卡片内容
-    const content = this.add.text(20, 180, card.content, {
+    // 卡片内容（正面）
+    const content = this.add.text(20, 180, card.front.join('\n'), {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.SMALL,
       color: '#A8A6A3',
@@ -389,7 +396,7 @@ export class CardPreviewScene extends BasePreviewScene {
 
     // 标题
     const title = this.add
-      .text(width / 2, cardY + 135, card.title, {
+      .text(width / 2, cardY + 135, card.name, {
         fontFamily: 'Noto Sans SC',
         fontSize: this.FONT_SIZE.SECTION,
         color: '#E8E6E3',
@@ -419,8 +426,9 @@ export class CardPreviewScene extends BasePreviewScene {
     divider.lineBetween(cardX + 35, cardY + 235, cardX + cardWidth - 35, cardY + 235);
     this.previewContainer.add(divider);
 
-    // 内容
-    const content = this.add.text(cardX + 35, cardY + 265, card.content, {
+    // 内容（正面 + 背面）
+    const fullContent = [...card.front, '', ...card.detail].join('\n');
+    const content = this.add.text(cardX + 35, cardY + 265, fullContent, {
       fontFamily: 'Noto Sans SC',
       fontSize: this.FONT_SIZE.NORMAL,
       color: '#A8A6A3',

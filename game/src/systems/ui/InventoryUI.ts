@@ -6,7 +6,7 @@
  */
 
 import Phaser from 'phaser';
-import { narrativeEngine, CardCategory } from '@/systems/narrative';
+import { narrativeEngine } from '@/systems/narrative';
 import { TEXT_STYLES, COLORS } from '@/config/game.config';
 import { UI, UI_FONT_SIZE } from '@/config/ui.config';
 import { a11yManager } from '@/systems/accessibility/A11yManager';
@@ -337,14 +337,8 @@ export class InventoryUI {
       // 获取所有已获得的卡片
       cards = narrativeEngine.getObtainedCards();
     } else {
-      const categoryMap: Record<TabType, CardCategory> = {
-        all: CardCategory.ARCHIVE,
-        archive: CardCategory.ARCHIVE,
-        item: CardCategory.ITEM,
-        prayer: CardCategory.PRAYER,
-        verdict: CardCategory.VERDICT,
-      };
-      cards = narrativeEngine.getCardsByCategory(categoryMap[this._currentTab]);
+      // Tab 名称与卡片类型一致
+      cards = narrativeEngine.getCardsByType(this._currentTab);
     }
 
     if (cards.length === 0) {
@@ -394,7 +388,7 @@ export class InventoryUI {
 
     // 卡片背景
     const bg = this._scene.add.graphics();
-    const cardColor = this._getCardColor(card.category);
+    const cardColor = this._getCardColor(card.type);
     bg.fillStyle(cardColor, 0.9);
     bg.fillRoundedRect(
       -CONFIG.CARD_THUMB_WIDTH / 2,
@@ -416,13 +410,13 @@ export class InventoryUI {
     const icon = this._scene.add.text(
       -CONFIG.CARD_THUMB_WIDTH / 2 + 10,
       -CONFIG.CARD_THUMB_HEIGHT / 2 + 10,
-      this._getCategoryIcon(card.category),
+      this._getTypeIcon(card.type),
       { fontSize: UI_FONT_SIZE.SMALL }
     );
 
     // 卡片标题
     const title = this._scene.add
-      .text(0, 0, card.title, {
+      .text(0, 0, card.name, {
         ...TEXT_STYLES.BODY,
         fontSize: UI_FONT_SIZE.TINY,
         wordWrap: { width: CONFIG.CARD_THUMB_WIDTH - 20 },
@@ -458,7 +452,7 @@ export class InventoryUI {
 
     // 对可使用的卡片（ITEM/PRAYER）显示使用按钮
     const isUsable = narrativeEngine.isCardUsable(card.id);
-    if (isUsable && (card.category === CardCategory.ITEM || card.category === CardCategory.PRAYER)) {
+    if (isUsable && (card.type === 'item' || card.type === 'prayer')) {
       const useBtn = this._createUseButton(card);
       useBtn.setPosition(0, CONFIG.CARD_THUMB_HEIGHT / 2 - 35);
       container.add(useBtn);
@@ -584,13 +578,13 @@ export class InventoryUI {
         const success = narrativeEngine.useCard(card.id);
         if (success) {
           // 显示使用成功提示
-          this._showUseToast(card.title);
+          this._showUseToast(card.name);
 
           // 刷新卡片显示
           this._refreshCards();
 
           // 播报使用成功
-          a11yManager.announce(`已使用：${card.title}`, 'assertive');
+          a11yManager.announce(`已使用：${card.name}`, 'assertive');
         }
       });
 
@@ -633,26 +627,26 @@ export class InventoryUI {
     });
   }
 
-  private _getCardColor(category: CardCategory): number {
+  private _getCardColor(type: string): number {
     const colors: Record<string, number> = {
-      [CardCategory.ARCHIVE]: 0x1a3a4a,
-      [CardCategory.ITEM]: 0x3a1a4a,
-      [CardCategory.PRAYER]: 0x4a3a1a,
-      [CardCategory.VERDICT]: 0x4a1a1a,
-      [CardCategory.DIARY]: 0x2a2a3a,
+      archive: 0x1a3a4a,
+      item: 0x3a1a4a,
+      prayer: 0x4a3a1a,
+      verdict: 0x4a1a1a,
+      diary: 0x2a2a3a,
     };
-    return colors[category] || COLORS.BG_TERTIARY;
+    return colors[type] || COLORS.BG_TERTIARY;
   }
 
-  private _getCategoryIcon(category: CardCategory): string {
+  private _getTypeIcon(type: string): string {
     const icons: Record<string, string> = {
-      [CardCategory.ARCHIVE]: '📋',
-      [CardCategory.ITEM]: '🔧',
-      [CardCategory.PRAYER]: '🙏',
-      [CardCategory.VERDICT]: '⚖️',
-      [CardCategory.DIARY]: '📖',
+      archive: '📋',
+      item: '🔧',
+      prayer: '🙏',
+      verdict: '⚖️',
+      diary: '📖',
     };
-    return icons[category] || '📄';
+    return icons[type] || '📄';
   }
 
   // ==================== 私有方法 - 键盘导航 ====================
@@ -778,7 +772,7 @@ export class InventoryUI {
       if (cardData) {
         focusGroup.add({
           id: `card-${index}`,
-          label: cardData.title,
+          label: cardData.name,
           role: 'listitem',
           enabled: true,
           onFocus: () => this._highlightCard(index, true),
@@ -841,7 +835,7 @@ export class InventoryUI {
 
     const bg = container.list[0] as Phaser.GameObjects.Graphics;
     const cardData = container.getData('card') as INarrativeCard | undefined;
-    const cardColor = cardData ? this._getCardColor(cardData.category) : COLORS.BG_TERTIARY;
+    const cardColor = cardData ? this._getCardColor(cardData.type) : COLORS.BG_TERTIARY;
 
     bg.clear();
     if (highlight) {

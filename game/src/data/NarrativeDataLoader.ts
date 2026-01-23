@@ -887,26 +887,21 @@ function registerDataToNarrativeEngine(
     });
   }
 
-  // 注册卡片
+  // 注册卡片（统一格式：name, type, front, detail）
   for (const card of cards) {
     narrativeEngine.registerCard({
       id: card.id,
-      title: card.name,
-      subtitle: '',
-      category: card.type as unknown as import('@/systems/narrative').CardCategory,
-      content: card.front?.join('\n') || '',
-      chapter: card.chapter,
+      name: card.name,
+      type: card.type as import('@/systems/narrative').CardType,
+      chapter: card.chapter as import('@/config/game.config').ChapterID,
       zone: card.zone,
-      image: undefined,
-      // 保留原始的 front 和 detail 数组，用于 CardUI 显示
-      front: card.front || [],
-      detail: card.detail || [],
+      front: card.front,
+      detail: card.detail,
       effects: card.fx?.map((f) => ({
         type: f.type as 'taint' | 'flash' | 'glitch' | 'redact',
         target: f.target,
         intensity: f.duration,
       })),
-      // Phase 3: 传递 Gameplay 效果
       gameplayFx: card.gameplayFx?.map((fx) => ({
         trigger: fx.trigger,
         effects: fx.effects.map((effect) => ({

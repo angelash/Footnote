@@ -85,21 +85,24 @@ export interface IDialogueData {
 }
 
 /**
- * 卡片数据
+ * 卡片数据（统一格式）
  */
 export interface ICard {
   id: string;
-  title: string;
-  subtitle?: string;
-  category: CardCategory;
-  content: string;
+  /** 卡片名称 */
+  name: string;
+  /** 卡片类型 */
+  type: CardType;
+  /** 所属章节 */
   chapter: ChapterID;
+  /** 所属区域 */
   zone: string;
+  /** 正面内容 */
+  front: string[];
+  /** 背面详情 */
+  detail: string[];
+  /** 卡片图片（可选） */
   image?: string;
-  /** 正面内容（数组格式，用于 CardUI 显示） */
-  front?: string[];
-  /** 背面详情（数组格式，用于 CardUI 显示） */
-  detail?: string[];
   /** 视觉效果（UI层面） */
   effects?: ICardEffect[];
   /** Gameplay 效果（游戏机制层面） */
@@ -109,7 +112,13 @@ export interface ICard {
 }
 
 /**
- * 卡片类别
+ * 卡片类型
+ */
+export type CardType = 'archive' | 'item' | 'prayer' | 'verdict' | 'diary';
+
+/**
+ * 卡片类型枚举（兼容旧代码）
+ * @deprecated 请直接使用 CardType 字符串类型
  */
 export enum CardCategory {
   ARCHIVE = 'archive',
@@ -655,8 +664,8 @@ class NarrativeEngine {
     eventBus.emit(GameEvent.CARD_OBTAIN, {
       cardId,
       card: card
-        ? { id: card.id, title: card.title, category: card.category }
-        : { id: cardId, title: cardId, category: CardCategory.ITEM },
+        ? { id: card.id, name: card.name, type: card.type }
+        : { id: cardId, name: cardId, type: 'item' as CardType },
     });
 
     // 自动触发 'obtain' 时机的 gameplay 效果
@@ -698,10 +707,10 @@ class NarrativeEngine {
   }
 
   /**
-   * 按类别获取卡片
+   * 按类型获取卡片
    */
-  getCardsByCategory(category: CardCategory | string): ICard[] {
-    return this.getObtainedCards().filter((c) => c.category === category);
+  getCardsByType(type: CardType | string): ICard[] {
+    return this.getObtainedCards().filter((c) => c.type === type);
   }
 
   /**
@@ -754,7 +763,7 @@ class NarrativeEngine {
     if (applied && card.consumable) {
       worldState.consumeCard(cardId);
       this._obtainedCards.delete(cardId);
-      eventBus.emit(GameEvent.CARD_CONSUME, { cardId, card: { id: card.id, title: card.title } });
+      eventBus.emit(GameEvent.CARD_CONSUME, { cardId, card: { id: card.id, name: card.name } });
       logger.info(`Card consumed: ${cardId}`);
     }
 

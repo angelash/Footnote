@@ -13,4 +13,5 @@ export type {
   IForeshadowState,
   ForeshadowStage,
   INarrativeState,
+  CardType,
 } from './NarrativeEngine';

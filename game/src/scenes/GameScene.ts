@@ -1893,25 +1893,17 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * 转换NarrativeEngine的卡片格式到UI需要的格式
+   * 注：格式已统一，直接映射字段
    */
   private _convertNarrativeCard(card: INarrativeCard): ICard {
-    // 优先使用原始的 front/detail 数组，如果没有则从 content 生成
-    const front = card.front && card.front.length > 0
-      ? card.front
-      : [card.title, card.subtitle || '', card.content.slice(0, 100)];
-    
-    const detail = card.detail && card.detail.length > 0
-      ? card.detail
-      : [card.content];
-
     return {
       id: card.id,
-      name: card.title,
-      type: card.category as ICard['type'],
+      name: card.name,
+      type: card.type as ICard['type'],
       chapter: card.chapter,
       zone: card.zone,
-      front,
-      detail,
+      front: card.front,
+      detail: card.detail,
     };
   }
 

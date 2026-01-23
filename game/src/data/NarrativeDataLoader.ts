@@ -894,9 +894,15 @@ function registerDataToNarrativeEngine(
       })),
       onComplete: lastDialogue.trigger
         ? ([
-            lastDialogue.trigger.card
-              ? { type: 'card' as const, cardId: lastDialogue.trigger.card }
-              : null,
+            // 支持多张卡片（trigger.cards 数组优先）
+            ...((lastDialogue.trigger as { cards?: string[] }).cards || []).map((cardId) => ({
+              type: 'card' as const,
+              cardId,
+            })),
+            // 向后兼容：如果没有 cards 数组，使用单个 card
+            ...(!((lastDialogue.trigger as { cards?: string[] }).cards?.length) && lastDialogue.trigger.card
+              ? [{ type: 'card' as const, cardId: lastDialogue.trigger.card }]
+              : []),
             lastDialogue.trigger.foreshadow
               ? {
                   type: 'foreshadow' as const,

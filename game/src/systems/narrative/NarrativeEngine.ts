@@ -96,6 +96,10 @@ export interface ICard {
   chapter: ChapterID;
   zone: string;
   image?: string;
+  /** 正面内容（数组格式，用于 CardUI 显示） */
+  front?: string[];
+  /** 背面详情（数组格式，用于 CardUI 显示） */
+  detail?: string[];
   /** 视觉效果（UI层面） */
   effects?: ICardEffect[];
   /** Gameplay 效果（游戏机制层面） */

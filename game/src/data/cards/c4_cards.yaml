@@ -1,149 +1,165 @@
 # 第4章卡片数据
+# 统一使用格式A: { id, name, type, chapter, zone, front[], detail[] }
+
 cards:
-  # C4-Z1 临时公告
+  # ==================== C4-Z1 临时公告 ====================
   CARD_C4_TEMP_NOTICE:
     id: CARD_C4_TEMP_NOTICE
-    title: 临时公告（灾后版）
+    name: 临时公告（灾后版）
     type: archive
-    content: |
-      封锁范围：已更新
-      
-      请以最新更正为准
-      
-      [长按可见：封锁日期存在轻微涂改痕迹]
-    flavorText: 日期不干净，记忆也不干净。
+    chapter: C4
+    zone: C4-Z1
+    front:
+      - 封锁范围：已更新
+      - 请以最新更正为准
+    detail:
+      - [长按可见：封锁日期存在轻微涂改痕迹]
+      - ——
+      - 日期不干净，记忆也不干净。
     rarity: common
 
-  # C4-Z2 演示回执
+  # ==================== C4-Z2 演示回执 ====================
   CARD_C4_DEMO_RECEIPT:
     id: CARD_C4_DEMO_RECEIPT
-    title: 演示回执
+    name: 演示回执
     type: archive
-    content: |
-      回溯已执行。
-      
-      遗留：擦痕（不可归因）
-    flavorText: 补丁痕迹不是"事件原因"，是"自洽代价"。
+    chapter: C4
+    zone: C4-Z2
+    front:
+      - 回溯已执行。
+      - 遗留：擦痕（不可归因）
+    detail:
+      - ——
+      - 补丁痕迹不是"事件原因"，是"自洽代价"。
     rarity: uncommon
 
-  # C4-Z2 时间授权
+  # ==================== C4-Z2 时间授权 ====================
   CARD_C4_TIME_AUTH:
     id: CARD_C4_TIME_AUTH
-    title: 授权记录（时间干预）
+    name: 授权记录（时间干预）
     type: archive
-    content: |
-      权限：回溯至稳定节点
-      
-      警告：回溯不会抹去深度伤痕
-      
-      备注：解释成本：上升（已更正）
-    flavorText: 你能做的，只是把错误搬到别处。
+    chapter: C4
+    zone: C4-Z2
+    front:
+      - 权限：回溯至稳定节点
+      - 警告：回溯不会抹去深度伤痕
+    detail:
+      - 备注：解释成本：上升（已更正）
+      - ——
+      - 你能做的，只是把错误搬到别处。
     rarity: rare
 
-  # C4-Z3 节点卡片回执
+  # ==================== C4-Z3 节点卡片回执 ====================
   CARD_C4_NODE_RECEIPT_01:
     id: CARD_C4_NODE_RECEIPT_01
-    title: 节点卡片回执-01
+    name: 节点卡片回执-01
     type: archive
-    content: |
-      节点：断口·警报前
-      
-      回溯：已执行
-      
-      遗留：补丁痕迹
-    flavorText: 我回来了……但墙没有恢复。
+    chapter: C4
+    zone: C4-Z3
+    front:
+      - 节点：断口·警报前
+      - 回溯：已执行
+    detail:
+      - 遗留：补丁痕迹
+      - ——
+      - 我回来了……但墙没有恢复。
     rarity: uncommon
     foreshadowId: F13
 
-  # C4-Z3 断口记录
+  # ==================== C4-Z3 断口记录 ====================
   CARD_C4_EDGE_RECORD_02:
     id: CARD_C4_EDGE_RECORD_02
-    title: 断口记录-02（回溯后版本）
+    name: 断口记录-02（回溯后版本）
     type: archive
-    content: |
-      同一路径在不同尝试中表现不同。
-      
-      自洽修补：已发生（不可归因）
-    flavorText: 回溯洗不掉深度伤痕。
+    chapter: C4
+    zone: C4-Z3
+    front:
+      - 同一路径在不同尝试中表现不同。
+      - 自洽修补：已发生（不可归因）
+    detail:
+      - ——
+      - 回溯洗不掉深度伤痕。
     rarity: uncommon
 
-  # C4-Z4 病例卡-02
+  # ==================== C4-Z4 病例卡-02 ====================
   CARD_C4_MED_CARD_02:
     id: CARD_C4_MED_CARD_02
-    title: 病例卡-02
+    name: 病例卡-02
     type: archive
-    content: |
-      编号：MC-◦◦-断口
-      
-      症状：事件重复感 / 补丁敏感
-      
-      结论：建议减少回溯
-      
-      注记：补丁痕迹敏感性↑
-      
-      对齐：待定
-    flavorText: 编号格式与节点卡的刻度点呼应。
+    chapter: C4
+    zone: C4-Z4
+    front:
+      - 编号：MC-◦◦-断口
+      - 症状：事件重复感 / 补丁敏感
+    detail:
+      - 结论：建议减少回溯
+      - 注记：补丁痕迹敏感性↑
+      - 对齐：待定
+      - ——
+      - 编号格式与节点卡的刻度点呼应。
     rarity: uncommon
     foreshadowId: F14
 
-  # C4-Z5 碎片日记-02
+  # ==================== C4-Z5 碎片日记-02 ====================
   CARD_C4_FRAGMENT_DIARY_02:
     id: CARD_C4_FRAGMENT_DIARY_02
-    title: 碎片日记-02
+    name: 碎片日记-02
     type: archive
-    content: |
-      补丁痕迹不是错误，是对账。
-      
-      对账的人不在这里。
-    flavorText: 你每次回来，墙上都会多一条"不属于任何原因"的痕。
+    chapter: C4
+    zone: C4-Z5
+    front:
+      - 补丁痕迹不是错误，是对账。
+      - 对账的人不在这里。
+    detail:
+      - ——
+      - 你每次回来，墙上都会多一条"不属于任何原因"的痕。
     rarity: rare
 
-  # C4-Z6 无人需要的地图
+  # ==================== C4-Z6 无人需要的地图 ====================
   CARD_C4_USELESS_MAP:
     id: CARD_C4_USELESS_MAP
-    title: 无人需要的地图（贴墙版）
+    name: 无人需要的地图（贴墙版）
     type: archive
-    content: |
-      已贴回。
-      
-      结算：无可用收益。
-      
-      [角落版本号已涂抹]
-    flavorText: 让撕掉变成一个动作，而不是一句更正。
+    chapter: C4
+    zone: C4-Z6
+    front:
+      - 已贴回。
+      - 结算：无可用收益。
+    detail:
+      - [角落版本号已涂抹]
+      - ——
+      - 让撕掉变成一个动作，而不是一句更正。
     rarity: uncommon
     foreshadowId: F21
 
-  # C4-Z7 祷文抄本-03
+  # ==================== C4-Z7 祷文抄本-03 ====================
   CARD_C4_PRAYER_03:
     id: CARD_C4_PRAYER_03
-    title: 祷文抄本-03
+    name: 祷文抄本-03
     type: prayer
-    content: |
-      折纸不灭痕 归位非归真
-      形塑于折返 更正止于形
-    flavorText: 折痕多了，纸会学会另一种形状。
+    chapter: C4
+    zone: C4-Z7
+    front:
+      - 折纸不灭痕 归位非归真
+      - 形塑于折返 更正止于形
+    detail:
+      - ——
+      - 折痕多了，纸会学会另一种形状。
     rarity: rare
     foreshadowId: F15
 
-  # C4-Z8 权限变更通知
+  # ==================== C4-Z8 权限变更通知 ====================
   CARD_C4_PERMISSION_CHANGE:
     id: CARD_C4_PERMISSION_CHANGE
-    title: 权限变更通知
+    name: 权限变更通知
     type: verdict
-    content: |
-      写入权限：暂挂审核
-      
-      原因：解释成本超阈值
-      
-      建议：减少干预
-    flavorText: 你仍然能选择，但会更难。
+    chapter: C4
+    zone: C4-Z8
+    front:
+      - 写入权限：暂挂审核
+      - 原因：解释成本超阈值
+    detail:
+      - 建议：减少干预
+      - ——
+      - 你仍然能选择，但会更难。
     rarity: uncommon
-
-
-
-
-
-
-
-
-

@@ -1,157 +1,191 @@
 # 终章卡片数据
+# 统一使用格式A: { id, name, type, chapter, zone, front[], detail[] }
+
 cards:
-  # CF-Z1 冗余字段区快照
+  # ==================== CF-Z1 冗余字段区快照 ====================
   CARD_CF_REDUNDANT_SNAPSHOT:
     id: CARD_CF_REDUNDANT_SNAPSHOT
-    title: 冗余字段区快照-01
+    name: 冗余字段区快照-01
     type: archive
-    content: |
-      收敛：失败
-      字段：＿
-      残差：保留
-    flavorText: 你进入了一个无法关闭的字段。
+    chapter: CF
+    zone: CF-Z1
+    front:
+      - 收敛：失败
+      - 字段：＿
+    detail:
+      - 残差：保留
+      - ——
+      - 你进入了一个无法关闭的字段。
     rarity: uncommon
     foreshadowId: F22
 
-  # CF-Z2 空椅占位·终局版
+  # ==================== CF-Z2 空椅占位·终局版 ====================
   CARD_CF_CHAIR_FINAL:
     id: CARD_CF_CHAIR_FINAL
-    title: 空椅占位·终局版
+    name: 空椅占位·终局版
     type: archive
-    content: |
-      仪式完成。
-      
-      无可用收益。
-      
-      字段：＿（待定义）
-    flavorText: 让他们抹掉的时候，得多花一次力气。
+    chapter: CF
+    zone: CF-Z2
+    front:
+      - 仪式完成。
+      - 无可用收益。
+    detail:
+      - 字段：＿（待定义）
+      - ——
+      - 让他们抹掉的时候，得多花一次力气。
     rarity: rare
 
-  # CF-Z2 版本库封存回执
+  # ==================== CF-Z2 版本库封存回执 ====================
   CARD_CF_ARCHIVE_FINAL:
     id: CARD_CF_ARCHIVE_FINAL
-    title: 版本库封存回执
+    name: 版本库封存回执
     type: archive
-    content: |
-      封条：◦◦◦
-      
-      条目：不可归档
-      
-      残差保留
-    flavorText: 把差异保留得更久一点。
+    chapter: CF
+    zone: CF-Z2
+    front:
+      - 封条：◦◦◦
+      - 条目：不可归档
+    detail:
+      - 残差保留
+      - ——
+      - 把差异保留得更久一点。
     rarity: rare
 
-  # CF-Z2 点灯记录
+  # ==================== CF-Z2 点灯记录 ====================
   CARD_CF_LAMP_FINAL:
     id: CARD_CF_LAMP_FINAL
-    title: 点灯记录（对象不存在）
+    name: 点灯记录（对象不存在）
     type: archive
-    content: |
-      对象：不存在
-      行为：执行
-      
-      灯光很弱，但非常稳定
-    flavorText: 对比之前一切都在抖，这盏灯稳得异常。
+    chapter: CF
+    zone: CF-Z2
+    front:
+      - 对象：不存在
+      - 行为：执行
+    detail:
+      - 灯光很弱，但非常稳定
+      - ——
+      - 对比之前一切都在抖，这盏灯稳得异常。
     rarity: rare
 
-  # CF-Z3 字段接受回执
+  # ==================== CF-Z3 字段接受回执 ====================
   CARD_CF_FIELD_ACCEPTED:
     id: CARD_CF_FIELD_ACCEPTED
-    title: 字段接受回执
+    name: 字段接受回执
     type: verdict
-    content: |
-      字段：◦◦◦
-      状态：已接受
-      代价：解释成本↑
-      备注：非最优解 允许
-    flavorText: 你不是赢了谁，你是让"无意义"获得了一个合法的位置。
+    chapter: CF
+    zone: CF-Z3
+    front:
+      - 字段：◦◦◦
+      - 状态：已接受
+    detail:
+      - 代价：解释成本↑
+      - 备注：非最优解 允许
+      - ——
+      - 你不是赢了谁，你是让"无意义"获得了一个合法的位置。
     rarity: legendary
     foreshadowId: F22
 
-  # CF-Z4 非最优保留证明
+  # ==================== CF-Z4 非最优保留证明 ====================
   CARD_CF_PRESERVE_PROOF:
     id: CARD_CF_PRESERVE_PROOF
-    title: 非最优保留证明
+    name: 非最优保留证明
     type: verdict
-    content: |
-      条目：保留。
-      字段：◦◦◦
-    flavorText: 世界保留了一件多余的事。
+    chapter: CF
+    zone: CF-Z4
+    front:
+      - 条目：保留。
+      - 字段：◦◦◦
+    detail:
+      - ——
+      - 世界保留了一件多余的事。
     rarity: legendary
     foreshadowId: F23
 
-  # CF-Z6 顾临的更正条款
+  # ==================== CF-Z6 顾临的更正条款 ====================
   CARD_CF_GULIN_CLAUSE:
     id: CARD_CF_GULIN_CLAUSE
-    title: 顾临的更正条款
+    name: 顾临的更正条款
     type: archive
-    content: |
-      更正条款
-      
-      ~~无收益条目应删除~~
-      
-      [已划掉]
-    flavorText: 读不下去的东西，也能留下。
+    chapter: CF
+    zone: CF-Z6
+    front:
+      - 更正条款
+      - ~~无收益条目应删除~~
+    detail:
+      - [已划掉]
+      - ——
+      - 读不下去的东西，也能留下。
     rarity: rare
 
-  # CF-Z6 版本库底层新增标签
+  # ==================== CF-Z6 版本库底层新增标签 ====================
   CARD_CF_SONGLAN_LABEL:
     id: CARD_CF_SONGLAN_LABEL
-    title: 版本库底层新增标签
+    name: 版本库底层新增标签
     type: archive
-    content: |
-      ◦◦◦
-    flavorText: 最底层多了一格——他们没删掉。
+    chapter: CF
+    zone: CF-Z6
+    front:
+      - ◦◦◦
+    detail:
+      - ——
+      - 最底层多了一格——他们没删掉。
     rarity: uncommon
 
-  # CF-Z6 许澄批注
+  # ==================== CF-Z6 许澄批注 ====================
   CARD_CF_XUCHENG_NOTE:
     id: CARD_CF_XUCHENG_NOTE
-    title: 许澄批注（新增一句）
+    name: 许澄批注（新增一句）
     type: archive
-    content: |
-      意义不必通过收益证明。
-    flavorText: 我不再敢说这叫痊愈。
+    chapter: CF
+    zone: CF-Z6
+    front:
+      - 意义不必通过收益证明。
+    detail:
+      - ——
+      - 我不再敢说这叫痊愈。
     rarity: rare
 
-  # CF-Z6 祷文拼读结果
+  # ==================== CF-Z6 祷文拼读结果 ====================
   CARD_CF_PRAYER_RESULT:
     id: CARD_CF_PRAYER_RESULT
-    title: 祷文拼读结果
+    name: 祷文拼读结果
     type: prayer
-    content: |
-      字端对齐结 阈收模空定
-      非最优允存 字段已接受
-    flavorText: 原来早就写在这里了。
+    chapter: CF
+    zone: CF-Z6
+    front:
+      - 字端对齐结 阈收模空定
+      - 非最优允存 字段已接受
+    detail:
+      - ——
+      - 原来早就写在这里了。
     rarity: legendary
     foreshadowId: F15
 
-  # CF-Z6 碎片日记·终章
+  # ==================== CF-Z6 碎片日记·终章 ====================
   CARD_CF_ATANG_DIARY:
     id: CARD_CF_ATANG_DIARY
-    title: 碎片日记·终章
+    name: 碎片日记·终章
     type: archive
-    content: |
-      多余被承认的那一刻，
-      我突然不那么累了。
-    flavorText: 我漂的时候，不再全是错。
+    chapter: CF
+    zone: CF-Z6
+    front:
+      - 多余被承认的那一刻，
+      - 我突然不那么累了。
+    detail:
+      - ——
+      - 我漂的时候，不再全是错。
     rarity: rare
 
-  # CF-Z6 栖蓝的小纸条
+  # ==================== CF-Z6 栖蓝的小纸条 ====================
   CARD_CF_QILAN_NOTE:
     id: CARD_CF_QILAN_NOTE
-    title: 栖蓝的小纸条
+    name: 栖蓝的小纸条
     type: archive
-    content: |
-      没用不是事实。
-    flavorText: 它还在。这就够了。
+    chapter: CF
+    zone: CF-Z6
+    front:
+      - 没用不是事实。
+    detail:
+      - ——
+      - 它还在。这就够了。
     rarity: rare
-
-
-
-
-
-
-
-
-

@@ -1,141 +1,167 @@
 # 第5章卡片数据
+# 统一使用格式A: { id, name, type, chapter, zone, front[], detail[] }
+
 cards:
-  # C5-Z1 版本冲突快照
+  # ==================== C5-Z1 版本冲突快照 ====================
   CARD_C5_VERSION_CONFLICT:
     id: CARD_C5_VERSION_CONFLICT
-    title: 版本冲突快照
+    name: 版本冲突快照
     type: archive
-    content: |
-      左滑：版本V-A（墙不存在）
-      右滑：版本V-B（墙存在）
-      
-      版本互斥：无法合并
-    flavorText: 都是真的。但只能选一个。
+    chapter: C5
+    zone: C5-Z1
+    front:
+      - 左滑：版本V-A（墙不存在）
+      - 右滑：版本V-B（墙存在）
+    detail:
+      - 版本互斥：无法合并
+      - ——
+      - 都是真的。但只能选一个。
     rarity: uncommon
     foreshadowId: F12
 
-  # C5-Z1 纪念墙抄录（可选）
+  # ==================== C5-Z1 纪念墙抄录（可选） ====================
   CARD_C5_MEMORIAL_COPY:
     id: CARD_C5_MEMORIAL_COPY
-    title: 纪念墙抄录
+    name: 纪念墙抄录
     type: archive
-    content: |
-      抄录完成。
-      
-      结算：无可用收益。
-      
-      [十几个名字，有些模糊]
-    flavorText: 你做了系统不想算的事情。
+    chapter: C5
+    zone: C5-Z1
+    front:
+      - 抄录完成。
+      - 结算：无可用收益。
+    detail:
+      - [十几个名字，有些模糊]
+      - ——
+      - 你做了系统不想算的事情。
     rarity: rare
 
-  # C5-Z2 纠偏回执
+  # ==================== C5-Z2 纠偏回执 ====================
   CARD_C5_CORRECTION_RECEIPT:
     id: CARD_C5_CORRECTION_RECEIPT
-    title: 纠偏回执（半字段表）
+    name: 纠偏回执（半字段表）
     type: archive
-    content: |
-      条目：版本冲突
-      状态：待结算
-      字段：＿
-      备注：解释成本↑
-    flavorText: 这种格式……不是给人看的。
+    chapter: C5
+    zone: C5-Z2
+    front:
+      - 条目：版本冲突
+      - 状态：待结算
+    detail:
+      - 字段：＿
+      - 备注：解释成本↑
+      - ——
+      - 这种格式……不是给人看的。
     rarity: uncommon
     foreshadowId: F13
 
-  # C5-Z3 许澄私记（拒绝疗程）
+  # ==================== C5-Z3 许澄私记（拒绝疗程） ====================
   CARD_C5_XUCHENG_NOTE:
     id: CARD_C5_XUCHENG_NOTE
-    title: 许澄私记-01
+    name: 许澄私记-01
     type: archive
-    content: |
-      这不是治疗，这是抹平。
-      
-      抹平能救很多人，
-      也会抹掉他们的一部分。
-    flavorText: 我在帮"还活得下去的你"。
+    chapter: C5
+    zone: C5-Z3
+    front:
+      - 这不是治疗，这是抹平。
+      - 抹平能救很多人，
+    detail:
+      - 也会抹掉他们的一部分。
+      - ——
+      - 我在帮"还活得下去的你"。
     rarity: rare
 
-  # C5-Z3 疗程执行回执（接受疗程）
+  # ==================== C5-Z3 疗程执行回执（接受疗程） ====================
   CARD_C5_TREATMENT_RECEIPT:
     id: CARD_C5_TREATMENT_RECEIPT
-    title: 疗程执行回执
+    name: 疗程执行回执
     type: archive
-    content: |
-      执行：稳定疗程
-      结果：差异已对齐
-      备注：解释成本↓
-    flavorText: 你轻松了，但你少了一点东西。
+    chapter: C5
+    zone: C5-Z3
+    front:
+      - 执行：稳定疗程
+      - 结果：差异已对齐
+    detail:
+      - 备注：解释成本↓
+      - ——
+      - 你轻松了，但你少了一点东西。
     rarity: common
 
-  # C5-Z4 祷文抄本-04
+  # ==================== C5-Z4 祷文抄本-04 ====================
   CARD_C5_PRAYER_04:
     id: CARD_C5_PRAYER_04
-    title: 祷文抄本-04
+    name: 祷文抄本-04
     type: prayer
-    content: |
-      字端对齐尽 阈过收敛空
-      模中无意义 新增解释重
-    flavorText: 原来早就写在这里了。
+    chapter: C5
+    zone: C5-Z4
+    front:
+      - 字端对齐尽 阈过收敛空
+      - 模中无意义 新增解释重
+    detail:
+      - ——
+      - 原来早就写在这里了。
     rarity: rare
     foreshadowId: F15
 
-  # C5-Z5 空椅事件-更正
+  # ==================== C5-Z5 空椅事件-更正 ====================
   CARD_C5_CHAIR_CORRECTED:
     id: CARD_C5_CHAIR_CORRECTED
-    title: 空椅事件-更正
+    name: 空椅事件-更正
     type: archive
-    content: |
-      对象：不存在。
-      建议：忽略。
-    flavorText: 他们连"拿走"都不需要。只要更正一句。
+    chapter: C5
+    zone: C5-Z5
+    front:
+      - 对象：不存在。
+      - 建议：忽略。
+    detail:
+      - ——
+      - 他们连"拿走"都不需要。只要更正一句。
     rarity: uncommon
 
-  # C5-Z5 空椅占位记录
+  # ==================== C5-Z5 空椅占位记录 ====================
   CARD_C5_CHAIR_PLACEHOLDER:
     id: CARD_C5_CHAIR_PLACEHOLDER
-    title: 空椅占位记录
+    name: 空椅占位记录
     type: archive
-    content: |
-      占位已建立。
-      
-      结算：无可用收益。
-      
-      [解释成本↑]
-    flavorText: 没用是他们的词。我不用他们的词。
+    chapter: C5
+    zone: C5-Z5
+    front:
+      - 占位已建立。
+      - 结算：无可用收益。
+    detail:
+      - [解释成本↑]
+      - ——
+      - 没用是他们的词。我不用他们的词。
     rarity: rare
     foreshadowId: F23
 
-  # C5-Z6 审计快照-01
+  # ==================== C5-Z6 审计快照-01 ====================
   CARD_C5_AUDIT_SNAPSHOT:
     id: CARD_C5_AUDIT_SNAPSHOT
-    title: 审计快照-01
+    name: 审计快照-01
     type: archive
-    content: |
-      收敛：失败
-      建议：降阶
-      字段：＿
-    flavorText: 界面不再是"给我用的"，像是"有人在读我"。
+    chapter: C5
+    zone: C5-Z6
+    front:
+      - 收敛：失败
+      - 建议：降阶
+    detail:
+      - 字段：＿
+      - ——
+      - 界面不再是"给我用的"，像是"有人在读我"。
     rarity: uncommon
     foreshadowId: F11
 
-  # C5-Z7 判词回执（F21）
+  # ==================== C5-Z7 判词回执（F21） ====================
   CARD_C5_F21_JUDGMENT:
     id: CARD_C5_F21_JUDGMENT
-    title: 判词回执
+    name: 判词回执
     type: verdict
-    content: |
-      判词：此行为在当前模型中无意义。
-      
-      注：解释成本↑（字段待定）
-    flavorText: '"无意义"是他们的词。'
+    chapter: C5
+    zone: C5-Z7
+    front:
+      - 判词：此行为在当前模型中无意义。
+      - 注：解释成本↑（字段待定）
+    detail:
+      - ——
+      - "无意义"是他们的词。
     rarity: legendary
     foreshadowId: F21
-
-
-
-
-
-
-
-
-

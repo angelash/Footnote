@@ -1,129 +1,142 @@
 # 第2章卡片数据
+# 统一使用格式A: { id, name, type, chapter, zone, front[], detail[] }
+
 cards:
-  # C2-Z1 授权记录
+  # ==================== C2-Z1 授权记录 ====================
   CARD_C2_DEPTH_AUTH:
     id: CARD_C2_DEPTH_AUTH
-    title: 授权记录（深度感知）
+    name: 授权记录（深度感知）
     type: archive
-    content: |
-      授权：深度感知（只读）
-      
-      权限：读取深度格（观测）
-      禁止：写入/介入
-      
-      备注：观测将增加解释成本（已更正）
-    flavorText: 你获得了看见真相的能力，但被禁止改变它。
+    chapter: C2
+    zone: C2-Z1
+    front:
+      - 授权：深度感知（只读）
+      - 权限：读取深度格（观测）
+      - 禁止：写入/介入
+    detail:
+      - 备注：观测将增加解释成本（已更正）
+      - ——
+      - 你获得了看见真相的能力，但被禁止改变它。
     rarity: rare
     foreshadowId: F03
 
-  # C2-Z2 深度片段-01
+  # ==================== C2-Z2 深度片段-01 ====================
   CARD_C2_DEPTH_FRAGMENT_01:
     id: CARD_C2_DEPTH_FRAGMENT_01
-    title: 深度片段-01（空腔）
+    name: 深度片段-01（空腔）
     type: archive
-    content: |
-      坐标：薄墙巷口
-      
-      深度观测结果：
-      同一坐标下存在空腔结构。
-      
-      官方表象：无。
-    flavorText: 你亲眼看见了，但他们说没有。
+    chapter: C2
+    zone: C2-Z2
+    front:
+      - 坐标：薄墙巷口
+      - 深度观测结果：
+      - 同一坐标下存在空腔结构。
+    detail:
+      - 官方表象：无。
+      - ——
+      - 你亲眼看见了，但他们说没有。
     rarity: uncommon
     foreshadowId: F01
 
-  # C2-Z3 被更正的地图-02
+  # ==================== C2-Z3 被更正的地图-02 ====================
   CARD_C2_VERSION_MAP_02:
     id: CARD_C2_VERSION_MAP_02
-    title: 被更正的地图-02
+    name: 被更正的地图-02
     type: archive
-    content: |
-      区域：档案巷楼梯间
-      
-      版本A：三段楼梯连通
-      版本B：中段连接不存在
-      
-      差异：虚构结构
-      版本差异：已保存
-    flavorText: 你踩空的那一段，被记录了下来。
+    chapter: C2
+    zone: C2-Z3
+    front:
+      - 区域：档案巷楼梯间
+      - 版本A：三段楼梯连通
+      - 版本B：中段连接不存在
+    detail:
+      - 差异：虚构结构
+      - 版本差异：已保存
+      - ——
+      - 你踩空的那一段，被记录了下来。
     rarity: rare
     foreshadowId: F12
 
-  # C2-Z4 钉子（物品）
+  # ==================== C2-Z4 钉子（物品） ====================
   CARD_C2_NAIL:
     id: CARD_C2_NAIL
-    title: 旧钉子
+    name: 旧钉子
     type: item
-    content: |
-      一枚从钉子孔里捡到的旧钉子
-      
-      可以用来修补路标
-    flavorText: 也许它原本就在那里，等着被找到。
+    chapter: C2
+    zone: C2-Z4
+    front:
+      - 一枚从钉子孔里捡到的旧钉子
+      - 可以用来修补路标
+    detail:
+      - ——
+      - 也许它原本就在那里，等着被找到。
     rarity: common
 
-  # C2-Z4 修补记录
+  # ==================== C2-Z4 修补记录 ====================
   CARD_C2_REPAIR_RECORD:
     id: CARD_C2_REPAIR_RECORD
-    title: 修补记录-01
+    name: 修补记录-01
     type: archive
-    content: |
-      行为：扶正路标
-      位置：修补摊旁
-      
-      结算：无可用收益。
-    flavorText: 没有奖励，但做完了，感觉好一点。
+    chapter: C2
+    zone: C2-Z4
+    front:
+      - 行为：扶正路标
+      - 位置：修补摊旁
+    detail:
+      - 结算：无可用收益。
+      - ——
+      - 没有奖励，但做完了，感觉好一点。
     rarity: common
     foreshadowId: F05
 
-  # C2-Z5 碎片日记-01
+  # ==================== C2-Z5 碎片日记-01 ====================
   CARD_C2_FRAGMENT_DIARY_01:
     id: CARD_C2_FRAGMENT_DIARY_01
-    title: 碎片日记-01
+    name: 碎片日记-01
     type: archive
-    content: |
-      有人把今天折了一下。
-      我捡到了一次重复。
-      
-      p.??
-    flavorText: 阿棠的字迹，像是来自另一个时间线。
+    chapter: C2
+    zone: C2-Z5
+    front:
+      - 有人把今天折了一下。
+      - 我捡到了一次重复。
+    detail:
+      - p.??
+      - ——
+      - 阿棠的字迹，像是来自另一个时间线。
     rarity: rare
 
-  # C2-Z6 祷文抄本-02
+  # ==================== C2-Z6 祷文抄本-02 ====================
   CARD_C2_PRAYER_02:
     id: CARD_C2_PRAYER_02
-    title: 祷文抄本-02
+    name: 祷文抄本-02
     type: prayer
-    content: |
-      风越大 纸越薄
-      写得太多 纸会皱缩
-      皱缩太深 纸会撕裂
-      轻声走路 小心落笔
-    flavorText: 牧平的话，像是预言，又像是警告。
+    chapter: C2
+    zone: C2-Z6
+    front:
+      - 风越大 纸越薄
+      - 写得太多 纸会皱缩
+    detail:
+      - 皱缩太深 纸会撕裂
+      - 轻声走路 小心落笔
+      - ——
+      - 牧平的话，像是预言，又像是警告。
     rarity: rare
     foreshadowId: F15
 
-  # C2-Z7 深度片段-02
+  # ==================== C2-Z7 深度片段-02 ====================
   CARD_C2_DEPTH_FRAGMENT_02:
     id: CARD_C2_DEPTH_FRAGMENT_02
-    title: 深度片段-02（内部大厅）
+    name: 深度片段-02（内部大厅）
     type: archive
-    content: |
-      坐标：边缘断口
-      
-      深度观测结果：
-      同一坐标下存在巨大内部体积。
-      
-      表象记录：无。
-      
-      待解释
-    flavorText: 系统说"不存在"，但你亲眼看见了。
+    chapter: C2
+    zone: C2-Z7
+    front:
+      - 坐标：边缘断口
+      - 深度观测结果：
+      - 同一坐标下存在巨大内部体积。
+    detail:
+      - 表象记录：无。
+      - 待解释
+      - ——
+      - 系统说"不存在"，但你亲眼看见了。
     rarity: rare
-
-
-
-
-
-
-
-
-

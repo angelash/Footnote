@@ -93,27 +93,21 @@ interface IRawGameplayFx {
 }
 
 /**
- * 原始卡片数据格式（兼容两种格式）
+ * 原始卡片数据格式（统一格式A）
  *
- * 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
- * 格式B (C1-CF): { id, title, type, content(string), flavorText, rarity, foreshadowId }
+ * 格式: { id, name, type, chapter, zone, front[], detail[] }
  */
 interface IRawCard {
   id: string;
-  // 格式A字段
-  name?: string;
-  chapter?: string;
-  zone?: string;
-  front?: string[];
-  detail?: string[];
-  // 格式B字段
-  title?: string;
-  content?: string;
-  flavorText?: string;
+  name: string;
+  type: string;
+  chapter: string;
+  zone: string;
+  front: string[];
+  detail: string[];
+  // 可选字段
   rarity?: string;
   foreshadowId?: string;
-  // 通用字段
-  type: string;
   fx?: {
     type: string;
     value: number;
@@ -126,9 +120,9 @@ interface IRawCard {
       detail?: string[];
     }
   >;
-  /** Gameplay 效果（Phase 3 新增） */
+  /** Gameplay 效果 */
   gameplayFx?: IRawGameplayFx[];
-  /** 是否可消耗（Phase 3 新增） */
+  /** 是否可消耗 */
   consumable?: boolean;
 }
 
@@ -406,78 +400,32 @@ function transformGameplayFx(
 }
 
 /**
- * 标准化卡片数据，兼容两种格式
+ * 标准化卡片数据（统一格式A）
  *
- * 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
- * 格式B (C1-CF): { id, title, type, content(string), flavorText, rarity, foreshadowId }
+ * 格式: { id, name, type, chapter, zone, front[], detail[] }
  *
  * @param raw 原始卡片数据
  * @returns 标准化的卡片数据
  */
 function normalizeCard(raw: IRawCard): ICard {
-  // 判断是哪种格式：如果有 name 和 front 字段，则是格式A
-  const isFormatA = raw.name !== undefined && raw.front !== undefined;
-
-  if (isFormatA) {
-    // 格式A: 直接使用原字段
-    return {
-      id: raw.id,
-      name: raw.name!,
-      type: raw.type as CardType,
-      chapter: (raw.chapter || 'C0') as ChapterID,
-      zone: raw.zone || '',
-      front: raw.front!,
-      detail: raw.detail || [],
-      fx: transformCardFx(raw.fx),
-      states: transformCardStates(raw.states),
-      gameplayFx: transformGameplayFx(raw.gameplayFx),
-      consumable: raw.consumable,
-    };
-  } else {
-    // 格式B: 转换字段
-    // content 是多行字符串，需要转换为数组
-    const contentLines = raw.content
-      ? raw.content
-          .split('\n')
-          .map((line) => line.trim())
-          .filter((line) => line.length > 0)
-      : [];
-
-    // front 取内容前2-3行作为简介，detail 取完整内容
-    const frontLines = contentLines.slice(0, Math.min(3, contentLines.length));
-
-    // detail 包含完整内容 + flavorText（如果有）
-    const detailLines = [...contentLines];
-    if (raw.flavorText) {
-      detailLines.push('——');
-      detailLines.push(raw.flavorText);
-    }
-
-    // 从 id 解析 chapter（例如 CARD_C1_PERMIT -> C1）
-    const chapterMatch = raw.id.match(/CARD_(C[0-5F]|CF|RV)_/i);
-    const chapter = chapterMatch ? chapterMatch[1].toUpperCase() : 'C0';
-
-    return {
-      id: raw.id,
-      name: raw.title || raw.id,
-      type: raw.type as CardType,
-      chapter: chapter as ChapterID,
-      zone: raw.zone || '',
-      front: frontLines,
-      detail: detailLines,
-      fx: transformCardFx(raw.fx),
-      states: transformCardStates(raw.states),
-      gameplayFx: transformGameplayFx(raw.gameplayFx),
-      consumable: raw.consumable,
-    };
-  }
+  return {
+    id: raw.id,
+    name: raw.name,
+    type: raw.type as CardType,
+    chapter: raw.chapter as ChapterID,
+    zone: raw.zone,
+    front: raw.front,
+    detail: raw.detail,
+    fx: transformCardFx(raw.fx),
+    states: transformCardStates(raw.states),
+    gameplayFx: transformGameplayFx(raw.gameplayFx),
+    consumable: raw.consumable,
+  };
 }
 
 /**
  * 加载卡片数据
- * 支持两种YAML格式：
- * - 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
- * - 格式B (C1-CF): { id, title, type, content(string), flavorText, rarity, foreshadowId }
+ * 统一格式: { id, name, type, chapter, zone, front[], detail[] }
  */
 export function loadCards(yamlContent: string): ICard[] {
   try {
@@ -950,6 +898,9 @@ function registerDataToNarrativeEngine(
       chapter: card.chapter,
       zone: card.zone,
       image: undefined,
+      // 保留原始的 front 和 detail 数组，用于 CardUI 显示
+      front: card.front || [],
+      detail: card.detail || [],
       effects: card.fx?.map((f) => ({
         type: f.type as 'taint' | 'flash' | 'glitch' | 'redact',
         target: f.target,

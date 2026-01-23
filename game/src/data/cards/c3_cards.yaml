@@ -1,141 +1,154 @@
 # 第3章卡片数据
+# 统一使用格式A: { id, name, type, chapter, zone, front[], detail[] }
+
 cards:
-  # C3-Z1 深度介入许可
+  # ==================== C3-Z1 深度介入许可 ====================
   CARD_C3_DEPTH_INTERVENTION:
     id: CARD_C3_DEPTH_INTERVENTION
-    title: 深度介入许可
+    name: 深度介入许可
     type: archive
-    content: |
-      权限：写入深度格（局部）
-      
-      警告：写入会增加解释成本
-      
-      条款：造成的结构伤痕不可完全回滚
-      
-      结算方式：待定
-    flavorText: 这是债，不是奖赏。
+    chapter: C3
+    zone: C3-Z1
+    front:
+      - 权限：写入深度格（局部）
+      - 警告：写入会增加解释成本
+    detail:
+      - 条款：造成的结构伤痕不可完全回滚
+      - 结算方式：待定
+      - ——
+      - 这是债，不是奖赏。
     rarity: rare
 
-  # C3-Z2 旧灯芯
+  # ==================== C3-Z2 旧灯芯 ====================
   CARD_C3_OLD_WICK:
     id: CARD_C3_OLD_WICK
-    title: 旧灯芯
+    name: 旧灯芯
     type: item
-    content: |
-      一截旧灯芯。
-      
-      点亮它的人已经不在记录里。
-    flavorText: 陈匠说：别让它被忘掉。
+    chapter: C3
+    zone: C3-Z2
+    front:
+      - 一截旧灯芯。
+      - 点亮它的人已经不在记录里。
+    detail:
+      - ——
+      - 陈匠说：别让它被忘掉。
     rarity: uncommon
 
-  # C3-Z2 救援记录
+  # ==================== C3-Z2 救援记录 ====================
   CARD_C3_RESCUE_RECORD:
     id: CARD_C3_RESCUE_RECORD
-    title: 救援记录-01
+    name: 救援记录-01
     type: archive
-    content: |
-      目标：不存在的房间内被困者
-      
-      结果：已撤离
-      
-      方式：[因解法而异]
-      
-      字段：——
-    flavorText: 系统无法完全归档这次救援。
+    chapter: C3
+    zone: C3-Z2
+    front:
+      - 目标：不存在的房间内被困者
+      - 结果：已撤离
+    detail:
+      - 方式：[因解法而异]
+      - 字段：——
+      - ——
+      - 系统无法完全归档这次救援。
     rarity: rare
 
-  # C3-Z3 被更正的地图-03
+  # ==================== C3-Z3 被更正的地图-03 ====================
   CARD_C3_VERSION_MAP_03:
     id: CARD_C3_VERSION_MAP_03
-    title: 被更正的地图-03
+    name: 被更正的地图-03
     type: archive
-    content: |
-      版本库三联：
-      
-      V1：门影区域显示为空白
-      V2：空白被涂抹
-      V3：空白位置被写成"墙"
-      
-      差异：持续更正中
-    flavorText: 他们一直在"更正"这个区域的记录。
+    chapter: C3
+    zone: C3-Z3
+    front:
+      - 版本库三联：
+      - V1：门影区域显示为空白
+      - V2：空白被涂抹
+    detail:
+      - V3：空白位置被写成"墙"
+      - 差异：持续更正中
+      - ——
+      - 他们一直在"更正"这个区域的记录。
     rarity: rare
     foreshadowId: F12
 
-  # C3-Z3 差异提交回执
+  # ==================== C3-Z3 差异提交回执 ====================
   CARD_C3_DIFF_RECEIPT:
     id: CARD_C3_DIFF_RECEIPT
-    title: 差异提交回执
+    name: 差异提交回执
     type: archive
-    content: |
-      差异已保存。
-      
-      奖励：无。
-    flavorText: 每一个被记录的差异，都是对"唯一版本"的反驳。
+    chapter: C3
+    zone: C3-Z3
+    front:
+      - 差异已保存。
+      - 奖励：无。
+    detail:
+      - ——
+      - 每一个被记录的差异，都是对"唯一版本"的反驳。
     rarity: common
 
-  # C3-Z4 空椅记录
+  # ==================== C3-Z4 空椅记录 ====================
   CARD_C3_EMPTY_CHAIR:
     id: CARD_C3_EMPTY_CHAIR
-    title: 空椅记录-01
+    name: 空椅记录-01
     type: archive
-    content: |
-      椅子已摆正。
-      
-      结算：无可用收益。
-    flavorText: 不是所有事都需要有用。但我需要它在。
+    chapter: C3
+    zone: C3-Z4
+    front:
+      - 椅子已摆正。
+      - 结算：无可用收益。
+    detail:
+      - ——
+      - 不是所有事都需要有用。但我需要它在。
     rarity: uncommon
     foreshadowId: F23
 
-  # C3-Z5 病例卡
+  # ==================== C3-Z5 病例卡 ====================
   CARD_C3_MED_CARD_01:
     id: CARD_C3_MED_CARD_01
-    title: 病例卡-01
+    name: 病例卡-01
     type: archive
-    content: |
-      编号：MC-□□-17
-      
-      症状：[玩家选择]
-      
-      结论：建议休息 / 降低观察刺激
-      
-      对齐：建议
-    flavorText: 这个编号意味着什么？
+    chapter: C3
+    zone: C3-Z5
+    front:
+      - 编号：MC-□□-17
+      - 症状：[玩家选择]
+    detail:
+      - 结论：建议休息 / 降低观察刺激
+      - 对齐：建议
+      - ——
+      - 这个编号意味着什么？
     rarity: uncommon
     foreshadowId: F14
 
-  # C3-Z6 祷文抄本-03
+  # ==================== C3-Z6 祷文抄本-03 ====================
   CARD_C3_PRAYER_03:
     id: CARD_C3_PRAYER_03
-    title: 祷文抄本-03
+    name: 祷文抄本-03
     type: prayer
-    content: |
-      看见是风 写入是墨
-      墨多则厚 厚则难折
-      轻声写字 纸背有风
-      风大纸薄 慎之慎之
-    flavorText: 学会写得"轻"，非最优，也可保存。
+    chapter: C3
+    zone: C3-Z6
+    front:
+      - 看见是风 写入是墨
+      - 墨多则厚 厚则难折
+    detail:
+      - 轻声写字 纸背有风
+      - 风大纸薄 慎之慎之
+      - ——
+      - 学会写得"轻"，非最优，也可保存。
     rarity: rare
     foreshadowId: F15
 
-  # C3-Z7 断裂样本
+  # ==================== C3-Z7 断裂样本 ====================
   CARD_C3_FRACTURE_SAMPLE:
     id: CARD_C3_FRACTURE_SAMPLE
-    title: 断裂样本-01
+    name: 断裂样本-01
     type: archive
-    content: |
-      骨架断口已记录。
-      
-      自洽修补：未执行。
-      
-      [若介入] 写入：已执行（不可回滚）
-    flavorText: 路变了。是我写的，还是它自己裂的？
+    chapter: C3
+    zone: C3-Z7
+    front:
+      - 骨架断口已记录。
+      - 自洽修补：未执行。
+    detail:
+      - [若介入] 写入：已执行（不可回滚）
+      - ——
+      - 路变了。是我写的，还是它自己裂的？
     rarity: uncommon
-
-
-
-
-
-
-
-
-

@@ -312,3 +312,112 @@ describe('SaveManager 版本迁移', () => {
     expect(needsMigration).toBe(false);
   });
 });
+
+// ==================== markDirty 和 autoSave 测试 ====================
+describe('SaveManager markDirty 和 autoSave', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('markDirty 后 isDirty 返回 true', async () => {
+    vi.resetModules();
+    const { saveManager } = await import('@/systems/save/SaveManager');
+
+    // 初始状态应该是 false
+    expect(saveManager.isDirty()).toBe(false);
+
+    // 标记为脏
+    saveManager.markDirty('测试原因');
+
+    // 应该返回 true
+    expect(saveManager.isDirty()).toBe(true);
+  });
+
+  it('markDirty 记录原因', async () => {
+    vi.resetModules();
+    const { saveManager } = await import('@/systems/save/SaveManager');
+
+    saveManager.markDirty('交互: card @ test_object');
+
+    expect(saveManager.getDirtyReason()).toBe('交互: card @ test_object');
+  });
+
+  it('debounce 时间内多次 markDirty 只触发一次 autoSave', async () => {
+    vi.resetModules();
+    const { saveManager } = await import('@/systems/save/SaveManager');
+
+    // 监听 autoSave 调用
+    const autoSaveSpy = vi.spyOn(saveManager, 'autoSave');
+
+    // 快速连续调用 markDirty
+    saveManager.markDirty('原因1');
+    saveManager.markDirty('原因2');
+    saveManager.markDirty('原因3');
+
+    // 在 debounce 时间内不应该触发 autoSave
+    expect(autoSaveSpy).not.toHaveBeenCalled();
+
+    // 快进 3000ms（默认 debounce 时间）
+    await vi.advanceTimersByTimeAsync(3000);
+
+    // 应该只触发一次 autoSave
+    expect(autoSaveSpy).toHaveBeenCalledTimes(1);
+
+    autoSaveSpy.mockRestore();
+  });
+
+  it('clearDirty 后 isDirty 返回 false', async () => {
+    vi.resetModules();
+    const { saveManager } = await import('@/systems/save/SaveManager');
+
+    // 先标记为脏
+    saveManager.markDirty('测试');
+    expect(saveManager.isDirty()).toBe(true);
+
+    // 清除脏标记
+    saveManager.clearDirty();
+
+    expect(saveManager.isDirty()).toBe(false);
+    expect(saveManager.getDirtyReason()).toBe('');
+  });
+
+  it('clearDirty 取消待执行的 autoSave', async () => {
+    vi.resetModules();
+    const { saveManager } = await import('@/systems/save/SaveManager');
+
+    const autoSaveSpy = vi.spyOn(saveManager, 'autoSave');
+
+    // 标记为脏（会启动 debounce 定时器）
+    saveManager.markDirty('测试');
+
+    // 立即清除
+    saveManager.clearDirty();
+
+    // 快进超过 debounce 时间
+    await vi.advanceTimersByTimeAsync(5000);
+
+    // autoSave 不应该被调用
+    expect(autoSaveSpy).not.toHaveBeenCalled();
+
+    autoSaveSpy.mockRestore();
+  });
+
+  it('autoSave 完成后清除脏标记', async () => {
+    vi.resetModules();
+    const { saveManager } = await import('@/systems/save/SaveManager');
+
+    saveManager.markDirty('测试');
+    expect(saveManager.isDirty()).toBe(true);
+
+    // 调用 autoSave
+    await saveManager.autoSave();
+
+    // 脏标记应该被清除
+    expect(saveManager.isDirty()).toBe(false);
+  });
+});

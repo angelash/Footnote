@@ -118,6 +118,8 @@ export interface IWorldStateData {
   currentChapter: ChapterID;
   /** 已完成的交互记录 */
   completedInteractions?: IInteractionRecord[];
+  /** 已消耗的卡片ID列表 */
+  consumedCards?: string[];
 }
 
 interface IZoneStateData {
@@ -178,6 +180,9 @@ class WorldState {
 
   /** 已完成的交互记录（用于一次性交互追踪） */
   private _completedInteractions: Map<string, IInteractionRecord> = new Map();
+
+  /** 已消耗的卡片ID */
+  private _consumedCards: Set<string> = new Set();
 
   // 计数器
   private _scarIdCounter: number = 0;
@@ -434,6 +439,39 @@ class WorldState {
    */
   getCompletedInteractions(): IInteractionRecord[] {
     return Array.from(this._completedInteractions.values());
+  }
+
+  // ==================== 卡片消耗操作 ====================
+
+  /**
+   * 消耗卡片（标记为已使用）
+   * @param cardId 卡片ID
+   */
+  consumeCard(cardId: string): void {
+    if (this._consumedCards.has(cardId)) {
+      logger.debug(`卡片已被消耗: ${cardId}`);
+      return;
+    }
+
+    this._consumedCards.add(cardId);
+    logger.info(`卡片已消耗: ${cardId}`);
+  }
+
+  /**
+   * 检查卡片是否已消耗
+   * @param cardId 卡片ID
+   * @returns 是否已消耗
+   */
+  isCardConsumed(cardId: string): boolean {
+    return this._consumedCards.has(cardId);
+  }
+
+  /**
+   * 获取所有已消耗的卡片ID
+   * @returns 已消耗的卡片ID数组
+   */
+  getConsumedCards(): string[] {
+    return Array.from(this._consumedCards);
   }
 
   // ==================== Zone状态操作 ====================
@@ -713,6 +751,7 @@ class WorldState {
       currentZoneId: this._currentZoneId,
       currentChapter: this._currentChapter,
       completedInteractions: this.getCompletedInteractions(),
+      consumedCards: this.getConsumedCards(),
     };
   }
 
@@ -778,6 +817,11 @@ class WorldState {
         this._completedInteractions.set(record.id, record);
       }
     }
+
+    // 恢复已消耗的卡片
+    if (data.consumedCards) {
+      this._consumedCards = new Set(data.consumedCards);
+    }
   }
 
   /**
@@ -804,6 +848,9 @@ class WorldState {
 
     // 重置交互记录
     this._completedInteractions.clear();
+
+    // 重置已消耗的卡片
+    this._consumedCards.clear();
 
     this._initializeDefaultZones();
   }

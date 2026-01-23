@@ -41,6 +41,8 @@ interface IRawDialogueOld {
     foreshadow?: [string, string];
     ability?: string;
     event?: string;
+    /** 旧格式：flag 设置列表 */
+    flags?: Array<{ name: string; value: boolean }>;
   };
   condition?: IRawCondition;
 }
@@ -106,6 +108,27 @@ function isNewFormatDialogue(raw: IRawDialogue): raw is IRawDialogueNew {
 }
 
 /**
+ * 原始 Gameplay 效果数据格式
+ */
+interface IRawGameplayEffect {
+  type: 'counterDelta' | 'setFlag' | 'giveCard' | 'unlockAbility';
+  counter?: 'R' | 'P';
+  delta?: number;
+  flagName?: string;
+  flagValue?: boolean;
+  cardId?: string;
+  abilityType?: string;
+}
+
+/**
+ * 原始 Gameplay FX 数据格式
+ */
+interface IRawGameplayFx {
+  trigger: 'obtain' | 'use' | 'view';
+  effects: IRawGameplayEffect[];
+}
+
+/**
  * 原始卡片数据格式（兼容两种格式）
  *
  * 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
@@ -139,6 +162,10 @@ interface IRawCard {
       detail?: string[];
     }
   >;
+  /** Gameplay 效果（Phase 3 新增） */
+  gameplayFx?: IRawGameplayFx[];
+  /** 是否可消耗（Phase 3 新增） */
+  consumable?: boolean;
 }
 
 /**
@@ -219,6 +246,8 @@ function normalizeOldFormatDialogue(raw: IRawDialogueOld): IDialogue {
           foreshadow: raw.trigger.foreshadow as [string, ForeshadowStage] | undefined,
           ability: raw.trigger.ability as AbilityType | undefined,
           event: raw.trigger.event,
+          // 传递旧格式的 flags（转换为 onComplete 效果会在 registerDataToNarrativeEngine 中处理）
+          flags: raw.trigger.flags,
         }
       : undefined,
     condition: raw.condition ? transformCondition(raw.condition) : undefined,
@@ -408,6 +437,28 @@ function transformCardStates(
 }
 
 /**
+ * 转换 Gameplay FX 数据
+ */
+function transformGameplayFx(
+  rawFx?: IRawGameplayFx[]
+): ICard['gameplayFx'] {
+  if (!rawFx || rawFx.length === 0) return undefined;
+
+  return rawFx.map((fx) => ({
+    trigger: fx.trigger,
+    effects: fx.effects.map((effect) => ({
+      type: effect.type,
+      counter: effect.counter,
+      delta: effect.delta,
+      flagName: effect.flagName,
+      flagValue: effect.flagValue,
+      cardId: effect.cardId,
+      abilityType: effect.abilityType,
+    })),
+  }));
+}
+
+/**
  * 标准化卡片数据，兼容两种格式
  *
  * 格式A (C0): { id, name, type, chapter, zone, front[], detail[] }
@@ -432,6 +483,8 @@ function normalizeCard(raw: IRawCard): ICard {
       detail: raw.detail || [],
       fx: transformCardFx(raw.fx),
       states: transformCardStates(raw.states),
+      gameplayFx: transformGameplayFx(raw.gameplayFx),
+      consumable: raw.consumable,
     };
   } else {
     // 格式B: 转换字段
@@ -467,6 +520,8 @@ function normalizeCard(raw: IRawCard): ICard {
       detail: detailLines,
       fx: transformCardFx(raw.fx),
       states: transformCardStates(raw.states),
+      gameplayFx: transformGameplayFx(raw.gameplayFx),
+      consumable: raw.consumable,
     };
   }
 }
@@ -876,6 +931,20 @@ function registerDataToNarrativeEngine(
         target: f.target,
         intensity: f.duration,
       })),
+      // Phase 3: 传递 Gameplay 效果
+      gameplayFx: card.gameplayFx?.map((fx) => ({
+        trigger: fx.trigger,
+        effects: fx.effects.map((effect) => ({
+          type: effect.type,
+          counter: effect.counter,
+          delta: effect.delta,
+          flagName: effect.flagName,
+          flagValue: effect.flagValue,
+          cardId: effect.cardId,
+          abilityType: effect.abilityType,
+        })),
+      })),
+      consumable: card.consumable,
     });
   }
 

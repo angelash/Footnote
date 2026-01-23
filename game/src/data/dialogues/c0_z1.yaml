@@ -83,20 +83,14 @@ dialogues:
       flags:
         - name: FLAG_C0Z1_NOTICE_EXAMINED
           value: true
-      flags:
-        - name: FLAG_C0Z1_NOTICE_EXAMINED
-          value: true
 
-  # 公告板（已查看过涂改痕迹）
+  # 公告板（已查看过涂改痕迹）- 此对话不再单独设置 flag，因为 NOTICE_BOARD_EXAMINE 已设置
   NOTICE_BOARD_EXAMINED:
     id: NOTICE_BOARD_EXAMINED
     speaker: 岑回
     text: 公告板上的涂改痕迹……第274周期的字样隐约可见。
     expression: thinking
     next: null
-      flags:
-        - name: FLAG_C0Z1_NOTICE_EXAMINED
-          value: true
 
   NOTICE_BOARD_EXAMINE_2:
     id: NOTICE_BOARD_EXAMINE_2

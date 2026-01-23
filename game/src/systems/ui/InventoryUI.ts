@@ -456,6 +456,14 @@ export class InventoryUI {
       container.add(newBadge);
     }
 
+    // 对可使用的卡片（ITEM/PRAYER）显示使用按钮
+    const isUsable = narrativeEngine.isCardUsable(card.id);
+    if (isUsable && (card.category === CardCategory.ITEM || card.category === CardCategory.PRAYER)) {
+      const useBtn = this._createUseButton(card);
+      useBtn.setPosition(0, CONFIG.CARD_THUMB_HEIGHT / 2 - 35);
+      container.add(useBtn);
+    }
+
     // 交互
     container
       .setInteractive({ useHandCursor: true })
@@ -514,6 +522,115 @@ export class InventoryUI {
       });
 
     return container;
+  }
+
+  /**
+   * 创建使用按钮
+   */
+  private _createUseButton(card: INarrativeCard): Phaser.GameObjects.Container {
+    const container = this._scene.add.container(0, 0);
+    const btnWidth = 60;
+    const btnHeight = 24;
+
+    // 按钮背景
+    const bg = this._scene.add.graphics();
+    bg.fillStyle(0x00aa88, 0.9);
+    bg.fillRoundedRect(-btnWidth / 2, -btnHeight / 2, btnWidth, btnHeight, 4);
+    bg.lineStyle(1, 0x00ffaa, 1);
+    bg.strokeRoundedRect(-btnWidth / 2, -btnHeight / 2, btnWidth, btnHeight, 4);
+
+    // 按钮文字
+    const text = this._scene.add
+      .text(0, 0, '使用', {
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#FFFFFF',
+      })
+      .setOrigin(0.5);
+
+    // 效果预览（显示使用效果）
+    const effectPreview = narrativeEngine.getCardEffectPreview(card.id);
+    if (effectPreview.length > 0) {
+      const previewText = this._scene.add
+        .text(0, -18, effectPreview.join(' '), {
+          fontSize: UI_FONT_SIZE.TINY,
+          color: '#00FFAA',
+        })
+        .setOrigin(0.5);
+      container.add(previewText);
+    }
+
+    container.add([bg, text]);
+    container.setSize(btnWidth, btnHeight);
+
+    // 交互
+    container
+      .setInteractive({ useHandCursor: true })
+      .on('pointerover', () => {
+        bg.clear();
+        bg.fillStyle(0x00cc99, 1);
+        bg.fillRoundedRect(-btnWidth / 2, -btnHeight / 2, btnWidth, btnHeight, 4);
+        bg.lineStyle(2, 0x00ffaa, 1);
+        bg.strokeRoundedRect(-btnWidth / 2, -btnHeight / 2, btnWidth, btnHeight, 4);
+      })
+      .on('pointerout', () => {
+        bg.clear();
+        bg.fillStyle(0x00aa88, 0.9);
+        bg.fillRoundedRect(-btnWidth / 2, -btnHeight / 2, btnWidth, btnHeight, 4);
+        bg.lineStyle(1, 0x00ffaa, 1);
+        bg.strokeRoundedRect(-btnWidth / 2, -btnHeight / 2, btnWidth, btnHeight, 4);
+      })
+      .on('pointerdown', () => {
+        // 使用卡片
+        const success = narrativeEngine.useCard(card.id);
+        if (success) {
+          // 显示使用成功提示
+          this._showUseToast(card.title);
+
+          // 刷新卡片显示
+          this._refreshCards();
+
+          // 播报使用成功
+          a11yManager.announce(`已使用：${card.title}`, 'assertive');
+        }
+      });
+
+    return container;
+  }
+
+  /**
+   * 显示使用提示
+   */
+  private _showUseToast(cardTitle: string): void {
+    const { width, height } = this._scene.scale;
+    const toast = this._scene.add
+      .text(width / 2, height / 2 - 200, `已使用：${cardTitle}`, {
+        fontSize: UI_FONT_SIZE.NORMAL,
+        color: '#00FFAA',
+        backgroundColor: '#1a1a2e',
+        padding: { x: 16, y: 8 },
+      })
+      .setOrigin(0.5)
+      .setDepth(2000)
+      .setAlpha(0);
+
+    this._scene.tweens.add({
+      targets: toast,
+      alpha: 1,
+      y: height / 2 - 220,
+      duration: 200,
+      ease: 'Power2',
+      onComplete: () => {
+        this._scene.time.delayedCall(1500, () => {
+          this._scene.tweens.add({
+            targets: toast,
+            alpha: 0,
+            y: height / 2 - 240,
+            duration: 200,
+            onComplete: () => toast.destroy(),
+          });
+        });
+      },
+    });
   }
 
   private _getCardColor(category: CardCategory): number {

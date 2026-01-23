@@ -94,7 +94,12 @@ export interface ICard {
   chapter: ChapterID;
   zone: string;
   image?: string;
+  /** 视觉效果（UI层面） */
   effects?: ICardEffect[];
+  /** Gameplay 效果（游戏机制层面） */
+  gameplayFx?: ICardGameplayFx[];
+  /** 是否可消耗（使用后从背包移除） */
+  consumable?: boolean;
 }
 
 /**
@@ -109,12 +114,43 @@ export enum CardCategory {
 }
 
 /**
- * 卡片效果
+ * 卡片视觉效果（UI层面）
  */
 export interface ICardEffect {
   type: 'taint' | 'flash' | 'glitch' | 'redact';
   target?: string;
   intensity?: number;
+}
+
+/**
+ * 卡片 Gameplay 效果（游戏机制层面）
+ * 定义卡片的使用效果，如修改计数器、设置Flag、给予卡片等
+ */
+export interface ICardGameplayFx {
+  /** 触发时机 */
+  trigger: 'obtain' | 'use' | 'view';
+  /** 效果列表 */
+  effects: ICardGameplayEffect[];
+}
+
+/**
+ * 单个 Gameplay 效果
+ */
+export interface ICardGameplayEffect {
+  /** 效果类型 */
+  type: 'counterDelta' | 'setFlag' | 'giveCard' | 'unlockAbility';
+  /** 计数器名称（counterDelta 使用） */
+  counter?: 'R' | 'P';
+  /** 变化量（counterDelta 使用） */
+  delta?: number;
+  /** Flag 名称（setFlag 使用） */
+  flagName?: string;
+  /** Flag 值（setFlag 使用） */
+  flagValue?: boolean;
+  /** 卡片 ID（giveCard 使用） */
+  cardId?: string;
+  /** 能力类型（unlockAbility 使用） */
+  abilityType?: string;
 }
 
 // 从统一类型定义导入
@@ -726,6 +762,11 @@ class NarrativeEngine {
         : { id: cardId, title: cardId, category: CardCategory.ITEM },
     });
 
+    // 自动触发 'obtain' 时机的 gameplay 效果
+    if (card) {
+      this.applyCardGameplayFx(cardId, 'obtain');
+    }
+
     return true;
   }
 
@@ -773,7 +814,184 @@ class NarrativeEngine {
     if (this._obtainedCards.has(cardId) && !this._viewedCards.has(cardId)) {
       this._viewedCards.add(cardId);
       eventBus.emit(GameEvent.CARD_VIEW, { cardId });
+
+      // 触发 'view' 时机的 gameplay 效果
+      this.applyCardGameplayFx(cardId, 'view');
     }
+  }
+
+  /**
+   * 使用卡片
+   * @param cardId 卡片ID
+   * @returns 是否使用成功
+   */
+  useCard(cardId: string): boolean {
+    if (!this._obtainedCards.has(cardId)) {
+      logger.warn(`Cannot use card: ${cardId} (not obtained)`);
+      return false;
+    }
+
+    // 检查是否已消耗
+    if (worldState.isCardConsumed(cardId)) {
+      logger.warn(`Cannot use card: ${cardId} (already consumed)`);
+      return false;
+    }
+
+    const card = this._cardRegistry.get(cardId);
+    if (!card) {
+      logger.warn(`Cannot use card: ${cardId} (not found in registry)`);
+      return false;
+    }
+
+    // 检查是否有 'use' 触发的效果
+    const hasUseEffect = card.gameplayFx?.some((fx) => fx.trigger === 'use');
+    if (!hasUseEffect) {
+      logger.info(`Card ${cardId} has no 'use' effect`);
+      return false;
+    }
+
+    // 应用 'use' 效果
+    const applied = this.applyCardGameplayFx(cardId, 'use');
+
+    // 如果是消耗品，标记为已消耗
+    if (applied && card.consumable) {
+      worldState.consumeCard(cardId);
+      this._obtainedCards.delete(cardId);
+      eventBus.emit(GameEvent.CARD_CONSUME, { cardId, card: { id: card.id, title: card.title } });
+      logger.info(`Card consumed: ${cardId}`);
+    }
+
+    return applied;
+  }
+
+  /**
+   * 检查卡片是否可使用
+   * @param cardId 卡片ID
+   * @returns 是否可使用
+   */
+  isCardUsable(cardId: string): boolean {
+    if (!this._obtainedCards.has(cardId)) return false;
+    if (worldState.isCardConsumed(cardId)) return false;
+
+    const card = this._cardRegistry.get(cardId);
+    if (!card) return false;
+
+    // 检查是否有 'use' 触发的效果
+    return card.gameplayFx?.some((fx) => fx.trigger === 'use') ?? false;
+  }
+
+  /**
+   * 获取卡片效果预览文本
+   * @param cardId 卡片ID
+   * @returns 效果预览文本数组
+   */
+  getCardEffectPreview(cardId: string): string[] {
+    const card = this._cardRegistry.get(cardId);
+    if (!card?.gameplayFx) return [];
+
+    const previews: string[] = [];
+    const useFx = card.gameplayFx.filter((fx) => fx.trigger === 'use');
+
+    for (const fx of useFx) {
+      for (const effect of fx.effects) {
+        switch (effect.type) {
+          case 'counterDelta':
+            if (effect.counter && effect.delta !== undefined) {
+              const sign = effect.delta >= 0 ? '+' : '';
+              previews.push(`${effect.counter} ${sign}${effect.delta}`);
+            }
+            break;
+          case 'setFlag':
+            if (effect.flagName) {
+              previews.push(`设置标记: ${effect.flagName}`);
+            }
+            break;
+          case 'giveCard':
+            if (effect.cardId) {
+              previews.push(`获得卡片`);
+            }
+            break;
+          case 'unlockAbility':
+            if (effect.abilityType) {
+              previews.push(`解锁能力`);
+            }
+            break;
+        }
+      }
+    }
+
+    return previews;
+  }
+
+  /**
+   * 应用卡片 Gameplay 效果
+   * @param cardId 卡片ID
+   * @param trigger 触发时机
+   * @returns 是否成功应用了效果
+   */
+  applyCardGameplayFx(cardId: string, trigger: 'obtain' | 'use' | 'view'): boolean {
+    const card = this._cardRegistry.get(cardId);
+    if (!card?.gameplayFx) return false;
+
+    const fxList = card.gameplayFx.filter((fx) => fx.trigger === trigger);
+    if (fxList.length === 0) return false;
+
+    let appliedAny = false;
+
+    for (const fx of fxList) {
+      for (const effect of fx.effects) {
+        const applied = this._applyGameplayEffect(effect);
+        if (applied) appliedAny = true;
+      }
+    }
+
+    if (appliedAny) {
+      logger.info(`Applied gameplay effects for card ${cardId} on ${trigger}`);
+    }
+
+    return appliedAny;
+  }
+
+  /**
+   * 应用单个 Gameplay 效果
+   */
+  private _applyGameplayEffect(effect: ICardGameplayEffect): boolean {
+    switch (effect.type) {
+      case 'counterDelta':
+        if (effect.counter && effect.delta !== undefined) {
+          if (effect.counter === 'R') {
+            worldState.addR(effect.delta);
+          } else if (effect.counter === 'P') {
+            worldState.addP(effect.delta);
+          }
+          return true;
+        }
+        break;
+
+      case 'setFlag':
+        if (effect.flagName !== undefined) {
+          worldState.setFlag(effect.flagName, effect.flagValue ?? true);
+          return true;
+        }
+        break;
+
+      case 'giveCard':
+        if (effect.cardId) {
+          this.obtainCard(effect.cardId);
+          return true;
+        }
+        break;
+
+      case 'unlockAbility':
+        if (effect.abilityType) {
+          const normalizedType = this._normalizeAbilityType(effect.abilityType);
+          worldState.unlockAbility(normalizedType as AbilityType);
+          return true;
+        }
+        break;
+    }
+
+    return false;
   }
 
   /**

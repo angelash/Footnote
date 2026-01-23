@@ -27,6 +27,10 @@ export enum GameEvent {
   CARD_OBTAIN = 'card:obtain',
   CARD_VIEW = 'card:view',
   CARD_CLOSE = 'card:close',
+  /** 卡片被消耗（使用后消失） */
+  CARD_CONSUME = 'card:consume',
+  /** 卡片被使用（可能不消耗） */
+  CARD_USE = 'card:use',
 
   // ==================== 能力事件 ====================
   ABILITY_UNLOCK = 'ability:unlock',
@@ -151,6 +155,8 @@ export interface IEventPayloads {
   [GameEvent.CARD_OBTAIN]: { cardId: string; card: ICardBasic };
   [GameEvent.CARD_VIEW]: { cardId: string };
   [GameEvent.CARD_CLOSE]: { cardId: string };
+  [GameEvent.CARD_CONSUME]: { cardId: string; card: ICardBasic };
+  [GameEvent.CARD_USE]: { cardId: string; card: ICardBasic; consumed: boolean };
 
   [GameEvent.ABILITY_UNLOCK]: { abilityType: string };
   [GameEvent.ABILITY_ACTIVATE]: { abilityType: string };

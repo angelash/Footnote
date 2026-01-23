@@ -168,6 +168,36 @@ export interface IDialogueCondition {
 
 // ==================== 卡片系统 ====================
 
+/**
+ * 卡片 Gameplay 效果（游戏机制层面）
+ */
+export interface ICardGameplayFx {
+  /** 触发时机 */
+  trigger: 'obtain' | 'use' | 'view';
+  /** 效果列表 */
+  effects: ICardGameplayEffect[];
+}
+
+/**
+ * 单个 Gameplay 效果
+ */
+export interface ICardGameplayEffect {
+  /** 效果类型 */
+  type: 'counterDelta' | 'setFlag' | 'giveCard' | 'unlockAbility';
+  /** 计数器名称（counterDelta 使用） */
+  counter?: 'R' | 'P';
+  /** 变化量（counterDelta 使用） */
+  delta?: number;
+  /** Flag 名称（setFlag 使用） */
+  flagName?: string;
+  /** Flag 值（setFlag 使用） */
+  flagValue?: boolean;
+  /** 卡片 ID（giveCard 使用） */
+  cardId?: string;
+  /** 能力类型（unlockAbility 使用） */
+  abilityType?: string;
+}
+
 export interface ICard {
   id: string;
   name: string;
@@ -179,6 +209,10 @@ export interface ICard {
   fx?: ICardFX[];
   states?: Record<string, ICardStateOverride>;
   currentState?: string;
+  /** Gameplay 效果（游戏机制层面） */
+  gameplayFx?: ICardGameplayFx[];
+  /** 是否可消耗（使用后从背包移除） */
+  consumable?: boolean;
 }
 
 export interface ICardFX {

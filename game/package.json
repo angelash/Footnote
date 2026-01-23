@@ -42,7 +42,8 @@
     "test:perf:baseline": "vitest run tests/unit/performance/performance-baseline.test.ts",
     "lighthouse": "lhci autorun",
     "lighthouse:collect": "lhci collect",
-    "lighthouse:assert": "lhci assert"
+    "lighthouse:assert": "lhci assert",
+    "audit:interactions": "npx tsx scripts/audit_interactions.ts"
   },
   "dependencies": {
     "idb": "^8.0.0",

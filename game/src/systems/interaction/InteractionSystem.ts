@@ -179,7 +179,10 @@ export class InteractionSystem {
     interactionId: string
   ): { canProceed: boolean; reason?: string } {
     // 检查是否是一次性交互且已完成
-    const isOnce = action.once ?? (action.type === 'card'); // card 类型默认一次性
+    // 注意：逻辑必须与 _applyStateChanges 中的 isOnce 保持一致！
+    // - card 类型默认一次性
+    // - dialogue 类型带有 dialogueId 的也默认一次性
+    const isOnce = action.once ?? (action.type === 'card' || (action.type === 'dialogue' && !!action.dialogueId));
     if (isOnce && worldState.hasInteraction(interactionId)) {
       return { canProceed: false, reason: '该交互已完成' };
     }

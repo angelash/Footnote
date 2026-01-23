@@ -777,24 +777,13 @@ function registerDataToNarrativeEngine(
   }
 
   // 按对话链分组
-  // 1. _LINE_N 后缀的新格式对话
-  // 2. 通过 next 链接的旧格式对话
+  // 所有对话通过 next 链接形成链，链头负责收集整个链
+  // 注意：_LINE_N 后缀的对话也是通过 next 链接的，不需要单独处理
   const dialogueChains = new Map<string, IDialogue[]>();
 
   for (const dialogue of dialogues) {
-    // 检查是否是新格式链的一部分（_LINE_N 后缀）
-    const lineMatch = dialogue.id.match(/^(.+)_LINE_(\d+)$/);
-    if (lineMatch) {
-      const baseId = lineMatch[1];
-      if (!dialogueChains.has(baseId)) {
-        dialogueChains.set(baseId, []);
-      }
-      dialogueChains.get(baseId)!.push(dialogue);
-      continue;
-    }
-
-    // 检查是否是旧格式对话链的一部分（被其他对话通过 next 引用）
-    // 如果是，跳过它，让链头来处理整个链
+    // 跳过被其他对话通过 next 引用的对话
+    // 这些对话会被链头收集，不需要单独处理
     if (referencedByNext.has(dialogue.id)) {
       continue;
     }

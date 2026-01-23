@@ -312,10 +312,12 @@ function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
     if (isLastLine && raw.onComplete) {
       const triggers = raw.onComplete;
       // 合并所有onComplete动作到trigger
+      // 注意：卡片和flags支持多个，需要累积
+      const cardIds: string[] = [];
       for (const action of triggers) {
         if (!trigger) trigger = {};
         if (action.type === 'card' && action.cardId) {
-          trigger.card = action.cardId;
+          cardIds.push(action.cardId);
         }
         if (action.type === 'foreshadow' && action.foreshadowId && action.foreshadowStage) {
           trigger.foreshadow = [action.foreshadowId, action.foreshadowStage] as [
@@ -331,6 +333,11 @@ function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
           if (!trigger.flags) trigger.flags = [];
           trigger.flags.push({ name: action.flagName, value: action.flagValue ?? true });
         }
+      }
+      // 设置卡片（支持多张）
+      if (cardIds.length > 0) {
+        trigger.cards = cardIds;  // 使用 cards 数组存储多张卡片
+        trigger.card = cardIds[0];  // 保持向后兼容，第一张卡片也放在 card
       }
     }
 

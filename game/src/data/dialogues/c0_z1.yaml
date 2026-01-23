@@ -23,27 +23,30 @@ dialogues:
     text: 身份卡、通讯器、维修工具包。
     expression: neutral
     next: null
-    trigger:
-      card: CARD_C0_IDENTITY
+    # 不再自动给卡片，改为点击场景物品获取
 
   # ==================== 身份卡交互 ====================
-  IDENTITY_CARD_EXAMINE:
-    id: IDENTITY_CARD_EXAMINE
-    speaker: 系统
-    text: 身份识别卡正在载入...
-    next: IDENTITY_CARD_INFO
-    
-  IDENTITY_CARD_INFO:
-    id: IDENTITY_CARD_INFO
-    speaker: 系统
-    text: |
-      ▸ 姓名：岑回
-      ▸ 编号：EX-7749
-      ▸ 所属：维修局外勤
-      ▸ 通行级别：灰
-    next: null
-    trigger:
-      card: CARD_C0_IDENTITY
+  # 首次拾取身份卡
+  C0Z1_IDENTITY_PICKUP:
+    id: C0Z1_IDENTITY_PICKUP
+    lines:
+      - speaker: 岑回
+        text: （拿起身份卡）
+      - speaker: ""
+        text: 维修局外勤身份凭证。持卡人：岑回。编号：EX-7749。
+    onComplete:
+      - type: card
+        cardId: CARD_C0_IDENTITY
+      - type: flag
+        flagName: FLAG_C0Z1_GOT_IDENTITY
+        flagValue: true
+
+  # 已获得后再次点击
+  C0Z1_IDENTITY_EXAMINE_DONE:
+    id: C0Z1_IDENTITY_EXAMINE_DONE
+    lines:
+      - speaker: 岑回
+        text: 身份卡已经在手上了。
 
   # ==================== 公告板交互 ====================
   NOTICE_BOARD_LOOK:

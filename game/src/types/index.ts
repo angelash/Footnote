@@ -146,6 +146,8 @@ export interface IDialogueChoice {
 
 export interface IDialogueTrigger {
   card?: string;
+  /** 多张卡片（支持 onComplete 中多张卡片） */
+  cards?: string[];
   foreshadow?: [string, ForeshadowStage];
   ability?: AbilityType;
   event?: string;

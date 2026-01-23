@@ -432,9 +432,15 @@ class NarrativeEngine {
           })),
           onComplete: oldFormat.trigger
             ? ([
-                oldFormat.trigger.card
-                  ? { type: 'card' as const, cardId: oldFormat.trigger.card }
-                  : null,
+                // 支持多张卡片（trigger.cards 数组）
+                ...((oldFormat.trigger as { cards?: string[] }).cards || []).map((cardId) => ({
+                  type: 'card' as const,
+                  cardId,
+                })),
+                // 向后兼容：如果没有 cards 数组，使用单个 card
+                ...(!((oldFormat.trigger as { cards?: string[] }).cards?.length) && oldFormat.trigger.card
+                  ? [{ type: 'card' as const, cardId: oldFormat.trigger.card }]
+                  : []),
                 oldFormat.trigger.foreshadow
                   ? {
                       type: 'foreshadow' as const,
@@ -442,6 +448,12 @@ class NarrativeEngine {
                       foreshadowStage: oldFormat.trigger.foreshadow[1] as ForeshadowStage,
                     }
                   : null,
+                // 支持 flags 数组
+                ...((oldFormat.trigger.flags || []).map((f) => ({
+                  type: 'flag' as const,
+                  flagName: f.name,
+                  flagValue: f.value,
+                }))),
               ].filter(Boolean) as IDialogueAction[])
             : undefined,
         });
@@ -558,9 +570,10 @@ class NarrativeEngine {
     // 该事件已由 DialogueUI.selectChoice() 发送
     // 如果在这里再次发送会导致无限递归
 
-    // 应用效果
-    if (choice.effects) {
-      this._applyChoiceEffects(choice.effects);
+    // 应用效果（兼容两种属性名：effect 和 effects）
+    const effectData = (choice as { effect?: IChoiceEffect; effects?: IChoiceEffect }).effect || choice.effects;
+    if (effectData) {
+      this._applyChoiceEffects(effectData);
     }
 
     // 调用处理器（使用正确的变量名）

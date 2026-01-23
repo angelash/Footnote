@@ -57,6 +57,7 @@ export class GameScene extends Phaser.Scene {
   private _isNewGame: boolean = false;
   private _assembledScene: IAssembledScene | null = null;
   private _sceneAssembler!: SceneAssembler;
+  private _narrativeDataReady: Promise<void> = Promise.resolve();
 
   // 游戏对象
   private _player!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
@@ -169,8 +170,9 @@ export class GameScene extends Phaser.Scene {
       onAction: (action) => this._handleSceneAction(action),
     });
 
-    // 加载叙事数据
-    this._loadNarrativeData();
+    // 加载叙事数据（异步）
+    // 保存 Promise 供 onEnter 对话使用
+    this._narrativeDataReady = this._loadNarrativeData();
 
     // 加载Zone数据
     this._loadZone(this._currentZoneId);
@@ -240,8 +242,8 @@ export class GameScene extends Phaser.Scene {
     // 检查 SceneAssembler 创建的可交互对象
     if (this._assembledScene) {
       for (const obj of this._assembledScene.objects) {
-        // 只检查有交互数据的对象
-        if (obj instanceof Phaser.GameObjects.Container && obj.getData('action')) {
+        // 只检查有交互数据的对象，且必须可见
+        if (obj instanceof Phaser.GameObjects.Container && obj.getData('action') && obj.visible) {
           const dist = Phaser.Math.Distance.Between(playerX, playerY, obj.x, obj.y);
           if (dist < this._interactionRange && dist < nearestDist) {
             nearestDist = dist;
@@ -253,6 +255,8 @@ export class GameScene extends Phaser.Scene {
 
     // 检查旧的交互点数组
     for (const interactable of this._interactables) {
+      // 跳过不可见的对象
+      if (!interactable.visible) continue;
       const dist = Phaser.Math.Distance.Between(playerX, playerY, interactable.x, interactable.y);
       if (dist < this._interactionRange && dist < nearestDist) {
         nearestDist = dist;
@@ -344,7 +348,8 @@ export class GameScene extends Phaser.Scene {
       // 检查 SceneAssembler 创建的可交互对象
       if (this._assembledScene) {
         for (const obj of this._assembledScene.objects) {
-          if (obj instanceof Phaser.GameObjects.Container && obj.getData('action')) {
+          // 只检查有交互数据的对象，且必须可见
+          if (obj instanceof Phaser.GameObjects.Container && obj.getData('action') && obj.visible) {
             const dist = Phaser.Math.Distance.Between(playerX, playerY, obj.x, obj.y);
             if (dist < this._interactionRange && dist < closestDist) {
               closestDist = dist;
@@ -356,6 +361,8 @@ export class GameScene extends Phaser.Scene {
 
       // 检查旧的交互点数组
       for (const interactable of this._interactables) {
+        // 跳过不可见的对象
+        if (!interactable.visible) continue;
         const dist = Phaser.Math.Distance.Between(playerX, playerY, interactable.x, interactable.y);
         if (dist < this._interactionRange && dist < closestDist) {
           closestDist = dist;
@@ -1502,10 +1509,14 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
-    // 延迟触发对话，等待场景加载完成
-    this.time.delayedCall(100, () => {
-      logger.info(`触发 onEnter 对话: ${dialogueId}`);
-      void this.showDialogueById(dialogueId);
+    // 等待叙事数据加载完成后再触发对话
+    // 这确保了对话数据在显示前已经注册到 NarrativeEngine
+    void this._narrativeDataReady.then(() => {
+      // 延迟触发对话，等待场景加载完成
+      this.time.delayedCall(100, () => {
+        logger.info(`触发 onEnter 对话: ${dialogueId}`);
+        void this.showDialogueById(dialogueId);
+      });
     });
   }
 

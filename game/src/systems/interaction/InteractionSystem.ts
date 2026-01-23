@@ -180,9 +180,10 @@ export class InteractionSystem {
   ): { canProceed: boolean; reason?: string } {
     // 检查是否是一次性交互且已完成
     // 注意：逻辑必须与 _applyStateChanges 中的 isOnce 保持一致！
-    // - card 类型默认一次性
-    // - dialogue 类型带有 dialogueId 的也默认一次性
-    const isOnce = action.once ?? (action.type === 'card' || (action.type === 'dialogue' && !!action.dialogueId));
+    // - card 类型默认一次性（获得后不再重复获得）
+    // - dialogue 类型默认可重复（除非显式设置 once: true）
+    // - 物品消失/切换应通过 condition（flagTrue/flagFalse）控制，而不是这里
+    const isOnce = action.once ?? (action.type === 'card');
     if (isOnce && worldState.hasInteraction(interactionId)) {
       return { canProceed: false, reason: '该交互已完成' };
     }
@@ -273,9 +274,10 @@ export class InteractionSystem {
     }
 
     // 3. 标记一次性交互为已完成
-    // - card 类型默认一次性
-    // - dialogue 类型带有 dialogueId 的也默认一次性（防止物品对话重复触发）
-    const isOnce = action.once ?? (action.type === 'card' || (action.type === 'dialogue' && !!action.dialogueId));
+    // - card 类型默认一次性（获得后不再重复获得）
+    // - dialogue 类型默认可重复（除非显式设置 once: true）
+    // - 物品消失/切换应通过场景配置的 condition（flagTrue/flagFalse）控制
+    const isOnce = action.once ?? (action.type === 'card');
     if (isOnce && result.changed) {
       worldState.markInteractionDone(interactionId, {
         actionType: action.type,

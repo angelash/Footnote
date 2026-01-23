@@ -592,8 +592,11 @@ export class SceneAssembler {
     };
 
     const apply = (satisfied: boolean): void => {
+      console.log(`[ConditionWatcher] ${obj.id}: apply(${satisfied}), style=${options.style}, targets=${options.visualTargets.length}, hasInteractiveTarget=${!!options.interactiveTarget}`);
+      
       if (options.style === 'hide') {
         for (const target of options.visualTargets) {
+          console.log(`[ConditionWatcher] ${obj.id}: setVisible(${satisfied}) 在目标上`);
           (target as unknown as { setVisible?: (v: boolean) => void }).setVisible?.(satisfied);
           if (satisfied) {
             (target as unknown as { setAlpha?: (v: number) => void }).setAlpha?.(enabledAlpha);
@@ -611,14 +614,19 @@ export class SceneAssembler {
 
       if (options.interactiveTarget) {
         if (satisfied) {
+          console.log(`[ConditionWatcher] ${obj.id}: enableInteractive()`);
           options.enableInteractive?.();
         } else {
+          console.log(`[ConditionWatcher] ${obj.id}: disableInteractive()`);
           options.disableInteractive?.();
         }
+      } else {
+        console.log(`[ConditionWatcher] ${obj.id}: 没有 interactiveTarget，跳过交互控制`);
       }
     };
 
     let last = checkSatisfied();
+    console.log(`[ConditionWatcher] ${obj.id}: 初始化 satisfied=${last}, trueFlag=${requiredTrueFlag}, falseFlag=${requiredFalseFlag}`);
     apply(last);
 
     // 检查对象是否仍然存活
@@ -631,20 +639,29 @@ export class SceneAssembler {
 
     // 使用事件监听立即响应 flag 变化（不再依赖轮询延迟）
     const relevantFlags = [requiredTrueFlag, requiredFalseFlag].filter(Boolean) as string[];
+    console.log(`[ConditionWatcher] ${obj.id}: 监听 flags: [${relevantFlags.join(', ')}]`);
     
     const onFlagSet = (data: { flagName: string; value: boolean }): void => {
+      console.log(`[ConditionWatcher] ${obj.id}: 收到 FLAG_SET: ${data.flagName}=${data.value}, 相关flags=[${relevantFlags.join(', ')}]`);
+      
       // 检查是否是相关的 flag
-      if (!relevantFlags.includes(data.flagName)) return;
+      if (!relevantFlags.includes(data.flagName)) {
+        console.log(`[ConditionWatcher] ${obj.id}: 不是相关 flag，忽略`);
+        return;
+      }
       
       // 检查对象是否还存活
       if (!isAlive()) {
+        console.log(`[ConditionWatcher] ${obj.id}: 对象已销毁，移除监听器`);
         // 移除监听器
         eventBus.off(GameEvent.FLAG_SET, onFlagSet);
         return;
       }
 
       const now = checkSatisfied();
+      console.log(`[ConditionWatcher] ${obj.id}: 检查条件 last=${last}, now=${now}`);
       if (now !== last) {
+        console.log(`[ConditionWatcher] ${obj.id}: 条件变化！应用新状态: ${now}`);
         last = now;
         apply(now);
       }
@@ -652,6 +669,7 @@ export class SceneAssembler {
 
     // 注册 FLAG_SET 事件监听
     eventBus.on(GameEvent.FLAG_SET, onFlagSet);
+    console.log(`[ConditionWatcher] ${obj.id}: 事件监听器已注册`);
 
     // 保留轮询作为后备（主要用于清理监听器）
     const timer = this._scene.time.addEvent({

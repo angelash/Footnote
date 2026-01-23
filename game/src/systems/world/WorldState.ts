@@ -380,7 +380,9 @@ class WorldState {
    * 设置标记
    */
   setFlag(name: string, value: boolean): void {
+    console.log(`[WorldState] setFlag: ${name} = ${value}`);
     this._flags.set(name, value);
+    console.log(`[WorldState] 发出 FLAG_SET 事件: ${name} = ${value}`);
     eventBus.emit(GameEvent.FLAG_SET, { flagName: name, value });
   }
 

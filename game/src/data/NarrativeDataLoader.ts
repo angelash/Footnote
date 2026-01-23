@@ -866,6 +866,11 @@ function registerDataToNarrativeEngine(
                        mergedTrigger.flags.length > 0 || 
                        mergedTrigger.ability;
 
+    // 调试：记录有 onComplete 的对话
+    if (hasTrigger) {
+      console.log(`[NarrativeDataLoader] 注册对话 ${baseId}，onComplete: cards=[${mergedTrigger.cards.join(',')}], flags=[${mergedTrigger.flags.map(f => `${f.name}=${f.value}`).join(',')}]`);
+    }
+
     narrativeEngine.registerDialogue({
       id: baseId,
       lines,

@@ -321,6 +321,18 @@ class NarrativeEngine {
    * 开始对话
    */
   async startDialogue(dialogueIdOrData: string | IDialogueData[]): Promise<void> {
+    // 如果有正在进行的对话，先结束它
+    if (this._isDialogueActive && this._currentDialogue) {
+      logger.warn(`中断正在进行的对话: ${this._currentDialogue.id}`);
+      // 不执行 onComplete，直接清理状态
+      const oldDialogueId = this._currentDialogue.id;
+      this._currentDialogue = null;
+      this._currentLineIndex = 0;
+      this._isDialogueActive = false;
+      eventBus.emit(GameEvent.DIALOGUE_END, { dialogueId: oldDialogueId });
+      this._onDialogueEnd?.();
+    }
+
     let dialogue: IDialogueData;
 
     if (typeof dialogueIdOrData === 'string') {
@@ -497,14 +509,20 @@ class NarrativeEngine {
   private _endDialogue(): void {
     if (!this._currentDialogue) return;
 
+    const dialogueId = this._currentDialogue.id;
+    console.log(`[NarrativeEngine] _endDialogue: ${dialogueId}`);
+
     // 执行完成动作
-    if (this._currentDialogue.onComplete) {
-      this._currentDialogue.onComplete.forEach((action) => {
+    if (this._currentDialogue.onComplete && this._currentDialogue.onComplete.length > 0) {
+      console.log(`[NarrativeEngine] 执行 onComplete: ${this._currentDialogue.onComplete.length} 个动作`);
+      this._currentDialogue.onComplete.forEach((action, index) => {
+        console.log(`[NarrativeEngine] onComplete[${index}]:`, JSON.stringify(action));
         this._handleDialogueAction(action);
       });
+    } else {
+      console.log(`[NarrativeEngine] 没有 onComplete 动作`);
     }
 
-    const dialogueId = this._currentDialogue.id;
     this._currentDialogue = null;
     this._currentLineIndex = 0;
     this._isDialogueActive = false;
@@ -514,9 +532,13 @@ class NarrativeEngine {
   }
 
   private _handleDialogueAction(action: IDialogueAction): void {
+    console.log(`[NarrativeEngine] _handleDialogueAction: type=${action.type}`, action);
     switch (action.type) {
       case 'card':
-        if (action.cardId) this.obtainCard(action.cardId);
+        if (action.cardId) {
+          console.log(`[NarrativeEngine] 获得卡片: ${action.cardId}`);
+          this.obtainCard(action.cardId);
+        }
         break;
       case 'foreshadow':
         if (action.foreshadowId && action.foreshadowStage) {
@@ -525,7 +547,11 @@ class NarrativeEngine {
         break;
       case 'flag':
         if (action.flagName !== undefined) {
+          console.log(`[NarrativeEngine] 设置 flag: ${action.flagName} = ${action.flagValue ?? true}`);
           worldState.setFlag(action.flagName, action.flagValue ?? true);
+          // 验证 flag 是否设置成功
+          const flagValue = worldState.getFlag(action.flagName);
+          console.log(`[NarrativeEngine] 验证 flag ${action.flagName} = ${flagValue}`);
         }
         break;
       case 'ability':

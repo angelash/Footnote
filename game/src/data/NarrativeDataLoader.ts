@@ -336,6 +336,7 @@ function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
       }
       // 设置卡片（支持多张）
       if (cardIds.length > 0) {
+        if (!trigger) trigger = {};
         trigger.cards = cardIds;  // 使用 cards 数组存储多张卡片
         trigger.card = cardIds[0];  // 保持向后兼容，第一张卡片也放在 card
       }

@@ -237,20 +237,20 @@
 
 ## 测试执行记录
 
-### 执行日期: 2026-01-23
+### 执行日期: 2026-01-23 (更新)
 
 | 用例 | 结果 | 问题描述 | 修复状态 |
 |------|------|----------|----------|
 | TC-Z1-01 | ✅ PASS | 身份卡拾取后正确消失，状态切换正常 | - |
-| TC-Z1-02 | ✅ PASS | 储物柜给两张卡片（修复后） | ✅ 已修复 |
-| TC-Z1-03 | 🔄 待进一步测试 | 选择效果需要验证 | - |
-| TC-Z1-04 | 待执行 | | |
+| TC-Z1-02 | ✅ PASS | 储物柜给两张卡片（早餐券+工单） | ✅ 已修复 |
+| TC-Z1-03 | ✅ PASS | 祷词台选择效果正常（获得晨间祷词，状态切换） | ✅ 已修复 |
+| TC-Z1-04 | ✅ PASS | 公告板选择效果正常（状态切换） | ✅ 已修复 |
 | TC-Z1-05 | 待执行 | | |
-| TC-Z2-01 | 待执行 | | |
+| TC-Z2-01 | ✅ PASS | 固定套餐选择正常（获得早餐小票） | - |
 | TC-Z2-02 | 待执行 | | |
-| TC-Z3-01 | 待执行 | | |
-| TC-Z3-02 | 待执行 | | |
-| TC-Z4-01 | 待执行 | | |
+| TC-Z3-01 | ✅ PASS | 钉子拾取正常（获得旧钉子，对象消失） | - |
+| TC-Z3-02 | 待执行 | 长按触发需要特殊测试方式 | |
+| TC-Z4-01 | ✅ PASS | 前台报到正确解锁任务板 | - |
 | TC-Z4-02 | 待执行 | | |
 | TC-Z4-03 | 待执行 | | |
 | TC-Z4-04 | 待执行 | | |
@@ -298,7 +298,35 @@ trigger.cards = cardIds;
 **问题**: 身份卡没有 condition 控制显示/隐藏
 **修复**: 添加 `identity_card` 和 `identity_card_done` 两个状态版本
 
+### 修复5: 旧格式对话链合并 (2026-01-23)
+**文件**: `NarrativeDataLoader.ts`
+**问题**: 旧格式对话使用 `next` 字段链接多个对话，但 `registerDataToNarrativeEngine` 没有合并它们，导致对话无法正确链接到选择界面
+**修复**: 在 `registerDataToNarrativeEngine` 中追踪 `next` 链接，将旧格式对话链合并成多行对话
+```typescript
+// 追踪整个链
+const chain: IDialogue[] = [dialogue];
+let current = dialogue;
+while (current.next && dialogueMap.has(current.next)) {
+  const nextDialogue = dialogueMap.get(current.next)!;
+  chain.push(nextDialogue);
+  current = nextDialogue;
+}
+```
+
+### 修复6: 对话链 trigger 合并 (2026-01-23)
+**文件**: `NarrativeDataLoader.ts`
+**问题**: 对话链中间的对话有 trigger（如设置 flag），但只从最后一个对话获取 trigger，导致中间对话的效果丢失
+**修复**: 合并整个对话链中所有对话的 trigger 效果
+```typescript
+const mergedTrigger = { cards: [], flags: [] };
+for (const d of chain) {
+  if (d.trigger) {
+    // 合并卡片、伏笔、flags、能力
+  }
+}
+```
+
 ---
 
-*文档版本: v1.1*
+*文档版本: v1.2*
 *更新日期: 2026-01-23*

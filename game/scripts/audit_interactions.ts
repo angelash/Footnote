@@ -52,9 +52,19 @@ interface ISceneConfig {
 
 interface IDialogueChoice {
   next?: string;
+  nextDialogueId?: string; // 另一种 next 字段名
   effect?: {
     r?: number;
     card?: string;
+  };
+  effects?: {
+    setFlag?: {
+      name: string;
+      value: boolean | number;
+    };
+    rDelta?: number;
+    pDelta?: number;
+    giveCard?: string;
   };
 }
 
@@ -128,6 +138,9 @@ function scanScenes(): Map<string, ISceneConfig> {
 
 /**
  * 扫描所有对话配置
+ * 支持两种格式：
+ * 1. 对象格式: dialogues: { ID: {...}, ... }
+ * 2. 数组格式: dialogues: [ { id: ..., ... }, ... ]
  */
 function scanDialogues(): Map<string, IDialogue> {
   const dialogues = new Map<string, IDialogue>();
@@ -143,11 +156,23 @@ function scanDialogues(): Map<string, IDialogue> {
   for (const file of files) {
     try {
       const content = fs.readFileSync(path.join(dialoguesDir, file), 'utf-8');
-      const data = yaml.parse(content) as { dialogues?: Record<string, IDialogue> };
+      const data = yaml.parse(content) as {
+        dialogues?: Record<string, IDialogue> | IDialogue[];
+      };
 
       if (data?.dialogues) {
-        for (const [id, dialogue] of Object.entries(data.dialogues)) {
-          dialogues.set(id, { ...dialogue, id });
+        // 支持数组格式: dialogues: [ { id: ..., ... }, ... ]
+        if (Array.isArray(data.dialogues)) {
+          for (const dialogue of data.dialogues) {
+            if (dialogue.id) {
+              dialogues.set(dialogue.id, dialogue);
+            }
+          }
+        } else {
+          // 支持对象格式: dialogues: { ID: {...}, ... }
+          for (const [id, dialogue] of Object.entries(data.dialogues)) {
+            dialogues.set(id, { ...dialogue, id });
+          }
         }
       }
     } catch (err) {
@@ -215,6 +240,18 @@ function collectFlagSources(
       for (const action of dialogue.onComplete) {
         if (action.type === 'flag' && action.flagName && action.flagValue === true) {
           flagSources.add(action.flagName);
+        }
+      }
+    }
+
+    // choices.effects.setFlag - 选项效果中的 flag 设置
+    if (dialogue.choices) {
+      for (const choice of dialogue.choices) {
+        if (choice.effects?.setFlag?.name) {
+          // 接受 true 或任何非假值（如数字 1）作为有效设置
+          if (choice.effects.setFlag.value) {
+            flagSources.add(choice.effects.setFlag.name);
+          }
         }
       }
     }

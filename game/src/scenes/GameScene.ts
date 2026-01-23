@@ -1448,8 +1448,9 @@ export class GameScene extends Phaser.Scene {
 
     const cfg = getSceneConfig(zoneId);
     if (!cfg) {
-      // 回退到旧的硬编码交互点（开发阶段安全兜底）
-      this._createInteractionPoints(zoneId);
+      // 配置不存在时，记录错误并显示提示（不再使用硬编码 fallback）
+      logger.error(`场景配置不存在: ${zoneId}，请检查 YAML 文件`);
+      this._showConfigMissingWarning(zoneId);
       return;
     }
 
@@ -1468,7 +1469,10 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * 处理进入场景时的自动对话
-   * 使用 flag 防止重复触发（默认只触发一次）
+   * 使用统一的 WorldState.markInteractionDone 防止重复触发
+   * 
+   * 注意：使用与 InteractionSystem 相同的 once 追踪机制
+   * 确保 onEnter 对话和物品交互对话使用一致的防重复逻辑
    */
   private _handleOnEnterDialogue(
     zoneId: string,
@@ -1480,16 +1484,22 @@ export class GameScene extends Phaser.Scene {
     // 默认只触发一次
     const once = onEnterConfig.once !== false;
     
+    // 生成统一的交互ID（与 InteractionSystem 格式一致）
+    const interactionId = `${zoneId}_onEnter_dialogue_${dialogueId}`;
+    
     if (once) {
-      // 使用 flag 检查是否已触发过
-      const flagName = `FLAG_ONENTER_${zoneId.replace(/-/g, '_')}_DONE`;
-      if (worldState.getFlag(flagName)) {
+      // 使用统一的交互追踪机制检查是否已触发过
+      if (worldState.hasInteraction(interactionId)) {
         logger.debug(`onEnter 对话已触发过，跳过: ${dialogueId}`);
         return;
       }
       
-      // 设置 flag 标记已触发
-      worldState.setFlag(flagName, true);
+      // 标记交互已完成
+      worldState.markInteractionDone(interactionId, {
+        actionType: 'dialogue',
+        dialogueId: dialogueId,
+        zoneId: zoneId,
+      });
     }
 
     // 延迟触发对话，等待场景加载完成
@@ -1588,86 +1598,38 @@ export class GameScene extends Phaser.Scene {
     logger.debug(`物品已捡取并隐藏: ${itemId}`);
   }
 
-  private _createInteractionPoints(zoneId: string): void {
-    // TODO: 根据Zone数据创建交互点
-    // 临时：创建示例交互点
-
-    if (zoneId === 'C0-Z1') {
-      // 身份卡交互点
-      const idCard = this._createInteractable(200, 600, '身份卡', {
-        type: 'card',
-        cardId: 'CARD_C0_IDENTITY',
-      });
-      idCard.setData('testid', 'identity-card');
-      this._interactables.push(idCard);
-
-      // 公告板交互点
-      const noticeBoard = this._createInteractable(500, 500, '公告板', {
-        type: 'dialogue',
-        speaker: '系统',
-        text: '公告板上贴满了通知，日期处有涂改痕迹...',
-      });
-      this._interactables.push(noticeBoard);
-
-      // 出口门（前往C0-Z2）
-      const exitDoor = this._createInteractable(600, 900, '出口', {
-        type: 'gotoZone',
-        zoneId: 'C0-Z2',
-      });
-      this._interactables.push(exitDoor);
-    }
-  }
-
   /**
-   * 创建可交互对象（存储 action 数据，不直接绑定点击事件）
+   * 显示配置缺失警告
+   * 当 YAML 场景配置不存在时显示开发提示
    */
-  private _createInteractable(
-    x: number,
-    y: number,
-    label: string,
-    action: ISceneAction
-  ): Phaser.GameObjects.Container {
-    const container = this.add.container(x, y);
-
-    // 交互指示器
-    const indicator = this.add.graphics();
-    indicator.fillStyle(0x00ffaa, 0.3);
-    indicator.fillCircle(0, 0, 30);
-    indicator.lineStyle(2, 0x00ffaa, 0.8);
-    indicator.strokeCircle(0, 0, 30);
-
-    // 标签文字
-    const text = this.add
-      .text(0, 45, label, {
-        ...TEXT_STYLES.MUTED,
-        fontSize: UI_FONT_SIZE.TINY,
-      })
-      .setOrigin(0.5);
-
-    container.add([indicator, text]);
-    container.setSize(60, 60);
-    container.setName(label);
-
-    // 设置交互区域（仅用于 hover cursor）
-    container.setInteractive({ useHandCursor: true });
-
-    // 存储交互数据，供 InteractionPrompt 触发
-    container.setData('action', action);
-    container.setData('label', label);
-
-    // 呼吸动画
-    this.tweens.add({
-      targets: indicator,
-      alpha: 0.5,
-      scale: 1.1,
-      duration: 1000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
-
-    return container;
+  private _showConfigMissingWarning(zoneId: string): void {
+    const { width, height } = this.scale;
+    
+    // 创建警告背景
+    const bg = this.add.rectangle(width / 2, height / 2, 400, 200, 0x000000, 0.8);
+    bg.setDepth(2000);
+    
+    // 创建警告文字
+    const warningText = this.add.text(
+      width / 2,
+      height / 2,
+      `⚠️ 场景配置缺失\n\nZone: ${zoneId}\n\n请检查 game/src/data/scenes/${zoneId.toLowerCase().replace('-', '_')}.yaml`,
+      {
+        fontSize: '16px',
+        color: '#ffcc00',
+        align: 'center',
+        wordWrap: { width: 380 },
+      }
+    );
+    warningText.setOrigin(0.5);
+    warningText.setDepth(2001);
+    
+    logger.warn(`场景配置缺失: ${zoneId}，已显示开发警告`);
   }
+
+  // 注意：_createInteractionPoints 和 _createInteractable 方法已移除
+  // 所有场景交互点现在必须通过 YAML 配置定义
+  // 如果配置缺失，将显示警告而不是使用硬编码 fallback
 
   private _setupInput(): void {
     // 方向键 + WASD（安全初始化，处理键盘不可用的情况）

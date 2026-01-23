@@ -20,35 +20,10 @@ import type {
 import type { CardType, ChapterID, AbilityType } from '@/config/game.config';
 
 // ==================== 类型定义 ====================
+// 注意：已移除旧格式对话支持，所有对话必须使用新格式（lines 数组）
 
 /**
- * 旧格式对话（C0）- 单行对话
- */
-interface IRawDialogueOld {
-  id: string;
-  speaker: string;
-  text: string;
-  expression?: string;
-  next?: string | null;
-  choices?: {
-    label: string;
-    next: string;
-    effect?: { r?: number; p?: number };
-    condition?: IRawCondition;
-  }[];
-  trigger?: {
-    card?: string;
-    foreshadow?: [string, string];
-    ability?: string;
-    event?: string;
-    /** 旧格式：flag 设置列表 */
-    flags?: Array<{ name: string; value: boolean }>;
-  };
-  condition?: IRawCondition;
-}
-
-/**
- * 新格式对话行
+ * 对话行
  */
 interface IRawDialogueLine {
   speaker: string;
@@ -74,9 +49,10 @@ interface IRawDialogueAction {
 }
 
 /**
- * 新格式对话（C1+）- 多行对话
+ * 对话配置（统一格式）
+ * 所有对话必须使用 lines 数组格式
  */
-interface IRawDialogueNew {
+interface IRawDialogue {
   id: string;
   lines: IRawDialogueLine[];
   choices?: {
@@ -93,18 +69,6 @@ interface IRawDialogueNew {
     nextDialogueId?: string;
   }[];
   onComplete?: IRawDialogueAction[];
-}
-
-/**
- * 统一的原始对话类型（可能是新格式或旧格式）
- */
-type IRawDialogue = IRawDialogueOld | IRawDialogueNew;
-
-/**
- * 检查是否为新格式对话
- */
-function isNewFormatDialogue(raw: IRawDialogue): raw is IRawDialogueNew {
-  return 'lines' in raw && Array.isArray(raw.lines);
 }
 
 /**
@@ -225,39 +189,12 @@ interface IRawCondition {
 // ==================== 加载函数 ====================
 
 /**
- * 将旧格式对话转换为统一的IDialogue格式
+ * 将对话配置转换为多个IDialogue（每行一个对话，通过next链接）
+ * 
+ * 注意：所有对话必须使用统一的 lines 数组格式
+ * 旧格式（speaker/text/next）已不再支持
  */
-function normalizeOldFormatDialogue(raw: IRawDialogueOld): IDialogue {
-  return {
-    id: raw.id,
-    speaker: raw.speaker,
-    text: raw.text,
-    expression: raw.expression as IDialogue['expression'],
-    next: raw.next ?? null,
-    choices: raw.choices?.map((c) => ({
-      label: c.label,
-      next: c.next,
-      effect: c.effect,
-      condition: c.condition ? transformCondition(c.condition) : undefined,
-    })),
-    trigger: raw.trigger
-      ? {
-          card: raw.trigger.card,
-          foreshadow: raw.trigger.foreshadow as [string, ForeshadowStage] | undefined,
-          ability: raw.trigger.ability as AbilityType | undefined,
-          event: raw.trigger.event,
-          // 传递旧格式的 flags（转换为 onComplete 效果会在 registerDataToNarrativeEngine 中处理）
-          flags: raw.trigger.flags,
-        }
-      : undefined,
-    condition: raw.condition ? transformCondition(raw.condition) : undefined,
-  };
-}
-
-/**
- * 将新格式对话转换为多个IDialogue（每行一个对话，通过next链接）
- */
-function normalizeNewFormatDialogue(raw: IRawDialogueNew): IDialogue[] {
+function normalizeDialogue(raw: IRawDialogue): IDialogue[] {
   const dialogues: IDialogue[] = [];
   const lines = raw.lines;
 
@@ -374,7 +311,9 @@ function transformConditionNew(
 }
 
 /**
- * 加载对话数据 - 兼容新旧两种格式
+ * 加载对话数据
+ * 
+ * 注意：只支持统一的 lines 数组格式，旧格式（speaker/text/next）已不再支持
  */
 export function loadDialogues(yamlContent: string): IDialogue[] {
   try {
@@ -384,13 +323,13 @@ export function loadDialogues(yamlContent: string): IDialogue[] {
     const result: IDialogue[] = [];
 
     for (const raw of Object.values(data.dialogues) as IRawDialogue[]) {
-      if (isNewFormatDialogue(raw)) {
-        // 新格式：多行对话转换为多个IDialogue
-        result.push(...normalizeNewFormatDialogue(raw));
-      } else {
-        // 旧格式：单行对话直接转换
-        result.push(normalizeOldFormatDialogue(raw));
+      // 验证格式
+      if (!raw.lines || !Array.isArray(raw.lines)) {
+        logger.error(`对话 ${raw.id} 缺少 lines 数组，请使用统一的新格式`);
+        continue;
       }
+      // 转换为多个 IDialogue（每行一个，通过 next 链接）
+      result.push(...normalizeDialogue(raw));
     }
 
     return result;
@@ -1089,4 +1028,84 @@ function registerDataToNarrativeEngine(
  */
 export function getAllDialogueFiles(): string[] {
   return [...ALL_DIALOGUE_FILES];
+}
+
+/**
+ * 动态加载单个对话文件并注册到 NarrativeEngine
+ * 这是统一的动态加载入口，确保对话链被正确处理
+ * 
+ * @param yamlFile 文件名（不含路径和扩展名），如 "c0_z1"
+ * @returns 是否加载成功
+ */
+export async function loadDialogueFileAndRegister(yamlFile: string): Promise<boolean> {
+  try {
+    // 动态fetch YAML文件（开发环境使用 /src/data，生产环境使用 /assets/data）
+    const basePath = import.meta.env.DEV ? '/src/data/dialogues' : '/assets/data/dialogues';
+    const response = await fetch(`${basePath}/${yamlFile}.yaml`);
+    if (!response.ok) {
+      logger.debug(`对话文件不存在: ${yamlFile}.yaml`);
+      return false;
+    }
+
+    const content = await response.text();
+    const dialogues = loadDialogues(content);
+    
+    if (dialogues.length === 0) {
+      logger.debug(`对话文件无有效数据: ${yamlFile}.yaml`);
+      return false;
+    }
+
+    // 使用统一的注册流程（正确处理对话链）
+    registerDataToNarrativeEngine(dialogues, [], []);
+    
+    logger.info(`动态加载对话文件成功: ${yamlFile}.yaml (${dialogues.length}条对话)`);
+    return true;
+  } catch (error) {
+    logger.warn(`动态加载对话失败: ${yamlFile}.yaml`, error);
+    return false;
+  }
+}
+
+/**
+ * 根据对话ID推断YAML文件名
+ * 这是统一的文件推断逻辑，供 NarrativeEngine 使用
+ * 
+ * @example "C0Z1_IDENTITY_PICKUP" -> "c0_z1"
+ * @example "CENHUI_MONO_01" -> null (旧格式，无法推断)
+ */
+export function inferYamlFileFromDialogueId(dialogueId: string): string | null {
+  // 新格式匹配: C{chapter}Z{zone}_xxx
+  const newFormatMatch = dialogueId.match(/^C(\d+)Z(\d+)_/i);
+  if (newFormatMatch) {
+    const chapter = newFormatMatch[1].toLowerCase();
+    const zone = newFormatMatch[2];
+    return `c${chapter}_z${zone}`;
+  }
+
+  // 终章格式匹配: CFZ{zone}_xxx
+  const finalChapterMatch = dialogueId.match(/^CFZ(\d+)_/i);
+  if (finalChapterMatch) {
+    const zone = finalChapterMatch[1];
+    return `cf_z${zone}`;
+  }
+
+  // 特殊对话匹配
+  if (dialogueId.startsWith('RV_') || dialogueId.includes('_RV_')) {
+    return 'rv_dialogues';
+  }
+  if (dialogueId.startsWith('NG_') || dialogueId.includes('_NG_')) {
+    return 'ngplus_dialogues';
+  }
+
+  // 序章旧格式的特殊处理
+  // 这些 ID 模式通常在 c0_z1.yaml 中
+  const c0z1Prefixes = ['CENHUI_', 'IDENTITY_', 'NOTICE_', 'NEIGHBOR_', 'DOOR_'];
+  for (const prefix of c0z1Prefixes) {
+    if (dialogueId.startsWith(prefix)) {
+      return 'c0_z1';
+    }
+  }
+
+  logger.debug(`无法推断对话文件: ${dialogueId}`);
+  return null;
 }

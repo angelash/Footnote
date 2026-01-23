@@ -11,6 +11,8 @@ const logger = createLogger('NarrativeEngine');
 import { worldState } from '@/systems/world';
 import type { ChapterID } from '@/config/game.config';
 import { AbilityType } from '@/config/game.config';
+// 统一使用 NarrativeDataLoader 的加载逻辑（不再使用内部的解析方法）
+import { loadDialogueFileAndRegister, inferYamlFileFromDialogueId } from '@/data/NarrativeDataLoader';
 
 // ==================== 类型定义 ====================
 
@@ -288,185 +290,32 @@ class NarrativeEngine {
   }
 
   /**
-   * 动态加载对话 - 根据ID推断YAML文件并加载
+   * 动态加载对话 - 使用统一的 NarrativeDataLoader 流程
+   * 
+   * 注意：不再使用内部的 _parseDialoguesFromYaml，而是委托给 NarrativeDataLoader
+   * 这确保了对话链（通过 next 链接的旧格式对话）被正确合并处理
    */
   private async _dynamicLoadDialogue(dialogueId: string): Promise<IDialogueData | null> {
-    // 根据对话ID推断对应的YAML文件
-    const yamlFile = this._inferYamlFileFromDialogueId(dialogueId);
+    // 使用统一的文件推断逻辑
+    const yamlFile = inferYamlFileFromDialogueId(dialogueId);
     if (!yamlFile) {
       logger.debug(`无法推断对话文件: ${dialogueId}`);
       return null;
     }
 
-    try {
-      // 动态fetch YAML文件（开发环境使用 /src/data，生产环境使用 /assets/data）
-      const basePath = import.meta.env.DEV ? '/src/data/dialogues' : '/assets/data/dialogues';
-      const response = await fetch(`${basePath}/${yamlFile}.yaml`);
-      if (!response.ok) {
-        logger.debug(`对话文件不存在: ${yamlFile}.yaml`);
-        return null;
-      }
-
-      const yamlContent = await response.text();
-
-      // 使用动态导入加载yaml解析器
-      const { parse: parseYaml } = await import('yaml');
-      const data = parseYaml(yamlContent);
-
-      if (!data?.dialogues) {
-        logger.debug(`对话文件无有效数据: ${yamlFile}.yaml`);
-        return null;
-      }
-
-      // 解析并注册所有对话（缓存整个文件）
-      const dialogues = this._parseDialoguesFromYaml(data.dialogues);
-      dialogues.forEach((d) => this.registerDialogue(d));
-
-      logger.info(`动态加载对话文件成功: ${yamlFile}.yaml (${dialogues.length}条对话)`);
-
-      // 返回请求的对话
-      return this._dialogueRegistry.get(dialogueId) || null;
-    } catch (error) {
-      logger.warn(`动态加载对话失败: ${yamlFile}.yaml`, error);
+    // 使用统一的加载和注册流程
+    const success = await loadDialogueFileAndRegister(yamlFile);
+    if (!success) {
       return null;
     }
+
+    // 返回请求的对话（现在应该已经在注册表中了）
+    return this._dialogueRegistry.get(dialogueId) || null;
   }
 
-  /**
-   * 根据对话ID推断YAML文件名
-   * 例如: "CENHUI_MONO_01" -> "c0_z1"
-   *       "C1Z1_TICKET_MACHINE" -> "c1_z1"
-   *       "C2Z1_GULIN_TALK" -> "c2_z1"
-   */
-  private _inferYamlFileFromDialogueId(dialogueId: string): string | null {
-    // 新格式匹配: C{chapter}Z{zone}_xxx
-    const newFormatMatch = dialogueId.match(/^C(\d+)Z(\d+)_/i);
-    if (newFormatMatch) {
-      const chapter = newFormatMatch[1].toLowerCase();
-      const zone = newFormatMatch[2];
-      return `c${chapter}_z${zone}`;
-    }
-
-    // 终章格式匹配: CFZ{zone}_xxx
-    const finalChapterMatch = dialogueId.match(/^CFZ(\d+)_/i);
-    if (finalChapterMatch) {
-      const zone = finalChapterMatch[1];
-      return `cf_z${zone}`;
-    }
-
-    // 特殊对话匹配
-    if (dialogueId.startsWith('RV_') || dialogueId.includes('_RV_')) {
-      return 'rv_dialogues';
-    }
-    if (dialogueId.startsWith('NG_') || dialogueId.includes('_NG_')) {
-      return 'ngplus_dialogues';
-    }
-
-    // 序章旧格式: 假设以 CENHUI_, IDENTITY_, NOTICE_, NEIGHBOR_ 等开头的是 c0_z1
-    // 这需要更复杂的映射逻辑，暂时返回null让系统使用已缓存的数据
-    logger.debug(`无法推断对话文件（旧格式ID）: ${dialogueId}`);
-    return null;
-  }
-
-  /**
-   * 从YAML数据解析对话（兼容新旧格式）
-   */
-  private _parseDialoguesFromYaml(dialoguesData: Record<string, unknown>): IDialogueData[] {
-    const result: IDialogueData[] = [];
-
-    for (const [_key, raw] of Object.entries(dialoguesData)) {
-      const dialogue = raw as Record<string, unknown>;
-
-      if ('lines' in dialogue && Array.isArray(dialogue.lines)) {
-        // 新格式：直接使用
-        result.push(dialogue as unknown as IDialogueData);
-      } else if ('speaker' in dialogue && 'text' in dialogue) {
-        // 旧格式：转换为新格式
-        const oldFormat = dialogue as {
-          id: string;
-          speaker: string;
-          text: string;
-          expression?: string;
-          next?: string | null;
-          choices?: Array<{
-            label: string;
-            next: string;
-            effect?: {
-              r?: number;
-              p?: number;
-              setFlag?: { name: string; value: boolean };
-              giveCard?: string;
-              triggerForeshadow?: { id: string; stage: string };
-            };
-          }>;
-          trigger?: { 
-            card?: string; 
-            foreshadow?: [string, string]; 
-            ability?: string;
-            flags?: Array<{ name: string; value: boolean }>;
-          };
-        };
-
-        result.push({
-          id: oldFormat.id,
-          lines: [
-            {
-              speaker: oldFormat.speaker,
-              text: oldFormat.text,
-              emotion: oldFormat.expression,
-            },
-          ],
-          choices: oldFormat.choices?.map((c) => ({
-            id: c.label,
-            text: c.label,
-            nextDialogueId: c.next,
-            effects: c.effect
-              ? {
-                  rDelta: c.effect.r,
-                  pDelta: c.effect.p,
-                  setFlag: c.effect.setFlag,
-                  giveCard: c.effect.giveCard,
-                  triggerForeshadow: c.effect.triggerForeshadow
-                    ? {
-                        id: c.effect.triggerForeshadow.id,
-                        stage: c.effect.triggerForeshadow.stage as ForeshadowStage,
-                      }
-                    : undefined,
-                }
-              : undefined,
-          })),
-          onComplete: oldFormat.trigger
-            ? ([
-                // 支持多张卡片（trigger.cards 数组）
-                ...((oldFormat.trigger as { cards?: string[] }).cards || []).map((cardId) => ({
-                  type: 'card' as const,
-                  cardId,
-                })),
-                // 向后兼容：如果没有 cards 数组，使用单个 card
-                ...(!((oldFormat.trigger as { cards?: string[] }).cards?.length) && oldFormat.trigger.card
-                  ? [{ type: 'card' as const, cardId: oldFormat.trigger.card }]
-                  : []),
-                oldFormat.trigger.foreshadow
-                  ? {
-                      type: 'foreshadow' as const,
-                      foreshadowId: oldFormat.trigger.foreshadow[0],
-                      foreshadowStage: oldFormat.trigger.foreshadow[1] as ForeshadowStage,
-                    }
-                  : null,
-                // 支持 flags 数组
-                ...((oldFormat.trigger.flags || []).map((f) => ({
-                  type: 'flag' as const,
-                  flagName: f.name,
-                  flagValue: f.value,
-                }))),
-              ].filter(Boolean) as IDialogueAction[])
-            : undefined,
-        });
-      }
-    }
-
-    return result;
-  }
+  // 注意：_parseDialoguesFromYaml 已移除
+  // 所有对话解析现在统一由 NarrativeDataLoader 处理
+  // 这确保了对话链（通过 next 链接）被正确合并
 
   /**
    * 开始对话

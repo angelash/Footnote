@@ -4,25 +4,79 @@ export type SceneObjectType = 'image' | 'sprite' | 'zone';
 
 export type SceneActionType = 'dialogue' | 'card' | 'gotoZone' | 'none';
 
+// ==================== 统一效果系统 ====================
+
 /**
- * 交互效果类型
- * 用于定义交互产生的副作用（设置flag、修改计数器、获得卡片、播放音效）
+ * 游戏效果类型枚举
+ * 统一定义所有系统（交互、对话、卡片）可使用的效果类型
  */
-export interface IInteractionEffect {
-  type: 'flag' | 'counter' | 'card' | 'sound';
-  /** flag 类型使用：flag名称 */
+export type GameplayEffectType = 
+  | 'flag'       // 设置 flag
+  | 'counter'    // 修改计数器 (R/P)
+  | 'card'       // 获得卡片
+  | 'ability'    // 解锁能力
+  | 'foreshadow' // 触发伏笔
+  | 'sound'      // 播放音效
+  | 'bgm'        // 切换背景音乐
+  | 'goto';      // 跳转场景（仅限交互系统）
+
+/**
+ * 统一游戏效果接口
+ * 
+ * 所有系统（InteractionSystem、NarrativeEngine、CardSystem）都应使用此接口
+ * 确保效果处理的一致性
+ * 
+ * @example
+ * // 设置 flag
+ * { type: 'flag', flagName: 'FLAG_C0Z1_GOT_IDENTITY', flagValue: true }
+ * 
+ * // 修改计数器
+ * { type: 'counter', counter: 'R', delta: 1 }
+ * 
+ * // 获得卡片
+ * { type: 'card', cardId: 'CARD_C0_IDENTITY' }
+ * 
+ * // 解锁能力
+ * { type: 'ability', abilityType: 'DEPTH_PERCEPTION' }
+ * 
+ * // 触发伏笔
+ * { type: 'foreshadow', foreshadowId: 'F01', foreshadowStage: 'plant' }
+ */
+export interface IGameplayEffect {
+  type: GameplayEffectType;
+  
+  // flag 类型
   flagName?: string;
-  /** flag 类型使用：flag值 */
   flagValue?: boolean;
-  /** counter 类型使用：计数器类型 */
+  
+  // counter 类型
   counter?: 'R' | 'P';
-  /** counter 类型使用：变化量 */
   delta?: number;
-  /** card 类型使用：卡片ID */
+  
+  // card 类型
   cardId?: string;
-  /** sound 类型使用：音效key */
+  
+  // ability 类型
+  abilityType?: string;
+  
+  // foreshadow 类型
+  foreshadowId?: string;
+  foreshadowStage?: 'plant' | 'deepen' | 'misread' | 'collect';
+  
+  // sound/bgm 类型
+  audioKey?: string;
+  /** @deprecated 使用 audioKey */
   sfxKey?: string;
+  
+  // goto 类型
+  targetZoneId?: string;
 }
+
+/**
+ * 交互效果类型（向后兼容别名）
+ * @deprecated 推荐直接使用 IGameplayEffect
+ */
+export type IInteractionEffect = IGameplayEffect;
 
 export interface ISceneAction {
   type: SceneActionType;

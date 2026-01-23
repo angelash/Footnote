@@ -1,29 +1,22 @@
 # C0-Z1 宿舍走廊 对话数据
 # 序章第一个Zone的所有对话
+# 注意：统一使用新格式（lines 数组），不再使用旧格式（speaker/text/next）
 
 dialogues:
   # ==================== 开场独白 ====================
+  # 原 CENHUI_MONO_01 → 02 → 03 合并为单个多行对话
   CENHUI_MONO_01:
     id: CENHUI_MONO_01
-    speaker: 岑回
-    text: 先按流程走。
-    expression: neutral
-    next: CENHUI_MONO_02
-
-  CENHUI_MONO_02:
-    id: CENHUI_MONO_02
-    speaker: 岑回
-    text: 七点二十，出门前检查。
-    expression: thinking
-    next: CENHUI_MONO_03
-
-  CENHUI_MONO_03:
-    id: CENHUI_MONO_03
-    speaker: 岑回
-    text: 身份卡、通讯器、维修工具包。
-    expression: neutral
-    next: null
-    # 不再自动给卡片，改为点击场景物品获取
+    lines:
+      - speaker: 岑回
+        text: 先按流程走。
+        emotion: neutral
+      - speaker: 岑回
+        text: 七点二十，出门前检查。
+        emotion: thinking
+      - speaker: 岑回
+        text: 身份卡、通讯器、维修工具包。
+        emotion: neutral
 
   # ==================== 身份卡交互 ====================
   # 首次拾取身份卡
@@ -49,66 +42,61 @@ dialogues:
         text: 身份卡已经在手上了。
 
   # ==================== 公告板交互 ====================
+  # 原 NOTICE_BOARD_LOOK → NOTICE_BOARD_DETAIL 合并
   NOTICE_BOARD_LOOK:
     id: NOTICE_BOARD_LOOK
-    speaker: 岑回
-    text: 公告板上贴满了通知，日期处有涂改痕迹...
-    expression: curious
-    next: NOTICE_BOARD_DETAIL
-
-  NOTICE_BOARD_DETAIL:
-    id: NOTICE_BOARD_DETAIL
-    speaker: 岑回
-    text: 「本周维修配额：17件」「严禁私自保留异常物件」
-    expression: thinking
-    next: NOTICE_BOARD_CHOICE
-    
-  NOTICE_BOARD_CHOICE:
-    id: NOTICE_BOARD_CHOICE
-    speaker: 系统
-    text: 是否仔细查看日期涂改处？
+    lines:
+      - speaker: 岑回
+        text: 公告板上贴满了通知，日期处有涂改痕迹...
+        emotion: curious
+      - speaker: 岑回
+        text: 「本周维修配额：17件」「严禁私自保留异常物件」
+        emotion: thinking
+      - speaker: 系统
+        text: 是否仔细查看日期涂改处？
     choices:
-      - label: 仔细查看
-        next: NOTICE_BOARD_EXAMINE
-        effect:
-          r: 1
-      - label: 算了，不重要
-        next: null
+      - id: examine
+        text: 仔细查看
+        effects:
+          rDelta: 1
+        nextDialogueId: NOTICE_BOARD_EXAMINE
+      - id: ignore
+        text: 算了，不重要
+        nextDialogueId: null
 
+  # 原 NOTICE_BOARD_EXAMINE → NOTICE_BOARD_EXAMINE_2 合并
   NOTICE_BOARD_EXAMINE:
     id: NOTICE_BOARD_EXAMINE
-    speaker: 岑回
-    text: 涂改下面隐约能看到「第274周期」的字样...但现在显示的是「第275周期」。
-    expression: surprised
-    next: NOTICE_BOARD_EXAMINE_2
-    trigger:
-      foreshadow: [F02, plant]
-      flags:
-        - name: FLAG_C0Z1_NOTICE_EXAMINED
-          value: true
+    lines:
+      - speaker: 岑回
+        text: 涂改下面隐约能看到「第274周期」的字样...但现在显示的是「第275周期」。
+        emotion: surprised
+      - speaker: 岑回
+        text: 周期变更？维修局从不提这种事。
+        emotion: thinking
+    onComplete:
+      - type: foreshadow
+        foreshadowId: F02
+        foreshadowStage: plant
+      - type: flag
+        flagName: FLAG_C0Z1_NOTICE_EXAMINED
+        flagValue: true
 
-  # 公告板（已查看过涂改痕迹）- 此对话不再单独设置 flag，因为 NOTICE_BOARD_EXAMINE 已设置
+  # 公告板（已查看过涂改痕迹）
   NOTICE_BOARD_EXAMINED:
     id: NOTICE_BOARD_EXAMINED
-    speaker: 岑回
-    text: 公告板上的涂改痕迹……第274周期的字样隐约可见。
-    expression: thinking
-    next: null
-
-  NOTICE_BOARD_EXAMINE_2:
-    id: NOTICE_BOARD_EXAMINE_2
-    speaker: 岑回
-    text: 周期变更？维修局从不提这种事。
-    expression: thinking
-    next: null
+    lines:
+      - speaker: 岑回
+        text: 公告板上的涂改痕迹……第274周期的字样隐约可见。
+        emotion: thinking
 
   # 已检查过公告板后的对话
   NOTICE_BOARD_DONE:
     id: NOTICE_BOARD_DONE
-    speaker: 岑回
-    text: 公告板上的涂改痕迹...第274周期被改成了第275周期。
-    expression: thinking
-    next: null
+    lines:
+      - speaker: 岑回
+        text: 公告板上的涂改痕迹...第274周期被改成了第275周期。
+        emotion: thinking
 
   # ==================== 储物柜交互 ====================
   C0Z1_STORAGE:
@@ -137,18 +125,15 @@ dialogues:
         text: 工具包已经取过了。
 
   # ==================== 邻居交互 ====================
+  # 原 NEIGHBOR_DOOR_KNOCK → NEIGHBOR_DOOR_KNOCK_2 合并
   NEIGHBOR_DOOR_KNOCK:
     id: NEIGHBOR_DOOR_KNOCK
-    speaker: 系统
-    text: 邻居的门紧闭着，门上有一个褪色的号码牌。
-    next: NEIGHBOR_DOOR_KNOCK_2
-
-  NEIGHBOR_DOOR_KNOCK_2:
-    id: NEIGHBOR_DOOR_KNOCK_2
-    speaker: 岑回
-    text: 103号？不对，我记得这里应该是102号……
-    expression: confused
-    next: null
+    lines:
+      - speaker: 系统
+        text: 邻居的门紧闭着，门上有一个褪色的号码牌。
+      - speaker: 岑回
+        text: 103号？不对，我记得这里应该是102号……
+        emotion: confused
 
   # ==================== 身份卡长按细节（F06伏笔）====================
   C0Z1_IDENTITY_DETAIL:
@@ -163,7 +148,7 @@ dialogues:
         delay: 500
       - speaker: 岑回
         text: 什么时候改的？我怎么不记得……
-        expression: confused
+        emotion: confused
     onComplete:
       - type: foreshadow
         foreshadowId: F06
@@ -206,4 +191,3 @@ dialogues:
     lines:
       - speaker: 岑回
         text: 祷词台空了。我已经取走了那张祷词。
-

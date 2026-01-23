@@ -287,6 +287,14 @@ export class InteractionSystem {
 
   /**
    * 应用单个交互效果
+   * 
+   * 支持统一的 IGameplayEffect 类型，包括：
+   * - flag: 设置 flag
+   * - counter: 修改 R/P 计数器
+   * - card: 获得卡片
+   * - ability: 解锁能力
+   * - foreshadow: 触发伏笔
+   * - sound/bgm: 播放音效/背景音乐
    */
   private _applyEffect(
     effect: IInteractionEffect,
@@ -324,9 +332,46 @@ export class InteractionSystem {
         }
         break;
 
+      case 'ability':
+        if (effect.abilityType) {
+          worldState.unlockAbility(effect.abilityType as import('@/config/game.config').AbilityType);
+          result.changed = true;
+          logger.debug(`解锁能力: ${effect.abilityType}`);
+          eventBus.emit(GameEvent.ABILITY_UNLOCK, { ability: effect.abilityType });
+        }
+        break;
+
+      case 'foreshadow':
+        if (effect.foreshadowId && effect.foreshadowStage) {
+          narrativeEngine.triggerForeshadow(
+            effect.foreshadowId, 
+            effect.foreshadowStage as import('@/systems/narrative').ForeshadowStage
+          );
+          result.changed = true;
+          logger.debug(`触发伏笔: ${effect.foreshadowId} -> ${effect.foreshadowStage}`);
+        }
+        break;
+
       case 'sound':
-        if (effect.sfxKey) {
-          result.sfxToPlay.push(effect.sfxKey);
+        // 兼容旧的 sfxKey 和新的 audioKey
+        const sfxKey = effect.audioKey || effect.sfxKey;
+        if (sfxKey) {
+          result.sfxToPlay.push(sfxKey);
+        }
+        break;
+
+      case 'bgm':
+        if (effect.audioKey) {
+          eventBus.emit(GameEvent.BGM_PLAY, { key: effect.audioKey });
+          logger.debug(`切换BGM: ${effect.audioKey}`);
+        }
+        break;
+
+      case 'goto':
+        // goto 效果在 _triggerFeedback 中通过 onGotoZone 回调处理
+        // 这里只记录日志
+        if (effect.targetZoneId) {
+          logger.debug(`准备跳转场景: ${effect.targetZoneId}`);
         }
         break;
     }

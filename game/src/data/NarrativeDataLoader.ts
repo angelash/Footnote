@@ -822,18 +822,54 @@ function registerDataToNarrativeEngine(
   cards: ICard[],
   foreshadows: IForeshadow[]
 ): void {
-  // 按对话链分组（基础ID -> 所有行）
+  // 创建对话 ID -> 对话的映射
+  const dialogueMap = new Map<string, IDialogue>();
+  for (const d of dialogues) {
+    dialogueMap.set(d.id, d);
+  }
+
+  // 找出所有被其他对话通过 next 引用的对话
+  const referencedByNext = new Set<string>();
+  for (const d of dialogues) {
+    if (d.next && dialogueMap.has(d.next)) {
+      referencedByNext.add(d.next);
+    }
+  }
+
+  // 按对话链分组
+  // 1. _LINE_N 后缀的新格式对话
+  // 2. 通过 next 链接的旧格式对话
   const dialogueChains = new Map<string, IDialogue[]>();
 
   for (const dialogue of dialogues) {
-    // 检查是否是链的一部分（_LINE_N 后缀）
+    // 检查是否是新格式链的一部分（_LINE_N 后缀）
     const lineMatch = dialogue.id.match(/^(.+)_LINE_(\d+)$/);
-    const baseId = lineMatch ? lineMatch[1] : dialogue.id;
-
-    if (!dialogueChains.has(baseId)) {
-      dialogueChains.set(baseId, []);
+    if (lineMatch) {
+      const baseId = lineMatch[1];
+      if (!dialogueChains.has(baseId)) {
+        dialogueChains.set(baseId, []);
+      }
+      dialogueChains.get(baseId)!.push(dialogue);
+      continue;
     }
-    dialogueChains.get(baseId)!.push(dialogue);
+
+    // 检查是否是旧格式对话链的一部分（被其他对话通过 next 引用）
+    // 如果是，跳过它，让链头来处理整个链
+    if (referencedByNext.has(dialogue.id)) {
+      continue;
+    }
+
+    // 这是一个独立对话或链头，追踪整个链
+    const chain: IDialogue[] = [dialogue];
+    let current = dialogue;
+    while (current.next && dialogueMap.has(current.next)) {
+      const nextDialogue = dialogueMap.get(current.next)!;
+      chain.push(nextDialogue);
+      current = nextDialogue;
+      // 防止无限循环
+      if (chain.length > 100) break;
+    }
+    dialogueChains.set(dialogue.id, chain);
   }
 
   // 转换每个对话链为 IDialogueData
@@ -855,8 +891,51 @@ function registerDataToNarrativeEngine(
       emotion: d.expression,
     }));
 
-    // 从最后一行获取 choices 和 trigger
+    // 从最后一行获取 choices，从整个链合并 trigger
     const lastDialogue = chain[chain.length - 1];
+    
+    // 合并整个链中所有对话的 trigger（cards, flags, foreshadow 等）
+    const mergedTrigger: {
+      cards: string[];
+      card?: string;
+      foreshadow?: [string, string];
+      flags: Array<{ name: string; value: boolean }>;
+      ability?: string;
+    } = { cards: [], flags: [] };
+    
+    for (const d of chain) {
+      if (d.trigger) {
+        // 合并卡片
+        if ((d.trigger as { cards?: string[] }).cards) {
+          mergedTrigger.cards.push(...(d.trigger as { cards?: string[] }).cards!);
+        } else if (d.trigger.card) {
+          mergedTrigger.cards.push(d.trigger.card);
+        }
+        // 合并伏笔（后面的覆盖前面的）
+        if (d.trigger.foreshadow) {
+          mergedTrigger.foreshadow = d.trigger.foreshadow;
+        }
+        // 合并 flags
+        if (d.trigger.flags) {
+          mergedTrigger.flags.push(...d.trigger.flags);
+        }
+        // 合并能力（后面的覆盖前面的）
+        if (d.trigger.ability) {
+          mergedTrigger.ability = d.trigger.ability;
+        }
+      }
+    }
+    
+    // 保持向后兼容：设置 card 为第一张卡片
+    if (mergedTrigger.cards.length > 0) {
+      mergedTrigger.card = mergedTrigger.cards[0];
+    }
+    
+    // 判断是否有任何 trigger 内容
+    const hasTrigger = mergedTrigger.cards.length > 0 || 
+                       mergedTrigger.foreshadow || 
+                       mergedTrigger.flags.length > 0 || 
+                       mergedTrigger.ability;
 
     narrativeEngine.registerDialogue({
       id: baseId,
@@ -892,37 +971,35 @@ function registerDataToNarrativeEngine(
             }
           : undefined,
       })),
-      onComplete: lastDialogue.trigger
+      onComplete: hasTrigger
         ? ([
-            // 支持多张卡片（trigger.cards 数组优先）
-            ...((lastDialogue.trigger as { cards?: string[] }).cards || []).map((cardId) => ({
+            // 支持多张卡片
+            ...mergedTrigger.cards.map((cardId) => ({
               type: 'card' as const,
               cardId,
             })),
-            // 向后兼容：如果没有 cards 数组，使用单个 card
-            ...(!((lastDialogue.trigger as { cards?: string[] }).cards?.length) && lastDialogue.trigger.card
-              ? [{ type: 'card' as const, cardId: lastDialogue.trigger.card }]
-              : []),
-            lastDialogue.trigger.foreshadow
+            // 伏笔
+            mergedTrigger.foreshadow
               ? {
                   type: 'foreshadow' as const,
-                  foreshadowId: lastDialogue.trigger.foreshadow[0],
-                  foreshadowStage: lastDialogue.trigger.foreshadow[1] as
+                  foreshadowId: mergedTrigger.foreshadow[0],
+                  foreshadowStage: mergedTrigger.foreshadow[1] as
                     | 'plant'
                     | 'deepen'
                     | 'misread'
                     | 'collect',
                 }
               : null,
-            lastDialogue.trigger.ability
-              ? { type: 'ability' as const, abilityType: lastDialogue.trigger.ability }
+            // 能力
+            mergedTrigger.ability
+              ? { type: 'ability' as const, abilityType: mergedTrigger.ability }
               : null,
-            // 处理 flag 类型的 onComplete 动作
-            ...(lastDialogue.trigger.flags?.map((f) => ({
+            // Flags
+            ...mergedTrigger.flags.map((f) => ({
               type: 'flag' as const,
               flagName: f.name,
               flagValue: f.value,
-            })) || []),
+            })),
           ].filter(Boolean) as import('@/systems/narrative').IDialogueAction[])
         : undefined,
     });

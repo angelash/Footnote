@@ -44,6 +44,8 @@ objects:
     depth: 10
     label: 继续收敛
     labelOffset: [0, 70]
+    condition:
+      flagTrue: CAN_PICK_ENDING_A
     interactive:
       cursor: true
       testid: ending-a
@@ -62,6 +64,8 @@ objects:
     depth: 10
     label: 释放表示
     labelOffset: [0, 70]
+    condition:
+      flagTrue: CAN_PICK_ENDING_B
     interactive:
       cursor: true
       testid: ending-b
@@ -80,6 +84,8 @@ objects:
     depth: 10
     label: 承载字段
     labelOffset: [0, 70]
+    condition:
+      flagTrue: CAN_PICK_ENDING_C
     interactive:
       cursor: true
       testid: ending-c

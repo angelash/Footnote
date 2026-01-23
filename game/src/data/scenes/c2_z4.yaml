@@ -9,7 +9,7 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 歪斜路标
+  # 歪斜路标（修好后隐藏）
   - id: crooked_sign
     type: image
     texture: px_item_sign
@@ -20,6 +20,8 @@ objects:
     rotation: 0.3
     label: 歪斜路标
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C2Z4_SIGN_FIXED
     interactive:
       cursor: true
       testid: crooked-sign
@@ -36,7 +38,8 @@ objects:
     scale: 0.8
     depth: 10
     rotation: 0
-    visible: false
+    label: 路标
+    labelOffset: [0, 90]
     condition:
       flagTrue: FLAG_C2Z4_SIGN_FIXED
 

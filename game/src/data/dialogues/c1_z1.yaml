@@ -73,10 +73,19 @@ dialogues:
       - id: submit_form
         text: 提交表格
         condition:
-          flagTrue: FLAG_C1Z1_FORM_FILLED
+          flagTrue:
+            - FLAG_C1Z1_FORM_FILLED
+            - FLAG_C1Z1_GOT_TICKET
         nextDialogueId: C1Z1_SUBMIT
+      - id: no_ticket
+        text: 我还没取号
+        condition:
+          flagFalse: FLAG_C1Z1_GOT_TICKET
+        nextDialogueId: C1Z1_GO_TICKET
       - id: no_form
         text: 我还没填好
+        condition:
+          flagFalse: FLAG_C1Z1_FORM_FILLED
         nextDialogueId: C1Z1_GO_FILL
 
   # 提交表格
@@ -106,6 +115,15 @@ dialogues:
     lines:
       - speaker: 市政职员
         text: 填表台在那边。填好再来。
+
+  # 去取号
+  C1Z1_GO_TICKET:
+    id: C1Z1_GO_TICKET
+    lines:
+      - speaker: 市政职员
+        text: 没有取号单？
+      - speaker: 市政职员
+        text: 取号机在入口那边。先取号，再来排队。
 
   # 老人
   C1Z1_ELDERLY:

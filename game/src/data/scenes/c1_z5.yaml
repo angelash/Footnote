@@ -96,7 +96,7 @@ objects:
     depth: 1
     alpha: 0.3
 
-  # 祷文抄本位置
+  # 祷文抄本位置（已通过对话获取，此处仅作为视觉提示）
   - id: prayer_note
     type: image
     texture: px_item_archive
@@ -111,8 +111,8 @@ objects:
     interactive:
       cursor: true
       action:
-        type: card
-        cardId: CARD_C1_PRAYER_01
+        type: dialogue
+        dialogueId: C1Z5_PRAYER_NOTE_EXAMINE
 
   # 出口 - 前往边缘断口
   - id: exit_forward

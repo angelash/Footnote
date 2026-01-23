@@ -64,11 +64,14 @@ dialogues:
       - speaker: 牧平
         text: 风越大，说明背面的东西越多。
 
-
-
-
-
-
-
-
-
+  # 祷文抄本（新增）
+  C5Z4_PRAYER_SCROLL:
+    id: C5Z4_PRAYER_SCROLL
+    lines:
+      - speaker: ""
+        text: 一卷被风吹得有些破旧的抄本。
+      - speaker: ""
+        text: 上面写着一些像诗又像代码的句子。
+    onComplete:
+      - type: card
+        cardId: CARD_C5_PRAYER_04

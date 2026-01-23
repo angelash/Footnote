@@ -26,7 +26,7 @@ objects:
         type: dialogue
         dialogueId: C2Z1_CALIBRATION_A
 
-  # 校准台B - 空腔样本
+  # 校准台B - 空腔样本（需先完成A）
   - id: calibration_b
     type: image
     texture: px_item_archive
@@ -36,6 +36,8 @@ objects:
     depth: 10
     label: 校准台B
     labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C2Z1_CALIBRATION_A
     interactive:
       cursor: true
       testid: calibration-b
@@ -43,7 +45,7 @@ objects:
         type: dialogue
         dialogueId: C2Z1_CALIBRATION_B
 
-  # 校准台C - 断裂样本
+  # 校准台C - 断裂样本（需先完成B）
   - id: calibration_c
     type: image
     texture: px_item_archive
@@ -53,6 +55,8 @@ objects:
     depth: 10
     label: 校准台C
     labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C2Z1_CALIBRATION_B
     interactive:
       cursor: true
       testid: calibration-c

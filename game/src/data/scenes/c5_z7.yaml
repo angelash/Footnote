@@ -159,6 +159,7 @@ objects:
     visible: false
     condition:
       flagTrue: FLAG_C5Z7_TASKS_DONE
+      # 修复逻辑：TASKS_DONE现在会在完成C或拒绝C后触发
 
   # 出口
   - id: exit_forward
@@ -189,12 +190,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C5-Z6
-
-
-
-
-
-
-
-
-

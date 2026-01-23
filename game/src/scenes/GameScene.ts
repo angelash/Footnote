@@ -948,6 +948,32 @@ export class GameScene extends Phaser.Scene {
 
     // 监听对话选项选择
     eventBus.onTyped(GameEvent.DIALOGUE_CHOICE, this._onDialogueChoice.bind(this));
+
+    // 监听 Flag 设置（用于 CF-Z6 尾声角色对话完成检查）
+    eventBus.on(GameEvent.FLAG_SET, this._onFlagSet.bind(this));
+  }
+
+  /**
+   * Flag 设置回调
+   * 用于检查 CF-Z6 尾声角色对话完成状态
+   */
+  private _onFlagSet(data: { flagName: string; value: boolean }): void {
+    // 只在 CF-Z6 且设置为 true 时检查
+    if (this._currentZoneId !== 'CF-Z6' || !data.value) return;
+
+    // 检查是否是角色对话完成 Flag
+    const characterFlags = [
+      'FLAG_GULIN_SEEN',
+      'FLAG_SONGLAN_SEEN',
+      'FLAG_XUCHENG_SEEN',
+      'FLAG_MUPING_SEEN',
+      'FLAG_ATANG_SEEN',
+      'FLAG_QILAN_SEEN',
+    ];
+
+    if (characterFlags.includes(data.flagName)) {
+      this._checkEpilogueCompletion();
+    }
   }
 
   /**
@@ -964,6 +990,7 @@ export class GameScene extends Phaser.Scene {
     eventBus.removeAllListeners(GameEvent.DIALOGUE_END);
     eventBus.removeAllListeners(GameEvent.DIALOGUE_ADVANCE);
     eventBus.removeAllListeners(GameEvent.DIALOGUE_CHOICE);
+    eventBus.removeAllListeners(GameEvent.FLAG_SET);
   }
 
   /**
@@ -1353,8 +1380,64 @@ export class GameScene extends Phaser.Scene {
     // 播放Zone音频
     this._playZoneAudio(zoneId);
 
+    // CF-Z5 特殊处理：根据 R/W 值设置结局可选 Flag
+    if (zoneId === 'CF-Z5') {
+      this._setupEndingAvailabilityFlags();
+    }
+
+    // CF-Z6 特殊处理：检查角色对话完成状态
+    if (zoneId === 'CF-Z6') {
+      this._checkEpilogueCompletion();
+    }
+
     // 创建交互点
     this._buildZoneFromConfig(zoneId);
+  }
+
+  /**
+   * 设置结局可选 Flag（CF-Z5 专用）
+   * 根据当前 R/W 值计算哪些结局可选，并设置对应的 Flag
+   */
+  private _setupEndingAvailabilityFlags(): void {
+    const available = this._endingEffects.getAvailableEndings();
+
+    // 清除旧的 Flag
+    worldState.setFlag('CAN_PICK_ENDING_A', false);
+    worldState.setFlag('CAN_PICK_ENDING_B', false);
+    worldState.setFlag('CAN_PICK_ENDING_C', false);
+
+    // 设置可选结局的 Flag
+    available.forEach((ending) => {
+      worldState.setFlag(`CAN_PICK_ENDING_${ending}`, true);
+    });
+
+    const counters = worldState.getCounters();
+    logger.info(
+      `结局可选性: A=${available.includes('A')}, B=${available.includes('B')}, C=${available.includes('C')} ` +
+        `(R=${counters.R}, W=${counters.W})`
+    );
+  }
+
+  /**
+   * 检查尾声对话完成状态（CF-Z6 专用）
+   * 当所有 6 个角色对话完成时，设置 FLAG_ALL_EPILOGUE_SEEN
+   */
+  private _checkEpilogueCompletion(): void {
+    const characterFlags = [
+      'FLAG_GULIN_SEEN',
+      'FLAG_SONGLAN_SEEN',
+      'FLAG_XUCHENG_SEEN',
+      'FLAG_MUPING_SEEN',
+      'FLAG_ATANG_SEEN',
+      'FLAG_QILAN_SEEN',
+    ];
+
+    const allSeen = characterFlags.every((flag) => worldState.getFlag(flag));
+
+    if (allSeen && !worldState.getFlag('FLAG_ALL_EPILOGUE_SEEN')) {
+      worldState.setFlag('FLAG_ALL_EPILOGUE_SEEN', true);
+      logger.info('所有角色对话完成，设置 FLAG_ALL_EPILOGUE_SEEN');
+    }
   }
 
   private _buildZoneFromConfig(zoneId: string): void {

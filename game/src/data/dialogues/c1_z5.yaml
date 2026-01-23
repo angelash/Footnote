@@ -124,6 +124,19 @@ dialogues:
       - speaker: 牧平
         text: 小心纸页。
 
+  # 检查抄本（已获得卡片后）
+  C1Z5_PRAYER_NOTE_EXAMINE:
+    id: C1Z5_PRAYER_NOTE_EXAMINE
+    lines:
+      - speaker: 岑回
+        text: （这是牧平给我的抄本……）
+      - speaker: ""
+        text: 纸片上写满了密密麻麻的文字。
+      - speaker: ""
+        text: 有些是祷文，有些像是……警告？
+      - speaker: 岑回
+        text: （我已经把它收好了。）
+
 
 
 

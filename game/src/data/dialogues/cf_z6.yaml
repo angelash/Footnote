@@ -155,7 +155,7 @@ dialogues:
         text: 底部字段条◦◦◦将始终存在。
     onComplete:
       - type: flag
-        flagName: FLAG_ALL_EPILOGUE_SEEN
+        flagName: FLAG_FIELD_MODE_UNLOCKED
         flagValue: true
 
 

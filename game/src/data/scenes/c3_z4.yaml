@@ -9,7 +9,7 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 空椅子
+  # 空椅子（修复后隐藏）
   - id: empty_chair
     type: image
     texture: obj_chair
@@ -20,6 +20,8 @@ objects:
     rotation: 0.15
     label: 空椅子
     labelOffset: [0, 85]
+    condition:
+      flagFalse: FLAG_EMPTY_CHAIR_SET
     interactive:
       cursor: true
       testid: empty-chair
@@ -74,7 +76,7 @@ objects:
         type: dialogue
         dialogueId: C3Z4_CHAIR_LEG
 
-  # 小灯座
+  # 小灯座（未点亮）
   - id: lamp_stand
     type: image
     texture: obj_oil_lamp
@@ -84,11 +86,40 @@ objects:
     depth: 9
     label: 小灯座
     labelOffset: [0, 60]
+    condition:
+      flagFalse: FLAG_LAMP_LIT
     interactive:
       cursor: true
       action:
         type: dialogue
         dialogueId: C3Z4_LAMP_STAND
+
+  # 点亮的灯（视觉反馈）
+  - id: lit_lamp_glow
+    type: image
+    texture: obj_oil_lamp
+    x: 250
+    y: 450
+    scale: 0.5
+    depth: 9
+    tint: 0xFFDD88
+    label: 亮着的灯
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_LAMP_LIT
+
+  # 灯光光晕效果
+  - id: lamp_glow_effect
+    type: image
+    texture: px_fx_field_accept
+    x: 250
+    y: 430
+    scale: 0.6
+    depth: 8
+    alpha: 0.4
+    tint: 0xFFAA44
+    condition:
+      flagTrue: FLAG_LAMP_LIT
 
   # 栖蓝
   - id: qilan

@@ -37,7 +37,7 @@ objects:
         type: dialogue
         dialogueId: C2Z3_FAKE_STAIR
 
-  # 楼梯段3（真实）
+  # 楼梯段3（真实）- 点击可发现正确路径
   - id: stair_segment_3
     type: image
     texture: px_tiles_platform
@@ -47,6 +47,32 @@ objects:
     depth: 8
     label: 第三段楼梯
     labelOffset: [0, 80]
+    interactive:
+      cursor: true
+      testid: stair-segment-3
+      action:
+        type: dialogue
+        dialogueId: C2Z3_REAL_STAIR
+
+  # 路径标记点（独立交互区，用于发现正确路径）
+  # 解决逻辑死锁：top_door 需要 FLAG_C2Z3_FOUND_PATH，此点独立于门可触发
+  - id: path_marker
+    type: zone
+    x: 450
+    y: 380
+    width: 120
+    height: 80
+    depth: 15
+    label: 发光标记
+    labelOffset: [0, 50]
+    condition:
+      flagFalse: FLAG_C2Z3_FOUND_PATH
+    interactive:
+      cursor: true
+      testid: path-marker
+      action:
+        type: dialogue
+        dialogueId: C2Z3_REAL_STAIR
 
   # 深度感知显示区（虚构结构标记）
   - id: depth_fake_marker

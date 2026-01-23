@@ -26,7 +26,7 @@ objects:
         type: dialogue
         dialogueId: CFZ2_QILAN_TALK
 
-  # 仪式①：空椅占位
+  # 仪式①：空椅占位（执行后消失，与其他仪式互斥）
   - id: ritual_chair
     type: image
     texture: obj_chair
@@ -37,13 +37,15 @@ objects:
     alpha: 0.7
     label: 空椅仪式
     labelOffset: [0, 70]
+    condition:
+      flagFalse: FLAG_RITE_COMMITTED
     interactive:
       cursor: true
       action:
         type: dialogue
         dialogueId: CFZ2_RITUAL_CHAIR
 
-  # 仪式②：版本库封存
+  # 仪式②：版本库封存（执行后消失，与其他仪式互斥）
   - id: ritual_archive
     type: image
     texture: px_item_archive
@@ -53,13 +55,15 @@ objects:
     depth: 10
     label: 封存仪式
     labelOffset: [0, 60]
+    condition:
+      flagFalse: FLAG_RITE_COMMITTED
     interactive:
       cursor: true
       action:
         type: dialogue
         dialogueId: CFZ2_RITUAL_ARCHIVE
 
-  # 仪式③：点灯
+  # 仪式③：点灯（执行后消失，与其他仪式互斥）
   - id: ritual_lamp
     type: image
     texture: obj_oil_lamp
@@ -70,6 +74,8 @@ objects:
     alpha: 0.8
     label: 点灯仪式
     labelOffset: [0, 55]
+    condition:
+      flagFalse: FLAG_RITE_COMMITTED
     interactive:
       cursor: true
       action:

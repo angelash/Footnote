@@ -69,6 +69,9 @@ dialogues:
         text: 扶正它
         effects:
           rDelta: 1
+          setFlag:
+            name: FLAG_CHAIR_FIXED
+            value: true
         nextDialogueId: C4Z7_FIX_CHAIR
       - id: ignore
         text: 不管它

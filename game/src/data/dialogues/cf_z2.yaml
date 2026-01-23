@@ -62,6 +62,9 @@ dialogues:
       - type: flag
         flagName: FLAG_FINAL_RITE_DONE
         flagValue: true
+      - type: flag
+        flagName: FLAG_RITE_COMMITTED
+        flagValue: true
 
   # 仪式②：版本库封存
   CFZ2_RITUAL_ARCHIVE:
@@ -109,6 +112,9 @@ dialogues:
         flagValue: true
       - type: flag
         flagName: FLAG_FINAL_RITE_DONE
+        flagValue: true
+      - type: flag
+        flagName: FLAG_RITE_COMMITTED
         flagValue: true
 
   # 仪式③：点灯
@@ -159,6 +165,9 @@ dialogues:
         flagValue: true
       - type: flag
         flagName: FLAG_FINAL_RITE_DONE
+        flagValue: true
+      - type: flag
+        flagName: FLAG_RITE_COMMITTED
         flagValue: true
 
   # 跳过

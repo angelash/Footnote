@@ -55,6 +55,7 @@ objects:
     labelOffset: [0, 45]
     condition:
       flagTrue: FLAG_C4Z5_TALKED
+      flagFalse: FLAG_C4Z5_HAS_NOTE
     interactive:
       cursor: true
       action:

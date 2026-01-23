@@ -3,7 +3,7 @@
 id: C2-Z6
 title: 礼堂街
 background:
-  texture: px_bg_placeholder
+  texture: bg_c2z6_hall_street
   x: 0
   y: 0
   origin: [0, 0]

@@ -56,11 +56,24 @@ objects:
     rotation: 0.2
     label: 歪椅子
     labelOffset: [0, 65]
+    condition:
+      flagFalse: FLAG_CHAIR_FIXED
     interactive:
       cursor: true
       action:
         type: dialogue
         dialogueId: C4Z7_TILTED_CHAIR
+
+  # 扶正后的椅子
+  - id: fixed_chair
+    type: image
+    texture: obj_chair
+    x: 500
+    y: 520
+    scale: 0.6
+    depth: 8
+    condition:
+      flagTrue: FLAG_CHAIR_FIXED
 
   # 抄本领取处
   - id: prayer_scroll

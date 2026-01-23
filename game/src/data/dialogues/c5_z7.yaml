@@ -68,7 +68,7 @@ dialogues:
         nextDialogueId: C5Z7_TASK_C_DONE
       - id: dont_put
         text: 不放
-        nextDialogueId: C5Z7_TASK_SKIP
+        nextDialogueId: C5Z7_TASK_C_SKIP
 
   # 任务C完成
   C5Z7_TASK_C_DONE:
@@ -90,7 +90,24 @@ dialogues:
       - type: dialogue
         dialogueId: C5Z7_F21_TRIGGER
 
-  # 跳过任务
+  # 任务C跳过（拒绝）
+  C5Z7_TASK_C_SKIP:
+    id: C5Z7_TASK_C_SKIP
+    lines:
+      - speaker: 岑回
+        text: （……也许不需要仪式。）
+      - speaker: ""
+        text: 你没有放入版本卡。
+      - speaker: ""
+        text: 但这也是一种选择。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C5Z7_TASKS_DONE
+        flagValue: true
+      - type: dialogue
+        dialogueId: C5Z7_F21_TRIGGER
+
+  # 跳过任务 (Generic)
   C5Z7_TASK_SKIP:
     id: C5Z7_TASK_SKIP
     lines:
@@ -154,12 +171,3 @@ dialogues:
         text: 你看，"无意义"是他们的词。
       - speaker: ""
         text: （她不再说话）
-
-
-
-
-
-
-
-
-

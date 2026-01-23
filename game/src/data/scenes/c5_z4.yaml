@@ -51,8 +51,8 @@ objects:
     interactive:
       cursor: true
       action:
-        type: card
-        cardId: CARD_C5_PRAYER_04
+        type: dialogue
+        dialogueId: C5Z4_PRAYER_SCROLL
 
   # 路灯
   - id: street_lamp
@@ -99,12 +99,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C5-Z3
-
-
-
-
-
-
-
-
-

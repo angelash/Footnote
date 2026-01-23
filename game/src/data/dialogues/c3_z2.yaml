@@ -164,7 +164,13 @@ dialogues:
         text: 那个人没来。但灯还在。
       - speaker: 陈匠
         text: 我只是想让灯亮着，让那个"没来"显得不那么绝对。
+      - speaker: ""
+        text: （他从衣袋里掏出一截旧灯芯）
+      - speaker: 陈匠
+        text: 你带我出去吧。这个给你，别让它被忘掉。
     onComplete:
+      - type: card
+        cardId: CARD_C3_OLD_WICK
       - type: flag
         flagName: FLAG_C3Z2_RESCUED
         flagValue: true
@@ -177,7 +183,13 @@ dialogues:
         text: 名字不重要，重要的是别让它被抹掉。
       - speaker: 陈匠
         text: 我叫陈匠。记住就好。
+      - speaker: ""
+        text: （他递给你一截旧灯芯）
+      - speaker: 陈匠
+        text: 走吧。这个给你，它虽然没用了，但别让它被忘掉。
     onComplete:
+      - type: card
+        cardId: CARD_C3_OLD_WICK
       - type: flag
         flagName: FLAG_C3Z2_RESCUED
         flagValue: true

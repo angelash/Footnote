@@ -52,6 +52,23 @@ dialogues:
       - speaker: 岑回
         text: （保存……什么意思？）
 
+  # 真实楼梯（第三段）- 找到正确路径
+  C2Z3_REAL_STAIR:
+    id: C2Z3_REAL_STAIR
+    lines:
+      - speaker: ""
+        text: （踏上这段楼梯……）
+      - speaker: ""
+        text: 脚下稳固，结构真实。
+      - speaker: 岑回
+        text: 这段是真的。可以通过。
+      - speaker: ""
+        text: 你找到了通往出口的正确路径。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C2Z3_FOUND_PATH
+        flagValue: true
+
   # 虚构楼梯
   C2Z3_FAKE_STAIR:
     id: C2Z3_FAKE_STAIR
@@ -117,13 +134,10 @@ dialogues:
     id: C2Z3_EXIT_DOOR
     lines:
       - speaker: ""
-        text: 你找到了正确的路径，抵达了顶层门。
+        text: 你抵达了顶层门。
       - speaker: ""
         text: 你通过了一个不该存在的连接。
     onComplete:
-      - type: flag
-        flagName: FLAG_C2Z3_FOUND_PATH
-        flagValue: true
       - type: flag
         flagName: FLAG_C2Z3_COMPLETED
         flagValue: true

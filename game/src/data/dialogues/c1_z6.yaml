@@ -118,6 +118,7 @@ dialogues:
         text: 完成巡检，提交报告。这是你的工作。
       - speaker: ""
         text: （通讯结束）
+    nextDialogueId: C1Z6_CHAPTER_COMPLETE
 
   # 顾临结束
   C1Z6_GULIN_END:
@@ -127,6 +128,7 @@ dialogues:
         text: 很好。完成巡检后回来报告。
       - speaker: ""
         text: （通讯结束）
+    nextDialogueId: C1Z6_CHAPTER_COMPLETE
 
   # 碎片检查
   C1Z6_DEBRIS:

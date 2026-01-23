@@ -100,7 +100,8 @@ objects:
     height: 80
     label: 离开
     condition:
-      flagTrue: FLAG_INTERVENTION_RESTRICTED
+      flagTrue: FLAG_C4Z8_SHOW_RESTRICTED
+      flagFalse: FLAG_INTERVENTION_RESTRICTED
     interactive:
       cursor: true
       action:

@@ -10,16 +10,17 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 身份卡（未获得时显示）- 点击获得身份卡
+  # ========== 拾取物：拾取后消失 ==========
+  
+  # 身份卡 - 拾取后消失
   - id: identity_card
     type: image
-    texture: obj_filing_cabinet  # WebP物件：文件柜（存放身份卡的地方）
+    texture: obj_filing_cabinet
     x: 200
     y: 620
     scale: 0.8
     depth: 10
     label: 身份卡
-    labelOffset: [0, 90]
     condition:
       flagFalse: FLAG_C0Z1_GOT_IDENTITY
     interactive:
@@ -29,40 +30,17 @@ objects:
         type: dialogue
         dialogueId: C0Z1_IDENTITY_PICKUP
 
-  # 身份卡（已获得后显示）- 长按查看细节
-  - id: identity_card_done
-    type: image
-    texture: obj_filing_cabinet
-    x: 200
-    y: 620
-    scale: 0.8
-    depth: 10
-    label: 身份卡
-    labelOffset: [0, 90]
-    condition:
-      flagTrue: FLAG_C0Z1_GOT_IDENTITY
-    interactive:
-      cursor: true
-      action:
-        type: dialogue
-        dialogueId: C0Z1_IDENTITY_EXAMINE_DONE
-    # 长按查看身份卡细节（F06伏笔：日期更正）
-    longPress:
-      duration: 800
-      action:
-        type: dialogue
-        dialogueId: C0Z1_IDENTITY_DETAIL
+  # ========== 交互物：交互后保留 ==========
 
-  # 公告板（未检查过）
+  # 公告板（未检查）
   - id: notice_board
     type: image
-    texture: obj_sign  # WebP物件：标识牌
+    texture: obj_sign
     x: 520
     y: 520
     scale: 0.8
     depth: 10
     label: 公告板
-    labelOffset: [0, 90]
     condition:
       flagFalse: FLAG_C0Z1_NOTICE_EXAMINED
     interactive:
@@ -71,7 +49,7 @@ objects:
         type: dialogue
         dialogueId: NOTICE_BOARD_LOOK
 
-  # 公告板（已检查过）
+  # 公告板（已检查）
   - id: notice_board_done
     type: image
     texture: obj_sign
@@ -80,7 +58,6 @@ objects:
     scale: 0.8
     depth: 10
     label: 公告板
-    labelOffset: [0, 90]
     condition:
       flagTrue: FLAG_C0Z1_NOTICE_EXAMINED
     interactive:
@@ -89,7 +66,7 @@ objects:
         type: dialogue
         dialogueId: NOTICE_BOARD_DONE
 
-  # 储物柜（取工具包和早餐券）
+  # 储物柜（未取工具）
   - id: storage_cabinet
     type: image
     texture: obj_filing_cabinet
@@ -98,8 +75,6 @@ objects:
     scale: 0.7
     depth: 9
     label: 储物柜
-    labelOffset: [0, 80]
-    # 未取过工具时显示
     condition:
       flagFalse: FLAG_C0Z1_GOT_TOOLS
     interactive:
@@ -108,7 +83,7 @@ objects:
         type: dialogue
         dialogueId: C0Z1_STORAGE
 
-  # 储物柜（已取过工具）
+  # 储物柜（已取工具）
   - id: storage_cabinet_done
     type: image
     texture: obj_filing_cabinet
@@ -117,8 +92,6 @@ objects:
     scale: 0.7
     depth: 9
     label: 储物柜
-    labelOffset: [0, 80]
-    # 取过工具后显示
     condition:
       flagTrue: FLAG_C0Z1_GOT_TOOLS
     interactive:
@@ -127,38 +100,15 @@ objects:
         type: dialogue
         dialogueId: C0Z1_STORAGE_DONE
 
-  # 走廊台灯（WebP可动物件动画）
-  - id: corridor_lamp
-    type: sprite
-    texture: anim_lamp_flicker_frame_0  # 使用第一帧作为初始纹理
-    x: 380
-    y: 400
-    scale: 1.0
-    depth: 15
-    animation:
-      key: webp_lamp_flicker  # 动画键名
-      frameRate: 4
-      repeat: -1
-
-  # 走廊植物
-  - id: corridor_plant
-    type: image
-    texture: obj_plant  # WebP物件：植物
-    x: 650
-    y: 700
-    scale: 0.6
-    depth: 8
-
-  # 墙上祷词台（获取晨间祷词卡片）
+  # 祷词台（未取祷词）
   - id: prayer_board
     type: image
-    texture: obj_sign  # 复用标识牌纹理
+    texture: obj_sign
     x: 450
     y: 380
     scale: 0.5
     depth: 7
     label: 祷词台
-    labelOffset: [0, 60]
     condition:
       flagFalse: FLAG_C0Z1_GOT_PRAYER
     interactive:
@@ -167,7 +117,7 @@ objects:
         type: dialogue
         dialogueId: C0Z1_PRAYER_BOARD
 
-  # 祷词台（已取过祷词）
+  # 祷词台（已取祷词）
   - id: prayer_board_done
     type: image
     texture: obj_sign
@@ -176,7 +126,6 @@ objects:
     scale: 0.5
     depth: 7
     label: 祷词台
-    labelOffset: [0, 60]
     condition:
       flagTrue: FLAG_C0Z1_GOT_PRAYER
     interactive:
@@ -185,16 +134,39 @@ objects:
         type: dialogue
         dialogueId: C0Z1_PRAYER_BOARD_DONE
 
+  # ========== 装饰物和固定设施 ==========
+
+  # 走廊台灯
+  - id: corridor_lamp
+    type: sprite
+    texture: anim_lamp_flicker_frame_0
+    x: 380
+    y: 400
+    scale: 1.0
+    depth: 15
+    animation:
+      key: webp_lamp_flicker
+      frameRate: 4
+      repeat: -1
+
+  # 走廊植物
+  - id: corridor_plant
+    type: image
+    texture: obj_plant
+    x: 650
+    y: 700
+    scale: 0.6
+    depth: 8
+
   # 邻居的门
   - id: corridor_door
     type: image
-    texture: obj_door  # WebP物件：门
+    texture: obj_door
     x: 100
     y: 450
     scale: 0.7
     depth: 5
     label: 邻居的门
-    labelOffset: [0, 80]
     interactive:
       cursor: true
       action:
@@ -210,10 +182,8 @@ objects:
     scale: 0.8
     depth: 6
     label: 出口
-    labelOffset: [0, 80]
     interactive:
       cursor: true
       action:
         type: gotoZone
         zoneId: C0-Z2
-

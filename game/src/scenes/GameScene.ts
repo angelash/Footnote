@@ -242,12 +242,16 @@ export class GameScene extends Phaser.Scene {
     // 检查 SceneAssembler 创建的可交互对象
     if (this._assembledScene) {
       for (const obj of this._assembledScene.objects) {
-        // 只检查有交互数据的对象，且必须可见
-        if (obj instanceof Phaser.GameObjects.Container && obj.getData('action') && obj.visible) {
+        // 只检查有交互数据的对象（支持 Container 和 Image），且必须可见
+        const isInteractable = 
+          (obj instanceof Phaser.GameObjects.Container || obj instanceof Phaser.GameObjects.Image) &&
+          obj.getData('action') && 
+          obj.visible;
+        if (isInteractable) {
           const dist = Phaser.Math.Distance.Between(playerX, playerY, obj.x, obj.y);
           if (dist < this._interactionRange && dist < nearestDist) {
             nearestDist = dist;
-            nearest = obj;
+            nearest = obj as Phaser.GameObjects.Container;
           }
         }
       }
@@ -348,12 +352,16 @@ export class GameScene extends Phaser.Scene {
       // 检查 SceneAssembler 创建的可交互对象
       if (this._assembledScene) {
         for (const obj of this._assembledScene.objects) {
-          // 只检查有交互数据的对象，且必须可见
-          if (obj instanceof Phaser.GameObjects.Container && obj.getData('action') && obj.visible) {
+          // 只检查有交互数据的对象（支持 Container 和 Image），且必须可见
+          const isInteractable = 
+            (obj instanceof Phaser.GameObjects.Container || obj instanceof Phaser.GameObjects.Image) &&
+            obj.getData('action') && 
+            obj.visible;
+          if (isInteractable) {
             const dist = Phaser.Math.Distance.Between(playerX, playerY, obj.x, obj.y);
             if (dist < this._interactionRange && dist < closestDist) {
               closestDist = dist;
-              target = obj;
+              target = obj as Phaser.GameObjects.Container;
             }
           }
         }

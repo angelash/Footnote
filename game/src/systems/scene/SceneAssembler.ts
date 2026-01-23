@@ -164,6 +164,7 @@ export class SceneAssembler {
   // ==================== 物件创建 ====================
 
   private _createObject(obj: ISceneObjectConfig): Phaser.GameObjects.GameObject[] {
+    console.log(`[SceneAssembler] 创建对象: ${obj.id}, type=${obj.type}, hasCondition=${!!obj.condition}`);
     const created: Phaser.GameObjects.GameObject[] = [];
 
     // 检查一次性物品是否已被捡取（card 类型交互）
@@ -171,6 +172,7 @@ export class SceneAssembler {
       const cardId = obj.interactive.action.cardId;
       // 检查 FLAG（物品是否已被捡取）
       if (worldState.getFlag(`ITEM_TAKEN_${cardId}`)) {
+        console.log(`[SceneAssembler] ${obj.id}: 物品已被捡取，跳过创建`);
         // 物品已被捡取，不创建可交互对象（或创建但禁用）
         return created;
       }
@@ -574,12 +576,22 @@ export class SceneAssembler {
       disableInteractive?: () => void;
     }
   ): void {
+    console.log(`[ConditionWatcher] ${obj.id}: 尝试安装条件监视器, condition=`, obj.condition);
+    
     const condition = obj.condition;
-    if (!condition) return;
+    if (!condition) {
+      console.log(`[ConditionWatcher] ${obj.id}: 没有 condition，跳过`);
+      return;
+    }
 
     const requiredTrueFlag = this._getConditionRequiredTrueFlag(condition);
     const requiredFalseFlag = condition.flagFalse;
-    if (!requiredTrueFlag && !requiredFalseFlag) return;
+    console.log(`[ConditionWatcher] ${obj.id}: requiredTrueFlag=${requiredTrueFlag}, requiredFalseFlag=${requiredFalseFlag}`);
+    
+    if (!requiredTrueFlag && !requiredFalseFlag) {
+      console.log(`[ConditionWatcher] ${obj.id}: 没有需要监听的 flag，跳过`);
+      return;
+    }
 
     const configuredAlpha = typeof obj.alpha === 'number' ? obj.alpha : 1;
     // 对于带 condition 的对象，alpha=0 通常表示“暂时隐藏等待条件”
@@ -596,8 +608,14 @@ export class SceneAssembler {
       
       if (options.style === 'hide') {
         for (const target of options.visualTargets) {
-          console.log(`[ConditionWatcher] ${obj.id}: setVisible(${satisfied}) 在目标上`);
-          (target as unknown as { setVisible?: (v: boolean) => void }).setVisible?.(satisfied);
+          const targetAny = target as unknown as { visible?: boolean; setVisible?: (v: boolean) => void; name?: string; type?: string };
+          const beforeVisible = targetAny.visible;
+          const targetName = targetAny.name || 'unknown';
+          const targetType = target.constructor?.name || 'unknown';
+          console.log(`[ConditionWatcher] ${obj.id}: setVisible(${satisfied}) 在目标上 [name=${targetName}, type=${targetType}], 之前 visible=${beforeVisible}`);
+          targetAny.setVisible?.(satisfied);
+          const afterVisible = targetAny.visible;
+          console.log(`[ConditionWatcher] ${obj.id}: setVisible 完成, 之后 visible=${afterVisible}`);
           if (satisfied) {
             (target as unknown as { setAlpha?: (v: number) => void }).setAlpha?.(enabledAlpha);
           }
@@ -663,7 +681,9 @@ export class SceneAssembler {
       if (now !== last) {
         console.log(`[ConditionWatcher] ${obj.id}: 条件变化！应用新状态: ${now}`);
         last = now;
+        console.log(`[ConditionWatcher] ${obj.id}: 即将调用 apply(${now})...`);
         apply(now);
+        console.log(`[ConditionWatcher] ${obj.id}: apply 调用完成`);
       }
     };
 

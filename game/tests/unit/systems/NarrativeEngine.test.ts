@@ -182,9 +182,10 @@ describe('NarrativeEngine', () => {
 
       const card = {
         id: 'card_001',
-        title: '测试卡片',
-        category: 'archive' as const,
-        content: '这是卡片内容',
+        name: '测试卡片',
+        type: 'archive' as const,
+        front: ['这是卡片正面'],
+        detail: ['这是卡片内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       };
@@ -193,7 +194,7 @@ describe('NarrativeEngine', () => {
       const retrieved = engine.getCard('card_001');
 
       expect(retrieved).not.toBeUndefined();
-      expect(retrieved?.title).toBe('测试卡片');
+      expect(retrieved?.name).toBe('测试卡片');
     });
 
     it('批量注册卡片应正常工作', async () => {
@@ -203,17 +204,19 @@ describe('NarrativeEngine', () => {
       const cards = [
         {
           id: 'card_a',
-          title: '卡片A',
-          category: 'item' as const,
-          content: '内容A',
+          name: '卡片A',
+          type: 'item' as const,
+          front: ['正面A'],
+          detail: ['内容A'],
           chapter: 'C1' as const,
           zone: 'C1-Z1',
         },
         {
           id: 'card_b',
-          title: '卡片B',
-          category: 'diary' as const,
-          content: '内容B',
+          name: '卡片B',
+          type: 'diary' as const,
+          front: ['正面B'],
+          detail: ['内容B'],
           chapter: 'C1' as const,
           zone: 'C1-Z2',
         },
@@ -221,8 +224,8 @@ describe('NarrativeEngine', () => {
 
       engine.registerCards(cards);
 
-      expect(engine.getCard('card_a')?.title).toBe('卡片A');
-      expect(engine.getCard('card_b')?.title).toBe('卡片B');
+      expect(engine.getCard('card_a')?.name).toBe('卡片A');
+      expect(engine.getCard('card_b')?.name).toBe('卡片B');
     });
 
     it('获得卡片应更新已获得列表', async () => {
@@ -231,9 +234,10 @@ describe('NarrativeEngine', () => {
 
       const card = {
         id: 'obtain_card',
-        title: '获得测试',
-        category: 'archive' as const,
-        content: '内容',
+        name: '获得测试',
+        type: 'archive' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       };
@@ -255,9 +259,10 @@ describe('NarrativeEngine', () => {
 
       const card = {
         id: 'duplicate_card',
-        title: '重复测试',
-        category: 'item' as const,
-        content: '内容',
+        name: '重复测试',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       };
@@ -287,25 +292,28 @@ describe('NarrativeEngine', () => {
       const cards = [
         {
           id: 'card_x',
-          title: '卡片X',
-          category: 'archive' as const,
-          content: 'X',
+          name: '卡片X',
+          type: 'archive' as const,
+          front: ['正面X'],
+          detail: ['X'],
           chapter: 'C0' as const,
           zone: 'C0-Z1',
         },
         {
           id: 'card_y',
-          title: '卡片Y',
-          category: 'item' as const,
-          content: 'Y',
+          name: '卡片Y',
+          type: 'item' as const,
+          front: ['正面Y'],
+          detail: ['Y'],
           chapter: 'C0' as const,
           zone: 'C0-Z1',
         },
         {
           id: 'card_z',
-          title: '卡片Z',
-          category: 'prayer' as const,
-          content: 'Z',
+          name: '卡片Z',
+          type: 'prayer' as const,
+          front: ['正面Z'],
+          detail: ['Z'],
           chapter: 'C0' as const,
           zone: 'C0-Z1',
         },
@@ -322,32 +330,35 @@ describe('NarrativeEngine', () => {
       expect(obtained.map((c) => c.id)).not.toContain('card_y');
     });
 
-    it('getCardsByCategory应按类别筛选卡片', async () => {
+    it('getCardsByType应按类型筛选卡片', async () => {
       const engine = await createFreshNarrativeEngine();
       engine.reset();
 
       const cards = [
         {
           id: 'archive_1',
-          title: '档案1',
-          category: 'archive' as const,
-          content: '1',
+          name: '档案1',
+          type: 'archive' as const,
+          front: ['正面1'],
+          detail: ['1'],
           chapter: 'C0' as const,
           zone: 'C0-Z1',
         },
         {
           id: 'archive_2',
-          title: '档案2',
-          category: 'archive' as const,
-          content: '2',
+          name: '档案2',
+          type: 'archive' as const,
+          front: ['正面2'],
+          detail: ['2'],
           chapter: 'C0' as const,
           zone: 'C0-Z1',
         },
         {
           id: 'item_1',
-          title: '物品1',
-          category: 'item' as const,
-          content: '3',
+          name: '物品1',
+          type: 'item' as const,
+          front: ['正面3'],
+          detail: ['3'],
           chapter: 'C0' as const,
           zone: 'C0-Z1',
         },
@@ -356,9 +367,9 @@ describe('NarrativeEngine', () => {
       engine.registerCards(cards);
       cards.forEach((c) => engine.obtainCard(c.id));
 
-      const archives = engine.getCardsByCategory('archive');
+      const archives = engine.getCardsByType('archive');
       expect(archives.length).toBe(2);
-      expect(archives.every((c) => c.category === 'archive')).toBe(true);
+      expect(archives.every((c) => c.type === 'archive')).toBe(true);
     });
 
     it('viewCard应标记卡片为已查看', async () => {
@@ -367,9 +378,10 @@ describe('NarrativeEngine', () => {
 
       const card = {
         id: 'view_card',
-        title: '查看测试',
-        category: 'archive' as const,
-        content: '内容',
+        name: '查看测试',
+        type: 'archive' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       };
@@ -388,9 +400,10 @@ describe('NarrativeEngine', () => {
 
       const card = {
         id: 'unobtained_card',
-        title: '未获得',
-        category: 'archive' as const,
-        content: '内容',
+        name: '未获得',
+        type: 'archive' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       };
@@ -414,6 +427,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'C0-Z1', trigger: 'dialogue', description: '投放' },
           deepen: { zone: 'C1-Z1', trigger: 'interaction', description: '加深' },
+          reveal: { zone: 'C2-Z1', trigger: 'event', description: '揭示' },
           collect: { zone: 'C3-Z1', trigger: 'event', description: '回收' },
         },
       };
@@ -436,6 +450,7 @@ describe('NarrativeEngine', () => {
           stages: {
             plant: { zone: 'C0-Z1', trigger: 't', description: 'd' },
             deepen: { zone: 'C1-Z1', trigger: 't', description: 'd' },
+            reveal: { zone: 'C1-Z2', trigger: 't', description: 'd' },
             collect: { zone: 'C2-Z1', trigger: 't', description: 'd' },
           },
         },
@@ -446,6 +461,7 @@ describe('NarrativeEngine', () => {
           stages: {
             plant: { zone: 'C0-Z2', trigger: 't', description: 'd' },
             deepen: { zone: 'C1-Z2', trigger: 't', description: 'd' },
+            reveal: { zone: 'C1-Z3', trigger: 't', description: 'd' },
             collect: { zone: 'C2-Z2', trigger: 't', description: 'd' },
           },
         },
@@ -468,6 +484,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'C0-Z1', trigger: 't', description: 'd' },
           deepen: { zone: 'C1-Z1', trigger: 't', description: 'd' },
+          reveal: { zone: 'C1-Z2', trigger: 't', description: 'd' },
           collect: { zone: 'C2-Z1', trigger: 't', description: 'd' },
         },
       });
@@ -491,6 +508,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'C0-Z1', trigger: 't', description: 'd' },
           deepen: { zone: 'C1-Z1', trigger: 't', description: 'd' },
+          reveal: { zone: 'C1-Z2', trigger: 't', description: 'd' },
           collect: { zone: 'C2-Z1', trigger: 't', description: 'd' },
         },
       });
@@ -517,6 +535,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'C0-Z1', trigger: 't', description: 'd' },
           deepen: { zone: 'C1-Z1', trigger: 't', description: 'd' },
+          reveal: { zone: 'C1-Z2', trigger: 't', description: 'd' },
           collect: { zone: 'C2-Z1', trigger: 't', description: 'd' },
         },
       });
@@ -535,6 +554,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'C0-Z1', trigger: 't', description: 'd' },
           deepen: { zone: 'C1-Z1', trigger: 't', description: 'd' },
+          reveal: { zone: 'C1-Z2', trigger: 't', description: 'd' },
           collect: { zone: 'C2-Z1', trigger: 't', description: 'd' },
         },
       });
@@ -568,6 +588,7 @@ describe('NarrativeEngine', () => {
           stages: {
             plant: { zone: 'Z1', trigger: 't', description: 'd' },
             deepen: { zone: 'Z2', trigger: 't', description: 'd' },
+            reveal: { zone: 'Z2', trigger: 't', description: 'd' },
             collect: { zone: 'Z3', trigger: 't', description: 'd' },
           },
         },
@@ -578,6 +599,7 @@ describe('NarrativeEngine', () => {
           stages: {
             plant: { zone: 'Z1', trigger: 't', description: 'd' },
             deepen: { zone: 'Z2', trigger: 't', description: 'd' },
+            reveal: { zone: 'Z2', trigger: 't', description: 'd' },
             collect: { zone: 'Z3', trigger: 't', description: 'd' },
           },
         },
@@ -675,9 +697,10 @@ describe('NarrativeEngine', () => {
       // 先注册卡片
       engine.registerCard({
         id: 'action_card',
-        title: '测试卡片',
-        category: 'archive' as const,
-        content: '内容',
+        name: '测试卡片',
+        type: 'archive' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       });
@@ -705,9 +728,10 @@ describe('NarrativeEngine', () => {
 
       engine.registerCard({
         id: 'complete_card',
-        title: '完成卡片',
-        category: 'item' as const,
-        content: '内容',
+        name: '完成卡片',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       });
@@ -758,9 +782,10 @@ describe('NarrativeEngine', () => {
       // 设置一些状态
       engine.registerCard({
         id: 'ser_card',
-        title: '序列化卡',
-        category: 'archive' as const,
-        content: '内容',
+        name: '序列化卡',
+        type: 'archive' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       });
@@ -774,6 +799,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'Z1', trigger: 't', description: 'd' },
           deepen: { zone: 'Z2', trigger: 't', description: 'd' },
+          reveal: { zone: 'Z2', trigger: 't', description: 'd' },
           collect: { zone: 'Z3', trigger: 't', description: 'd' },
         },
       });
@@ -793,9 +819,10 @@ describe('NarrativeEngine', () => {
       // 注册卡片和伏笔（恢复前需要先注册）
       engine.registerCard({
         id: 'res_card',
-        title: '恢复卡',
-        category: 'archive' as const,
-        content: '内容',
+        name: '恢复卡',
+        type: 'archive' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       });
@@ -806,6 +833,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'Z1', trigger: 't', description: 'd' },
           deepen: { zone: 'Z2', trigger: 't', description: 'd' },
+          reveal: { zone: 'Z2', trigger: 't', description: 'd' },
           collect: { zone: 'Z3', trigger: 't', description: 'd' },
         },
       });
@@ -818,7 +846,7 @@ describe('NarrativeEngine', () => {
           res_fore: {
             planted: true,
             deepened: false,
-            collected: false,
+            revealed: false,
             plantedAt: 'C0-Z1',
           },
         },
@@ -838,9 +866,10 @@ describe('NarrativeEngine', () => {
       // 设置一些状态
       engine.registerCard({
         id: 'reset_card',
-        title: '重置卡',
-        category: 'archive' as const,
-        content: '内容',
+        name: '重置卡',
+        type: 'archive' as const,
+        front: ['正面'],
+        detail: ['内容'],
         chapter: 'C0' as const,
         zone: 'C0-Z1',
       });
@@ -853,6 +882,7 @@ describe('NarrativeEngine', () => {
         stages: {
           plant: { zone: 'Z1', trigger: 't', description: 'd' },
           deepen: { zone: 'Z2', trigger: 't', description: 'd' },
+          reveal: { zone: 'Z2', trigger: 't', description: 'd' },
           collect: { zone: 'Z3', trigger: 't', description: 'd' },
         },
       });

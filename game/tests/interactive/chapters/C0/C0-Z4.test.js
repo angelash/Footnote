@@ -2,7 +2,14 @@
 // C0-Z4.test.js - 维修局前台
 // ============================================================================
 // 生成时间: 2026-01-21
+// 更新时间: 2026-01-23 (审计修复)
 // Zone 描述: 堆满旧文件的档案储存室，秩序语法第一次正面登场，顾临首次出场
+// 
+// 审计验收点：
+// - [P0] 任务板需要先报到（条件锁定）
+// - [P0] 顾临对话完成后获得警告卡片
+// - [P1] Flag 名称一致性（FLAG_C0Z1_NOTICE_EXAMINED 而非 FLAG_SEEN_NOTICE）
+// - [P2] 章节完成标记触发
 // ============================================================================
 
 const ZONE_ID = 'C0-Z4';
@@ -13,7 +20,8 @@ const ZONE_NAME = '维修局前台';
  * 
  * 交互对象:
  * - reception_window: 前台窗口
- * - task_board: 任务板
+ * - task_board: 任务板（需要先报到）
+ * - task_board_locked: 任务板锁定状态（未报到时显示）
  * - gulin_door: 顾临办公室（多分支对话，含条件选项）
  * - info_board: 规章制度
  * - exit_back: 返回巷口
@@ -54,20 +62,55 @@ const TESTS = [
   },
 
   // ============================================
-  // TC-C0Z4-02: 任务板交互
+  // TC-C0Z4-02a: 任务板交互（未报到时锁定）
   // ============================================
   {
-    id: 'TC-C0Z4-02',
-    name: '任务板交互',
+    id: 'TC-C0Z4-02a',
+    name: '任务板交互（未报到时锁定）',
+    zoneId: ZONE_ID,
+    zoneName: ZONE_NAME,
+    objectId: 'task_board_locked',
+    objectName: '任务板（锁定）',
+    description: '[P0] 未报到时尝试查看任务板，显示锁定提示',
+    preconditions: ['FLAG_C0Z4_CHECKED_IN = false'],
+    steps: [
+      { action: 'teleport', zoneId: ZONE_ID },
+      { action: 'wait', duration: 2000 },
+      { action: 'setFlag', flag: 'FLAG_C0Z4_CHECKED_IN', value: false },
+      { action: 'moveToObject', objectId: 'task_board_locked' },
+      { action: 'interact' },
+      { action: 'waitForDialogue', timeout: 1000 },
+    ],
+    expectedResults: {
+      cards: [],
+      flags: {},
+      rDelta: 0,
+      pDelta: 0,
+      foreshadow: null,
+      nextZone: null,
+      // 对话验证: 锁定提示(1)
+      expectedLines: 1,
+      dialogueContains: ['报到', '才能'],
+    },
+    tags: ['precondition', 'P0'],
+  },
+
+  // ============================================
+  // TC-C0Z4-02b: 任务板交互（已报到）
+  // ============================================
+  {
+    id: 'TC-C0Z4-02b',
+    name: '任务板交互（已报到）',
     zoneId: ZONE_ID,
     zoneName: ZONE_NAME,
     objectId: 'task_board',
     objectName: '任务板',
-    description: '查看任务板，获得任务单卡片，触发伏笔 F03',
-    preconditions: [],
+    description: '报到后查看任务板，获得任务单卡片，触发伏笔 F03',
+    preconditions: ['FLAG_C0Z4_CHECKED_IN = true'],
     steps: [
       { action: 'teleport', zoneId: ZONE_ID },
       { action: 'wait', duration: 2000 },
+      { action: 'setFlag', flag: 'FLAG_C0Z4_CHECKED_IN', value: true },
       { action: 'moveToObject', objectId: 'task_board' },
       { action: 'interact' },
       { action: 'waitForDialogue', timeout: 1000 },
@@ -84,6 +127,7 @@ const TESTS = [
       expectedLines: 5,
       dialogueContains: ['巡检任务单', '路线A', '标注异常', '更正'],
     },
+    tags: ['card', 'foreshadow'],
   },
 
   // ============================================
@@ -96,7 +140,7 @@ const TESTS = [
     zoneName: ZONE_NAME,
     objectId: 'gulin_door',
     objectName: '顾临办公室',
-    description: '与顾临对话，选择"明白"，接受任务',
+    description: '[P0] 与顾临对话，选择"明白"，接受任务并获得警告卡片',
     branch: '明白',
     preconditions: [],
     steps: [
@@ -109,7 +153,8 @@ const TESTS = [
       { action: 'wait', duration: 3000 },
     ],
     expectedResults: {
-      cards: [],
+      // [P0 修复] 添加警告卡片获取
+      cards: ['CARD_C0_WARNING'],
       flags: {
         FLAG_C0_TASK_RECEIVED: true,
         FLAG_C0_END: true,
@@ -122,6 +167,7 @@ const TESTS = [
       expectedLines: 5,
       dialogueContains: ['既定走', '流程解决', '例外', '复杂度', '记录在案'],
     },
+    tags: ['card', 'chapter-complete', 'P0'],
   },
 
   // ============================================
@@ -134,21 +180,23 @@ const TESTS = [
     zoneName: ZONE_NAME,
     objectId: 'gulin_door',
     objectName: '顾临办公室',
-    description: '提出公告板日期问题（需要先查看过公告板）',
+    description: '[P1] 提出公告板日期问题（需要先查看过公告板，Flag 已修复为 FLAG_C0Z1_NOTICE_EXAMINED）',
     branch: '昨晚公告板日期不对',
-    preconditions: ['FLAG_SEEN_NOTICE = true'],
+    // [P1 修复] 使用正确的 Flag 名称
+    preconditions: ['FLAG_C0Z1_NOTICE_EXAMINED = true'],
     steps: [
       { action: 'teleport', zoneId: ZONE_ID },
       { action: 'wait', duration: 2000 },
-      { action: 'setFlag', flag: 'FLAG_SEEN_NOTICE', value: true },
+      // [P1 修复] 使用正确的 Flag 名称
+      { action: 'setFlag', flag: 'FLAG_C0Z1_NOTICE_EXAMINED', value: true },
       { action: 'moveToObject', objectId: 'gulin_door' },
       { action: 'interact' },
       { action: 'waitForDialogue', timeout: 1000 },
-      { action: 'selectChoice', index: 1, text: '昨晚公告板日期不对', requiresFlag: 'FLAG_SEEN_NOTICE' },
+      { action: 'selectChoice', index: 1, text: '昨晚公告板日期不对', requiresFlag: 'FLAG_C0Z1_NOTICE_EXAMINED' },
       { action: 'wait', duration: 3000 },
     ],
     expectedResults: {
-      cards: [],
+      cards: ['CARD_C0_WARNING'],  // [P0 修复] 添加警告卡片获取
       flags: {
         FLAG_C0_TASK_RECEIVED: true,
         FLAG_C0_END: true,
@@ -161,6 +209,7 @@ const TESTS = [
       expectedLines: 7,
       dialogueContains: ['既定走', '流程解决', '记录就好', '主观', '事实', '记录为准'],
     },
+    tags: ['flag-consistency', 'P1', 'card'],
   },
 
   // ============================================
@@ -173,7 +222,7 @@ const TESTS = [
     zoneName: ZONE_NAME,
     objectId: 'gulin_door',
     objectName: '顾临办公室',
-    description: '提出薄墙回声问题（需要先触发过墙壁回声）',
+    description: '提出薄墙回声问题（需要先触发过墙壁回声），获得警告卡片',
     branch: '我听到墙里是空的',
     preconditions: ['FLAG_HEARD_WALL_ECHO = true'],
     steps: [
@@ -187,7 +236,8 @@ const TESTS = [
       { action: 'wait', duration: 3000 },
     ],
     expectedResults: {
-      cards: [],
+      // [P0 修复] 添加警告卡片获取
+      cards: ['CARD_C0_WARNING'],
       flags: {
         FLAG_C0_TASK_RECEIVED: true,
         FLAG_C0_END: true,
@@ -200,6 +250,7 @@ const TESTS = [
       expectedLines: 8,
       dialogueContains: ['既定走', '流程解决', '听到', '感知异常', '结构异常', '系统判定'],
     },
+    tags: ['card', 'foreshadow-deepening', 'F01'],
   },
 
   // ============================================
@@ -334,12 +385,16 @@ const ZONE_STATS = {
   zoneId: ZONE_ID,
   zoneName: ZONE_NAME,
   totalTests: TESTS.length,
-  objectsCovered: [...new Set(TESTS.map(t => t.objectId))],
+  objectsCovered: [...new Set(TESTS.map(t => t.objectId).filter(Boolean))],
   cardsCovered: [...new Set(TESTS.flatMap(t => t.expectedResults.cards || []))],
   flagsCovered: [...new Set(TESTS.flatMap(t => Object.keys(t.expectedResults.flags || {})))],
   foreshadowsCovered: TESTS.filter(t => t.expectedResults.foreshadow).map(t => t.expectedResults.foreshadow.id),
   totalRPoints: TESTS.reduce((sum, t) => sum + (t.expectedResults.rDelta || 0), 0),
   branchCount: TESTS.filter(t => t.branch).length,
+  // 审计标签统计
+  p0Tests: TESTS.filter(t => t.tags?.includes('P0')).length,
+  p1Tests: TESTS.filter(t => t.tags?.includes('P1')).length,
+  p2Tests: TESTS.filter(t => t.tags?.includes('P2')).length,
 };
 
 // ============================================

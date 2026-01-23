@@ -11,6 +11,9 @@ export { NarrativeTests } from './06-narrative.spec';
 export { SaveTests } from './07-save.spec';
 export { AbilityTests } from './08-ability.spec';
 export { PreviewTests } from './09-preview.spec';
+export { ChapterFlowTests } from './10-chapter-flow.spec';
+export { EndingTests } from './11-endings.spec';
+export { GameplayDesignVerificationTests } from './12-gameplay-design-verification.spec';
 
 // 所有测试套件
 export const AllTestSuites = [
@@ -23,4 +26,7 @@ export const AllTestSuites = [
   'SaveTests',
   'AbilityTests',
   'PreviewTests',
+  'ChapterFlowTests',
+  'EndingTests',
+  'GameplayDesignVerificationTests',
 ];

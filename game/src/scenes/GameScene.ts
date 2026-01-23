@@ -188,10 +188,9 @@ export class GameScene extends Phaser.Scene {
       isRevisit: (worldState.getZoneState(this._currentZoneId)?.visitCount ?? 0) > 0,
     });
 
-    // 如果是新游戏，播放序章开场
-    if (this._isNewGame) {
-      this._playPrologueIntro();
-    }
+    // 注意：新游戏的开场对话现在通过场景配置的 onEnter.dialogue 触发
+    // 不再需要在这里调用 _playPrologueIntro()
+    // 参见 c0_z1.yaml 中的 onEnter: dialogue: CENHUI_MONO_01
   }
 
   update(time: number, delta: number): void {
@@ -1460,6 +1459,44 @@ export class GameScene extends Phaser.Scene {
     }
 
     this._assembledScene = this._sceneAssembler.build(cfg);
+
+    // 处理 onEnter 配置：进入场景时自动触发对话
+    if (cfg.onEnter?.dialogue) {
+      this._handleOnEnterDialogue(zoneId, cfg.onEnter);
+    }
+  }
+
+  /**
+   * 处理进入场景时的自动对话
+   * 使用 flag 防止重复触发（默认只触发一次）
+   */
+  private _handleOnEnterDialogue(
+    zoneId: string,
+    onEnterConfig: { dialogue?: string; once?: boolean }
+  ): void {
+    const dialogueId = onEnterConfig.dialogue;
+    if (!dialogueId) return;
+
+    // 默认只触发一次
+    const once = onEnterConfig.once !== false;
+    
+    if (once) {
+      // 使用 flag 检查是否已触发过
+      const flagName = `FLAG_ONENTER_${zoneId.replace(/-/g, '_')}_DONE`;
+      if (worldState.getFlag(flagName)) {
+        logger.debug(`onEnter 对话已触发过，跳过: ${dialogueId}`);
+        return;
+      }
+      
+      // 设置 flag 标记已触发
+      worldState.setFlag(flagName, true);
+    }
+
+    // 延迟触发对话，等待场景加载完成
+    this.time.delayedCall(100, () => {
+      logger.info(`触发 onEnter 对话: ${dialogueId}`);
+      void this.showDialogueById(dialogueId);
+    });
   }
 
   /**
@@ -1902,15 +1939,6 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private _playPrologueIntro(): void {
-    logger.debug('播放序章开场');
-
-    // 延迟显示第一条对话
-    this.time.delayedCall(1000, () => {
-      this._showDialogue({
-        speaker: '岑回',
-        text: '先按流程走。',
-      });
-    });
-  }
+  // _playPrologueIntro 方法已移除
+  // 开场对话现在通过场景配置的 onEnter.dialogue 触发（参见 c0_z1.yaml）
 }

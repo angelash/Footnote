@@ -399,7 +399,12 @@ class NarrativeEngine {
               triggerForeshadow?: { id: string; stage: string };
             };
           }>;
-          trigger?: { card?: string; foreshadow?: [string, string]; ability?: string };
+          trigger?: { 
+            card?: string; 
+            foreshadow?: [string, string]; 
+            ability?: string;
+            flags?: Array<{ name: string; value: boolean }>;
+          };
         };
 
         result.push({

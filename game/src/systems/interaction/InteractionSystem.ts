@@ -255,7 +255,7 @@ export class InteractionSystem {
 
       case 'dialogue':
         // 对话本身不产生状态变更（对话内的选择会触发变更）
-        // 但需要标记对话已触发
+        // 但需要标记对话已触发，并防止重复触发
         result.changed = true;
         break;
 
@@ -270,7 +270,9 @@ export class InteractionSystem {
     }
 
     // 3. 标记一次性交互为已完成
-    const isOnce = action.once ?? (action.type === 'card');
+    // - card 类型默认一次性
+    // - dialogue 类型带有 dialogueId 的也默认一次性（防止物品对话重复触发）
+    const isOnce = action.once ?? (action.type === 'card' || (action.type === 'dialogue' && !!action.dialogueId));
     if (isOnce && result.changed) {
       worldState.markInteractionDone(interactionId, {
         actionType: action.type,

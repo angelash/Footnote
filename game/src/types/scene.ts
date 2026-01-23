@@ -110,11 +110,23 @@ export interface ISceneBackgroundConfig {
   alpha?: number;
 }
 
+/**
+ * 场景进入时的动作配置
+ */
+export interface ISceneOnEnterConfig {
+  /** 自动触发的对话ID */
+  dialogue?: string;
+  /** 是否只触发一次（默认 true） */
+  once?: boolean;
+}
+
 export interface ISceneConfig {
   id: string;
   title?: string;
   background?: ISceneBackgroundConfig;
   objects: ISceneObjectConfig[];
+  /** 进入场景时自动触发的动作 */
+  onEnter?: ISceneOnEnterConfig;
 }
 
 export interface ISceneAssemblerCallbacks {

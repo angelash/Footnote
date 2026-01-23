@@ -16,6 +16,7 @@ import { UI_FONT_SIZE } from '@/config/ui.config';
 import { assetResolver } from '@/systems/whitebox/AssetResolver';
 import { useProductionAsset } from '@/config/assetMode.config';
 import { worldState } from '@/systems/world';
+import { eventBus, GameEvent } from '@/systems/EventBus';
 import type { IZoneBillboardConfig, IBillboardConfig } from '@/systems/whitebox/BillboardFactory';
 
 // ==================== Zone类型映射 ====================
@@ -620,20 +621,51 @@ export class SceneAssembler {
     let last = checkSatisfied();
     apply(last);
 
+    // 检查对象是否仍然存活
+    const isAlive = (): boolean => {
+      return options.visualTargets.some((t) => {
+        const asAny = t as unknown as { scene?: unknown; active?: boolean };
+        return !!asAny.scene && asAny.active !== false;
+      });
+    };
+
+    // 使用事件监听立即响应 flag 变化（不再依赖轮询延迟）
+    const relevantFlags = [requiredTrueFlag, requiredFalseFlag].filter(Boolean) as string[];
+    
+    const onFlagSet = (data: { flagName: string; value: boolean }): void => {
+      // 检查是否是相关的 flag
+      if (!relevantFlags.includes(data.flagName)) return;
+      
+      // 检查对象是否还存活
+      if (!isAlive()) {
+        // 移除监听器
+        eventBus.off(GameEvent.FLAG_SET, onFlagSet);
+        return;
+      }
+
+      const now = checkSatisfied();
+      if (now !== last) {
+        last = now;
+        apply(now);
+      }
+    };
+
+    // 注册 FLAG_SET 事件监听
+    eventBus.on(GameEvent.FLAG_SET, onFlagSet);
+
+    // 保留轮询作为后备（主要用于清理监听器）
     const timer = this._scene.time.addEvent({
-      delay: 500,
+      delay: 1000,
       loop: true,
       callback: () => {
-        // 对象被销毁后停止轮询（避免泄漏/访问无效引用）
-        const anyAlive = options.visualTargets.some((t) => {
-          const asAny = t as unknown as { scene?: unknown; active?: boolean };
-          return !!asAny.scene && asAny.active !== false;
-        });
-        if (!anyAlive) {
+        // 对象被销毁后停止轮询和事件监听
+        if (!isAlive()) {
           timer.destroy();
+          eventBus.off(GameEvent.FLAG_SET, onFlagSet);
           return;
         }
 
+        // 后备检查
         const now = checkSatisfied();
         if (now !== last) {
           last = now;

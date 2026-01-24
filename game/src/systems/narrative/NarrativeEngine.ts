@@ -588,8 +588,8 @@ class NarrativeEngine {
     eventBus.emit(GameEvent.CARD_OBTAIN, {
       cardId,
       card: card
-        ? { id: card.id, name: card.name, type: card.type }
-        : { id: cardId, name: cardId, type: 'item' as CardType },
+        ? { id: card.id, title: card.name, category: card.type }
+        : { id: cardId, title: cardId, category: 'item' },
     });
 
     // 自动触发 'obtain' 时机的 gameplay 效果
@@ -687,7 +687,7 @@ class NarrativeEngine {
     if (applied && card.consumable) {
       worldState.consumeCard(cardId);
       this._obtainedCards.delete(cardId);
-      eventBus.emit(GameEvent.CARD_CONSUME, { cardId, card: { id: card.id, name: card.name } });
+      eventBus.emit(GameEvent.CARD_CONSUME, { cardId, card: { id: card.id, title: card.name, category: card.type } });
       logger.info(`Card consumed: ${cardId}`);
     }
 

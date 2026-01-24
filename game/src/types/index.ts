@@ -5,85 +5,27 @@
 import { ChapterID, AbilityType, ZoneType, CardType } from '@/config/game.config';
 
 // ==================== 世界状态 ====================
-
-export interface IWorldState {
-  /** 隐藏计数器 */
-  counters: ICounters;
-
-  /** 当前章节 */
-  chapter: ChapterID;
-
-  /** 能力解锁状态 */
-  abilities: IAbilityState;
-
-  /** Zone状态 */
-  zones: Record<string, ZoneState>;
-
-  /** 已完成的对话 */
-  dialoguesCompleted: Set<string>;
-
-  /** 选择记录 */
-  choices: IChoiceRecord[];
-
-  /** 收集的卡片 */
-  collectedCards: Set<string>;
-
-  /** 深度伤痕 */
-  depthScars: IDepthScar[];
-
-  /** 时间节点 */
-  timeNodes: ITimeNode[];
-
-  /** 时间污染度 */
-  timeContamination: number;
-
-  /** 游戏时间（秒） */
-  playTime: number;
-}
-
-export interface ICounters {
-  /** R - 无收益残差 */
-  r: number;
-  /** P - 观察者压力 */
-  p: number;
-  /** W - 世界可读性 */
-  w: number;
-}
-
-export interface IAbilityState {
-  /** 深度感知 */
-  depthPerception: boolean;
-  /** 深度介入 */
-  depthIntervention: boolean;
-  /** 时间干预 */
-  timeIntervention: boolean;
-}
+// 注意：IWorldState、ICounters、IAbilityState 等已移至 WorldState.ts
+// 此处保留 ZoneState 类型别名供外部使用
 
 export type ZoneState = 'locked' | 'unlocked' | 'visited' | 'completed';
 
-export interface IChoiceRecord {
-  id: string;
-  dialogueId: string;
-  choiceIndex: number;
-  timestamp: number;
-  rValue?: number;
-  pValue?: number;
-  completed: boolean;
-}
-
-export interface IDepthScar {
-  zoneId: string;
-  position: { x: number; y: number };
-  severity: 'light' | 'medium' | 'severe';
-  timestamp: number;
-}
-
+/**
+ * 时间节点（统一接口）
+ * 合并了设计字段和运行时字段
+ */
 export interface ITimeNode {
   id: string;
   zoneId: string;
   timestamp: number;
-  label: string;
-  canRewind: boolean;
+  /** UI显示标签 */
+  label?: string;
+  /** 是否可回溯 */
+  canRewind?: boolean;
+  /** 存档槽位（运行时） */
+  saveSlot?: number;
+  /** 节点索引（运行时） */
+  index?: number;
 }
 
 // ==================== 对话系统 ====================
@@ -235,6 +177,8 @@ export interface ICard {
 
 /**
  * 卡片视觉效果（UI层面）
+ * @reserved 美术预留 - 用于卡片污染/故障等视觉特效
+ * @todo CardUI 需要实现读取此字段并渲染特效
  */
 export interface ICardEffect {
   type: 'taint' | 'flash' | 'glitch' | 'redact';
@@ -244,6 +188,8 @@ export interface ICardEffect {
 
 /**
  * 卡片数据层 FX（YAML 定义）
+ * @reserved 美术预留 - 用于卡片动画效果
+ * @todo CardUI 需要实现读取此字段并播放动画
  */
 export interface ICardFX {
   type: 'taint' | 'flash' | 'shake' | 'fade';
@@ -443,36 +389,10 @@ export interface IROpportunity {
 }
 
 // ==================== 角色系统 ====================
-
-export interface ICharacter {
-  id: string;
-  name: string;
-  title: string;
-  description: string;
-  portrait?: string;
-  sprite?: string;
-  dialoguePrefix: string;
-}
+// 注意：ICharacter 已移至 characters.config.ts 的 ICharacterInfo
 
 // ==================== 存档系统 ====================
-
-export interface ISaveData {
-  version: string;
-  slot: number;
-  timestamp: number;
-  worldState: IWorldState;
-  foreshadowStates: Record<string, IForeshadowState>;
-  currentZone: string;
-  settings: IGameSettings;
-}
-
-export interface IGameSettings {
-  bgmVolume: number;
-  sfxVolume: number;
-  textSpeed: 'slow' | 'normal' | 'fast' | 'instant';
-  language: 'zh-CN';
-  autoSave: boolean;
-}
+// 注意：ISaveData、IGameSettings 已移至 SaveManager.ts
 
 // ==================== 结局系统 ====================
 
@@ -487,31 +407,9 @@ export interface IEndingResult {
   description: string;
   foreshadowsResolved: string[];
   totalPlayTime: number;
-  finalCounters: ICounters;
+  /** 最终计数器值（R/P/W） */
+  finalCounters: { R: number; P: number; W: number };
 }
 
 // ==================== 事件系统 ====================
-
-export interface IGameEvent {
-  type: string;
-  payload?: unknown;
-  timestamp: number;
-}
-
-export type GameEventType =
-  | 'zone:enter'
-  | 'zone:exit'
-  | 'zone:complete'
-  | 'dialogue:start'
-  | 'dialogue:text'
-  | 'dialogue:choice'
-  | 'dialogue:end'
-  | 'card:collect'
-  | 'card:view'
-  | 'ability:unlock'
-  | 'ability:use'
-  | 'foreshadow:trigger'
-  | 'time:rewind'
-  | 'depth:perceive'
-  | 'depth:intervene'
-  | 'ending:reach';
+// 注意：IGameEvent、GameEventType 已移至 EventBus.ts 的 GameEvent 枚举

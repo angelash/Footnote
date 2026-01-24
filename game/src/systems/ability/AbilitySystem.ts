@@ -14,6 +14,7 @@ import { saveManager } from '@/systems/save';
 import { SCENES } from '@/config/game.config';
 import type { AbilityType } from '@/config/game.config';
 import { UI_FONT_SIZE } from '@/config/ui.config';
+import type { ITimeNode } from '@/types';
 
 // ==================== 配置常量 ====================
 
@@ -67,16 +68,7 @@ interface IIntervenableTarget {
   originalPosition?: { x: number; y: number };
 }
 
-/**
- * 时间节点信息
- */
-interface ITimeNode {
-  id: string;
-  zoneId: string;
-  timestamp: number;
-  saveSlot: number;
-  index: number;
-}
+// ITimeNode 已移至 @/types 统一定义
 
 // ==================== AbilitySystem类 ====================
 
@@ -795,7 +787,7 @@ export class AbilitySystem {
     const reversedNodes = [...availableNodes].reverse();
     reversedNodes.slice(0, 8).forEach((node, displayIndex) => {
       const y = 150 + displayIndex * 60;
-      const cost = this.calculateRewindCost(node.index);
+      const cost = this.calculateRewindCost(node.index ?? 0);
 
       const container = this._scene.add.container(width / 2, y);
 
@@ -936,11 +928,13 @@ export class AbilitySystem {
     }
 
     // 计算并消耗P值
-    const cost = this.calculateRewindCost(node.index);
+    const nodeIndex = node.index ?? 0;
+    const cost = this.calculateRewindCost(nodeIndex);
     worldState.addP(cost);
 
     // 加载存档
-    const success = await saveManager.load(node.saveSlot);
+    const saveSlot = node.saveSlot ?? 0;
+    const success = await saveManager.load(saveSlot);
     if (!success) {
       logger.error(`回溯失败: 无法加载节点 ${node.id}`);
       return;
@@ -954,7 +948,7 @@ export class AbilitySystem {
     });
 
     // 更新当前节点索引
-    this._currentNodeIndex = node.index;
+    this._currentNodeIndex = nodeIndex;
 
     logger.info(`时间回溯完成: ${node.zoneId}, P值消耗: ${cost}`);
 

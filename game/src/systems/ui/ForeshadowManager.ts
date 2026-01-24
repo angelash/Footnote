@@ -14,6 +14,7 @@ import { UI_FONT_SIZE } from '@/config/ui.config';
 import type {
   IForeshadow as IForeshadowBase,
   IForeshadowStageConfig,
+  IForeshadowMisleadConfig,
   ForeshadowStageLegacy,
 } from '@/types';
 import { normalizeForeshadowStage } from '@/types';
@@ -201,6 +202,9 @@ export class ForeshadowManager {
       if (normalizedStage === ForeshadowStage.REVEAL) {
         foreshadow.isCollected = true;
         this._showCollectNotification(foreshadow);
+      } else if (normalizedStage === ForeshadowStage.MISLEAD) {
+        // 误读阶段使用特殊通知
+        this._showMisleadNotification(foreshadow);
       } else {
         this._showProgressNotification(foreshadow, normalizedStage);
       }
@@ -291,6 +295,151 @@ export class ForeshadowManager {
 
     // 动画
     this._playNotificationAnimation();
+  }
+
+  /**
+   * 显示误读阶段通知
+   * 特殊展示：玩家预期 vs 真实情况
+   */
+  private _showMisleadNotification(foreshadow: IForeshadow): void {
+    this._notificationContainer.removeAll(true);
+
+    // 获取误读配置
+    const misleadConfig = foreshadow.stages.mislead as IForeshadowMisleadConfig | IForeshadowStageConfig | undefined;
+    
+    // 检查是否有 expected/truth 字段
+    const hasMisleadInfo = misleadConfig && 
+      ('expected' in misleadConfig || 'truth' in misleadConfig);
+
+    if (hasMisleadInfo) {
+      // 完整误读展示：显示预期 vs 真实
+      const config = misleadConfig as IForeshadowMisleadConfig;
+      
+      // 更大的背景
+      const bg = this._scene.add.rectangle(0, 0, 420, 140, 0x3a2a3a, 0.95);
+      bg.setStrokeStyle(2, 0xaa66aa);
+      this._notificationContainer.add(bg);
+
+      // 图标（问号/感叹号组合）
+      const icon = this._scene.add.text(-180, -40, '⁈', {
+        fontFamily: 'monospace',
+        fontSize: UI_FONT_SIZE.SECTION,
+        color: '#aa66aa',
+      });
+      icon.setOrigin(0.5);
+      this._notificationContainer.add(icon);
+
+      // 标题
+      const titleText = this._scene.add.text(0, -50, '伏笔误读', {
+        fontFamily: 'monospace',
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#aa66aa',
+      });
+      titleText.setOrigin(0.5);
+      this._notificationContainer.add(titleText);
+
+      // 伏笔名称
+      const nameText = this._scene.add.text(0, -28, foreshadow.name, {
+        fontFamily: 'monospace',
+        fontSize: UI_FONT_SIZE.NORMAL,
+        color: '#ffffff',
+      });
+      nameText.setOrigin(0.5);
+      this._notificationContainer.add(nameText);
+
+      // 分隔线
+      const divider = this._scene.add.rectangle(0, -5, 350, 1, 0x666666, 0.5);
+      this._notificationContainer.add(divider);
+
+      // 玩家预期（如果有）
+      if (config.expected) {
+        const expectedLabel = this._scene.add.text(-160, 10, '你以为：', {
+          fontFamily: 'monospace',
+          fontSize: UI_FONT_SIZE.TINY,
+          color: '#888888',
+        });
+        expectedLabel.setOrigin(0, 0.5);
+        this._notificationContainer.add(expectedLabel);
+
+        const expectedText = this._scene.add.text(-80, 10, config.expected, {
+          fontFamily: 'monospace',
+          fontSize: UI_FONT_SIZE.TINY,
+          color: '#cccccc',
+          wordWrap: { width: 260 },
+        });
+        expectedText.setOrigin(0, 0.5);
+        this._notificationContainer.add(expectedText);
+      }
+
+      // 真实情况（如果有）
+      if (config.truth) {
+        const truthLabel = this._scene.add.text(-160, 40, '实际上：', {
+          fontFamily: 'monospace',
+          fontSize: UI_FONT_SIZE.TINY,
+          color: '#aa66aa',
+        });
+        truthLabel.setOrigin(0, 0.5);
+        this._notificationContainer.add(truthLabel);
+
+        const truthText = this._scene.add.text(-80, 40, config.truth, {
+          fontFamily: 'monospace',
+          fontSize: UI_FONT_SIZE.TINY,
+          color: '#ddaadd',
+          wordWrap: { width: 260 },
+        });
+        truthText.setOrigin(0, 0.5);
+        this._notificationContainer.add(truthText);
+      }
+
+      // 更长的动画时间
+      this._playNotificationAnimation(5000);
+    } else {
+      // 简单误读展示（没有 expected/truth）
+      const bg = this._scene.add.rectangle(0, 0, 400, 70, 0x3a2a3a, 0.95);
+      bg.setStrokeStyle(2, 0xaa66aa);
+      this._notificationContainer.add(bg);
+
+      const icon = this._scene.add.text(-170, 0, '⁇', {
+        fontFamily: 'monospace',
+        fontSize: UI_FONT_SIZE.ICON,
+        color: '#aa66aa',
+      });
+      icon.setOrigin(0.5);
+      this._notificationContainer.add(icon);
+
+      const text = this._scene.add.text(0, -12, '伏笔误读', {
+        fontFamily: 'monospace',
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#aa66aa',
+      });
+      text.setOrigin(0.5);
+      this._notificationContainer.add(text);
+
+      const nameText = this._scene.add.text(0, 10, foreshadow.name, {
+        fontFamily: 'monospace',
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#ffffff',
+      });
+      nameText.setOrigin(0.5);
+      this._notificationContainer.add(nameText);
+
+      // 描述（如果有）
+      const description = (misleadConfig as IForeshadowStageConfig)?.description;
+      if (description) {
+        const descText = this._scene.add.text(0, 28, description, {
+          fontFamily: 'monospace',
+          fontSize: UI_FONT_SIZE.TINY,
+          color: '#aaaaaa',
+        });
+        descText.setOrigin(0.5);
+        this._notificationContainer.add(descText);
+      }
+
+      this._playNotificationAnimation(3500);
+    }
+
+    // 播放误读特效音
+    eventBus.emit(GameEvent.PLAY_SFX, { key: 'sfx_foreshadow_mislead' });
   }
 
   /**

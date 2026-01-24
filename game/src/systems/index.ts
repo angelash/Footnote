@@ -142,3 +142,11 @@ export type {
   IInteractionResult,
   IInteractionSystemConfig,
 } from './interaction';
+
+// Zone管理系统
+export { ZoneManager, getZoneManager, destroyZoneManager } from './zone';
+export type {
+  IZoneRuntimeState,
+  IZoneManagerConfig,
+  IInteractionCheckResult,
+} from './zone';

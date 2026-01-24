@@ -1,6 +1,6 @@
 /**
  * 结局演出效果系统
- * 三结局的视觉演出
+ * 三结局的视觉演出（数据驱动）
  * @module systems/ui/EndingEffects
  */
 
@@ -8,7 +8,18 @@ import Phaser from 'phaser';
 import { eventBus, GameEvent } from '@/systems/EventBus';
 import { UI_FONT_SIZE } from '@/config/ui.config';
 import { worldState } from '@/systems/world';
+import { narrativeEngine } from '@/systems/narrative';
 import { newGamePlusManager } from '@/systems/game/NewGamePlus';
+import {
+  ENDINGS,
+  ENDING_BY_CODE,
+  determineAvailableEndings,
+  createEndingResult,
+  getEndingRequirementText,
+  formatPlayTime,
+  type IEndingConfig,
+} from '@/config/endings.config';
+import type { IEndingResult, EndingType as EndingTypeEnum } from '@/types';
 
 export enum EndingType {
   /** 结局A：继续收敛（平面稳定） */
@@ -24,17 +35,29 @@ interface IEndingEffectsConfig {
 }
 
 /**
- * 结局演出效果管理器
+ * 结局演出效果管理器（数据驱动版本）
  */
 export class EndingEffects {
   private _scene: Phaser.Scene;
   private _container!: Phaser.GameObjects.Container;
   private _isPlaying: boolean = false;
+  /** 当前结局结果（演出完成后可获取） */
+  private _currentResult: IEndingResult | null = null;
+  /** 游戏开始时间（用于计算总时长） */
+  private _gameStartTime: number;
 
   constructor(config: IEndingEffectsConfig) {
     this._scene = config.scene;
+    this._gameStartTime = Date.now();
     this._createContainer();
     this._setupEventListeners();
+  }
+
+  /**
+   * 获取当前结局结果
+   */
+  public getCurrentResult(): IEndingResult | null {
+    return this._currentResult;
   }
 
   /**
@@ -73,27 +96,14 @@ export class EndingEffects {
   }
 
   /**
-   * 判定可选结局
+   * 判定可选结局（使用配置数据）
    * @param R 无收益残差值
    * @param W 世界可读性值
    * @returns 可选结局列表
    */
   public determineAvailableEndings(R: number, W: number): string[] {
-    const available: string[] = [];
-
-    // 结局A: 继续收敛 - R < 6 且 W > 60
-    if (R < 6 && W > 60) available.push('A');
-
-    // 结局B: 释放表示 - R >= 6 且 40 < W <= 60
-    if (R >= 6 && W > 40 && W <= 60) available.push('B');
-
-    // 结局C: 承载字段 - R >= 10 且 W <= 40
-    if (R >= 10 && W <= 40) available.push('C');
-
-    // 如果没有满足条件的结局，默认可选A
-    if (available.length === 0) available.push('A');
-
-    return available;
+    const counters = worldState.getCounters();
+    return determineAvailableEndings(R, counters.P, W);
   }
 
   /**
@@ -101,7 +111,7 @@ export class EndingEffects {
    */
   public getAvailableEndings(): string[] {
     const counters = worldState.getCounters();
-    return this.determineAvailableEndings(counters.R, counters.W);
+    return determineAvailableEndings(counters.R, counters.P, counters.W);
   }
 
   /**
@@ -112,323 +122,161 @@ export class EndingEffects {
   }
 
   /**
-   * 获取结局不可选的原因
+   * 获取结局不可选的原因（使用配置数据）
    */
   public getEndingRequirement(ending: string): string {
-    switch (ending) {
-      case 'A':
-        return 'R < 6 且 W > 60';
-      case 'B':
-        return 'R ≥ 6 且 40 < W ≤ 60';
-      case 'C':
-        return 'R ≥ 10 且 W ≤ 40';
-      default:
-        return '未知条件';
-    }
+    return getEndingRequirementText(ending as 'A' | 'B' | 'C');
   }
 
   /**
-   * 结局触发处理
+   * 获取结局配置
+   */
+  public getEndingConfig(ending: 'A' | 'B' | 'C'): IEndingConfig {
+    return ENDING_BY_CODE[ending];
+  }
+
+  /**
+   * 结局触发处理（数据驱动）
    */
   private _onEndingTriggered(data: { ending: EndingType }): void {
     if (this._isPlaying) return;
     this._isPlaying = true;
 
+    // 生成结局结果数据
+    this._generateEndingResult(data.ending);
+
+    // 播放结局演出
     switch (data.ending) {
       case EndingType.CONVERGENCE:
-        this._playEndingA();
+        this._playEndingFromConfig(ENDING_BY_CODE['A'], EndingType.CONVERGENCE);
         break;
       case EndingType.RELEASE:
-        this._playEndingB();
+        this._playEndingFromConfig(ENDING_BY_CODE['B'], EndingType.RELEASE);
         break;
       case EndingType.CARRIER:
-        this._playEndingC();
+        this._playEndingFromConfig(ENDING_BY_CODE['C'], EndingType.CARRIER);
         break;
     }
   }
 
   /**
-   * 结局A：继续收敛
-   * 视觉：稳定、有序、略带压抑
+   * 生成结局结果数据
    */
-  private _playEndingA(): void {
-    const { width, height } = this._scene.scale;
-    this._container.removeAll(true);
-
-    // 淡入黑色背景
-    const bg = this._scene.add.rectangle(0, 0, width, height, 0x0a0a0a, 0);
-    this._container.add(bg);
-
-    // 收敛线条动画
-    const lines: Phaser.GameObjects.Line[] = [];
-    for (let i = 0; i < 20; i++) {
-      const line = this._scene.add.line(
-        0,
-        0,
-        Phaser.Math.Between(-width / 2, width / 2),
-        -height / 2,
-        0,
-        0,
-        0x4444ff,
-        0.5
-      );
-      line.setLineWidth(2);
-      this._container.add(line);
-      lines.push(line);
-    }
-
-    // 中心文字
-    const titleText = this._scene.add.text(0, -50, '收敛继续', {
-      fontFamily: 'serif',
-      fontSize: UI_FONT_SIZE.HUGE,
-      color: '#4444ff',
-    });
-    titleText.setOrigin(0.5);
-    titleText.setAlpha(0);
-    this._container.add(titleText);
-
-    const subtitleText = this._scene.add.text(0, 20, '城还能继续被读。', {
-      fontFamily: 'serif',
-      fontSize: UI_FONT_SIZE.ICON,
-      color: '#aaaacc',
-    });
-    subtitleText.setOrigin(0.5);
-    subtitleText.setAlpha(0);
-    this._container.add(subtitleText);
-
-    const fieldText = this._scene.add.text(0, 80, '字段：◦◦◦（边缘保留）', {
-      fontFamily: 'monospace',
-      fontSize: UI_FONT_SIZE.MEDIUM,
-      color: '#666688',
-    });
-    fieldText.setOrigin(0.5);
-    fieldText.setAlpha(0);
-    this._container.add(fieldText);
-
-    // 动画序列
-    this._scene.tweens.add({
-      targets: this._container,
-      alpha: 1,
-      duration: 1000,
+  private _generateEndingResult(ending: EndingType): void {
+    const counters = worldState.getCounters();
+    const playTime = Date.now() - this._gameStartTime;
+    
+    // 获取已回收的伏笔
+    const foreshadowsResolved: string[] = [];
+    const foreshadowStates = narrativeEngine.getAllForeshadowStates();
+    foreshadowStates.forEach((state, id) => {
+      if (state.revealed) {
+        foreshadowsResolved.push(id);
+      }
     });
 
-    this._scene.tweens.add({
-      targets: bg,
-      fillAlpha: 0.95,
-      duration: 2000,
-    });
+    // 映射 EndingType 到 EndingTypeEnum
+    const endingTypeMap: Record<EndingType, EndingTypeEnum> = {
+      [EndingType.CONVERGENCE]: 'A_STABLE_PLANE',
+      [EndingType.RELEASE]: 'B_RELEASE_TRUTH',
+      [EndingType.CARRIER]: 'C_BECOME_SYSTEM',
+    };
 
-    // 线条收敛动画
-    lines.forEach((line, i) => {
-      this._scene.tweens.add({
-        targets: line,
-        x2: 0,
-        y2: 0,
-        duration: 2000,
-        delay: i * 100,
-        ease: 'Sine.easeIn',
-      });
-    });
-
-    // 文字淡入
-    this._scene.time.delayedCall(2500, () => {
-      this._scene.tweens.add({
-        targets: titleText,
-        alpha: 1,
-        y: -60,
-        duration: 1000,
-        ease: 'Sine.easeOut',
-      });
-    });
-
-    this._scene.time.delayedCall(3500, () => {
-      this._scene.tweens.add({
-        targets: subtitleText,
-        alpha: 1,
-        duration: 800,
-      });
-    });
-
-    this._scene.time.delayedCall(4500, () => {
-      this._scene.tweens.add({
-        targets: fieldText,
-        alpha: 0.7,
-        duration: 800,
-      });
-    });
-
-    // 结束后跳转
-    this._scene.time.delayedCall(7000, () => {
-      this._transitionToEpilogue(EndingType.CONVERGENCE);
-    });
+    this._currentResult = createEndingResult(
+      endingTypeMap[ending],
+      foreshadowsResolved,
+      playTime,
+      counters
+    );
   }
 
   /**
-   * 结局B：释放表示
-   * 视觉：混乱、多彩、自由
+   * 通用结局演出方法（数据驱动）
    */
-  private _playEndingB(): void {
+  private _playEndingFromConfig(config: IEndingConfig, endingType: EndingType): void {
     const { width, height } = this._scene.scale;
     this._container.removeAll(true);
 
-    // 渐变背景
-    const bg = this._scene.add.rectangle(0, 0, width, height, 0x0a0a1a, 0);
-    this._container.add(bg);
+    const { presentation } = config;
 
-    // 版本碎片
-    const fragments: Phaser.GameObjects.Text[] = [];
-    const fragmentTexts = ['V-A', 'V-B', 'V-C', 'V-?', '◦', '◇', '□', '△'];
-
-    for (let i = 0; i < 30; i++) {
-      const frag = this._scene.add.text(
-        Phaser.Math.Between(-width / 2, width / 2),
-        Phaser.Math.Between(-height / 2, height / 2),
-        Phaser.Math.RND.pick(fragmentTexts),
-        {
-          fontFamily: 'monospace',
-          fontSize: `${Phaser.Math.Between(14, 32)}px`,
-          color: Phaser.Display.Color.IntegerToColor(Phaser.Math.Between(0x4444ff, 0xffaa44)).rgba,
-        }
-      );
-      frag.setOrigin(0.5);
-      frag.setAlpha(0);
-      frag.setRotation(Phaser.Math.FloatBetween(-0.3, 0.3));
-      this._container.add(frag);
-      fragments.push(frag);
-    }
-
-    // 中心文字
-    const titleText = this._scene.add.text(0, -50, '表示松开', {
-      fontFamily: 'serif',
-      fontSize: UI_FONT_SIZE.HUGE,
-      color: '#ffaa44',
-    });
-    titleText.setOrigin(0.5);
-    titleText.setAlpha(0);
-    this._container.add(titleText);
-
-    const subtitleText = this._scene.add.text(0, 20, '版本不再排队。它们同时存在。', {
-      fontFamily: 'serif',
-      fontSize: UI_FONT_SIZE.ICON,
-      color: '#ccaa88',
-    });
-    subtitleText.setOrigin(0.5);
-    subtitleText.setAlpha(0);
-    this._container.add(subtitleText);
-
-    // 动画序列
-    this._scene.tweens.add({
-      targets: this._container,
-      alpha: 1,
-      duration: 500,
-    });
-
-    this._scene.tweens.add({
-      targets: bg,
-      fillAlpha: 0.9,
-      duration: 1500,
-    });
-
-    // 碎片飘动动画
-    fragments.forEach((frag, i) => {
-      this._scene.tweens.add({
-        targets: frag,
-        alpha: { from: 0, to: 0.7 },
-        y: frag.y + Phaser.Math.Between(-50, 50),
-        rotation: frag.rotation + Phaser.Math.FloatBetween(-0.5, 0.5),
-        duration: 3000,
-        delay: i * 50,
-        ease: 'Sine.easeInOut',
-        yoyo: true,
-        repeat: -1,
-      });
-    });
-
-    // 文字淡入
-    this._scene.time.delayedCall(2000, () => {
-      this._scene.tweens.add({
-        targets: titleText,
-        alpha: 1,
-        scale: { from: 0.8, to: 1 },
-        duration: 1000,
-        ease: 'Back.easeOut',
-      });
-    });
-
-    this._scene.time.delayedCall(3000, () => {
-      this._scene.tweens.add({
-        targets: subtitleText,
-        alpha: 1,
-        duration: 800,
-      });
-    });
-
-    // 结束后跳转
-    this._scene.time.delayedCall(7000, () => {
-      this._transitionToEpilogue(EndingType.RELEASE);
-    });
-  }
-
-  /**
-   * 结局C：承载字段
-   * 视觉：庄重、牺牲、希望
-   */
-  private _playEndingC(): void {
-    const { width, height } = this._scene.scale;
-    this._container.removeAll(true);
-
-    // 深色背景
+    // 淡入背景
     const bg = this._scene.add.rectangle(0, 0, width, height, 0x0a0a0a, 0);
     this._container.add(bg);
+
+    // 根据结局类型添加特效元素
+    this._addEndingEffects(config);
 
     // 字段符号
-    const fieldSymbol = this._scene.add.text(0, -100, '◦◦◦', {
+    const fieldSymbol = this._scene.add.text(0, -100, presentation.fieldSymbol, {
       fontFamily: 'monospace',
       fontSize: UI_FONT_SIZE.GIANT,
-      color: '#88ff88',
+      color: `#${presentation.themeColor.toString(16).padStart(6, '0')}`,
     });
     fieldSymbol.setOrigin(0.5);
     fieldSymbol.setAlpha(0);
     this._container.add(fieldSymbol);
 
-    // 承载光环
-    const halo = this._scene.add.circle(0, 0, 150, 0x88ff88, 0);
-    halo.setStrokeStyle(3, 0x88ff88, 0.5);
-    this._container.add(halo);
-
-    // 中心文字
-    const titleText = this._scene.add.text(0, 20, '字段交接', {
+    // 主标题
+    const titleText = this._scene.add.text(0, -20, presentation.title, {
       fontFamily: 'serif',
       fontSize: UI_FONT_SIZE.HUGE,
-      color: '#88ff88',
+      color: `#${presentation.themeColor.toString(16).padStart(6, '0')}`,
     });
     titleText.setOrigin(0.5);
     titleText.setAlpha(0);
     this._container.add(titleText);
 
-    const subtitleText = this._scene.add.text(0, 90, '你把代价背走了。', {
+    // 副标题
+    const subtitleText = this._scene.add.text(0, 40, presentation.subtitle, {
       fontFamily: 'serif',
       fontSize: UI_FONT_SIZE.ICON,
-      color: '#aaffaa',
+      color: `#${presentation.accentColor.toString(16).padStart(6, '0')}`,
     });
     subtitleText.setOrigin(0.5);
     subtitleText.setAlpha(0);
     this._container.add(subtitleText);
 
-    const descText = this._scene.add.text(
-      0,
-      130,
-      '你不是升维成神，你是背债。\n但你让某些人多活了一点。',
-      {
+    // 描述文本（多行）
+    const descY = 90;
+    const descTexts: Phaser.GameObjects.Text[] = [];
+    presentation.description.forEach((line, index) => {
+      const descText = this._scene.add.text(0, descY + index * 30, line, {
         fontFamily: 'serif',
         fontSize: UI_FONT_SIZE.MEDIUM,
-        color: '#88aa88',
-        align: 'center',
-      }
-    );
-    descText.setOrigin(0.5);
-    descText.setAlpha(0);
-    this._container.add(descText);
+        color: `#${presentation.accentColor.toString(16).padStart(6, '0')}`,
+        alpha: 0.8,
+      });
+      descText.setOrigin(0.5);
+      descText.setAlpha(0);
+      this._container.add(descText);
+      descTexts.push(descText);
+    });
+
+    // 结局统计（如果有结果数据）
+    if (this._currentResult) {
+      const statsY = descY + presentation.description.length * 30 + 40;
+      const statsText = this._scene.add.text(
+        0, statsY,
+        `游戏时长: ${formatPlayTime(this._currentResult.totalPlayTime)} | 伏笔回收: ${this._currentResult.foreshadowsResolved.length}/26`,
+        {
+          fontFamily: 'monospace',
+          fontSize: UI_FONT_SIZE.SMALL,
+          color: '#888888',
+        }
+      );
+      statsText.setOrigin(0.5);
+      statsText.setAlpha(0);
+      this._container.add(statsText);
+
+      // 延迟显示统计
+      this._scene.time.delayedCall(presentation.duration - 2000, () => {
+        this._scene.tweens.add({
+          targets: statsText,
+          alpha: 0.7,
+          duration: 800,
+        });
+      });
+    }
 
     // 动画序列
     this._scene.tweens.add({
@@ -441,16 +289,6 @@ export class EndingEffects {
       targets: bg,
       fillAlpha: 0.95,
       duration: 2000,
-    });
-
-    // 光环扩散
-    this._scene.tweens.add({
-      targets: halo,
-      fillAlpha: 0.1,
-      strokeAlpha: 0.8,
-      scale: { from: 0.5, to: 1.2 },
-      duration: 2000,
-      ease: 'Sine.easeOut',
     });
 
     // 字段符号显现
@@ -475,15 +313,18 @@ export class EndingEffects {
       });
     });
 
-    // 文字淡入
+    // 标题淡入
     this._scene.time.delayedCall(2500, () => {
       this._scene.tweens.add({
         targets: titleText,
         alpha: 1,
+        y: -30,
         duration: 1000,
+        ease: 'Sine.easeOut',
       });
     });
 
+    // 副标题淡入
     this._scene.time.delayedCall(3500, () => {
       this._scene.tweens.add({
         targets: subtitleText,
@@ -492,17 +333,132 @@ export class EndingEffects {
       });
     });
 
-    this._scene.time.delayedCall(4500, () => {
-      this._scene.tweens.add({
-        targets: descText,
-        alpha: 0.8,
-        duration: 800,
+    // 描述文本依次淡入
+    descTexts.forEach((text, index) => {
+      this._scene.time.delayedCall(4500 + index * 400, () => {
+        this._scene.tweens.add({
+          targets: text,
+          alpha: 0.8,
+          duration: 600,
+        });
       });
     });
 
     // 结束后跳转
-    this._scene.time.delayedCall(8000, () => {
-      this._transitionToEpilogue(EndingType.CARRIER);
+    this._scene.time.delayedCall(presentation.duration, () => {
+      this._transitionToEpilogue(endingType);
+    });
+  }
+
+  /**
+   * 添加结局特效元素
+   */
+  private _addEndingEffects(config: IEndingConfig): void {
+    const { width, height } = this._scene.scale;
+
+    switch (config.code) {
+      case 'A':
+        // 收敛线条动画
+        this._addConvergenceLines(width, height, config.presentation.themeColor);
+        break;
+      case 'B':
+        // 版本碎片动画
+        this._addVersionFragments(width, height);
+        break;
+      case 'C':
+        // 承载光环
+        this._addCarrierHalo(config.presentation.themeColor);
+        break;
+    }
+  }
+
+  /**
+   * 添加收敛线条（结局A特效）
+   */
+  private _addConvergenceLines(width: number, height: number, color: number): void {
+    const lines: Phaser.GameObjects.Line[] = [];
+    for (let i = 0; i < 20; i++) {
+      const line = this._scene.add.line(
+        0,
+        0,
+        Phaser.Math.Between(-width / 2, width / 2),
+        -height / 2,
+        0,
+        0,
+        color,
+        0.5
+      );
+      line.setLineWidth(2);
+      this._container.add(line);
+      lines.push(line);
+    }
+
+    // 线条收敛动画
+    lines.forEach((line, i) => {
+      this._scene.tweens.add({
+        targets: line,
+        x2: 0,
+        y2: 0,
+        duration: 2000,
+        delay: i * 100,
+        ease: 'Sine.easeIn',
+      });
+    });
+  }
+
+  /**
+   * 添加版本碎片（结局B特效）
+   */
+  private _addVersionFragments(width: number, height: number): void {
+    const fragmentTexts = ['V-A', 'V-B', 'V-C', 'V-?', '◦', '◇', '□', '△'];
+
+    for (let i = 0; i < 30; i++) {
+      const frag = this._scene.add.text(
+        Phaser.Math.Between(-width / 2, width / 2),
+        Phaser.Math.Between(-height / 2, height / 2),
+        Phaser.Math.RND.pick(fragmentTexts),
+        {
+          fontFamily: 'monospace',
+          fontSize: `${Phaser.Math.Between(14, 32)}px`,
+          color: Phaser.Display.Color.IntegerToColor(Phaser.Math.Between(0x4444ff, 0xffaa44)).rgba,
+        }
+      );
+      frag.setOrigin(0.5);
+      frag.setAlpha(0);
+      frag.setRotation(Phaser.Math.FloatBetween(-0.3, 0.3));
+      this._container.add(frag);
+
+      // 碎片飘动动画
+      this._scene.tweens.add({
+        targets: frag,
+        alpha: { from: 0, to: 0.7 },
+        y: frag.y + Phaser.Math.Between(-50, 50),
+        rotation: frag.rotation + Phaser.Math.FloatBetween(-0.5, 0.5),
+        duration: 3000,
+        delay: i * 50,
+        ease: 'Sine.easeInOut',
+        yoyo: true,
+        repeat: -1,
+      });
+    }
+  }
+
+  /**
+   * 添加承载光环（结局C特效）
+   */
+  private _addCarrierHalo(color: number): void {
+    const halo = this._scene.add.circle(0, 0, 150, color, 0);
+    halo.setStrokeStyle(3, color, 0.5);
+    this._container.add(halo);
+
+    // 光环扩散
+    this._scene.tweens.add({
+      targets: halo,
+      fillAlpha: 0.1,
+      strokeAlpha: 0.8,
+      scale: { from: 0.5, to: 1.2 },
+      duration: 2000,
+      ease: 'Sine.easeOut',
     });
   }
 

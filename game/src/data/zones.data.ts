@@ -5,17 +5,16 @@
  * @module data/zones.data
  */
 
-import type { IZone, IZoneInteraction, IZoneExit, IROpportunity } from '@/types';
-import { ChapterID } from '@/config/game.config';
-import type { ZoneType } from '@/config/game.config';
+import type { IZone } from '@/types';
 import { CONSTANTS } from '@/config/game.config';
+import type { ChapterID, ZoneType } from '@/config/game.config';
 
 // ==================== C0 序章 Zone 数据 ====================
 
 const C0_Z1_CORRIDOR: IZone = {
   id: 'C0-Z1',
   name: '宿舍走廊',
-  chapter: ChapterID.C0,
+  chapter: 'C0',
   type: CONSTANTS.ZONE_TYPE.LIFE,
   focus: '新手引导、身份确认',
   characters: ['岑回'],
@@ -76,7 +75,7 @@ const C0_Z1_CORRIDOR: IZone = {
 const C0_Z2_BREAKFAST: IZone = {
   id: 'C0-Z2',
   name: '早餐小店',
-  chapter: ChapterID.C0,
+  chapter: 'C0',
   type: CONSTANTS.ZONE_TYPE.LIFE,
   focus: '社交互动、信息收集',
   characters: ['岑回', '店主'],
@@ -145,7 +144,7 @@ const C0_Z2_BREAKFAST: IZone = {
 const C0_Z3_ALLEY: IZone = {
   id: 'C0-Z3',
   name: '薄墙巷口',
-  chapter: ChapterID.C0,
+  chapter: 'C0',
   type: CONSTANTS.ZONE_TYPE.STRUCTURAL,
   focus: '空间异常初体验',
   characters: ['岑回'],
@@ -207,7 +206,7 @@ const C0_Z3_ALLEY: IZone = {
 const C0_Z4_RECEPTION: IZone = {
   id: 'C0-Z4',
   name: '维修局前台',
-  chapter: ChapterID.C0,
+  chapter: 'C0',
   type: CONSTANTS.ZONE_TYPE.LIFE,
   focus: '正式入职、系统介绍',
   characters: ['岑回', '顾临'],
@@ -277,7 +276,7 @@ const C0_Z4_RECEPTION: IZone = {
 const C0_Z5_CLINIC: IZone = {
   id: 'C0-Z5',
   name: '废弃诊室',
-  chapter: ChapterID.C0,
+  chapter: 'C0',
   type: CONSTANTS.ZONE_TYPE.CAUSAL,
   focus: '许澄初见、医疗系统介绍',
   characters: ['岑回', '许澄'],
@@ -347,7 +346,7 @@ const C0_Z5_CLINIC: IZone = {
 const C0_Z6_HALL_STREET: IZone = {
   id: 'C0-Z6',
   name: '礼堂街',
-  chapter: ChapterID.C0,
+  chapter: 'C0',
   type: CONSTANTS.ZONE_TYPE.CONFLICT,
   focus: '序章结束、牧平初见',
   characters: ['岑回', '牧平'],

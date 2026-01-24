@@ -366,8 +366,8 @@ export class UIPreviewScene extends BasePreviewScene {
       speaker: '岑回',
       text: '这是一段示例对话文本，用于展示 DialogueUI 的完整效果。包括打字机动画、角色名称高亮、以及底部的继续提示。',
       choices: [
-        { text: '继续探索', nextId: 'next_1' },
-        { text: '询问详情', nextId: 'next_2' },
+        { label: '继续探索', next: 'next_1' },
+        { label: '询问详情', next: 'next_2' },
       ],
     };
 
@@ -776,7 +776,9 @@ export class UIPreviewScene extends BasePreviewScene {
           showWarning: '请注意：这是一条警告。',
           showInfo: '这是一条信息提示。',
         };
-        this._toastManager[toast.method](messages[toast.method]);
+        if (this._toastManager) {
+          this._toastManager[toast.method](messages[toast.method]);
+        }
       });
       this._uiPreviewContainer.add(hitArea);
     });

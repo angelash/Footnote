@@ -188,9 +188,9 @@ export abstract class BasePreviewScene extends Phaser.Scene {
     this.input.on(
       'wheel',
       (
-        pointer: Phaser.Input.Pointer,
-        gameObjects: Phaser.GameObjects.GameObject[],
-        deltaX: number,
+        _pointer: Phaser.Input.Pointer,
+        _gameObjects: Phaser.GameObjects.GameObject[],
+        _deltaX: number,
         deltaY: number
       ) => {
         this.scroll(deltaY * 0.5);
@@ -374,5 +374,14 @@ export abstract class BasePreviewScene extends Phaser.Scene {
         });
       },
     });
+  }
+
+  /**
+   * 场景关闭时清理
+   */
+  public shutdown(): void {
+    // 清理输入事件
+    this.input.removeAllListeners();
+    // 子类可以覆写此方法添加额外清理逻辑
   }
 }

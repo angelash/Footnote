@@ -295,7 +295,7 @@ export class AnimationPreviewScene extends BasePreviewScene {
       speedText.setText(`速度: ${speed}x`);
       const sprite = this.animationSprites.get(anim.key);
       if (sprite && sprite.anims.currentAnim) {
-        sprite.anims.setTimeScale(speed);
+        sprite.anims.timeScale = speed;
       }
     });
     this.previewContainer.add(speedText);

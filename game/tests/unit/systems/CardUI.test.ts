@@ -154,9 +154,10 @@ describe('CardUI', () => {
     id: 'card_test_001',
     name: '测试卡片',
     type: 'archive',
+    chapter: 'C0',
+    zone: 'C0-Z1',
     front: ['卡片正面内容第一行', '卡片正面内容第二行'],
     detail: ['卡片详情内容第一行', '卡片详情内容第二行', '更多详情'],
-    rarity: 'common',
   };
 
   beforeEach(() => {

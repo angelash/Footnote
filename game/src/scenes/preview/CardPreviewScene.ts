@@ -1,24 +1,34 @@
 /**
  * 卡片预览场景
  *
- * 预览游戏卡片系统
+ * 预览游戏卡片系统 - 从真实 YAML 数据加载
  */
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
+import { loadCards } from '@/data/NarrativeDataLoader';
+import { CONSTANTS } from '@/config/game.config';
+// 注意：CARD_TYPE_COLORS 已在 colors.config 中定义，可供扩展使用
+import type { ICard } from '@/types';
 
-// 卡片类型配置
+// 卡片类型配置（使用统一配置）
 const CARD_TYPE_CONFIG: Record<string, { name: string; color: string; icon: string }> = {
-  archive: { name: '档案', color: '#00FFAA', icon: '📁' },
-  item: { name: '物品', color: '#FFD700', icon: '🎒' },
-  map: { name: '地图', color: '#4A9EFF', icon: '🗺️' },
-  prayer: { name: '祈祷', color: '#9933FF', icon: '🙏' },
-  receipt: { name: '收据', color: '#A8A6A3', icon: '🧾' },
-  verdict: { name: '判决', color: '#FF4444', icon: '⚖️' },
-  diary: { name: '日记', color: '#FF8C00', icon: '📔' },
+  [CONSTANTS.CARD_TYPE.ARCHIVE]: { name: '档案', color: '#00FFAA', icon: '📁' },
+  [CONSTANTS.CARD_TYPE.ITEM]: { name: '物品', color: '#FFD700', icon: '🎒' },
+  [CONSTANTS.CARD_TYPE.MAP]: { name: '地图', color: '#4A9EFF', icon: '🗺️' },
+  [CONSTANTS.CARD_TYPE.PRAYER]: { name: '祈言', color: '#9933FF', icon: '🙏' },
+  [CONSTANTS.CARD_TYPE.RECEIPT]: { name: '收据', color: '#A8A6A3', icon: '🧾' },
+  [CONSTANTS.CARD_TYPE.VERDICT]: { name: '判词', color: '#FF4444', icon: '⚖️' },
+  [CONSTANTS.CARD_TYPE.DIARY]: { name: '日记', color: '#FF8C00', icon: '📔' },
 };
 
-// 示例卡片数据（统一格式）
+// 卡片文件列表
+const CARD_FILES = [
+  'c0_cards', 'c1_cards', 'c2_cards', 'c3_cards',
+  'c4_cards', 'c5_cards', 'cf_cards', 'rv_cards',
+];
+
+// 内部卡片数据格式（兼容旧代码）
 interface ICardData {
   id: string;
   type: string;
@@ -30,24 +40,44 @@ interface ICardData {
 
 export class CardPreviewScene extends BasePreviewScene {
   protected title = '🃏 卡片预览';
-  protected subtitle = '预览游戏卡片系统';
+  protected subtitle = '预览游戏卡片系统（从真实数据加载）';
 
   private previewContainer!: Phaser.GameObjects.Container;
   private isFullPreview = false;
+  private _loadedCards: ICard[] = [];
 
   constructor() {
     super({ key: 'CardPreviewScene' });
   }
 
   protected createContent(width: number, _height: number): void {
+    // 显示加载中
+    const loadingText = this.add
+      .text(width / 2, 200, '正在加载卡片数据...', {
+        fontFamily: 'Noto Sans SC',
+        fontSize: this.FONT_SIZE.NORMAL,
+        color: '#686868',
+      })
+      .setOrigin(0.5);
+    this.contentContainer.add(loadingText);
+
+    // 异步加载真实卡片数据
+    this._loadRealCards().then((cards) => {
+      this._loadedCards = cards;
+      loadingText.destroy();
+      this._renderContent(width);
+    });
+  }
+
+  private _renderContent(width: number): void {
     let currentY = 30;
 
-    // 获取示例卡片
-    const sampleCards = this.getSampleCards();
+    // 获取卡片数据
+    const sampleCards = this._convertCardsToPreviewFormat(this._loadedCards);
 
     // 统计
     const stats = this.add
-      .text(width / 2, currentY, `${Object.keys(CARD_TYPE_CONFIG).length} 种卡片类型`, {
+      .text(width / 2, currentY, `共 ${this._loadedCards.length} 张卡片，${Object.keys(CARD_TYPE_CONFIG).length} 种类型`, {
         fontFamily: 'Noto Sans SC',
         fontSize: this.FONT_SIZE.NORMAL,
         color: '#686868',
@@ -118,57 +148,54 @@ export class CardPreviewScene extends BasePreviewScene {
     this.previewContainer.setVisible(false);
   }
 
-  private getSampleCards(): ICardData[] {
-    return [
-      {
-        id: 'CARD_C0_01',
-        type: 'archive',
-        name: '维修局员工证',
-        front: ['岑回的员工证', '编号位置有明显的涂改痕迹'],
-        detail: ['持证人：岑回', '编号：EX-7749', '——', '背面有一道细小的划痕'],
-        chapter: 'C0',
-      },
-      {
-        id: 'CARD_C1_01',
-        type: 'item',
-        name: '旧钥匙',
-        front: ['一把锈迹斑斑的钥匙', '不知道能打开什么'],
-        detail: ['材质：铜', '——', '似乎很久没人用过了'],
-        chapter: 'C1',
-      },
-      {
-        id: 'CARD_C2_01',
-        type: 'archive',
-        name: '边缘区地图',
-        front: ['宋岚手绘的边缘区地图', '标注了多个危险位置'],
-        detail: ['版本：V-A', '注：与官方版本存在差异', '——', '差异被记录下来'],
-        chapter: 'C2',
-      },
-      {
-        id: 'CARD_C3_01',
-        type: 'prayer',
-        name: '栖蓝的祈祷',
-        front: ['愿那些被遗忘的名字', '在某个角落仍被记得'],
-        detail: ['——', '这不是祈求，只是希望'],
-        chapter: 'C3',
-      },
-      {
-        id: 'CARD_C4_01',
-        type: 'verdict',
-        name: '系统判决书',
-        front: ['对象：阿棠', '判定：对账失败'],
-        detail: ['处理：等待收敛', '——', '系统从不解释"为什么"'],
-        chapter: 'C4',
-      },
-      {
-        id: 'CARD_C5_01',
-        type: 'diary',
-        name: '岑回的日记',
-        front: ['今天又梦到了那个声音', '它说：你是例外'],
-        detail: ['日期：?/?/?', '——', '我不确定这是梦还是记忆'],
-        chapter: 'C5',
-      },
-    ];
+  /**
+   * 从真实 YAML 文件加载卡片数据
+   */
+  private async _loadRealCards(): Promise<ICard[]> {
+    const allCards: ICard[] = [];
+
+    for (const file of CARD_FILES) {
+      try {
+        const response = await fetch(`/src/data/cards/${file}.yaml`);
+        if (response.ok) {
+          const content = await response.text();
+          const cards = loadCards(content);
+          allCards.push(...cards);
+        }
+      } catch (error) {
+        console.warn(`加载卡片文件失败: ${file}`, error);
+      }
+    }
+
+    return allCards;
+  }
+
+  /**
+   * 将 ICard 转换为预览格式
+   */
+  private _convertCardsToPreviewFormat(cards: ICard[]): ICardData[] {
+    return cards.map((card) => ({
+      id: card.id,
+      type: card.type,
+      name: card.name,
+      front: card.front || [],
+      detail: card.detail || [],
+      chapter: card.chapter || 'unknown',
+    }));
+  }
+
+  /**
+   * 按类型分组卡片
+   */
+  private _groupCardsByType(cards: ICard[]): Record<string, ICard[]> {
+    const groups: Record<string, ICard[]> = {};
+    for (const card of cards) {
+      if (!groups[card.type]) {
+        groups[card.type] = [];
+      }
+      groups[card.type].push(card);
+    }
+    return groups;
   }
 
   private createTypeCard(

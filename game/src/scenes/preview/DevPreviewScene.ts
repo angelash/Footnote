@@ -104,7 +104,7 @@ export class DevPreviewScene extends Phaser.Scene {
 
   private menuContainer!: Phaser.GameObjects.Container;
   private titleText!: Phaser.GameObjects.Text;
-  private versionText!: Phaser.GameObjects.Text;
+  private _versionText!: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: 'DevPreviewScene' });
@@ -136,7 +136,7 @@ export class DevPreviewScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     // 版本信息
-    this.versionText = this.add
+    this._versionText = this.add
       .text(width / 2, height - 50, 'DEV v0.1.0 | 按 ESC 返回此菜单', {
         fontFamily: 'Noto Sans SC',
         fontSize: '22px',

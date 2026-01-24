@@ -244,10 +244,9 @@ export class EndingEffects {
         fontFamily: 'serif',
         fontSize: UI_FONT_SIZE.MEDIUM,
         color: `#${presentation.accentColor.toString(16).padStart(6, '0')}`,
-        alpha: 0.8,
       });
       descText.setOrigin(0.5);
-      descText.setAlpha(0);
+      descText.setAlpha(0); // 初始透明度为0，后续通过动画渐显
       this._container.add(descText);
       descTexts.push(descText);
     });

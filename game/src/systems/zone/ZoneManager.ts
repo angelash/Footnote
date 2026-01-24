@@ -450,12 +450,10 @@ export class ZoneManager {
     }
 
     // 发送事件
-    eventBus.emit(GameEvent.COUNTER_CHANGE, {
-      counter: 'R',
+    eventBus.emit(GameEvent.COUNTER_R_CHANGE, {
       oldValue: worldState.getCounters().R - opportunity.rValue,
       newValue: worldState.getCounters().R,
       delta: opportunity.rValue,
-      reason: `R值机会: ${opportunity.description}`,
     });
 
     logger.info(`完成R值机会: ${opportunityId}, R+${opportunity.rValue}`);
@@ -545,13 +543,13 @@ export class ZoneManager {
 
     // 检查对话完成
     if (condition.dialogueCompleted) {
-      if (!worldState.hasFlag(`DIALOGUE_${condition.dialogueCompleted}_COMPLETED`)) {
+      if (!worldState.getFlag(`DIALOGUE_${condition.dialogueCompleted}_COMPLETED`)) {
         return false;
       }
     }
 
     // 检查Flag
-    if (condition.flagTrue && !worldState.hasFlag(condition.flagTrue)) {
+    if (condition.flagTrue && !worldState.getFlag(condition.flagTrue)) {
       return false;
     }
 

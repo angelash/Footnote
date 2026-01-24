@@ -485,13 +485,13 @@ describe('DialogueUI', () => {
       
       const dialogueWithExpression: IDialogue = {
         ...mockDialogue,
-        expression: 'happy',
+        expression: 'smiling',
       };
 
       dialogueUI.showDialogue(dialogueWithExpression);
 
       // 应该处理表情参数，即使立绘不存在也不会报错
-      expect(dialogueWithExpression.expression).toBe('happy');
+      expect(dialogueWithExpression.expression).toBe('smiling');
     });
 
     it('默认表情应该是neutral', () => {

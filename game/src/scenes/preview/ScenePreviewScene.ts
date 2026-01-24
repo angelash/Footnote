@@ -10,22 +10,15 @@
 
 import Phaser from 'phaser';
 import { BasePreviewScene } from './BasePreviewScene';
-import { ZONES, ChapterId, getZonesByChapter } from '@/config/zones.config';
+import { ZONES, getZonesByChapter } from '@/config/zones.config';
 import { getSceneConfig, getAllZoneIds } from '@/data/scenes';
 import { SceneAssembler } from '@/systems/scene/SceneAssembler';
 import { assetResolver } from '@/systems/whitebox/AssetResolver';
+import { getChapterConfigs, type IChapterConfig } from './PreviewDataLoader';
 import type { ISceneConfig, IAssembledScene, ISceneAction } from '@/types/scene';
 
-// 章节配置
-const CHAPTERS = [
-  { id: ChapterId.C0, name: '序章 (C0)', color: '#4A9EFF' },
-  { id: ChapterId.C1, name: '第1章 (C1)', color: '#00CC66' },
-  { id: ChapterId.C2, name: '第2章 (C2)', color: '#FFD700' },
-  { id: ChapterId.C3, name: '第3章 (C3)', color: '#FF6600' },
-  { id: ChapterId.C4, name: '第4章 (C4)', color: '#FF4444' },
-  { id: ChapterId.C5, name: '第5章 (C5)', color: '#9933FF' },
-  { id: ChapterId.CF, name: '终章 (CF)', color: '#00FFAA' },
-];
+// 章节配置（从统一配置加载）
+const CHAPTERS: IChapterConfig[] = getChapterConfigs();
 
 // 显示模式
 type DisplayMode = 'list' | 'prefab';
@@ -308,7 +301,11 @@ export class ScenePreviewScene extends BasePreviewScene {
       // 将组装的对象添加到容器
       // 注意：SceneAssembler 直接添加到场景，我们需要调整深度
       this._assembledScene.objects.forEach((obj) => {
-        obj.setDepth((obj.depth ?? 0) + 10);
+        // 类型断言：大多数 GameObject 子类都有 setDepth 方法
+        const gameObj = obj as Phaser.GameObjects.Sprite | Phaser.GameObjects.Container;
+        if ('setDepth' in gameObj) {
+          gameObj.setDepth((gameObj.depth ?? 0) + 10);
+        }
       });
 
       // 创建调试覆盖层

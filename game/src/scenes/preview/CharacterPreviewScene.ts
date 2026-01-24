@@ -21,6 +21,7 @@ import {
 } from '@/config/characters.config';
 import { CHARACTER_PORTRAITS } from '@/data/webpAssets';
 import { DialogueUI } from '@/systems/ui/DialogueUI';
+import { getCharacterSampleDialogues } from './PreviewDataLoader';
 import type { IDialogue } from '@/types';
 
 export class CharacterPreviewScene extends BasePreviewScene {
@@ -29,7 +30,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
 
   private previewContainer!: Phaser.GameObjects.Container;
   private isFullPreview = false;
-  private currentCharacter: ICharacterInfo | null = null;
+  private _currentCharacter: ICharacterInfo | null = null;
 
   // 对话预览
   private _dialoguePreviewContainer!: Phaser.GameObjects.Container;
@@ -201,7 +202,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
   }
 
   private showCharacterDetail(character: ICharacterInfo): void {
-    this.currentCharacter = character;
+    this._currentCharacter = character;
     this.isFullPreview = true;
     const { width, height } = this.scale;
 
@@ -408,7 +409,7 @@ export class CharacterPreviewScene extends BasePreviewScene {
 
   private hideFullPreview(): void {
     this.isFullPreview = false;
-    this.currentCharacter = null;
+    this._currentCharacter = null;
 
     this.tweens.add({
       targets: this.previewContainer,
@@ -463,30 +464,20 @@ export class CharacterPreviewScene extends BasePreviewScene {
       },
     });
 
-    // 示例对话数据
-    const sampleDialogues: Record<string, string> = {
-      cenhui: '先按流程走。',
-      gulin: '收敛是必要的。不然世界会记住太多。',
-      songlan: '版本库里还有另一个说法……',
-      xuchen: '我只能告诉你，这不是病。',
-      atang: '我不存在。但我还是会漂。',
-      muping: '平面神话从不沉没。',
-      qilan: '我做的事没有收益。但我想做。',
-      chenjiang: '我修的东西已经不存在了。但我还是修。',
-    };
+    // 异步加载真实对话数据，然后显示对话
+    getCharacterSampleDialogues().then((sampleDialogues) => {
+      const dialogue: IDialogue = {
+        id: `preview_${character.id}`,
+        speaker: character.name,
+        text:
+          sampleDialogues[character.id] ||
+          `这是${character.name}的示例对话文本，用于展示角色在对话框中的表现效果。`,
+        expression: character.defaultExpression,
+      };
 
-    // 显示对话
-    const dialogue: IDialogue = {
-      id: `preview_${character.id}`,
-      speaker: character.name,
-      text:
-        sampleDialogues[character.id] ||
-        `这是${character.name}的示例对话文本，用于展示角色在对话框中的表现效果。`,
-      expression: character.defaultExpression,
-    };
-
-    this.time.delayedCall(300, () => {
-      this._dialogueUI?.showDialogue(dialogue);
+      this.time.delayedCall(300, () => {
+        this._dialogueUI?.showDialogue(dialogue);
+      });
     });
 
     // 关闭按钮

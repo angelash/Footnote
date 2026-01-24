@@ -335,7 +335,7 @@ describe('SceneAssembler', () => {
         cursor: true,
         action: {
           type: 'dialogue',
-          target: 'dlg_test',
+          dialogueId: 'dlg_test',
         },
         testid: 'test_interactive',
       },
@@ -462,7 +462,7 @@ describe('SceneAssembler', () => {
         interactive: {
           action: {
             type: 'card',
-            target: 'card_001',
+            cardId: 'card_001',
           },
         },
       };
@@ -484,7 +484,7 @@ describe('SceneAssembler', () => {
         interactive: {
           action: {
             type: 'dialogue',
-            target: 'dlg_001',
+            dialogueId: 'dlg_001',
           },
         },
       };
@@ -506,7 +506,7 @@ describe('SceneAssembler', () => {
         interactive: {
           action: {
             type: 'gotoZone',
-            target: 'C0-Z2',
+            zoneId: 'C0-Z2',
           },
         },
       };

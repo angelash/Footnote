@@ -11,6 +11,7 @@ import { eventBus, GameEvent } from '@/systems/EventBus';
 import { performanceMonitor } from '@/systems/debug/PerformanceMonitor';
 import type { IPerformanceMetrics, ILoadMetrics } from '@/systems/debug/PerformanceMonitor';
 import type { AbilityType, ChapterID } from '@/config/game.config';
+import { CHAPTER_START_ZONES } from '@/config/zones.config';
 
 const logger = createLogger('DebugCommands');
 
@@ -528,17 +529,8 @@ class DebugCommands {
   gotoChapter(chapter: ChapterID): ICommandResult {
     if (!this._isEnabled) return { success: false, message: '调试命令已禁用' };
 
-    const chapterStartZones: Record<ChapterID, string> = {
-      C0: 'C0-Z1',
-      C1: 'C1-Z1',
-      C2: 'C2-Z1',
-      C3: 'C3-Z1',
-      C4: 'C4-Z1',
-      C5: 'C5-Z1',
-      CF: 'CF-Z1',
-    };
-
-    const zoneId = chapterStartZones[chapter];
+    // 使用 zones.config.ts 中的章节起始 Zone 配置
+    const zoneId = CHAPTER_START_ZONES[chapter];
     if (!zoneId) return { success: false, message: `未知章节: ${chapter}` };
 
     // 设置章节前置条件

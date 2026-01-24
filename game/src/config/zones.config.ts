@@ -17,6 +17,25 @@ export enum ChapterId {
   CF = 'cf', // 终章
 }
 
+// ==================== Zone 默认常量 ====================
+
+/** 游戏起始 Zone */
+export const DEFAULT_ZONE = 'C0-Z1';
+
+/** 新游戏默认解锁的 Zone 列表 */
+export const DEFAULT_UNLOCKED_ZONES = ['C0-Z1', 'C0-Z2', 'C0-Z3', 'C0-Z4'] as const;
+
+/** 各章节起始 Zone 映射 */
+export const CHAPTER_START_ZONES: Record<string, string> = {
+  C0: 'C0-Z1',
+  C1: 'C1-Z1',
+  C2: 'C2-Z1',
+  C3: 'C3-Z1',
+  C4: 'C4-Z1',
+  C5: 'C5-Z1',
+  CF: 'CF-Z1',
+};
+
 /**
  * Zone信息接口
  */
@@ -376,6 +395,92 @@ export const ZONES: Record<string, IZoneInfo> = {
     description: '故事的尾声。',
     backgroundKey: 'bg_cfz6_epilogue',
   },
+
+  // ===== 重返变体 (RV) =====
+  'RV-01': {
+    id: 'RV-01',
+    chapter: ChapterId.C0,
+    name: '宿舍走廊[深度感知]',
+    description: '使用深度感知重新审视宿舍走廊。',
+    backgroundKey: 'bg_c0z1_corridor',
+  },
+  'RV-02': {
+    id: 'RV-02',
+    chapter: ChapterId.C0,
+    name: '早餐小店[深度感知]',
+    description: '使用深度感知重新审视早餐小店。',
+    backgroundKey: 'bg_c0z2_breakfast_shop',
+  },
+  'RV-03': {
+    id: 'RV-03',
+    chapter: ChapterId.C0,
+    name: '薄墙巷口[时间干预]',
+    description: '使用时间干预重新审视薄墙巷口。',
+    backgroundKey: 'bg_c0z3_alley',
+  },
+  'RV-04': {
+    id: 'RV-04',
+    chapter: ChapterId.C1,
+    name: '维修局[深度介入]',
+    description: '使用深度介入重新审视维修局。',
+    backgroundKey: 'bg_c1z1_bureau',
+  },
+  'RV-05': {
+    id: 'RV-05',
+    chapter: ChapterId.C2,
+    name: '折叠楼梯间[深度组合]',
+    description: '使用深度组合能力探索折叠楼梯间。',
+    backgroundKey: 'bg_c2z1_training',
+  },
+  'RV-06': {
+    id: 'RV-06',
+    chapter: ChapterId.C3,
+    name: '版本交界处[三能力]',
+    description: '使用三种能力探索版本交界处。',
+    backgroundKey: 'bg_c3z3_drift_trail',
+  },
+  'RV-07': {
+    id: 'RV-07',
+    chapter: ChapterId.C2,
+    name: '漂移者居所[深度感知]',
+    description: '使用深度感知探索漂移者居所。',
+    backgroundKey: 'bg_c2z4_drifter_zone',
+  },
+  'RV-08': {
+    id: 'RV-08',
+    chapter: ChapterId.C4,
+    name: '时间回溯点[时间干预]',
+    description: '使用时间干预探索时间回溯点。',
+    backgroundKey: 'bg_c4z6_rewind_fail',
+  },
+  'RV-09': {
+    id: 'RV-09',
+    chapter: ChapterId.C1,
+    name: '祈言堂[深度感知]',
+    description: '使用深度感知探索祈言堂。',
+    backgroundKey: 'bg_c1z5_field_record',
+  },
+  'RV-10': {
+    id: 'RV-10',
+    chapter: ChapterId.C1,
+    name: '档案巷[深度介入]',
+    description: '使用深度介入探索档案巷。',
+    backgroundKey: 'bg_c1z3_gulin_office',
+  },
+  'RV-11': {
+    id: 'RV-11',
+    chapter: ChapterId.C5,
+    name: '冲突点[三能力]',
+    description: '使用三种能力探索冲突点。',
+    backgroundKey: 'bg_c5z1_non_convergent',
+  },
+  'RV-12': {
+    id: 'RV-12',
+    chapter: ChapterId.C5,
+    name: '陈匠灯塔[时间干预]',
+    description: '使用时间干预探索陈匠灯塔。',
+    backgroundKey: 'bg_c3z5_lighthouse',
+  },
 };
 
 /**
@@ -404,4 +509,13 @@ export function getZonesByChapter(chapterId: ChapterId): IZoneInfo[] {
  */
 export function getZoneCountByChapter(chapterId: ChapterId): number {
   return getZonesByChapter(chapterId).length;
+}
+
+/**
+ * 获取Zone名称
+ * @param zoneId Zone ID (如 C0-Z1)
+ * @returns Zone名称，如果找不到则返回Zone ID本身
+ */
+export function getZoneName(zoneId: string): string {
+  return ZONES[zoneId]?.name ?? zoneId;
 }

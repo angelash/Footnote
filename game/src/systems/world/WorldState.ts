@@ -9,6 +9,8 @@ import { eventBus, GameEvent } from '@/systems/EventBus';
 
 const logger = createLogger('WorldState');
 import { CONSTANTS } from '@/config/game.config';
+import { DEFAULT_UNLOCKED_ZONES } from '@/config/zones.config';
+import { COUNTER_LIMITS, W_COEFFICIENTS, ABILITY_P_COST } from '@/config/world.config';
 import type { AbilityType, ChapterID } from '@/config/game.config';
 
 // ==================== 类型定义 ====================
@@ -132,29 +134,25 @@ interface IZoneStateData {
   triggeredEvents: string[];
 }
 
-// ==================== 配置常量 ====================
+// ==================== 配置常量（从 world.config.ts 导入） ====================
 
 const CONFIG = {
   /** P值上限 - 根据设计文档要求 */
-  P_MAX: 20,
+  P_MAX: COUNTER_LIMITS.P_MAX,
   /** R值上限 - 根据设计文档要求 */
-  R_MAX: 15,
+  R_MAX: COUNTER_LIMITS.R_MAX,
   /** W基础值 */
-  W_BASE: 100,
+  W_BASE: COUNTER_LIMITS.W_BASE,
   /** R值对W的影响系数 */
-  W_R_COEFFICIENT: 3,
+  W_R_COEFFICIENT: W_COEFFICIENTS.R_COEFFICIENT,
   /** P值对W的影响系数 */
-  W_P_COEFFICIENT: 2,
+  W_P_COEFFICIENT: W_COEFFICIENTS.P_COEFFICIENT,
   /** 每个伤痕对W的影响 (anomalyModifier) */
-  W_SCAR_PENALTY: 2,
+  W_SCAR_PENALTY: W_COEFFICIENTS.SCAR_PENALTY,
   /** 每个污染对W的影响 (anomalyModifier) */
-  W_CONTAMINATION_PENALTY: 5,
+  W_CONTAMINATION_PENALTY: W_COEFFICIENTS.CONTAMINATION_PENALTY,
   /** 能力P值消耗 */
-  ABILITY_P_COST: {
-    DEPTH_PERCEPTION: 1,
-    DEPTH_INTERVENTION: 3,
-    TIME_INTERVENTION: 5,
-  } as Record<AbilityType, number>,
+  ABILITY_P_COST,
 };
 
 // ==================== WorldState类 ====================
@@ -867,9 +865,8 @@ class WorldState {
   // ==================== 私有方法 ====================
 
   private _initializeDefaultZones(): void {
-    // 序章Zone默认解锁
-    const defaultUnlockedZones = ['C0-Z1', 'C0-Z2', 'C0-Z3', 'C0-Z4'];
-    defaultUnlockedZones.forEach((zoneId) => {
+    // 序章Zone默认解锁（使用 zones.config.ts 中的常量）
+    DEFAULT_UNLOCKED_ZONES.forEach((zoneId) => {
       this._zoneStates.set(zoneId, {
         ...this._createDefaultZoneState(),
         unlocked: true,

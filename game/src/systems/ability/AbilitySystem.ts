@@ -14,29 +14,31 @@ import { saveManager } from '@/systems/save';
 import { SCENES } from '@/config/game.config';
 import type { AbilityType } from '@/config/game.config';
 import { UI_FONT_SIZE } from '@/config/ui.config';
+import {
+  ABILITY_CONFIG,
+  DEPTH_PERCEPTION_CONFIG,
+  DEPTH_INTERVENTION_CONFIG,
+  TIME_INTERVENTION_CONFIG,
+} from '@/config/ability.config';
 import type { ITimeNode } from '@/types';
 
-// ==================== 配置常量 ====================
+// ==================== 配置常量（从 ability.config.ts 导入） ====================
 
 const CONFIG = {
   /** 深度感知蓄力时间(ms) - 长按超过此时间才激活 */
-  DEPTH_PERCEPTION_CHARGE_TIME: 500,
+  DEPTH_PERCEPTION_CHARGE_TIME: DEPTH_PERCEPTION_CONFIG.CHARGE_TIME,
   /** 深度感知每秒P值消耗 */
-  DEPTH_PERCEPTION_P_PER_SECOND: 1,
+  DEPTH_PERCEPTION_P_PER_SECOND: DEPTH_PERCEPTION_CONFIG.P_PER_SECOND,
   /** 深度介入冷却时间(ms) */
-  DEPTH_INTERVENTION_COOLDOWN: 10000,
+  DEPTH_INTERVENTION_COOLDOWN: DEPTH_INTERVENTION_CONFIG.COOLDOWN,
   /** 深度介入P值消耗 */
-  DEPTH_INTERVENTION_P_COST: 3,
+  DEPTH_INTERVENTION_P_COST: DEPTH_INTERVENTION_CONFIG.P_COST,
   /** 时间干预冷却时间(ms) */
-  TIME_INTERVENTION_COOLDOWN: 30000,
+  TIME_INTERVENTION_COOLDOWN: TIME_INTERVENTION_CONFIG.COOLDOWN,
   /** 时间干预每节点P值消耗 */
-  TIME_INTERVENTION_P_PER_NODE: 2,
+  TIME_INTERVENTION_P_PER_NODE: TIME_INTERVENTION_CONFIG.P_PER_NODE,
   /** 能力P值消耗（初始激活） */
-  P_COST: {
-    DEPTH_PERCEPTION: 0, // 深度感知按时长计P，初始不消耗
-    DEPTH_INTERVENTION: 3,
-    TIME_INTERVENTION: 0, // 时间干预按节点距离计P
-  } as Record<AbilityType, number>,
+  P_COST: ABILITY_CONFIG.P_COST,
 };
 
 // ==================== 类型定义 ====================

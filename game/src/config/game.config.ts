@@ -65,8 +65,9 @@ export const CONSTANTS = {
 
   // 存档
   SAVE: {
-    MAX_SLOTS: 3,
+    MAX_SLOTS: 5, // 与 SaveManager.ts 保持一致
     AUTO_SAVE_INTERVAL: 60000, // 1分钟
+    AUTO_SAVE_SLOT: 0, // 自动存档槽ID
     DB_NAME: 'footnote_save',
     DB_VERSION: 1,
   },

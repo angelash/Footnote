@@ -9,7 +9,8 @@ import { createLogger } from '@/utils/Logger';
 
 const logger = createLogger('GameScene');
 import { UI_FONT_SIZE } from '@/config/ui.config';
-import { getZoneBackgroundKey } from '@/config/zones.config';
+import { getZoneBackgroundKey, getZoneName, DEFAULT_ZONE } from '@/config/zones.config';
+import { PLAYER_CONFIG } from '@/config/player.config';
 import { getSceneConfig } from '@/data/scenes';
 import { SceneAssembler } from '@/systems/scene/SceneAssembler';
 import { worldState } from '@/systems/world';
@@ -71,7 +72,7 @@ export class GameScene extends Phaser.Scene {
     S: Phaser.Input.Keyboard.Key;
     D: Phaser.Input.Keyboard.Key;
   };
-  private _moveSpeed: number = 200;
+  private _moveSpeed: number = PLAYER_CONFIG.MOVE_SPEED;
 
   // 玩家状态
   private _isMoving: boolean = false;
@@ -107,7 +108,7 @@ export class GameScene extends Phaser.Scene {
   // 交互提示
   private _interactionPrompt!: InteractionPrompt;
   private _nearestInteractable: Phaser.GameObjects.Container | null = null;
-  private readonly _interactionRange: number = 100; // 交互范围
+  private readonly _interactionRange: number = PLAYER_CONFIG.INTERACTION_RANGE;
 
   // 交互系统
   private _interactionSystem!: InteractionSystem;
@@ -128,7 +129,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   init(data: IGameSceneData): void {
-    this._currentZoneId = data.zoneId || 'C0-Z1';
+    this._currentZoneId = data.zoneId || DEFAULT_ZONE;
     this._isNewGame = data.isNewGame ?? false;
 
     logger.info(`初始化 Zone: ${this._currentZoneId}`);
@@ -1310,76 +1311,8 @@ export class GameScene extends Phaser.Scene {
   private _loadZone(zoneId: string): void {
     logger.info(`加载Zone: ${zoneId}`);
 
-    // Zone标题映射
-    const zoneTitles: Record<string, string> = {
-      // 序章
-      'C0-Z1': '宿舍走廊',
-      'C0-Z2': '早餐小店',
-      'C0-Z3': '薄墙巷口',
-      'C0-Z4': '维修局前台',
-      // 第1章
-      'C1-Z1': '市政办事厅',
-      'C1-Z2': '错门走廊',
-      'C1-Z3': '档案巷口',
-      'C1-Z4': '诊疗台候诊区',
-      'C1-Z5': '礼堂街夜谈',
-      'C1-Z6': '边缘断口',
-      // 第2章
-      'C2-Z1': '维修局校准室',
-      'C2-Z2': '薄墙巷口',
-      'C2-Z3': '许澄诊疗室',
-      'C2-Z4': '修补摊',
-      'C2-Z5': '诊疗台候诊区',
-      'C2-Z6': '礼堂街',
-      'C2-Z7': '边缘断口',
-      // 第3章
-      'C3-Z1': '顾临办公室',
-      'C3-Z2': '不存在的房间',
-      'C3-Z3': '宋岚的版本库',
-      'C3-Z4': '小院街角',
-      'C3-Z5': '诊疗台',
-      'C3-Z6': '礼堂街',
-      'C3-Z7': '断裂走廊',
-      // 第4章
-      'C4-Z1': '坍塌后的生活区',
-      'C4-Z2': '校准室（时间）',
-      'C4-Z3': '断口通道',
-      'C4-Z4': '诊疗台',
-      'C4-Z5': '走廊长椅',
-      'C4-Z6': '街角破墙',
-      'C4-Z7': '礼堂街',
-      'C4-Z8': '市政走廊',
-      // 第5章
-      'C5-Z1': '版本冲突现场',
-      'C5-Z2': '纠偏中心',
-      'C5-Z3': '许澄的诊室',
-      'C5-Z4': '礼堂街',
-      'C5-Z5': '栖蓝的街角',
-      'C5-Z6': '审计覆盖区',
-      'C5-Z7': '判词之地',
-      // 终章
-      'CF-Z1': '冗余字段区',
-      'CF-Z2': '最后的选择',
-      'CF-Z3': '对视走廊',
-      'CF-Z4': '保留之地',
-      'CF-Z5': '平面尽头',
-      'CF-Z6': '尾声',
-      // 重返变体
-      'RV-01': '宿舍走廊[深度感知]',
-      'RV-02': '早餐小店[深度感知]',
-      'RV-03': '薄墙巷口[时间干预]',
-      'RV-04': '维修局[深度介入]',
-      'RV-05': '折叠楼梯间[深度组合]',
-      'RV-06': '版本交界处[三能力]',
-      'RV-07': '漂移者居所[深度感知]',
-      'RV-08': '时间回溯点[时间干预]',
-      'RV-09': '祈言堂[深度感知]',
-      'RV-10': '档案巷[深度介入]',
-      'RV-11': '冲突点[三能力]',
-      'RV-12': '陈匠灯塔[时间干预]',
-    };
-
-    this._zoneTitle.setText(zoneTitles[zoneId] || zoneId);
+    // 使用 zones.config.ts 中的配置获取 Zone 名称
+    this._zoneTitle.setText(getZoneName(zoneId));
     this._zoneTitle.setData('testid', 'zone-title');
 
     // 显示Zone标题动画

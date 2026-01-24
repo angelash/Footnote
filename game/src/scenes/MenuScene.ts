@@ -3,6 +3,7 @@
  */
 import Phaser from 'phaser';
 import { SCENES, TEXT_STYLES, COLORS } from '@/config/game.config';
+import { DEFAULT_ZONE } from '@/config/zones.config';
 import { createLogger } from '@/utils/Logger';
 
 const logger = createLogger('MenuScene');
@@ -455,7 +456,7 @@ export class MenuScene extends Phaser.Scene {
 
       this.cameras.main.once('camerafadeoutcomplete', () => {
         // worldState.getCurrentZone 已经被 load 方法更新
-        const currentZone = worldState.getCurrentZone() || 'C0-Z1';
+        const currentZone = worldState.getCurrentZone() || DEFAULT_ZONE;
         this.scene.start(SCENES.GAME, { zoneId: currentZone, isNewGame: false });
       });
     } else {
@@ -1062,7 +1063,7 @@ export class MenuScene extends Phaser.Scene {
     this.cameras.main.fadeOut(500, 10, 10, 15);
 
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start(SCENES.GAME, { zoneId: 'C0-Z1', isNewGame: true });
+      this.scene.start(SCENES.GAME, { zoneId: DEFAULT_ZONE, isNewGame: true });
     });
   }
 

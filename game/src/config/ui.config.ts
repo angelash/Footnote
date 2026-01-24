@@ -199,16 +199,36 @@ export const UI_TOAST = {
  * 动画时长（毫秒）
  */
 export const UI_ANIMATION = {
+  /** 瞬时动画 - 50ms */
+  INSTANT: 50,
+  /** 极快动画 - 100ms */
+  VERY_FAST: 100,
   /** 快速动画 - 150ms */
   FAST: 150,
+  /** 较快动画 - 200ms */
+  QUICK: 200,
   /** 标准动画 - 300ms */
   NORMAL: 300,
+  /** 较慢动画 - 400ms */
+  MEDIUM: 400,
   /** 慢速动画 - 500ms */
   SLOW: 500,
+  /** 缓慢动画 - 600ms */
+  LEISURELY: 600,
   /** 特效动画 - 800ms */
   EFFECT: 800,
   /** 超慢动画 - 1000ms */
   EXTRA_SLOW: 1000,
+  /** 戏剧动画 - 1500ms */
+  DRAMATIC: 1500,
+  /** 长动画 - 2000ms */
+  LONG: 2000,
+  /** 超长动画 - 3000ms */
+  VERY_LONG: 3000,
+  /** 结局动画 - 7000ms */
+  ENDING: 7000,
+  /** 结局长动画 - 8000ms */
+  ENDING_LONG: 8000,
 } as const;
 
 /**
@@ -243,14 +263,30 @@ export const UI_DEPTH = {
 export const UI_ALPHA = {
   /** 完全透明 */
   TRANSPARENT: 0,
-  /** 轻微透明 */
+  /** 极轻透明 - 0.1 */
+  VERY_LIGHT: 0.1,
+  /** 超轻透明 - 0.15 */
+  ULTRA_LIGHT: 0.15,
+  /** 浅透明 - 0.2 */
+  FAINT: 0.2,
+  /** 轻微透明 - 0.3 */
   LIGHT: 0.3,
-  /** 半透明 */
+  /** 较轻透明 - 0.4 */
+  LIGHT_MEDIUM: 0.4,
+  /** 半透明 - 0.5 */
   MEDIUM: 0.5,
-  /** 较不透明 */
+  /** 较浓透明 - 0.6 */
+  MEDIUM_HEAVY: 0.6,
+  /** 较不透明 - 0.7 */
   HEAVY: 0.7,
-  /** 几乎不透明 */
+  /** 浓透明 - 0.8 */
+  VERY_HEAVY: 0.8,
+  /** 几乎不透明 - 0.85 */
   DENSE: 0.85,
+  /** 超浓透明 - 0.9 */
+  VERY_DENSE: 0.9,
+  /** 近乎不透明 - 0.95 */
+  ALMOST_OPAQUE: 0.95,
   /** 完全不透明 */
   OPAQUE: 1,
 } as const;
@@ -298,6 +334,10 @@ export const UI_FONT_FAMILY = {
   JA_JP: "'Noto Sans JP', 'Yu Gothic', 'Hiragino Kaku Gothic ProN', sans-serif",
   /** 英文字体栈 */
   EN: "'Noto Sans SC', Arial, sans-serif",
+  /** 等宽字体栈 */
+  MONOSPACE: "'Courier New', 'Consolas', 'Monaco', monospace",
+  /** 衬线字体栈 */
+  SERIF: "'Noto Serif SC', 'Times New Roman', 'SimSun', serif",
 } as const;
 
 /**

@@ -197,6 +197,10 @@ export class DialogueUI {
     // 隐藏全屏点击层
     this._clickLayer?.setVisible(false);
 
+    // 记录是否是 NarrativeEngine 驱动的关闭（已发出 DIALOGUE_END）
+    // 如果 isWaitingToClose 为 true，说明 NarrativeEngine._endDialogue 已发出事件
+    const wasWaitingToClose = this._state.isWaitingToClose;
+
     this._scene.tweens.add({
       targets: this._container,
       alpha: 0,
@@ -206,7 +210,9 @@ export class DialogueUI {
         this._container.setVisible(false);
         this._hidePortrait();
 
-        if (this._state.currentDialogue) {
+        // 只在非 NarrativeEngine 驱动的关闭时发出事件（如用户按 ESC）
+        // 避免与 NarrativeEngine._endDialogue 重复发出
+        if (this._state.currentDialogue && !wasWaitingToClose) {
           eventBus.emit(GameEvent.DIALOGUE_END, {
             dialogueId: this._state.currentDialogue.id,
           });

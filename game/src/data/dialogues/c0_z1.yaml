@@ -82,14 +82,6 @@ dialogues:
         flagName: FLAG_C0Z1_NOTICE_EXAMINED
         flagValue: true
 
-  # 公告板（已查看过涂改痕迹）
-  NOTICE_BOARD_EXAMINED:
-    id: NOTICE_BOARD_EXAMINED
-    lines:
-      - speaker: 岑回
-        text: 公告板上的涂改痕迹……第274周期的字样隐约可见。
-        emotion: thinking
-
   # 已检查过公告板后的对话
   NOTICE_BOARD_DONE:
     id: NOTICE_BOARD_DONE

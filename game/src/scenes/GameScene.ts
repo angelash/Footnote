@@ -44,6 +44,7 @@ import { narrativeEngine } from '@/systems/narrative';
 import type { ICard as INarrativeCard } from '@/systems/narrative';
 import { loadAllNarrativeData } from '@/data/NarrativeDataLoader';
 import { AUDIO_CONFIG, ZONE_AUDIO_MAP } from '@/data/audioConfig';
+import { getNGPlusZoneEnterTriggers, getNGPlusAfterDialogueTriggers } from '@/config/ngplus.config';
 import type { IAssembledScene, ISceneAction } from '@/types/scene';
 import type { IDialogue, ICard } from '@/types';
 
@@ -1023,7 +1024,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
-   * 对话结束回调 - 处理结局触发
+   * 对话结束回调 - 处理结局触发和 NG+ 对话链
    */
   private _onDialogueEnd(payload: { dialogueId: string }): void {
     const { dialogueId } = payload;
@@ -1047,6 +1048,43 @@ export class GameScene extends Phaser.Scene {
           `结局${endingLetter}当前不可选\n条件: ${requirement}\n当前: R=${counters.R}, W=${counters.W}`
         );
       }
+    }
+
+    // 检查 NG+ 对话后触发
+    this._checkNGPlusAfterDialogueTriggers(dialogueId);
+  }
+
+  /**
+   * 检查并触发 NG+ 对话后连锁对话
+   */
+  private _checkNGPlusAfterDialogueTriggers(completedDialogueId: string): void {
+    const triggers = getNGPlusAfterDialogueTriggers(completedDialogueId);
+    if (triggers.length === 0) return;
+
+    for (const trigger of triggers) {
+      // 检查触发条件
+      const allFlagsOk = trigger.requiredFlags.every((flag) => worldState.getFlag(flag));
+      if (!allFlagsOk) continue;
+
+      // 检查阻止条件
+      const blocked = trigger.blockedByFlags?.some((flag) => worldState.getFlag(flag));
+      if (blocked) continue;
+
+      // 触发对话
+      logger.info(`[NG+] 触发对话后连锁: ${trigger.dialogueId} (after ${completedDialogueId})`);
+
+      // 设置完成 flag（防止重复触发）
+      if (trigger.setFlagOnComplete) {
+        worldState.setFlag(trigger.setFlagOnComplete, true);
+      }
+
+      // 延迟触发，等待对话 UI 完全关闭
+      this.time.delayedCall(300, () => {
+        void this.showDialogueById(trigger.dialogueId);
+      });
+
+      // 只触发第一个满足条件的（按优先级排序）
+      break;
     }
   }
 
@@ -1412,6 +1450,45 @@ export class GameScene extends Phaser.Scene {
     // 处理 onEnter 配置：进入场景时自动触发对话
     if (cfg.onEnter?.dialogue) {
       this._handleOnEnterDialogue(zoneId, cfg.onEnter);
+    }
+
+    // 处理 NG+ 进入场景触发
+    this._checkNGPlusZoneEnterTriggers(zoneId);
+  }
+
+  /**
+   * 检查并触发 NG+ 进入场景对话
+   */
+  private _checkNGPlusZoneEnterTriggers(zoneId: string): void {
+    const triggers = getNGPlusZoneEnterTriggers(zoneId);
+    if (triggers.length === 0) return;
+
+    for (const trigger of triggers) {
+      // 检查触发条件
+      const allFlagsOk = trigger.requiredFlags.every((flag) => worldState.getFlag(flag));
+      if (!allFlagsOk) continue;
+
+      // 检查阻止条件
+      const blocked = trigger.blockedByFlags?.some((flag) => worldState.getFlag(flag));
+      if (blocked) continue;
+
+      // 触发对话
+      logger.info(`[NG+] 触发进入场景对话: ${trigger.dialogueId}`);
+
+      // 设置完成 flag（防止重复触发）
+      if (trigger.setFlagOnComplete) {
+        worldState.setFlag(trigger.setFlagOnComplete, true);
+      }
+
+      // 延迟触发，等待场景加载和可能的 onEnter 对话完成
+      void this._narrativeDataReady.then(() => {
+        this.time.delayedCall(500, () => {
+          void this.showDialogueById(trigger.dialogueId);
+        });
+      });
+
+      // 只触发第一个满足条件的（按优先级排序）
+      break;
     }
   }
 

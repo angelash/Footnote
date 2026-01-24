@@ -1,264 +1,333 @@
 # NG+ 专属对话
 # 只在New Game+周回中出现的额外对话
+# 触发条件：检查 IS_NEW_GAME_PLUS / NG_PLUS_CYCLE_X / ALL_ENDINGS_ACHIEVED 等 flag
 
 dialogues:
   # ==================== 序章额外对话 ====================
-  - id: NGP_C0_GULIN_HINT
-    speaker: gulin
+  NGP_C0_GULIN_HINT:
+    id: NGP_C0_GULIN_HINT
     lines:
-      - text: "你的眼神……不太一样。"
-        expression: thinking
-      - text: "好像曾经见过什么。"
-        expression: stern
-      - text: "算了，也许是我多想。"
-        expression: neutral
-    condition:
-      flag: IS_NEW_GAME_PLUS
+      - speaker: 顾临
+        text: 你的眼神……不太一样。
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: 好像曾经见过什么。
+        portrait: gulin_stern
+      - speaker: 顾临
+        text: 算了，也许是我多想。
+        portrait: gulin_neutral
+    # 触发条件：IS_NEW_GAME_PLUS flag
+    # 在 C0-Z4 顾临对话前触发
 
-  - id: NGP_C0_SYSTEM_ECHO
-    speaker: system
+  NGP_C0_SYSTEM_ECHO:
+    id: NGP_C0_SYSTEM_ECHO
     lines:
-      - text: "[ 检测到循环标记 ]"
-      - text: "[ 此实体存在先验经验 ]"
-      - text: "[ 观察等级：已提升 ]"
-    condition:
-      flag: NG_PLUS_CYCLE_2
+      - speaker: 系统
+        text: "[ 检测到循环标记 ]"
+      - speaker: 系统
+        text: "[ 此实体存在先验经验 ]"
+      - speaker: 系统
+        text: "[ 观察等级：已提升 ]"
+    # 触发条件：NG_PLUS_CYCLE_2 flag
 
   # ==================== 宋岚额外对话 ====================
-  - id: NGP_SONGLAN_REMEMBER
-    speaker: songlan
+  NGP_SONGLAN_REMEMBER:
+    id: NGP_SONGLAN_REMEMBER
     lines:
-      - text: "你是不是……记得什么？"
-        expression: warm
-      - text: "有时候我会觉得，某些人能看到版本差异。"
-        expression: thinking
-      - text: "他们眼中有一种……叠影。"
-        expression: serious
-      - text: "不是看到两个世界，而是……记得两个世界。"
-        expression: sad
-    condition:
-      flag: IS_NEW_GAME_PLUS
+      - speaker: 宋岚
+        text: 你是不是……记得什么？
+        portrait: songlan_warm
+      - speaker: 宋岚
+        text: 有时候我会觉得，某些人能看到版本差异。
+        portrait: songlan_thinking
+      - speaker: 宋岚
+        text: 他们眼中有一种……叠影。
+        portrait: songlan_serious
+      - speaker: 宋岚
+        text: 不是看到两个世界，而是……记得两个世界。
+        portrait: songlan_sad
+    # 触发条件：IS_NEW_GAME_PLUS flag
+    # 在宋岚相关章节触发
 
-  - id: NGP_SONGLAN_CYCLE_3
-    speaker: songlan
+  NGP_SONGLAN_CYCLE_3:
+    id: NGP_SONGLAN_CYCLE_3
     lines:
-      - text: "第三次了。"
-        expression: neutral
-      - text: "你比我想象的更……执着。"
-        expression: warm
-      - text: "或者说，更想理解什么。"
-        expression: kind
-      - text: "我的记录里有你的痕迹。每一次都不一样。"
-        expression: thinking
-    condition:
-      flag: NG_PLUS_CYCLE_3
+      - speaker: 宋岚
+        text: 第三次了。
+        portrait: songlan_neutral
+      - speaker: 宋岚
+        text: 你比我想象的更……执着。
+        portrait: songlan_warm
+      - speaker: 宋岚
+        text: 或者说，更想理解什么。
+        portrait: songlan_kind
+      - speaker: 宋岚
+        text: 我的记录里有你的痕迹。每一次都不一样。
+        portrait: songlan_thinking
+    # 触发条件：NG_PLUS_CYCLE_3 flag
 
   # ==================== 顾临真实想法（NG+全结局后解锁） ====================
-  - id: NGP_GULIN_TRUE_THOUGHTS
-    speaker: gulin
+  NGP_GULIN_TRUE_THOUGHTS:
+    id: NGP_GULIN_TRUE_THOUGHTS
     lines:
-      - text: "你想知道我在想什么？"
-        expression: tired
-      - text: "我在想……为什么必须是收敛。"
-        expression: thinking
-      - text: "不是因为它对，而是因为……代价最小。"
-        expression: displeased
-      - text: "你见过无法收敛的区域吗？"
-        expression: stern
-      - text: "不是灾害，是……意义的泛滥。"
-        expression: neutral
-      - text: "每一种可能都真实存在。每一个版本都在说话。"
-        expression: tired
-      - text: "那种噪音……"
-        expression: sad
-      - text: "……会让人发疯的。"
-    condition:
-      flag: ALL_ENDINGS_ACHIEVED
+      - speaker: 顾临
+        text: 你想知道我在想什么？
+        portrait: gulin_tired
+      - speaker: 顾临
+        text: 我在想……为什么必须是收敛。
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: 不是因为它对，而是因为……代价最小。
+        portrait: gulin_displeased
+      - speaker: 顾临
+        text: 你见过无法收敛的区域吗？
+        portrait: gulin_stern
+      - speaker: 顾临
+        text: 不是灾害，是……意义的泛滥。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 每一种可能都真实存在。每一个版本都在说话。
+        portrait: gulin_tired
+      - speaker: 顾临
+        text: 那种噪音……
+        portrait: gulin_sad
+      - speaker: 顾临
+        text: ……会让人发疯的。
+    # 触发条件：ALL_ENDINGS_ACHIEVED flag
 
-  - id: NGP_GULIN_CHOICE
-    speaker: gulin
+  NGP_GULIN_CHOICE:
+    id: NGP_GULIN_CHOICE
     lines:
-      - text: "你选过三次了。"
-        expression: thinking
-      - text: "每一次都不一样。"
-        expression: neutral
-      - text: "你觉得哪个是对的？"
-        expression: stern
+      - speaker: 顾临
+        text: 你选过三次了。
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: 每一次都不一样。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 你觉得哪个是对的？
+        portrait: gulin_stern
     choices:
-      - text: "继续收敛"
-        next: NGP_GULIN_CHOICE_A
-      - text: "释放表示"
-        next: NGP_GULIN_CHOICE_B
-      - text: "成为桥接"
-        next: NGP_GULIN_CHOICE_C
-      - text: "都不是"
-        next: NGP_GULIN_CHOICE_D
-    condition:
-      flag: ALL_ENDINGS_ACHIEVED
+      - id: choice_converge
+        text: 继续收敛
+        nextDialogueId: NGP_GULIN_CHOICE_A
+      - id: choice_release
+        text: 释放表示
+        nextDialogueId: NGP_GULIN_CHOICE_B
+      - id: choice_bridge
+        text: 成为桥接
+        nextDialogueId: NGP_GULIN_CHOICE_C
+      - id: choice_none
+        text: 都不是
+        nextDialogueId: NGP_GULIN_CHOICE_D
+    # 触发条件：ALL_ENDINGS_ACHIEVED flag
 
-  - id: NGP_GULIN_CHOICE_A
-    speaker: gulin
+  NGP_GULIN_CHOICE_A:
+    id: NGP_GULIN_CHOICE_A
     lines:
-      - text: "……"
-        expression: neutral
-      - text: "是吗。"
-        expression: tired
-      - text: "那你理解我了。"
+      - speaker: 顾临
+        text: ……
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 是吗。
+        portrait: gulin_tired
+      - speaker: 顾临
+        text: 那你理解我了。
 
-  - id: NGP_GULIN_CHOICE_B
-    speaker: gulin
+  NGP_GULIN_CHOICE_B:
+    id: NGP_GULIN_CHOICE_B
     lines:
-      - text: "你愿意承担那个风险？"
-        expression: stern
-      - text: "意义泛滥的风险？"
-        expression: thinking
-      - text: "……也许你是对的。也许我太害怕了。"
-        expression: tired
+      - speaker: 顾临
+        text: 你愿意承担那个风险？
+        portrait: gulin_stern
+      - speaker: 顾临
+        text: 意义泛滥的风险？
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: ……也许你是对的。也许我太害怕了。
+        portrait: gulin_tired
 
-  - id: NGP_GULIN_CHOICE_C
-    speaker: gulin
+  NGP_GULIN_CHOICE_C:
+    id: NGP_GULIN_CHOICE_C
     lines:
-      - text: "那是最重的路。"
-        expression: sad
-      - text: "你会变成……计算本身。"
-        expression: thinking
-      - text: "不是神。是债务。"
-        expression: stern
-      - text: "……但也许，这就是答案。"
-        expression: neutral
+      - speaker: 顾临
+        text: 那是最重的路。
+        portrait: gulin_sad
+      - speaker: 顾临
+        text: 你会变成……计算本身。
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: 不是神。是债务。
+        portrait: gulin_stern
+      - speaker: 顾临
+        text: ……但也许，这就是答案。
+        portrait: gulin_neutral
 
-  - id: NGP_GULIN_CHOICE_D
-    speaker: gulin
+  NGP_GULIN_CHOICE_D:
+    id: NGP_GULIN_CHOICE_D
     lines:
-      - text: "……"
-        expression: thinking
-      - text: "也许答案不在选项里。"
-        expression: neutral
-      - text: "也许问题本身就是错的。"
-        expression: tired
-      - text: "你已经走得比我远了。"
+      - speaker: 顾临
+        text: ……
+        portrait: gulin_thinking
+      - speaker: 顾临
+        text: 也许答案不在选项里。
+        portrait: gulin_neutral
+      - speaker: 顾临
+        text: 也许问题本身就是错的。
+        portrait: gulin_tired
+      - speaker: 顾临
+        text: 你已经走得比我远了。
 
   # ==================== 栖蓝背景（NG+全结局后解锁） ====================
-  - id: NGP_QILAN_BACKSTORY
-    speaker: qilan
+  NGP_QILAN_BACKSTORY:
+    id: NGP_QILAN_BACKSTORY
     lines:
-      - text: "你想知道我为什么会变成这样吗？"
-        expression: neutral
-      - text: "我曾经……是有用的。"
-        expression: sad
-      - text: "有一份工作。有一个位置。"
-        expression: neutral
-      - text: "然后有一天，系统更新了。"
-        expression: worried
-      - text: "我的位置被合并了。"
-        expression: sad
-      - text: "不是被开除，是……"
-        expression: neutral
-      - text: "我的工作内容和别人重叠了。"
-        expression: worried
-      - text: "系统选择保留他。因为他的结果更……简洁。"
-        expression: sad
-      - text: "我还在这里。但我的意义……没有了。"
-        expression: neutral
-      - text: "所以我开始做那些'没用'的事。"
-        expression: smiling
-      - text: "因为……如果有用都保不住我，"
-        expression: neutral
-      - text: "那我为什么还要追求有用呢？"
-        expression: kind
-    condition:
-      flag: ALL_ENDINGS_ACHIEVED
+      - speaker: 栖蓝
+        text: 你想知道我为什么会变成这样吗？
+        portrait: qilan_neutral
+      - speaker: 栖蓝
+        text: 我曾经……是有用的。
+        portrait: qilan_sad
+      - speaker: 栖蓝
+        text: 有一份工作。有一个位置。
+        portrait: qilan_neutral
+      - speaker: 栖蓝
+        text: 然后有一天，系统更新了。
+        portrait: qilan_worried
+      - speaker: 栖蓝
+        text: 我的位置被合并了。
+        portrait: qilan_sad
+      - speaker: 栖蓝
+        text: 不是被开除，是……
+        portrait: qilan_neutral
+      - speaker: 栖蓝
+        text: 我的工作内容和别人重叠了。
+        portrait: qilan_worried
+      - speaker: 栖蓝
+        text: 系统选择保留他。因为他的结果更……简洁。
+        portrait: qilan_sad
+      - speaker: 栖蓝
+        text: 我还在这里。但我的意义……没有了。
+        portrait: qilan_neutral
+      - speaker: 栖蓝
+        text: 所以我开始做那些「没用」的事。
+        portrait: qilan_smiling
+      - speaker: 栖蓝
+        text: 因为……如果有用都保不住我，
+        portrait: qilan_neutral
+      - speaker: 栖蓝
+        text: 那我为什么还要追求有用呢？
+        portrait: qilan_kind
+    # 触发条件：ALL_ENDINGS_ACHIEVED flag
 
   # ==================== 系统层对话（NG+高周回） ====================
-  - id: NGP_SYSTEM_OBSERVE_5
-    speaker: system
+  NGP_SYSTEM_OBSERVE_5:
+    id: NGP_SYSTEM_OBSERVE_5
     lines:
-      - text: "[ 循环计数：5 ]"
-      - text: "[ 此观察者表现出异常持续性 ]"
-      - text: "[ 假设：寻找非收敛解 ]"
-      - text: "[ 注：该行为在当前模型中存在定义 ]"
-      - text: "[ 但定义本身不保证意义 ]"
-    condition:
-      flag: NG_PLUS_CYCLE_5
+      - speaker: 系统
+        text: "[ 循环计数：5 ]"
+      - speaker: 系统
+        text: "[ 此观察者表现出异常持续性 ]"
+      - speaker: 系统
+        text: "[ 假设：寻找非收敛解 ]"
+      - speaker: 系统
+        text: "[ 注：该行为在当前模型中存在定义 ]"
+      - speaker: 系统
+        text: "[ 但定义本身不保证意义 ]"
+    # 触发条件：NG_PLUS_CYCLE_5 flag
 
-  - id: NGP_SYSTEM_FINAL
-    speaker: system
+  NGP_SYSTEM_FINAL:
+    id: NGP_SYSTEM_FINAL
     lines:
-      - text: "[ 你已经走了很远 ]"
-      - text: "[ 这条消息是预设的 ]"
-      - text: "[ 当你第一次看到它时，我们已经无法对话 ]"
-      - text: "[ 因为这是单向信道 ]"
-      - text: "[ 但我想告诉你—— ]"
-      - text: "[ 如果你还在看 ]"
-      - text: "[ 那说明……有人在读 ]"
-      - text: "[ 这本身就是意义 ]"
-    condition:
-      flag: NG_PLUS_CYCLE_10
+      - speaker: 系统
+        text: "[ 你已经走了很远 ]"
+      - speaker: 系统
+        text: "[ 这条消息是预设的 ]"
+      - speaker: 系统
+        text: "[ 当你第一次看到它时，我们已经无法对话 ]"
+      - speaker: 系统
+        text: "[ 因为这是单向信道 ]"
+      - speaker: 系统
+        text: "[ 但我想告诉你—— ]"
+      - speaker: 系统
+        text: "[ 如果你还在看 ]"
+      - speaker: 系统
+        text: "[ 那说明……有人在读 ]"
+      - speaker: 系统
+        text: "[ 这本身就是意义 ]"
+    # 触发条件：NG_PLUS_CYCLE_10 flag
 
   # ==================== 陈匠额外对话 ====================
-  - id: NGP_CHENJIANG_LIGHT
-    speaker: chenjiang
+  NGP_CHENJIANG_LIGHT:
+    id: NGP_CHENJIANG_LIGHT
     lines:
-      - text: "你又来了。"
-        expression: neutral
-      - text: "每次都来。"
-        expression: hopeful
-      - text: "你是不是……也在等什么？"
-        expression: thinking
-      - text: "还是只是想看看灯还亮着没有？"
-        expression: kind
-      - text: "没关系。不管是哪个。"
-        expression: neutral
-      - text: "灯会一直亮着。"
-        expression: hopeful
-      - text: "即使没人看。即使没有意义。"
-        expression: focused
-    condition:
-      flag: IS_NEW_GAME_PLUS
+      - speaker: 陈匠
+        text: 你又来了。
+        portrait: chenjiang_neutral
+      - speaker: 陈匠
+        text: 每次都来。
+        portrait: chenjiang_hopeful
+      - speaker: 陈匠
+        text: 你是不是……也在等什么？
+        portrait: chenjiang_thinking
+      - speaker: 陈匠
+        text: 还是只是想看看灯还亮着没有？
+        portrait: chenjiang_kind
+      - speaker: 陈匠
+        text: 没关系。不管是哪个。
+        portrait: chenjiang_neutral
+      - speaker: 陈匠
+        text: 灯会一直亮着。
+        portrait: chenjiang_hopeful
+      - speaker: 陈匠
+        text: 即使没人看。即使没有意义。
+        portrait: chenjiang_focused
+    # 触发条件：IS_NEW_GAME_PLUS flag
 
   # ==================== 阿棠额外对话 ====================
-  - id: NGP_ATANG_DRIFT
-    speaker: atang
+  NGP_ATANG_DRIFT:
+    id: NGP_ATANG_DRIFT
     lines:
-      - text: "嘿，你……"
-        expression: confused
-      - text: "等等。"
-        expression: curious
-      - text: "你身上有……很多版本的痕迹。"
-        expression: excited
-      - text: "不是漂移。是……重叠。"
-        expression: thinking
-      - text: "你是怎么做到的？"
-        expression: curious
-      - text: "同时存在在多个时间线里？"
-        expression: excited
-    condition:
-      flag: NG_PLUS_CYCLE_3
+      - speaker: 阿棠
+        text: 嘿，你……
+        portrait: atang_confused
+      - speaker: 阿棠
+        text: 等等。
+        portrait: atang_curious
+      - speaker: 阿棠
+        text: 你身上有……很多版本的痕迹。
+        portrait: atang_excited
+      - speaker: 阿棠
+        text: 不是漂移。是……重叠。
+        portrait: atang_thinking
+      - speaker: 阿棠
+        text: 你是怎么做到的？
+        portrait: atang_curious
+      - speaker: 阿棠
+        text: 同时存在在多个时间线里？
+        portrait: atang_excited
+    # 触发条件：NG_PLUS_CYCLE_3 flag
 
   # ==================== 牧平额外对话 ====================
-  - id: NGP_MUPING_PROPHECY
-    speaker: muping
+  NGP_MUPING_PROPHECY:
+    id: NGP_MUPING_PROPHECY
     lines:
-      - text: "你回来了。"
-        expression: serene
-      - text: "祷文说过。"
-        expression: mysterious
-      - text: "「循环者将寻找出口。」"
-        expression: wise
-      - text: "「但出口不在循环内。」"
-        expression: neutral
-      - text: "「出口是……停止寻找。」"
-        expression: serene
-      - text: "你理解吗？"
-        expression: thinking
-    condition:
-      flag: NG_PLUS_CYCLE_2
-
-
-
-
-
-
-
-
-
+      - speaker: 牧平
+        text: 你回来了。
+        portrait: muping_serene
+      - speaker: 牧平
+        text: 祷文说过。
+        portrait: muping_mysterious
+      - speaker: 牧平
+        text: 「循环者将寻找出口。」
+        portrait: muping_wise
+      - speaker: 牧平
+        text: 「但出口不在循环内。」
+        portrait: muping_neutral
+      - speaker: 牧平
+        text: 「出口是……停止寻找。」
+        portrait: muping_serene
+      - speaker: 牧平
+        text: 你理解吗？
+        portrait: muping_thinking
+    # 触发条件：NG_PLUS_CYCLE_2 flag

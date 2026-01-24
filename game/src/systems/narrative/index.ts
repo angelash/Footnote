@@ -1,7 +1,7 @@
 /**
  * 叙事系统导出
  */
-export { narrativeEngine, CardCategory } from './NarrativeEngine';
+export { narrativeEngine } from './NarrativeEngine';
 export type {
   IDialogueLine,
   IDialogueAction,
@@ -9,6 +9,8 @@ export type {
   IDialogueData,
   ICard,
   ICardEffect,
+  ICardGameplayFx,
+  ICardGameplayEffect,
   IForeshadow,
   IForeshadowState,
   ForeshadowStage,

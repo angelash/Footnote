@@ -200,16 +200,32 @@ export interface ICardGameplayEffect {
   abilityType?: string;
 }
 
+/**
+ * 卡片数据（统一定义）
+ */
 export interface ICard {
   id: string;
+  /** 卡片名称 */
   name: string;
+  /** 卡片类型 */
   type: CardType;
+  /** 所属章节 */
   chapter: ChapterID;
+  /** 所属区域 */
   zone: string;
+  /** 正面内容 */
   front: string[];
+  /** 背面详情 */
   detail: string[];
+  /** 卡片图片（可选） */
+  image?: string;
+  /** 视觉效果（UI层面） */
+  effects?: ICardEffect[];
+  /** 数据层 FX（YAML 定义） */
   fx?: ICardFX[];
+  /** 状态变体 */
   states?: Record<string, ICardStateOverride>;
+  /** 当前状态 */
   currentState?: string;
   /** Gameplay 效果（游戏机制层面） */
   gameplayFx?: ICardGameplayFx[];
@@ -217,6 +233,18 @@ export interface ICard {
   consumable?: boolean;
 }
 
+/**
+ * 卡片视觉效果（UI层面）
+ */
+export interface ICardEffect {
+  type: 'taint' | 'flash' | 'glitch' | 'redact';
+  target?: string;
+  intensity?: number;
+}
+
+/**
+ * 卡片数据层 FX（YAML 定义）
+ */
 export interface ICardFX {
   type: 'taint' | 'flash' | 'shake' | 'fade';
   target: string;

@@ -19,7 +19,7 @@ export type {
 } from './world';
 
 // 叙事引擎
-export { narrativeEngine, CardCategory } from './narrative';
+export { narrativeEngine } from './narrative';
 export type {
   IDialogueLine,
   IDialogueAction,
@@ -27,10 +27,13 @@ export type {
   IDialogueData,
   ICard,
   ICardEffect,
+  ICardGameplayFx,
+  ICardGameplayEffect,
   IForeshadow,
   IForeshadowState,
   ForeshadowStage,
   INarrativeState,
+  CardType,
 } from './narrative';
 
 // 音频管理器

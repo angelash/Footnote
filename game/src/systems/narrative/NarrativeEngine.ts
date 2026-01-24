@@ -9,10 +9,12 @@ import { eventBus, GameEvent } from '@/systems/EventBus';
 
 const logger = createLogger('NarrativeEngine');
 import { worldState } from '@/systems/world';
-import type { ChapterID } from '@/config/game.config';
+import type { CardType } from '@/config/game.config';
 import { AbilityType } from '@/config/game.config';
 // 统一使用 NarrativeDataLoader 的加载逻辑（不再使用内部的解析方法）
 import { loadDialogueFileAndRegister, inferYamlFileFromDialogueId } from '@/data/NarrativeDataLoader';
+// 从统一类型导入卡片相关接口（用于内部使用）
+import type { ICard, ICardGameplayEffect } from '@/types';
 
 // ==================== 类型定义 ====================
 
@@ -84,89 +86,11 @@ export interface IDialogueData {
   onComplete?: IDialogueAction[];
 }
 
-/**
- * 卡片数据（统一格式）
- */
-export interface ICard {
-  id: string;
-  /** 卡片名称 */
-  name: string;
-  /** 卡片类型 */
-  type: CardType;
-  /** 所属章节 */
-  chapter: ChapterID;
-  /** 所属区域 */
-  zone: string;
-  /** 正面内容 */
-  front: string[];
-  /** 背面详情 */
-  detail: string[];
-  /** 卡片图片（可选） */
-  image?: string;
-  /** 视觉效果（UI层面） */
-  effects?: ICardEffect[];
-  /** Gameplay 效果（游戏机制层面） */
-  gameplayFx?: ICardGameplayFx[];
-  /** 是否可消耗（使用后从背包移除） */
-  consumable?: boolean;
-}
-
-/**
- * 卡片类型
- */
-export type CardType = 'archive' | 'item' | 'prayer' | 'verdict' | 'diary';
-
-/**
- * 卡片类型枚举（兼容旧代码）
- * @deprecated 请直接使用 CardType 字符串类型
- */
-export enum CardCategory {
-  ARCHIVE = 'archive',
-  ITEM = 'item',
-  PRAYER = 'prayer',
-  VERDICT = 'verdict',
-  DIARY = 'diary',
-}
-
-/**
- * 卡片视觉效果（UI层面）
- */
-export interface ICardEffect {
-  type: 'taint' | 'flash' | 'glitch' | 'redact';
-  target?: string;
-  intensity?: number;
-}
-
-/**
- * 卡片 Gameplay 效果（游戏机制层面）
- * 定义卡片的使用效果，如修改计数器、设置Flag、给予卡片等
- */
-export interface ICardGameplayFx {
-  /** 触发时机 */
-  trigger: 'obtain' | 'use' | 'view';
-  /** 效果列表 */
-  effects: ICardGameplayEffect[];
-}
-
-/**
- * 单个 Gameplay 效果
- */
-export interface ICardGameplayEffect {
-  /** 效果类型 */
-  type: 'counterDelta' | 'setFlag' | 'giveCard' | 'unlockAbility';
-  /** 计数器名称（counterDelta 使用） */
-  counter?: 'R' | 'P';
-  /** 变化量（counterDelta 使用） */
-  delta?: number;
-  /** Flag 名称（setFlag 使用） */
-  flagName?: string;
-  /** Flag 值（setFlag 使用） */
-  flagValue?: boolean;
-  /** 卡片 ID（giveCard 使用） */
-  cardId?: string;
-  /** 能力类型（unlockAbility 使用） */
-  abilityType?: string;
-}
+// ICard, ICardEffect, ICardGameplayFx, ICardGameplayEffect 已移至 @/types
+// 重新导出以保持向后兼容
+export type { ICard, ICardEffect, ICardGameplayFx, ICardGameplayEffect } from '@/types';
+// CardType 从 @/config/game.config 导出
+export type { CardType } from '@/config/game.config';
 
 // 从统一类型定义导入
 import type {

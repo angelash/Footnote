@@ -26,6 +26,19 @@ const CONFIG = {
   CARDS_PER_ROW: 3,
   /** 卡片间距 */
   CARD_SPACING: UI.SPACING.LG,
+  /** 滚动区域配置 */
+  SCROLL: {
+    /** 滚动区域顶部偏移（相对面板顶部） */
+    TOP_MARGIN: 140,
+    /** 滚动区域底部边距 */
+    BOTTOM_MARGIN: 80,
+    /** 滚动条宽度 */
+    BAR_WIDTH: 6,
+    /** 滚动条圆角 */
+    BAR_RADIUS: 3,
+    /** 滚动速度（每次滚轮） */
+    WHEEL_SPEED: 50,
+  },
 };
 
 // ==================== 类型定义 ====================
@@ -60,6 +73,19 @@ export class InventoryUI {
   private _cardThumbnails: Phaser.GameObjects.Container[] = [];
   private _currentFocusMode: 'tabs' | 'cards' = 'tabs';
 
+  // 滚动相关
+  private _scrollMask!: Phaser.Display.Masks.GeometryMask;
+  private _scrollBar!: Phaser.GameObjects.Graphics;
+  private _scrollTrack!: Phaser.GameObjects.Graphics;
+  private _scrollY = 0;
+  private _maxScrollY = 0;
+  private _scrollAreaHeight = 0;
+  private _contentHeight = 0;
+  private _isDragging = false;
+  private _dragStartY = 0;
+  private _dragStartScrollY = 0;
+  private _wheelHandler: ((event: WheelEvent) => void) | null = null;
+
   constructor(config: IInventoryUIConfig) {
     this._scene = config.scene;
     this._callbacks = config;
@@ -88,6 +114,9 @@ export class InventoryUI {
     this._setupKeyboardNavigation();
     this._setupTabsFocusGroup();
 
+    // 设置滚轮事件
+    this._setupWheelHandler();
+
     // 播报物品栏打开
     a11yManager.announceUIState('卡片收藏', 'opened');
   }
@@ -98,6 +127,9 @@ export class InventoryUI {
   hide(): void {
     // 移除键盘导航
     this._removeKeyboardNavigation();
+
+    // 移除滚轮事件
+    this._removeWheelHandler();
 
     // 播报物品栏关闭
     a11yManager.announceUIState('卡片收藏', 'closed');
@@ -126,6 +158,7 @@ export class InventoryUI {
    */
   destroy(): void {
     this._removeKeyboardNavigation();
+    this._removeWheelHandler();
     this._container.destroy();
   }
 
@@ -186,9 +219,77 @@ export class InventoryUI {
     // 标签栏
     this._createTabs(panel);
 
-    // 卡片容器
-    this._cardsContainer = this._scene.add.container(0, 30);
+    // 计算滚动区域
+    this._scrollAreaHeight =
+      CONFIG.PANEL_HEIGHT - CONFIG.SCROLL.TOP_MARGIN - CONFIG.SCROLL.BOTTOM_MARGIN;
+    const scrollAreaTop = -CONFIG.PANEL_HEIGHT / 2 + CONFIG.SCROLL.TOP_MARGIN;
+
+    // 创建滚动区域遮罩
+    const maskGraphics = this._scene.add.graphics();
+    maskGraphics.fillStyle(0xffffff);
+    maskGraphics.fillRect(
+      width / 2 - CONFIG.PANEL_WIDTH / 2 + 10,
+      height / 2 + scrollAreaTop,
+      CONFIG.PANEL_WIDTH - 20 - CONFIG.SCROLL.BAR_WIDTH - 10,
+      this._scrollAreaHeight
+    );
+    this._scrollMask = maskGraphics.createGeometryMask();
+
+    // 卡片容器（带遮罩）
+    this._cardsContainer = this._scene.add.container(0, scrollAreaTop);
+    this._cardsContainer.setMask(this._scrollMask);
     panel.add(this._cardsContainer);
+
+    // 创建滚动条轨道
+    this._scrollTrack = this._scene.add.graphics();
+    this._scrollTrack.fillStyle(0x333333, 0.5);
+    this._scrollTrack.fillRoundedRect(
+      CONFIG.PANEL_WIDTH / 2 - CONFIG.SCROLL.BAR_WIDTH - 12,
+      scrollAreaTop,
+      CONFIG.SCROLL.BAR_WIDTH,
+      this._scrollAreaHeight,
+      CONFIG.SCROLL.BAR_RADIUS
+    );
+    panel.add(this._scrollTrack);
+
+    // 创建滚动条
+    this._scrollBar = this._scene.add.graphics();
+    panel.add(this._scrollBar);
+
+    // 创建滚动区域交互层（用于拖拽滚动）
+    const scrollInteractArea = this._scene.add
+      .rectangle(
+        0,
+        scrollAreaTop + this._scrollAreaHeight / 2,
+        CONFIG.PANEL_WIDTH - 40,
+        this._scrollAreaHeight,
+        0x000000,
+        0
+      )
+      .setInteractive({ draggable: true });
+
+    scrollInteractArea.on('wheel', (_pointer: Phaser.Input.Pointer, _dx: number, dy: number) => {
+      this._handleScroll(dy > 0 ? CONFIG.SCROLL.WHEEL_SPEED : -CONFIG.SCROLL.WHEEL_SPEED);
+    });
+
+    scrollInteractArea.on('dragstart', (_pointer: Phaser.Input.Pointer) => {
+      this._isDragging = true;
+      this._dragStartY = _pointer.y;
+      this._dragStartScrollY = this._scrollY;
+    });
+
+    scrollInteractArea.on('drag', (_pointer: Phaser.Input.Pointer) => {
+      if (this._isDragging) {
+        const deltaY = this._dragStartY - _pointer.y;
+        this._setScrollY(this._dragStartScrollY + deltaY);
+      }
+    });
+
+    scrollInteractArea.on('dragend', () => {
+      this._isDragging = false;
+    });
+
+    panel.add(scrollInteractArea);
 
     // 统计信息
     this._createStats(panel);
@@ -331,6 +432,9 @@ export class InventoryUI {
     this._cardsContainer.removeAll(true);
     this._cardThumbnails = [];
 
+    // 重置滚动位置
+    this._scrollY = 0;
+
     // 获取卡片
     let cards: INarrativeCard[];
     if (this._currentTab === 'all') {
@@ -350,6 +454,11 @@ export class InventoryUI {
         .setOrigin(0.5);
       this._cardsContainer.add(emptyText);
 
+      // 隐藏滚动条
+      this._contentHeight = 0;
+      this._maxScrollY = 0;
+      this._updateScrollBar();
+
       // 播报空状态
       a11yManager.announce('暂无卡片');
       return;
@@ -358,7 +467,9 @@ export class InventoryUI {
     // 渲染卡片网格
     const startX =
       -((CONFIG.CARDS_PER_ROW - 1) * (CONFIG.CARD_THUMB_WIDTH + CONFIG.CARD_SPACING)) / 2;
-    const startY = -CONFIG.PANEL_HEIGHT / 2 + 180;
+    const startY = CONFIG.CARD_THUMB_HEIGHT / 2 + UI.SPACING.MD; // 从滚动区域顶部开始
+
+    const totalRows = Math.ceil(cards.length / CONFIG.CARDS_PER_ROW);
 
     cards.forEach((card, index) => {
       const row = Math.floor(index / CONFIG.CARDS_PER_ROW);
@@ -371,6 +482,14 @@ export class InventoryUI {
       this._cardThumbnails.push(cardThumb);
       this._cardsContainer.add(cardThumb);
     });
+
+    // 计算内容高度和最大滚动距离
+    this._contentHeight =
+      totalRows * (CONFIG.CARD_THUMB_HEIGHT + CONFIG.CARD_SPACING) + UI.SPACING.MD;
+    this._maxScrollY = Math.max(0, this._contentHeight - this._scrollAreaHeight);
+
+    // 更新滚动条
+    this._updateScrollBar();
 
     // 设置卡片焦点组
     this._setupCardsFocusGroup();
@@ -884,6 +1003,104 @@ export class InventoryUI {
         scale: 1,
         duration: 100,
       });
+    }
+  }
+
+  // ==================== 私有方法 - 滚动 ====================
+
+  /**
+   * 处理滚动
+   */
+  private _handleScroll(delta: number): void {
+    this._setScrollY(this._scrollY + delta);
+  }
+
+  /**
+   * 设置滚动位置
+   */
+  private _setScrollY(newY: number): void {
+    // 限制滚动范围
+    this._scrollY = Math.max(0, Math.min(this._maxScrollY, newY));
+
+    // 更新卡片容器位置
+    const scrollAreaTop = -CONFIG.PANEL_HEIGHT / 2 + CONFIG.SCROLL.TOP_MARGIN;
+    this._cardsContainer.setY(scrollAreaTop - this._scrollY);
+
+    // 更新滚动条
+    this._updateScrollBar();
+  }
+
+  /**
+   * 更新滚动条
+   */
+  private _updateScrollBar(): void {
+    this._scrollBar.clear();
+
+    // 如果内容不需要滚动，隐藏滚动条
+    if (this._maxScrollY <= 0) {
+      this._scrollTrack.setVisible(false);
+      return;
+    }
+
+    this._scrollTrack.setVisible(true);
+
+    // 计算滚动条高度和位置
+    const scrollRatio = this._scrollAreaHeight / this._contentHeight;
+    const barHeight = Math.max(30, this._scrollAreaHeight * scrollRatio);
+    const scrollProgress = this._maxScrollY > 0 ? this._scrollY / this._maxScrollY : 0;
+    const barY =
+      -CONFIG.PANEL_HEIGHT / 2 +
+      CONFIG.SCROLL.TOP_MARGIN +
+      scrollProgress * (this._scrollAreaHeight - barHeight);
+
+    // 绘制滚动条
+    this._scrollBar.fillStyle(COLORS.ACCENT, 0.7);
+    this._scrollBar.fillRoundedRect(
+      CONFIG.PANEL_WIDTH / 2 - CONFIG.SCROLL.BAR_WIDTH - 12,
+      barY,
+      CONFIG.SCROLL.BAR_WIDTH,
+      barHeight,
+      CONFIG.SCROLL.BAR_RADIUS
+    );
+  }
+
+  /**
+   * 设置滚轮事件
+   */
+  private _setupWheelHandler(): void {
+    if (this._wheelHandler) return;
+
+    this._wheelHandler = (event: WheelEvent): void => {
+      if (!this.isVisible()) return;
+
+      // 检查是否在面板区域内
+      const { width, height } = this._scene.scale;
+      const panelLeft = width / 2 - CONFIG.PANEL_WIDTH / 2;
+      const panelRight = width / 2 + CONFIG.PANEL_WIDTH / 2;
+      const panelTop = height / 2 - CONFIG.PANEL_HEIGHT / 2;
+      const panelBottom = height / 2 + CONFIG.PANEL_HEIGHT / 2;
+
+      if (
+        event.clientX >= panelLeft &&
+        event.clientX <= panelRight &&
+        event.clientY >= panelTop &&
+        event.clientY <= panelBottom
+      ) {
+        event.preventDefault();
+        this._handleScroll(event.deltaY > 0 ? CONFIG.SCROLL.WHEEL_SPEED : -CONFIG.SCROLL.WHEEL_SPEED);
+      }
+    };
+
+    window.addEventListener('wheel', this._wheelHandler, { passive: false });
+  }
+
+  /**
+   * 移除滚轮事件
+   */
+  private _removeWheelHandler(): void {
+    if (this._wheelHandler) {
+      window.removeEventListener('wheel', this._wheelHandler);
+      this._wheelHandler = null;
     }
   }
 }

@@ -11,7 +11,12 @@ export const GAME_CONFIG: Partial<Phaser.Types.Core.GameConfig> = {
   fps: {
     target: 60,
     forceSetTimeOut: false,
+    // 限制最大帧时间，防止焦点恢复后出现大量累积帧
+    deltaHistory: 10,
+    smoothStep: true,
   },
+  // 失去焦点时自动暂停游戏循环，防止后台运行导致状态异常
+  pauseOnBlur: true,
 };
 
 // 场景键名

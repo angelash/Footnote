@@ -123,30 +123,88 @@ const config: Phaser.Types.Core.GameConfig = {
 // 启动预览
 const game = new Phaser.Game(config);
 
+// 焦点状态管理器（与 main.ts 同步）
+// 统一处理页面可见性和窗口焦点，防止重复暂停/恢复导致的卡死
+const focusManager = {
+  _isPaused: false,
+  _debounceTimer: null as ReturnType<typeof setTimeout> | null,
+  _pausedScenes: new Set<string>(),
+
+  pause(): void {
+    if (this._debounceTimer) {
+      clearTimeout(this._debounceTimer);
+      this._debounceTimer = null;
+    }
+
+    if (this._isPaused) return;
+    this._isPaused = true;
+    this._pausedScenes.clear();
+
+    game.scene.scenes.forEach((scene) => {
+      try {
+        if (scene.scene.isActive() && !scene.scene.isPaused()) {
+          scene.scene.pause();
+          this._pausedScenes.add(scene.scene.key);
+        }
+      } catch (error) {
+        logger.warn(`暂停场景失败: ${scene.scene.key}`, error);
+      }
+    });
+
+    try {
+      game.sound.pauseAll();
+    } catch (error) {
+      logger.warn('暂停音频失败', error);
+    }
+  },
+
+  resume(): void {
+    if (this._debounceTimer) {
+      clearTimeout(this._debounceTimer);
+    }
+
+    this._debounceTimer = setTimeout(() => {
+      if (!this._isPaused) return;
+      this._isPaused = false;
+
+      this._pausedScenes.forEach((sceneKey) => {
+        try {
+          const scene = game.scene.getScene(sceneKey);
+          if (scene && scene.scene.isPaused()) {
+            scene.scene.resume();
+          }
+        } catch (error) {
+          logger.warn(`恢复场景失败: ${sceneKey}`, error);
+        }
+      });
+
+      this._pausedScenes.clear();
+
+      try {
+        game.sound.resumeAll();
+      } catch (error) {
+        logger.warn('恢复音频失败', error);
+      }
+    }, 100);
+  },
+};
+
 // 处理页面可见性变化
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    game.scene.scenes.forEach((scene) => {
-      if (scene.scene.isActive()) {
-        scene.scene.pause();
-      }
-    });
+    focusManager.pause();
   } else {
-    game.scene.scenes.forEach((scene) => {
-      if (scene.scene.isPaused()) {
-        scene.scene.resume();
-      }
-    });
+    focusManager.resume();
   }
 });
 
 // 处理窗口失焦
 window.addEventListener('blur', () => {
-  game.sound.pauseAll();
+  focusManager.pause();
 });
 
 window.addEventListener('focus', () => {
-  game.sound.resumeAll();
+  focusManager.resume();
 });
 
 // 防止iOS橡皮筋效果

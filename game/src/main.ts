@@ -109,30 +109,118 @@ const config: Phaser.Types.Core.GameConfig = {
 // 启动游戏
 const game = new Phaser.Game(config);
 
-// 处理页面可见性变化（省电）
+// 焦点状态管理器
+// 统一处理页面可见性和窗口焦点，防止重复暂停/恢复导致的卡死
+const focusManager = {
+  _isPaused: false,
+  _debounceTimer: null as ReturnType<typeof setTimeout> | null,
+  _pausedScenes: new Set<string>(),
+
+  /**
+   * 暂停游戏（带防抖）
+   * 只在确实需要暂停且未暂停时执行
+   */
+  pause(): void {
+    // 清除之前的恢复定时器
+    if (this._debounceTimer) {
+      clearTimeout(this._debounceTimer);
+      this._debounceTimer = null;
+    }
+
+    if (this._isPaused) {
+      logger.debug('游戏已暂停，跳过重复暂停');
+      return;
+    }
+
+    this._isPaused = true;
+    this._pausedScenes.clear();
+
+    // 暂停所有活跃场景
+    game.scene.scenes.forEach((scene) => {
+      try {
+        // 只暂停活跃且未暂停的场景
+        if (scene.scene.isActive() && !scene.scene.isPaused()) {
+          scene.scene.pause();
+          this._pausedScenes.add(scene.scene.key);
+          logger.debug(`场景暂停: ${scene.scene.key}`);
+        }
+      } catch (error) {
+        logger.warn(`暂停场景失败: ${scene.scene.key}`, error);
+      }
+    });
+
+    // 暂停所有音频
+    try {
+      game.sound.pauseAll();
+    } catch (error) {
+      logger.warn('暂停音频失败', error);
+    }
+
+    logger.info('游戏已暂停');
+  },
+
+  /**
+   * 恢复游戏（带防抖延迟）
+   * 延迟执行以避免快速切换导致的状态混乱
+   */
+  resume(): void {
+    // 清除之前的恢复定时器
+    if (this._debounceTimer) {
+      clearTimeout(this._debounceTimer);
+    }
+
+    // 延迟 100ms 恢复，避免快速切换导致的问题
+    this._debounceTimer = setTimeout(() => {
+      if (!this._isPaused) {
+        logger.debug('游戏未暂停，跳过恢复');
+        return;
+      }
+
+      this._isPaused = false;
+
+      // 只恢复之前由 focusManager 暂停的场景
+      this._pausedScenes.forEach((sceneKey) => {
+        try {
+          const scene = game.scene.getScene(sceneKey);
+          if (scene && scene.scene.isPaused()) {
+            scene.scene.resume();
+            logger.debug(`场景恢复: ${sceneKey}`);
+          }
+        } catch (error) {
+          logger.warn(`恢复场景失败: ${sceneKey}`, error);
+        }
+      });
+
+      this._pausedScenes.clear();
+
+      // 恢复所有音频
+      try {
+        game.sound.resumeAll();
+      } catch (error) {
+        logger.warn('恢复音频失败', error);
+      }
+
+      logger.info('游戏已恢复');
+    }, 100);
+  },
+};
+
+// 处理页面可见性变化（省电 + 防止后台运行）
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    game.scene.scenes.forEach((scene) => {
-      if (scene.scene.isActive()) {
-        scene.scene.pause();
-      }
-    });
+    focusManager.pause();
   } else {
-    game.scene.scenes.forEach((scene) => {
-      if (scene.scene.isPaused()) {
-        scene.scene.resume();
-      }
-    });
+    focusManager.resume();
   }
 });
 
-// 处理窗口失焦
+// 处理窗口失焦（用户切换到其他窗口）
 window.addEventListener('blur', () => {
-  game.sound.pauseAll();
+  focusManager.pause();
 });
 
 window.addEventListener('focus', () => {
-  game.sound.resumeAll();
+  focusManager.resume();
 });
 
 // 防止iOS橡皮筋效果

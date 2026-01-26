@@ -17,8 +17,8 @@ import type { ICard as INarrativeCard } from '@/systems/narrative';
 const CONFIG = {
   /** 面板宽度 */
   PANEL_WIDTH: UI.PANEL.MD.WIDTH + 100,
-  /** 面板高度 */
-  PANEL_HEIGHT: 1000,
+  /** 面板高度（会根据屏幕高度调整） */
+  PANEL_HEIGHT: 750,
   /** 卡片缩略图大小 */
   CARD_THUMB_WIDTH: UI.CARD.THUMB.WIDTH,
   CARD_THUMB_HEIGHT: UI.CARD.THUMB.HEIGHT,
@@ -85,6 +85,9 @@ export class InventoryUI {
   private _dragStartY = 0;
   private _dragStartScrollY = 0;
   private _wheelHandler: ((event: WheelEvent) => void) | null = null;
+
+  // 动态面板高度
+  private _panelHeight = CONFIG.PANEL_HEIGHT;
 
   constructor(config: IInventoryUIConfig) {
     this._scene = config.scene;
@@ -167,6 +170,9 @@ export class InventoryUI {
   private _createUI(): void {
     const { width, height } = this._scene.scale;
 
+    // 动态计算面板高度，留出上下边距
+    this._panelHeight = Math.min(CONFIG.PANEL_HEIGHT, height - 80);
+
     this._container = this._scene.add.container(0, 0);
     this._container.setDepth(1500);
     this._container.setVisible(false);
@@ -187,24 +193,24 @@ export class InventoryUI {
     panelBg.fillStyle(COLORS.BG_SECONDARY, 0.98);
     panelBg.fillRoundedRect(
       -CONFIG.PANEL_WIDTH / 2,
-      -CONFIG.PANEL_HEIGHT / 2,
+      -this._panelHeight / 2,
       CONFIG.PANEL_WIDTH,
-      CONFIG.PANEL_HEIGHT,
+      this._panelHeight,
       16
     );
     panelBg.lineStyle(2, COLORS.BORDER, 1);
     panelBg.strokeRoundedRect(
       -CONFIG.PANEL_WIDTH / 2,
-      -CONFIG.PANEL_HEIGHT / 2,
+      -this._panelHeight / 2,
       CONFIG.PANEL_WIDTH,
-      CONFIG.PANEL_HEIGHT,
+      this._panelHeight,
       16
     );
     panel.add(panelBg);
 
     // 标题
     const title = this._scene.add
-      .text(0, -CONFIG.PANEL_HEIGHT / 2 + 40, '卡片收藏', {
+      .text(0, -this._panelHeight / 2 + 40, '卡片收藏', {
         ...TEXT_STYLES.TITLE,
         fontSize: UI_FONT_SIZE.SECTION,
       })
@@ -213,7 +219,7 @@ export class InventoryUI {
 
     // 关闭按钮
     const closeBtn = this._createCloseButton();
-    closeBtn.setPosition(CONFIG.PANEL_WIDTH / 2 - 40, -CONFIG.PANEL_HEIGHT / 2 + 40);
+    closeBtn.setPosition(CONFIG.PANEL_WIDTH / 2 - 40, -this._panelHeight / 2 + 40);
     panel.add(closeBtn);
 
     // 标签栏
@@ -221,8 +227,8 @@ export class InventoryUI {
 
     // 计算滚动区域
     this._scrollAreaHeight =
-      CONFIG.PANEL_HEIGHT - CONFIG.SCROLL.TOP_MARGIN - CONFIG.SCROLL.BOTTOM_MARGIN;
-    const scrollAreaTop = -CONFIG.PANEL_HEIGHT / 2 + CONFIG.SCROLL.TOP_MARGIN;
+      this._panelHeight - CONFIG.SCROLL.TOP_MARGIN - CONFIG.SCROLL.BOTTOM_MARGIN;
+    const scrollAreaTop = -this._panelHeight / 2 + CONFIG.SCROLL.TOP_MARGIN;
 
     // 创建滚动区域遮罩
     const maskGraphics = this._scene.add.graphics();
@@ -234,11 +240,6 @@ export class InventoryUI {
       this._scrollAreaHeight
     );
     this._scrollMask = maskGraphics.createGeometryMask();
-
-    // 卡片容器（带遮罩）
-    this._cardsContainer = this._scene.add.container(0, scrollAreaTop);
-    this._cardsContainer.setMask(this._scrollMask);
-    panel.add(this._cardsContainer);
 
     // 创建滚动条轨道
     this._scrollTrack = this._scene.add.graphics();
@@ -256,40 +257,14 @@ export class InventoryUI {
     this._scrollBar = this._scene.add.graphics();
     panel.add(this._scrollBar);
 
-    // 创建滚动区域交互层（用于拖拽滚动）
-    const scrollInteractArea = this._scene.add
-      .rectangle(
-        0,
-        scrollAreaTop + this._scrollAreaHeight / 2,
-        CONFIG.PANEL_WIDTH - 40,
-        this._scrollAreaHeight,
-        0x000000,
-        0
-      )
-      .setInteractive({ draggable: true });
+    // 注意：不再创建 scrollInteractArea，因为它会阻止卡片点击事件
+    // 滚轮事件通过 _setupWheelHandler 在 window 上监听
+    // 拖拽滚动通过 _cardsContainer 上的事件处理
 
-    scrollInteractArea.on('wheel', (_pointer: Phaser.Input.Pointer, _dx: number, dy: number) => {
-      this._handleScroll(dy > 0 ? CONFIG.SCROLL.WHEEL_SPEED : -CONFIG.SCROLL.WHEEL_SPEED);
-    });
-
-    scrollInteractArea.on('dragstart', (_pointer: Phaser.Input.Pointer) => {
-      this._isDragging = true;
-      this._dragStartY = _pointer.y;
-      this._dragStartScrollY = this._scrollY;
-    });
-
-    scrollInteractArea.on('drag', (_pointer: Phaser.Input.Pointer) => {
-      if (this._isDragging) {
-        const deltaY = this._dragStartY - _pointer.y;
-        this._setScrollY(this._dragStartScrollY + deltaY);
-      }
-    });
-
-    scrollInteractArea.on('dragend', () => {
-      this._isDragging = false;
-    });
-
-    panel.add(scrollInteractArea);
+    // 卡片容器（带遮罩）- 放在交互层之后，确保卡片可以接收点击事件
+    this._cardsContainer = this._scene.add.container(0, scrollAreaTop);
+    this._cardsContainer.setMask(this._scrollMask);
+    panel.add(this._cardsContainer);
 
     // 统计信息
     this._createStats(panel);
@@ -350,7 +325,7 @@ export class InventoryUI {
 
     tabs.forEach((tab, index) => {
       const x = startX + index * tabWidth;
-      const tabBtn = this._createTabButton(x, -CONFIG.PANEL_HEIGHT / 2 + 90, tab.label, tab.type);
+      const tabBtn = this._createTabButton(x, -this._panelHeight / 2 + 90, tab.label, tab.type);
       this._tabButtons.set(tab.type, tabBtn);
       panel.add(tabBtn);
     });
@@ -410,7 +385,7 @@ export class InventoryUI {
   }
 
   private _createStats(panel: Phaser.GameObjects.Container): void {
-    const y = CONFIG.PANEL_HEIGHT / 2 - 50;
+    const y = this._panelHeight / 2 - 50;
 
     const totalCards = narrativeEngine.getCardCount();
     const obtainedCount = narrativeEngine.getObtainedCards().length;
@@ -471,6 +446,42 @@ export class InventoryUI {
 
     const totalRows = Math.ceil(cards.length / CONFIG.CARDS_PER_ROW);
 
+    // 计算内容高度
+    this._contentHeight =
+      totalRows * (CONFIG.CARD_THUMB_HEIGHT + CONFIG.CARD_SPACING) + UI.SPACING.MD;
+
+    // 添加拖拽滚动背景（作为最底层，不会阻挡卡片点击）
+    const dragBg = this._scene.add
+      .rectangle(
+        0,
+        this._contentHeight / 2,
+        CONFIG.PANEL_WIDTH - 40,
+        Math.max(this._contentHeight, this._scrollAreaHeight),
+        0x000000,
+        0
+      )
+      .setInteractive({ draggable: true });
+
+    dragBg.on('dragstart', (_pointer: Phaser.Input.Pointer) => {
+      this._isDragging = true;
+      this._dragStartY = _pointer.y;
+      this._dragStartScrollY = this._scrollY;
+    });
+
+    dragBg.on('drag', (_pointer: Phaser.Input.Pointer) => {
+      if (this._isDragging) {
+        const deltaY = this._dragStartY - _pointer.y;
+        this._setScrollY(this._dragStartScrollY + deltaY);
+      }
+    });
+
+    dragBg.on('dragend', () => {
+      this._isDragging = false;
+    });
+
+    this._cardsContainer.add(dragBg);
+
+    // 渲染卡片（在拖拽背景之后添加，所以在上层）
     cards.forEach((card, index) => {
       const row = Math.floor(index / CONFIG.CARDS_PER_ROW);
       const col = index % CONFIG.CARDS_PER_ROW;
@@ -483,9 +494,7 @@ export class InventoryUI {
       this._cardsContainer.add(cardThumb);
     });
 
-    // 计算内容高度和最大滚动距离
-    this._contentHeight =
-      totalRows * (CONFIG.CARD_THUMB_HEIGHT + CONFIG.CARD_SPACING) + UI.SPACING.MD;
+    // 计算最大滚动距离
     this._maxScrollY = Math.max(0, this._contentHeight - this._scrollAreaHeight);
 
     // 更新滚动条
@@ -1023,7 +1032,7 @@ export class InventoryUI {
     this._scrollY = Math.max(0, Math.min(this._maxScrollY, newY));
 
     // 更新卡片容器位置
-    const scrollAreaTop = -CONFIG.PANEL_HEIGHT / 2 + CONFIG.SCROLL.TOP_MARGIN;
+    const scrollAreaTop = -this._panelHeight / 2 + CONFIG.SCROLL.TOP_MARGIN;
     this._cardsContainer.setY(scrollAreaTop - this._scrollY);
 
     // 更新滚动条
@@ -1049,7 +1058,7 @@ export class InventoryUI {
     const barHeight = Math.max(30, this._scrollAreaHeight * scrollRatio);
     const scrollProgress = this._maxScrollY > 0 ? this._scrollY / this._maxScrollY : 0;
     const barY =
-      -CONFIG.PANEL_HEIGHT / 2 +
+      -this._panelHeight / 2 +
       CONFIG.SCROLL.TOP_MARGIN +
       scrollProgress * (this._scrollAreaHeight - barHeight);
 
@@ -1077,8 +1086,8 @@ export class InventoryUI {
       const { width, height } = this._scene.scale;
       const panelLeft = width / 2 - CONFIG.PANEL_WIDTH / 2;
       const panelRight = width / 2 + CONFIG.PANEL_WIDTH / 2;
-      const panelTop = height / 2 - CONFIG.PANEL_HEIGHT / 2;
-      const panelBottom = height / 2 + CONFIG.PANEL_HEIGHT / 2;
+      const panelTop = height / 2 - this._panelHeight / 2;
+      const panelBottom = height / 2 + this._panelHeight / 2;
 
       if (
         event.clientX >= panelLeft &&

@@ -348,17 +348,17 @@ export class PauseMenu {
     this._helpContainer = this._scene.add.container(width / 2, height / 2);
     this._helpContainer.setVisible(false);
 
-    // 面板背景
+    // 面板背景 - 更大的面板
     const panelBg = this._scene.add.graphics();
     panelBg.fillStyle(0x1a1a1f, 0.95);
-    panelBg.fillRoundedRect(-280, -320, 560, 640, 12);
+    panelBg.fillRoundedRect(-280, -350, 560, 700, 12);
     panelBg.lineStyle(2, COLORS.BORDER, 1);
-    panelBg.strokeRoundedRect(-280, -320, 560, 640, 12);
+    panelBg.strokeRoundedRect(-280, -350, 560, 700, 12);
     this._helpContainer.add(panelBg);
 
     // 标题
     const title = this._scene.add
-      .text(0, -280, i18n.t('help.title'), {
+      .text(0, -320, i18n.t('help.title'), {
         ...TEXT_STYLES.TITLE,
         fontSize: UI_FONT_SIZE.SECTION,
       })
@@ -366,190 +366,172 @@ export class PauseMenu {
     this._registerI18nText('help.title', title);
     this._helpContainer.add(title);
 
-    // 帮助内容 - 使用滚动区域
-    const contentY = -230;
-    const lineHeight = 28;
-    let currentY = contentY;
+    // 紧凑布局参数
+    const startY = -275;
+    const titleHeight = 22;
+    const itemHeight = 18;
+    const sectionGap = 12;
+    let y = startY;
 
     // === 计数器说明 ===
-    const countersTitle = this._scene.add
-      .text(-250, currentY, '【隐藏计数器】', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.NORMAL,
-        color: '#FFD700',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(countersTitle);
-    currentY += lineHeight + 8;
+    this._helpContainer.add(
+      this._scene.add
+        .text(-250, y, '【隐藏计数器】', {
+          fontSize: UI_FONT_SIZE.SMALL,
+          color: '#FFD700',
+          fontStyle: 'bold',
+        })
+        .setOrigin(0, 0)
+    );
+    y += titleHeight;
 
-    // R 值
-    const rDesc = this._scene.add
-      .text(-250, currentY, 'R (无收益残差)', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.SMALL,
-        color: '#FF4444',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(rDesc);
-    currentY += lineHeight;
+    // R/P/W 说明（单行格式）
+    const counters = [
+      { name: 'R', color: '#FF4444', desc: '无收益残差 - 无奖励行为累积，R≥3系统语气变化' },
+      { name: 'P', color: '#4A9EFF', desc: '观察者压力 - 能力使用增加，P≥18无法使用能力' },
+      { name: 'W', color: '#FFD700', desc: '世界可读性 - 综合稳定度，影响结局走向' },
+    ];
 
-    const rDetail = this._scene.add
-      .text(-230, currentY, '无奖励行为的累积。R≥3时系统语气会变化。', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.TINY,
-        color: '#A8A6A3',
-        wordWrap: { width: 480 },
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(rDetail);
-    currentY += lineHeight + 4;
+    counters.forEach((c) => {
+      this._helpContainer.add(
+        this._scene.add
+          .text(-250, y, c.name, { fontSize: UI_FONT_SIZE.TINY, color: c.color, fontStyle: 'bold' })
+          .setOrigin(0, 0)
+      );
+      this._helpContainer.add(
+        this._scene.add
+          .text(-230, y, c.desc, { fontSize: UI_FONT_SIZE.TINY, color: '#A8A6A3' })
+          .setOrigin(0, 0)
+      );
+      y += itemHeight;
+    });
 
-    // P 值
-    const pDesc = this._scene.add
-      .text(-250, currentY, 'P (观察者压力)', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.SMALL,
-        color: '#4A9EFF',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(pDesc);
-    currentY += lineHeight;
-
-    const pDetail = this._scene.add
-      .text(-230, currentY, '使用高维能力会增加P值。P≥18时无法使用能力。\n上限20，代表世界的不稳定程度。', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.TINY,
-        color: '#A8A6A3',
-        wordWrap: { width: 480 },
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(pDetail);
-    currentY += lineHeight * 2 + 4;
-
-    // W 值
-    const wDesc = this._scene.add
-      .text(-250, currentY, 'W (世界可读性)', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.SMALL,
-        color: '#FFD700',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(wDesc);
-    currentY += lineHeight;
-
-    const wDetail = this._scene.add
-      .text(-230, currentY, '综合稳定度指标。影响结局走向。', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.TINY,
-        color: '#A8A6A3',
-        wordWrap: { width: 480 },
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(wDetail);
-    currentY += lineHeight + 16;
+    y += sectionGap;
 
     // === 能力说明 ===
-    const abilitiesTitle = this._scene.add
-      .text(-250, currentY, '【三种能力】', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.NORMAL,
-        color: '#FFD700',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(abilitiesTitle);
-    currentY += lineHeight + 8;
+    this._helpContainer.add(
+      this._scene.add
+        .text(-250, y, '【三种能力】', {
+          fontSize: UI_FONT_SIZE.SMALL,
+          color: '#FFD700',
+          fontStyle: 'bold',
+        })
+        .setOrigin(0, 0)
+    );
+    y += titleHeight;
 
-    // 深度感知
-    const ability1 = this._scene.add
-      .text(-250, currentY, '1. 深度感知 [按键1]', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.SMALL,
+    const abilities = [
+      {
+        key: '1',
+        name: '深度感知',
         color: '#00FFAA',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(ability1);
-    currentY += lineHeight;
-
-    const ability1Detail = this._scene.add
-      .text(-230, currentY, '只看不动。揭示隐藏信息，持续消耗P值。\n再次按键可关闭。', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.TINY,
-        color: '#A8A6A3',
-        wordWrap: { width: 480 },
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(ability1Detail);
-    currentY += lineHeight * 2 + 4;
-
-    // 深度介入
-    const ability2 = this._scene.add
-      .text(-250, currentY, '2. 深度介入 [按键2]', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.SMALL,
+        desc: '揭示隐藏信息，持续消耗P值',
+      },
+      {
+        key: '2',
+        name: '深度介入',
         color: '#FF00FF',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(ability2);
-    currentY += lineHeight;
-
-    const ability2Detail = this._scene.add
-      .text(-230, currentY, '可改变结构，但会留下伤痕。每次使用P+2。\n再次按键可关闭。', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.TINY,
-        color: '#A8A6A3',
-        wordWrap: { width: 480 },
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(ability2Detail);
-    currentY += lineHeight * 2 + 4;
-
-    // 时间干预
-    const ability3 = this._scene.add
-      .text(-250, currentY, '3. 时间干预 [按键3]', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.SMALL,
+        desc: '改变结构留下伤痕，每次P+2',
+      },
+      {
+        key: '3',
+        name: '时间干预',
         color: '#FFD700',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(ability3);
-    currentY += lineHeight;
+        desc: '回溯节点，产生时间污染',
+      },
+    ];
 
-    const ability3Detail = this._scene.add
-      .text(-230, currentY, '回溯到之前的节点，产生时间污染。\n每个节点消耗P值。再次按键可关闭。', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.TINY,
-        color: '#A8A6A3',
-        wordWrap: { width: 480 },
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(ability3Detail);
-    currentY += lineHeight * 2 + 16;
+    abilities.forEach((a) => {
+      this._helpContainer.add(
+        this._scene.add
+          .text(-250, y, `[${a.key}] ${a.name}`, {
+            fontSize: UI_FONT_SIZE.TINY,
+            color: a.color,
+            fontStyle: 'bold',
+          })
+          .setOrigin(0, 0)
+      );
+      this._helpContainer.add(
+        this._scene.add
+          .text(-130, y, a.desc, { fontSize: UI_FONT_SIZE.TINY, color: '#A8A6A3' })
+          .setOrigin(0, 0)
+      );
+      y += itemHeight;
+    });
+
+    // 能力通用说明
+    this._helpContainer.add(
+      this._scene.add
+        .text(-230, y, '※ 再次按键或点击可关闭能力', {
+          fontSize: UI_FONT_SIZE.TINY,
+          color: '#686868',
+        })
+        .setOrigin(0, 0)
+    );
+    y += itemHeight + sectionGap;
+
+    // === 操作说明 ===
+    this._helpContainer.add(
+      this._scene.add
+        .text(-250, y, '【操作】', {
+          fontSize: UI_FONT_SIZE.SMALL,
+          color: '#FFD700',
+          fontStyle: 'bold',
+        })
+        .setOrigin(0, 0)
+    );
+    y += titleHeight;
+
+    const controls = [
+      { key: 'WASD/方向键', desc: '移动' },
+      { key: 'E/点击物体', desc: '交互' },
+      { key: 'ESC', desc: '暂停菜单' },
+      { key: 'I', desc: '物品栏' },
+    ];
+
+    controls.forEach((c) => {
+      this._helpContainer.add(
+        this._scene.add
+          .text(-250, y, c.key, { fontSize: UI_FONT_SIZE.TINY, color: '#00FFAA' })
+          .setOrigin(0, 0)
+      );
+      this._helpContainer.add(
+        this._scene.add
+          .text(-100, y, c.desc, { fontSize: UI_FONT_SIZE.TINY, color: '#A8A6A3' })
+          .setOrigin(0, 0)
+      );
+      y += itemHeight;
+    });
+
+    y += sectionGap;
 
     // === 提示 ===
-    const tipTitle = this._scene.add
-      .text(-250, currentY, '【提示】', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.NORMAL,
-        color: '#FFD700',
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(tipTitle);
-    currentY += lineHeight + 8;
+    this._helpContainer.add(
+      this._scene.add
+        .text(-250, y, '【提示】', {
+          fontSize: UI_FONT_SIZE.SMALL,
+          color: '#FFD700',
+          fontStyle: 'bold',
+        })
+        .setOrigin(0, 0)
+    );
+    y += titleHeight;
 
-    const tip = this._scene.add
-      .text(-230, currentY, '• 能力使用有代价，谨慎选择\n• 世界会记住你做过的一切\n• 不同选择会影响结局', {
-        ...TEXT_STYLES.BODY,
-        fontSize: UI_FONT_SIZE.TINY,
-        color: '#A8A6A3',
-        wordWrap: { width: 480 },
-      })
-      .setOrigin(0, 0);
-    this._helpContainer.add(tip);
+    const tips = ['• 能力使用有代价，谨慎选择', '• 世界会记住你做过的一切', '• 不同选择会影响结局'];
+
+    tips.forEach((t) => {
+      this._helpContainer.add(
+        this._scene.add
+          .text(-230, y, t, { fontSize: UI_FONT_SIZE.TINY, color: '#A8A6A3' })
+          .setOrigin(0, 0)
+      );
+      y += itemHeight;
+    });
 
     // 返回按钮
     const backBtn = this._createButton(
       0,
-      280,
+      310,
       i18n.t('common.back'),
       () => this._hideHelp(),
       'common.back'

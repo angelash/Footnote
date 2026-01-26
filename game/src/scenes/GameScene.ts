@@ -353,6 +353,52 @@ export class GameScene extends Phaser.Scene {
   }
 
   /**
+   * 切换能力状态（toggle）
+   * 如果能力已激活则取消，否则激活
+   */
+  private _toggleAbility(abilityType: AbilityType): void {
+    if (!this._abilitySystem) {
+      logger.warn('_toggleAbility: _abilitySystem 未初始化');
+      return;
+    }
+
+    // 先检查是否解锁
+    if (!worldState.hasAbility(abilityType)) {
+      this._toastManager?.showWarning('能力尚未解锁');
+      return;
+    }
+
+    const isActive = this._abilitySystem.isAbilityActive(abilityType);
+
+    if (isActive) {
+      this._abilitySystem.deactivateAbility(abilityType);
+      this._toastManager?.showInfo('能力已关闭');
+    } else {
+      // 检查冷却
+      const cooldown = this._abilitySystem.getCooldownRemaining(abilityType);
+      if (cooldown > 0) {
+        this._toastManager?.showWarning(`冷却中: ${Math.ceil(cooldown / 1000)}秒`);
+        return;
+      }
+
+      // 检查 P 值是否过高
+      const currentP = worldState.getP();
+      const pMax = 20; // CONFIG.P_MAX
+      const pThreshold = pMax * 0.9; // 18
+      if (currentP >= pThreshold) {
+        this._toastManager?.showWarning(`P值过高(${currentP}/${pMax})，无法使用能力`);
+        return;
+      }
+
+      const result = this._abilitySystem.activateAbility(abilityType);
+      if (!result) {
+        // 激活失败的其他原因
+        this._toastManager?.showWarning('无法激活能力');
+      }
+    }
+  }
+
+  /**
    * 尝试与最近的可交互对象交互
    * 优先使用已检测到的最近对象，否则重新搜索
    */
@@ -924,29 +970,36 @@ export class GameScene extends Phaser.Scene {
 
       this._abilityBar.add([bg, keyHint, icon, lockMask]);
 
-      // 点击激活能力
+      // 点击激活/取消能力（复用 _toggleAbility 统一处理反馈）
       const hitArea = this.add
         .rectangle(x, 0, 60, 50, 0x000000, 0)
         .setInteractive({ useHandCursor: true })
         .on('pointerdown', () => {
-          if (worldState.hasAbility(ability.type)) {
-            this._abilitySystem?.activateAbility(ability.type);
-          } else {
-            this._toastManager?.showWarning('能力尚未解锁');
-          }
+          this._toggleAbility(ability.type);
         });
       this._abilityBar.add(hitArea);
     });
 
-    // 键盘快捷键
+    // 键盘快捷键（toggle：再次按下同一键取消能力）
+    // 注意：Phaser 3 数字键事件名是 'keydown-1' 而不是 'keydown-ONE'
     this.input.keyboard?.on('keydown-ONE', () => {
-      this._abilitySystem?.activateAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION);
+      this._toggleAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION);
     });
     this.input.keyboard?.on('keydown-TWO', () => {
-      this._abilitySystem?.activateAbility(CONSTANTS.ABILITY.DEPTH_INTERVENTION);
+      this._toggleAbility(CONSTANTS.ABILITY.DEPTH_INTERVENTION);
     });
     this.input.keyboard?.on('keydown-THREE', () => {
-      this._abilitySystem?.activateAbility(CONSTANTS.ABILITY.TIME_INTERVENTION);
+      this._toggleAbility(CONSTANTS.ABILITY.TIME_INTERVENTION);
+    });
+    // 同时监听数字键（确保兼容性）
+    this.input.keyboard?.on('keydown-1', () => {
+      this._toggleAbility(CONSTANTS.ABILITY.DEPTH_PERCEPTION);
+    });
+    this.input.keyboard?.on('keydown-2', () => {
+      this._toggleAbility(CONSTANTS.ABILITY.DEPTH_INTERVENTION);
+    });
+    this.input.keyboard?.on('keydown-3', () => {
+      this._toggleAbility(CONSTANTS.ABILITY.TIME_INTERVENTION);
     });
   }
 

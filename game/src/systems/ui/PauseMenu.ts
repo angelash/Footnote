@@ -46,6 +46,7 @@ interface IPauseMenuConfig {
 /** 焦点组ID */
 const FOCUS_GROUP_MAIN_MENU = 'pause-main-menu';
 const FOCUS_GROUP_SETTINGS = 'pause-settings';
+const FOCUS_GROUP_HELP = 'pause-help';
 
 /**
  * 暂停菜单
@@ -55,6 +56,7 @@ export class PauseMenu {
   private _container!: Phaser.GameObjects.Container;
   private _mainMenuContainer!: Phaser.GameObjects.Container;
   private _settingsContainer!: Phaser.GameObjects.Container;
+  private _helpContainer!: Phaser.GameObjects.Container;
   private _settings: IGameSettings;
   private _callbacks: IPauseMenuConfig;
 
@@ -196,6 +198,9 @@ export class PauseMenu {
 
     // 创建设置面板
     this._createSettingsPanel(width, height);
+
+    // 创建帮助面板
+    this._createHelpPanel(width, height);
   }
 
   private _createMainMenu(width: number, height: number): void {
@@ -215,6 +220,7 @@ export class PauseMenu {
     const buttons = [
       { key: 'pause.resume', callback: () => this._onResume() },
       { key: 'pause.settings', callback: () => this._showSettings() },
+      { key: 'pause.help', callback: () => this._showHelp() },
       { key: 'pause.save', callback: () => this._onSave() },
       { key: 'pause.load', callback: () => this._onLoad() },
       { key: 'pause.mainMenu', callback: () => this._onQuit() },
@@ -333,6 +339,224 @@ export class PauseMenu {
     this._settingsContainer.add(backBtn);
 
     this._container.add(this._settingsContainer);
+  }
+
+  /**
+   * 创建帮助面板
+   */
+  private _createHelpPanel(width: number, height: number): void {
+    this._helpContainer = this._scene.add.container(width / 2, height / 2);
+    this._helpContainer.setVisible(false);
+
+    // 面板背景
+    const panelBg = this._scene.add.graphics();
+    panelBg.fillStyle(0x1a1a1f, 0.95);
+    panelBg.fillRoundedRect(-280, -320, 560, 640, 12);
+    panelBg.lineStyle(2, COLORS.BORDER, 1);
+    panelBg.strokeRoundedRect(-280, -320, 560, 640, 12);
+    this._helpContainer.add(panelBg);
+
+    // 标题
+    const title = this._scene.add
+      .text(0, -280, i18n.t('help.title'), {
+        ...TEXT_STYLES.TITLE,
+        fontSize: UI_FONT_SIZE.SECTION,
+      })
+      .setOrigin(0.5);
+    this._registerI18nText('help.title', title);
+    this._helpContainer.add(title);
+
+    // 帮助内容 - 使用滚动区域
+    const contentY = -230;
+    const lineHeight = 28;
+    let currentY = contentY;
+
+    // === 计数器说明 ===
+    const countersTitle = this._scene.add
+      .text(-250, currentY, '【隐藏计数器】', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.NORMAL,
+        color: '#FFD700',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(countersTitle);
+    currentY += lineHeight + 8;
+
+    // R 值
+    const rDesc = this._scene.add
+      .text(-250, currentY, 'R (无收益残差)', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#FF4444',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(rDesc);
+    currentY += lineHeight;
+
+    const rDetail = this._scene.add
+      .text(-230, currentY, '无奖励行为的累积。R≥3时系统语气会变化。', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#A8A6A3',
+        wordWrap: { width: 480 },
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(rDetail);
+    currentY += lineHeight + 4;
+
+    // P 值
+    const pDesc = this._scene.add
+      .text(-250, currentY, 'P (观察者压力)', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#4A9EFF',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(pDesc);
+    currentY += lineHeight;
+
+    const pDetail = this._scene.add
+      .text(-230, currentY, '使用高维能力会增加P值。P≥18时无法使用能力。\n上限20，代表世界的不稳定程度。', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#A8A6A3',
+        wordWrap: { width: 480 },
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(pDetail);
+    currentY += lineHeight * 2 + 4;
+
+    // W 值
+    const wDesc = this._scene.add
+      .text(-250, currentY, 'W (世界可读性)', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#FFD700',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(wDesc);
+    currentY += lineHeight;
+
+    const wDetail = this._scene.add
+      .text(-230, currentY, '综合稳定度指标。影响结局走向。', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#A8A6A3',
+        wordWrap: { width: 480 },
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(wDetail);
+    currentY += lineHeight + 16;
+
+    // === 能力说明 ===
+    const abilitiesTitle = this._scene.add
+      .text(-250, currentY, '【三种能力】', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.NORMAL,
+        color: '#FFD700',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(abilitiesTitle);
+    currentY += lineHeight + 8;
+
+    // 深度感知
+    const ability1 = this._scene.add
+      .text(-250, currentY, '1. 深度感知 [按键1]', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#00FFAA',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(ability1);
+    currentY += lineHeight;
+
+    const ability1Detail = this._scene.add
+      .text(-230, currentY, '只看不动。揭示隐藏信息，持续消耗P值。\n再次按键可关闭。', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#A8A6A3',
+        wordWrap: { width: 480 },
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(ability1Detail);
+    currentY += lineHeight * 2 + 4;
+
+    // 深度介入
+    const ability2 = this._scene.add
+      .text(-250, currentY, '2. 深度介入 [按键2]', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#FF00FF',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(ability2);
+    currentY += lineHeight;
+
+    const ability2Detail = this._scene.add
+      .text(-230, currentY, '可改变结构，但会留下伤痕。每次使用P+2。\n再次按键可关闭。', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#A8A6A3',
+        wordWrap: { width: 480 },
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(ability2Detail);
+    currentY += lineHeight * 2 + 4;
+
+    // 时间干预
+    const ability3 = this._scene.add
+      .text(-250, currentY, '3. 时间干预 [按键3]', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.SMALL,
+        color: '#FFD700',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(ability3);
+    currentY += lineHeight;
+
+    const ability3Detail = this._scene.add
+      .text(-230, currentY, '回溯到之前的节点，产生时间污染。\n每个节点消耗P值。再次按键可关闭。', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#A8A6A3',
+        wordWrap: { width: 480 },
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(ability3Detail);
+    currentY += lineHeight * 2 + 16;
+
+    // === 提示 ===
+    const tipTitle = this._scene.add
+      .text(-250, currentY, '【提示】', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.NORMAL,
+        color: '#FFD700',
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(tipTitle);
+    currentY += lineHeight + 8;
+
+    const tip = this._scene.add
+      .text(-230, currentY, '• 能力使用有代价，谨慎选择\n• 世界会记住你做过的一切\n• 不同选择会影响结局', {
+        ...TEXT_STYLES.BODY,
+        fontSize: UI_FONT_SIZE.TINY,
+        color: '#A8A6A3',
+        wordWrap: { width: 480 },
+      })
+      .setOrigin(0, 0);
+    this._helpContainer.add(tip);
+
+    // 返回按钮
+    const backBtn = this._createButton(
+      0,
+      280,
+      i18n.t('common.back'),
+      () => this._hideHelp(),
+      'common.back'
+    );
+    this._helpContainer.add(backBtn);
+
+    this._container.add(this._helpContainer);
   }
 
   /**
@@ -778,10 +1002,12 @@ export class PauseMenu {
   private _showSettings(): void {
     this._mainMenuContainer.setVisible(false);
     this._settingsContainer.setVisible(true);
+    this._helpContainer.setVisible(false);
     this._isInSettings = true;
 
     // 切换焦点组
     a11yManager.destroyFocusGroup(FOCUS_GROUP_MAIN_MENU);
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_HELP);
     this._setupSettingsFocusGroup();
 
     // 播报设置面板打开
@@ -799,6 +1025,33 @@ export class PauseMenu {
 
     // 播报设置面板关闭
     a11yManager.announceUIState('设置面板', 'closed');
+  }
+
+  private _showHelp(): void {
+    this._mainMenuContainer.setVisible(false);
+    this._settingsContainer.setVisible(false);
+    this._helpContainer.setVisible(true);
+    this._isInSettings = true; // 复用这个标志表示不在主菜单
+
+    // 切换焦点组
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_MAIN_MENU);
+    this._setupHelpFocusGroup();
+
+    // 播报帮助面板打开
+    a11yManager.announceUIState('帮助面板', 'opened');
+  }
+
+  private _hideHelp(): void {
+    this._helpContainer.setVisible(false);
+    this._mainMenuContainer.setVisible(true);
+    this._isInSettings = false;
+
+    // 切换焦点组
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_HELP);
+    this._setupMainMenuFocusGroup();
+
+    // 播报帮助面板关闭
+    a11yManager.announceUIState('帮助面板', 'closed');
   }
 
   private async _saveSettings(): Promise<void> {
@@ -848,8 +1101,10 @@ export class PauseMenu {
 
       // ESC 键处理
       if (event.code === 'Escape') {
-        if (this._isInSettings) {
+        if (this._settingsContainer.visible) {
           this._hideSettings();
+        } else if (this._helpContainer.visible) {
+          this._hideHelp();
         } else {
           this._onResume();
         }
@@ -872,6 +1127,7 @@ export class PauseMenu {
     // 销毁焦点组
     a11yManager.destroyFocusGroup(FOCUS_GROUP_MAIN_MENU);
     a11yManager.destroyFocusGroup(FOCUS_GROUP_SETTINGS);
+    a11yManager.destroyFocusGroup(FOCUS_GROUP_HELP);
   }
 
   /**
@@ -884,10 +1140,11 @@ export class PauseMenu {
       groupName: '暂停菜单',
     });
 
-    const buttonLabels = ['继续游戏', '设置', '保存', '读取', '返回主菜单'];
+    const buttonLabels = ['继续游戏', '设置', '帮助', '保存', '读取', '返回主菜单'];
     const buttonCallbacks = [
       () => this._onResume(),
       () => this._showSettings(),
+      () => this._showHelp(),
       () => this._onSave(),
       () => this._onLoad(),
       () => this._onQuit(),
@@ -935,6 +1192,34 @@ export class PauseMenu {
     });
 
     a11yManager.setActiveFocusGroup(FOCUS_GROUP_SETTINGS);
+  }
+
+  /**
+   * 设置帮助面板焦点组
+   */
+  private _setupHelpFocusGroup(): void {
+    const focusGroup = a11yManager.createFocusGroup(FOCUS_GROUP_HELP, {
+      wrapAround: true,
+      autoFocus: true,
+      groupName: '帮助面板',
+    });
+
+    // 添加返回按钮作为可聚焦元素
+    focusGroup.add({
+      id: 'help-back',
+      label: '返回',
+      role: 'button',
+      enabled: true,
+      onFocus: () => {
+        // 高亮返回按钮
+      },
+      onBlur: () => {
+        // 取消高亮
+      },
+      onActivate: () => this._hideHelp(),
+    });
+
+    a11yManager.setActiveFocusGroup(FOCUS_GROUP_HELP);
   }
 
   /**

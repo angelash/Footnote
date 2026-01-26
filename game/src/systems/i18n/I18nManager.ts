@@ -132,7 +132,11 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       save: '保存游戏',
       load: '读取存档',
       settings: '设置',
+      help: '帮助',
       mainMenu: '返回主菜单',
+    },
+    help: {
+      title: '游戏帮助',
     },
     inventory: {
       title: '物品栏',
@@ -232,7 +236,11 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       save: '保存遊戲',
       load: '讀取存檔',
       settings: '設定',
+      help: '幫助',
       mainMenu: '返回主選單',
+    },
+    help: {
+      title: '遊戲幫助',
     },
     inventory: {
       title: '物品欄',
@@ -332,7 +340,11 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       save: 'Save Game',
       load: 'Load Game',
       settings: 'Settings',
+      help: 'Help',
       mainMenu: 'Main Menu',
+    },
+    help: {
+      title: 'Game Help',
     },
     inventory: {
       title: 'Inventory',
@@ -432,7 +444,11 @@ const BUILT_IN_TRANSLATIONS: Record<SupportedLocale, ITranslation> = {
       save: 'セーブ',
       load: 'ロード',
       settings: '設定',
+      help: 'ヘルプ',
       mainMenu: 'メインメニュー',
+    },
+    help: {
+      title: 'ゲームヘルプ',
     },
     inventory: {
       title: 'インベントリ',

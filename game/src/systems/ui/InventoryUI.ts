@@ -240,6 +240,8 @@ export class InventoryUI {
       this._scrollAreaHeight
     );
     this._scrollMask = maskGraphics.createGeometryMask();
+    // 隐藏遮罩图形，防止阻挡点击事件
+    maskGraphics.setVisible(false);
 
     // 创建滚动条轨道
     this._scrollTrack = this._scene.add.graphics();
@@ -451,12 +453,15 @@ export class InventoryUI {
       totalRows * (CONFIG.CARD_THUMB_HEIGHT + CONFIG.CARD_SPACING) + UI.SPACING.MD;
 
     // 添加拖拽滚动背景（作为最底层，不会阻挡卡片点击）
+    // 注意：只覆盖滚动区域，不要延伸到标签栏和关闭按钮区域
+    const dragBgHeight = Math.max(this._contentHeight, this._scrollAreaHeight);
+    const dragBgY = dragBgHeight / 2; // 从滚动区域顶部开始向下
     const dragBg = this._scene.add
       .rectangle(
         0,
-        this._contentHeight / 2,
+        dragBgY,
         CONFIG.PANEL_WIDTH - 40,
-        Math.max(this._contentHeight, this._scrollAreaHeight),
+        dragBgHeight,
         0x000000,
         0
       )

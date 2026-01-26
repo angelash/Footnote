@@ -114,6 +114,21 @@ export class GameScene extends Phaser.Scene {
   // 交互系统
   private _interactionSystem!: InteractionSystem;
 
+  // 事件监听器引用（用于精确清理）
+  private _boundEventHandlers: {
+    onCounterRChanged?: (payload: { newValue: number }) => void;
+    onCounterPChanged?: (payload: { newValue: number }) => void;
+    onCounterWChanged?: (payload: { newValue: number }) => void;
+    onCardObtained?: (payload: { cardId: string; card?: { title?: string } }) => void;
+    onAbilityUnlocked?: (payload: { abilityType: string }) => void;
+    onZoneTransition?: (payload: { targetZone: string }) => void;
+    onPlaySfx?: (payload: { key: string }) => void;
+    onDialogueEnd?: (payload: { dialogueId: string }) => void;
+    onDialogueAdvance?: (payload: { dialogueId: string }) => void;
+    onDialogueChoice?: (payload: { dialogueId: string; choiceIndex: number; choiceText: string }) => void;
+    onFlagSet?: (data: { flagName: string; value: boolean }) => void;
+  } = {};
+
   // UI元素
   private _zoneTitle!: Phaser.GameObjects.Text;
   private _dialogueBox!: Phaser.GameObjects.Container;
@@ -939,34 +954,52 @@ export class GameScene extends Phaser.Scene {
    * 设置事件监听
    */
   private _setupEventListeners(): void {
+    // 先清理旧监听器（防止 scene.restart() 导致重复注册）
+    this._cleanupEventListeners();
+
+    // 创建并保存绑定的回调引用
+    this._boundEventHandlers = {
+      onCounterRChanged: this._onCounterRChanged.bind(this),
+      onCounterPChanged: this._onCounterPChanged.bind(this),
+      onCounterWChanged: this._onCounterWChanged.bind(this),
+      onCardObtained: this._onCardObtained.bind(this),
+      onAbilityUnlocked: this._onAbilityUnlocked.bind(this),
+      onZoneTransition: this._onZoneTransition.bind(this),
+      onPlaySfx: this._onPlaySfx.bind(this),
+      onDialogueEnd: this._onDialogueEnd.bind(this),
+      onDialogueAdvance: this._onDialogueAdvance.bind(this),
+      onDialogueChoice: this._onDialogueChoice.bind(this),
+      onFlagSet: this._onFlagSet.bind(this),
+    };
+
     // 监听计数器变化
-    eventBus.onTyped(GameEvent.COUNTER_R_CHANGE, this._onCounterRChanged.bind(this));
-    eventBus.onTyped(GameEvent.COUNTER_P_CHANGE, this._onCounterPChanged.bind(this));
-    eventBus.onTyped(GameEvent.COUNTER_W_CHANGE, this._onCounterWChanged.bind(this));
+    eventBus.onTyped(GameEvent.COUNTER_R_CHANGE, this._boundEventHandlers.onCounterRChanged!);
+    eventBus.onTyped(GameEvent.COUNTER_P_CHANGE, this._boundEventHandlers.onCounterPChanged!);
+    eventBus.onTyped(GameEvent.COUNTER_W_CHANGE, this._boundEventHandlers.onCounterWChanged!);
 
     // 监听卡片收集
-    eventBus.onTyped(GameEvent.CARD_OBTAIN, this._onCardObtained.bind(this));
+    eventBus.onTyped(GameEvent.CARD_OBTAIN, this._boundEventHandlers.onCardObtained!);
 
     // 监听能力解锁
-    eventBus.onTyped(GameEvent.ABILITY_UNLOCK, this._onAbilityUnlocked.bind(this));
+    eventBus.onTyped(GameEvent.ABILITY_UNLOCK, this._boundEventHandlers.onAbilityUnlocked!);
 
     // 监听Zone过渡
-    eventBus.on(GameEvent.ZONE_TRANSITION, this._onZoneTransition.bind(this));
+    eventBus.on(GameEvent.ZONE_TRANSITION, this._boundEventHandlers.onZoneTransition!);
 
     // 监听播放音效
-    eventBus.on(GameEvent.PLAY_SFX, this._onPlaySfx.bind(this));
+    eventBus.on(GameEvent.PLAY_SFX, this._boundEventHandlers.onPlaySfx!);
 
     // 监听对话结束，处理结局触发
-    eventBus.onTyped(GameEvent.DIALOGUE_END, this._onDialogueEnd.bind(this));
+    eventBus.onTyped(GameEvent.DIALOGUE_END, this._boundEventHandlers.onDialogueEnd!);
 
     // 监听对话推进（DialogueUI -> NarrativeEngine 同步）
-    eventBus.onTyped(GameEvent.DIALOGUE_ADVANCE, this._onDialogueAdvance.bind(this));
+    eventBus.onTyped(GameEvent.DIALOGUE_ADVANCE, this._boundEventHandlers.onDialogueAdvance!);
 
     // 监听对话选项选择
-    eventBus.onTyped(GameEvent.DIALOGUE_CHOICE, this._onDialogueChoice.bind(this));
+    eventBus.onTyped(GameEvent.DIALOGUE_CHOICE, this._boundEventHandlers.onDialogueChoice!);
 
     // 监听 Flag 设置（用于 CF-Z6 尾声角色对话完成检查）
-    eventBus.on(GameEvent.FLAG_SET, this._onFlagSet.bind(this));
+    eventBus.on(GameEvent.FLAG_SET, this._boundEventHandlers.onFlagSet!);
   }
 
   /**
@@ -994,19 +1027,26 @@ export class GameScene extends Phaser.Scene {
 
   /**
    * 清理事件监听
+   * 只移除 GameScene 自己注册的监听器，不影响其他系统
    */
   private _cleanupEventListeners(): void {
-    eventBus.removeAllListeners(GameEvent.COUNTER_R_CHANGE);
-    eventBus.removeAllListeners(GameEvent.COUNTER_P_CHANGE);
-    eventBus.removeAllListeners(GameEvent.COUNTER_W_CHANGE);
-    eventBus.removeAllListeners(GameEvent.CARD_OBTAIN);
-    eventBus.removeAllListeners(GameEvent.ABILITY_UNLOCK);
-    eventBus.removeAllListeners(GameEvent.ZONE_TRANSITION);
-    eventBus.removeAllListeners(GameEvent.PLAY_SFX);
-    eventBus.removeAllListeners(GameEvent.DIALOGUE_END);
-    eventBus.removeAllListeners(GameEvent.DIALOGUE_ADVANCE);
-    eventBus.removeAllListeners(GameEvent.DIALOGUE_CHOICE);
-    eventBus.removeAllListeners(GameEvent.FLAG_SET);
+    const h = this._boundEventHandlers;
+
+    // 只有保存了引用时才移除
+    if (h.onCounterRChanged) eventBus.off(GameEvent.COUNTER_R_CHANGE, h.onCounterRChanged);
+    if (h.onCounterPChanged) eventBus.off(GameEvent.COUNTER_P_CHANGE, h.onCounterPChanged);
+    if (h.onCounterWChanged) eventBus.off(GameEvent.COUNTER_W_CHANGE, h.onCounterWChanged);
+    if (h.onCardObtained) eventBus.off(GameEvent.CARD_OBTAIN, h.onCardObtained);
+    if (h.onAbilityUnlocked) eventBus.off(GameEvent.ABILITY_UNLOCK, h.onAbilityUnlocked);
+    if (h.onZoneTransition) eventBus.off(GameEvent.ZONE_TRANSITION, h.onZoneTransition);
+    if (h.onPlaySfx) eventBus.off(GameEvent.PLAY_SFX, h.onPlaySfx);
+    if (h.onDialogueEnd) eventBus.off(GameEvent.DIALOGUE_END, h.onDialogueEnd);
+    if (h.onDialogueAdvance) eventBus.off(GameEvent.DIALOGUE_ADVANCE, h.onDialogueAdvance);
+    if (h.onDialogueChoice) eventBus.off(GameEvent.DIALOGUE_CHOICE, h.onDialogueChoice);
+    if (h.onFlagSet) eventBus.off(GameEvent.FLAG_SET, h.onFlagSet);
+
+    // 清空引用
+    this._boundEventHandlers = {};
   }
 
   /**
@@ -1548,6 +1588,12 @@ export class GameScene extends Phaser.Scene {
     action: ISceneAction,
     sourceObject?: Phaser.GameObjects.Container
   ): void {
+    // 如果对话正在显示，阻止新的交互（防止状态混乱）
+    if (this._dialogueUI?.isVisible()) {
+      logger.debug('对话正在显示，阻止场景交互');
+      return;
+    }
+
     // 构建交互上下文
     const context = {
       zoneId: this._currentZoneId,

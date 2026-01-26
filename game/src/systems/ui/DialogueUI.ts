@@ -189,6 +189,11 @@ export class DialogueUI {
    * 隐藏对话
    */
   hideDialogue(): void {
+    console.log('[DialogueUI] hideDialogue() called', {
+      currentDialogueId: this._state.currentDialogue?.id,
+      isWaitingToClose: this._state.isWaitingToClose,
+    });
+
     this._stopTypewriter();
 
     // 移除键盘导航
@@ -207,6 +212,11 @@ export class DialogueUI {
       duration: 200,
       ease: 'Power2',
       onComplete: () => {
+        console.log('[DialogueUI] hideDialogue tween complete', {
+          wasWaitingToClose,
+          willEmitEnd: !!this._state.currentDialogue && !wasWaitingToClose,
+        });
+
         this._container.setVisible(false);
         this._hidePortrait();
 
@@ -229,27 +239,42 @@ export class DialogueUI {
    * 推进对话（点击继续）
    */
   advance(): void {
-    if (!this._state.currentDialogue) return;
+    console.log('[DialogueUI] advance() called', {
+      hasDialogue: !!this._state.currentDialogue,
+      dialogueId: this._state.currentDialogue?.id,
+      isWaitingToClose: this._state.isWaitingToClose,
+      isTyping: this._state.isTyping,
+      hasChoices: !!(this._state.currentDialogue?.choices?.length),
+    });
+
+    if (!this._state.currentDialogue) {
+      console.log('[DialogueUI] advance() - no currentDialogue, returning');
+      return;
+    }
 
     // 如果正在等待关闭，点击后关闭对话
     if (this._state.isWaitingToClose) {
+      console.log('[DialogueUI] advance() - isWaitingToClose, calling hideDialogue()');
       this.hideDialogue();
       return;
     }
 
     // 如果正在打字，直接显示全部文字
     if (this._state.isTyping) {
+      console.log('[DialogueUI] advance() - isTyping, completing typewriter');
       this._completeTypewriter();
       return;
     }
 
     // 如果有选项，不自动推进
     if (this._state.currentDialogue.choices && this._state.currentDialogue.choices.length > 0) {
+      console.log('[DialogueUI] advance() - has choices, not advancing');
       return;
     }
 
     // 总是通知外部，由外部决定是否继续或结束
     // 这样可以让 NarrativeEngine 控制多行对话的流程
+    console.log('[DialogueUI] advance() - emitting DIALOGUE_ADVANCE');
     eventBus.emit(GameEvent.DIALOGUE_ADVANCE, {
       dialogueId: this._state.currentDialogue.id,
       lineIndex: this._state.currentLineIndex,
@@ -261,6 +286,10 @@ export class DialogueUI {
    * 用于让用户有时间阅读最后一行内容
    */
   markWaitingToClose(): void {
+    console.log('[DialogueUI] markWaitingToClose() called', {
+      currentDialogueId: this._state.currentDialogue?.id,
+      wasWaitingToClose: this._state.isWaitingToClose,
+    });
     this._state.isWaitingToClose = true;
     // 显示继续指示器，提示用户点击关闭
     this._continueIndicator.setVisible(true);

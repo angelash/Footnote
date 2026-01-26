@@ -12,7 +12,7 @@ background:
 objects:
   # ========== 拾取物：拾取后消失 ==========
   
-  # 身份卡 - 拾取后消失
+  # 身份卡 - 拾取后消失（卡片进入物品栏）
   - id: identity_card
     type: image
     texture: obj_filing_cabinet
@@ -29,44 +29,6 @@ objects:
       action:
         type: dialogue
         dialogueId: C0Z1_IDENTITY_PICKUP
-
-  # 身份卡放置处 - 拾取后显示，点击提示已获得
-  - id: identity_card_spot
-    type: image
-    texture: obj_filing_cabinet
-    x: 200
-    y: 620
-    scale: 0.8
-    depth: 10
-    alpha: 0.5
-    label: 身份卡放置处
-    condition:
-      flagTrue: FLAG_C0Z1_GOT_IDENTITY
-    interactive:
-      cursor: true
-      testid: identity-card-spot
-      action:
-        type: dialogue
-        dialogueId: C0Z1_IDENTITY_EXAMINE_DONE
-
-  # 身份卡细节检查（长按交互，需要先获得身份卡且未查看过细节）
-  - id: identity_card_detail
-    type: zone
-    x: 200
-    y: 620
-    width: 80
-    height: 80
-    label: 仔细查看身份卡
-    condition:
-      flagTrue: FLAG_C0Z1_GOT_IDENTITY
-      flagFalse: FLAG_SEEN_IDENTITY_CORRECTION
-    interactive:
-      cursor: true
-      testid: identity-card-detail
-      longPress: true
-      action:
-        type: dialogue
-        dialogueId: C0Z1_IDENTITY_DETAIL
 
   # ========== 交互物：交互后保留 ==========
 

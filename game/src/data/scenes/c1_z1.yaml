@@ -2,9 +2,6 @@
 # 格式与更正第一次更显眼
 id: C1-Z1
 title: 市政办事厅
-# 进入第一章时的开场
-onEnter:
-  dialogue: C1Z1_INTRO
 background:
   texture: px_bg_placeholder
   x: 0

@@ -174,9 +174,32 @@ dialogues:
       - speaker: 老人
         text: 没关系……慢慢等就好。
 
+  # ========== 双态对话（已完成状态） ==========
 
+  # 取号机（已取号）
+  C1Z1_TICKET_MACHINE_DONE:
+    id: C1Z1_TICKET_MACHINE_DONE
+    lines:
+      - speaker: 岑回
+        text: 我已经取过号了。A-047。
 
+  # 填表台（已填表）
+  C1Z1_FORM_DESK_DONE:
+    id: C1Z1_FORM_DESK_DONE
+    lines:
+      - speaker: 岑回
+        text: 表格已经填好了。
+      - speaker: 岑回
+        text: 虽然……不太是我填的那样。
 
+  # 服务窗口（已办理）
+  C1Z1_WINDOW_DONE:
+    id: C1Z1_WINDOW_DONE
+    lines:
+      - speaker: 市政职员
+        text: 通行证正在办理中。
+      - speaker: 市政职员
+        text: 下一位。
 
 
 

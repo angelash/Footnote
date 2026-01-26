@@ -126,6 +126,10 @@ dialogues:
         text: 别太在意。大多数人都会慢慢习惯的。
       - speaker: 岑回
         text: （习惯……什么？）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z4_XUCHENG_TALKED
+        flagValue: true
 
   # 阿棠短暂对话
   C1Z4_ATANG_BRIEF:
@@ -158,10 +162,73 @@ dialogues:
         text: 「对齐服务免费提供」
       - speaker: 岑回
         text: 对齐……又是这个词。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z4_NOTICE_CHECKED
+        flagValue: true
 
+  # ========== 双态对话（已完成状态） ==========
 
+  # 问卷台（已填写）
+  C1Z4_QUESTIONNAIRE_DONE:
+    id: C1Z4_QUESTIONNAIRE_DONE
+    lines:
+      - speaker: 岑回
+        text: 问卷已经提交了。
+      - speaker: 岑回
+        text: 「状态稳定。无需干预。」
+      - speaker: 岑回
+        text: 无论怎么回答，结论都一样。
 
+  # 公告板（已查看）
+  C1Z4_NOTICE_BOARD_DONE:
+    id: C1Z4_NOTICE_BOARD_DONE
+    lines:
+      - speaker: 岑回
+        text: 公告板……记忆一致性检测，对齐服务。
+      - speaker: 岑回
+        text: 他们在对齐什么？
 
+  # 诊疗室门（未访问）
+  C1Z4_CLINIC_DOOR:
+    id: C1Z4_CLINIC_DOOR
+    lines:
+      - speaker: ""
+        text: 诊疗室的门紧闭着。
+      - speaker: 岑回
+        text: 里面应该是许澄的工作区域。
+      - speaker: 岑回
+        text: 没有预约的话，不能进去。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z4_CLINIC_VISITED
+        flagValue: true
+
+  # 诊疗室门（已访问）
+  C1Z4_CLINIC_DOOR_DONE:
+    id: C1Z4_CLINIC_DOOR_DONE
+    lines:
+      - speaker: 岑回
+        text: 诊疗室……
+      - speaker: 岑回
+        text: 许澄说，她帮助大家"适应"。
+
+  # 许澄（跟进对话）
+  C1Z4_XUCHENG_FOLLOWUP:
+    id: C1Z4_XUCHENG_FOLLOWUP
+    lines:
+      - speaker: 许澄
+        text: 还有什么问题吗？
+      - speaker: 岑回
+        text: ……没什么。
+      - speaker: 许澄
+        text: 有什么不舒服随时来找我。
+      - speaker: 许澄
+        text: 适应需要时间。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z4_XUCHENG_TALKED
+        flagValue: true
 
 
 

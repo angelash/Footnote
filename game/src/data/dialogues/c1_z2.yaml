@@ -190,9 +190,43 @@ dialogues:
         foreshadowId: F04
         foreshadowStage: plant
 
+  # ========== 双态对话（已完成状态） ==========
 
+  # 门牌17B（已检查）
+  C1Z2_DOOR_17B_DONE:
+    id: C1Z2_DOOR_17B_DONE
+    lines:
+      - speaker: 岑回
+        text: 17B……我已经检查过了。
+      - speaker: 岑回
+        text: 里面是储物间，不是我要找的地方。
 
+  # 门牌19A（已检查）
+  C1Z2_DOOR_19A_DONE:
+    id: C1Z2_DOOR_19A_DONE
+    lines:
+      - speaker: 岑回
+        text: 19A……这扇门通向正确的地方。
+      - speaker: 岑回
+        text: 虽然门牌是错的。
 
+  # 门牌15C（已检查）
+  C1Z2_DOOR_15C_DONE:
+    id: C1Z2_DOOR_15C_DONE
+    lines:
+      - speaker: 岑回
+        text: 15C……里面有人住。
+      - speaker: 岑回
+        text: 但他们也在困惑门牌的问题。
+
+  # 脚印（已检查）
+  C1Z2_FOOTPRINTS_DONE:
+    id: C1Z2_FOOTPRINTS_DONE
+    lines:
+      - speaker: 岑回
+        text: 脚印都指向19A那扇门……
+      - speaker: 岑回
+        text: 人们用脚投票了。
 
 
 

@@ -10,6 +10,10 @@ dialogues:
         text: 看起来不像是普通的地图摊。
       - speaker: ""
         text: 摊主抬起头，目光锐利。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z3_MAP_EXAMINED
+        flagValue: true
 
   # 宋岚对话（核心）
   C1Z3_SONGLAN_TALK:
@@ -47,6 +51,9 @@ dialogues:
     onComplete:
       - type: card
         cardId: CARD_C1_VERSION_MAP_01
+      - type: flag
+        flagName: FLAG_C1Z3_SONGLAN_TALKED
+        flagValue: true
 
   # 想买地图
   C1Z3_SONGLAN_MAP:
@@ -63,6 +70,9 @@ dialogues:
     onComplete:
       - type: card
         cardId: CARD_C1_VERSION_MAP_01
+      - type: flag
+        flagName: FLAG_C1Z3_SONGLAN_TALKED
+        flagValue: true
 
   # 想知道真相
   C1Z3_SONGLAN_TRUTH:
@@ -117,6 +127,9 @@ dialogues:
     onComplete:
       - type: card
         cardId: CARD_C1_VERSION_MAP_01
+      - type: flag
+        flagName: FLAG_C1Z3_SONGLAN_TALKED
+        flagValue: true
 
   # 旧地图
   C1Z3_OLD_MAPS:
@@ -130,6 +143,10 @@ dialogues:
         text: 仔细看，每张地图上同一条街的位置都略有不同。
       - speaker: 岑回
         text: 难道……街道的位置也会变？
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z3_OLD_MAPS_CHECKED
+        flagValue: true
 
   # 记录本
   C1Z3_NOTEBOOK:
@@ -145,10 +162,48 @@ dialogues:
         text: 有一行字被画了圈：
       - speaker: ""
         text: 「版本差异 ≠ 错误。差异 = 被改写的证据。」
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z3_NOTEBOOK_CHECKED
+        flagValue: true
 
+  # ========== 双态对话（已完成状态） ==========
 
+  # 地图摊（已交互）
+  C1Z3_MAP_STALL_DONE:
+    id: C1Z3_MAP_STALL_DONE
+    lines:
+      - speaker: 岑回
+        text: 地图摊……宋岚说这里卖的不是地图，是记录。
 
+  # 旧地图（已检查）
+  C1Z3_OLD_MAPS_DONE:
+    id: C1Z3_OLD_MAPS_DONE
+    lines:
+      - speaker: 岑回
+        text: 这些旧地图……同一个地方有很多版本。
+      - speaker: 岑回
+        text: 街道的位置会变，这已经不是什么新鲜事了。
 
+  # 记录本（已检查）
+  C1Z3_NOTEBOOK_DONE:
+    id: C1Z3_NOTEBOOK_DONE
+    lines:
+      - speaker: 岑回
+        text: 宋岚的记录本……
+      - speaker: 岑回
+        text: 「版本差异 ≠ 错误。差异 = 被改写的证据。」
+
+  # 宋岚（跟进对话）
+  C1Z3_SONGLAN_FOLLOWUP:
+    id: C1Z3_SONGLAN_FOLLOWUP
+    lines:
+      - speaker: 宋岚
+        text: 有新的发现吗？
+      - speaker: 岑回
+        text: 还在观察。
+      - speaker: 宋岚
+        text: 好。继续记录。
 
 
 

@@ -137,9 +137,56 @@ dialogues:
       - speaker: 岑回
         text: （我已经把它收好了。）
 
+  # ========== 双态对话（已完成状态） ==========
 
+  # 讲台
+  C1Z5_PODIUM:
+    id: C1Z5_PODIUM
+    lines:
+      - speaker: 岑回
+        text: 简易的讲台……
+      - speaker: 岑回
+        text: 牧平就是在这里讲他那些神秘的话。
+      - speaker: 岑回
+        text: 「纸页不恨你，它只会承受不住。」
 
+  # 祷文抄本（未获取状态）
+  C1Z5_PRAYER_NOTE:
+    id: C1Z5_PRAYER_NOTE
+    lines:
+      - speaker: ""
+        text: 地上有一张散落的纸片。
+      - speaker: 岑回
+        text: 这是……抄本？
+      - speaker: ""
+        text: （拾起纸片）
+      - speaker: 岑回
+        text: 上面写满了祷文和警告。
+    onComplete:
+      - type: card
+        cardId: CARD_C1_PRAYER_01
+      - type: flag
+        flagName: FLAG_C1Z5_PRAYER_GOT
+        flagValue: true
 
+  # 牧平（跟进对话）
+  C1Z5_MUPING_FOLLOWUP:
+    id: C1Z5_MUPING_FOLLOWUP
+    lines:
+      - speaker: 牧平
+        text: 你还在这里。
+      - speaker: 岑回
+        text: 我有些问题……
+      - speaker: 牧平
+        text: 问题不是用来回答的。
+      - speaker: 牧平
+        text: 问题是用来承受的。
+      - speaker: 牧平
+        text: 走吧，去看看边缘。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z5_MUPING_TALKED
+        flagValue: true
 
 
 

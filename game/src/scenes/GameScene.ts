@@ -1389,6 +1389,9 @@ export class GameScene extends Phaser.Scene {
   private _loadZone(zoneId: string): void {
     logger.info(`加载Zone: ${zoneId}`);
 
+    // 同步当前 Zone 到 WorldState（用于存档）
+    worldState.setCurrentZone(zoneId);
+
     // 使用 zones.config.ts 中的配置获取 Zone 名称
     this._zoneTitle.setText(getZoneName(zoneId));
     this._zoneTitle.setData('testid', 'zone-title');

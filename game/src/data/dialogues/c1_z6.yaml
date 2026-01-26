@@ -14,6 +14,10 @@ dialogues:
         text: 边缘很整齐。太整齐了。
       - speaker: 岑回
         text: 正常的坍塌不会是这样的。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_COLLAPSE_INSPECTED
+        flagValue: true
 
   # 警告标志
   C1Z6_WARNING_SIGN:
@@ -73,6 +77,10 @@ dialogues:
         text: 「处理方案：等待系统更正」
       - speaker: 岑回
         text: 就这样？不维修，只是等？
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_MARKER_CHECKED
+        flagValue: true
 
   # 顾临远程通讯
   C1Z6_GULIN_COMMS:
@@ -118,6 +126,10 @@ dialogues:
         text: 完成巡检，提交报告。这是你的工作。
       - speaker: ""
         text: （通讯结束）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_GULIN_CONTACTED
+        flagValue: true
     nextDialogueId: C1Z6_CHAPTER_COMPLETE
 
   # 顾临结束
@@ -128,6 +140,10 @@ dialogues:
         text: 很好。完成巡检后回来报告。
       - speaker: ""
         text: （通讯结束）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_GULIN_CONTACTED
+        flagValue: true
     nextDialogueId: C1Z6_CHAPTER_COMPLETE
 
   # 碎片检查
@@ -145,6 +161,9 @@ dialogues:
     onComplete:
       - type: card
         cardId: CARD_C1_COLLAPSE_REPORT
+      - type: flag
+        flagName: FLAG_C1Z6_DEBRIS_COLLECTED
+        flagValue: true
 
   # 深度感知：隐藏结构
   C1Z6_HIDDEN_STRUCTURE:
@@ -193,9 +212,59 @@ dialogues:
         flagName: FLAG_C1_COMPLETE
         flagValue: true
 
+  # ========== 双态对话（已完成状态） ==========
 
+  # 坍塌区域（已检查）
+  C1Z6_COLLAPSE_INSPECT_DONE:
+    id: C1Z6_COLLAPSE_INSPECT_DONE
+    lines:
+      - speaker: 岑回
+        text: 坍塌区域……边缘太整齐了。
+      - speaker: 岑回
+        text: 这不是自然塌陷，更像是被抽空的。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_COLLAPSE_INSPECTED
+        flagValue: true
 
+  # 维修局标记（已检查）
+  C1Z6_BUREAU_MARKER_DONE:
+    id: C1Z6_BUREAU_MARKER_DONE
+    lines:
+      - speaker: 岑回
+        text: 维修局的标记……「等待系统更正」。
+      - speaker: 岑回
+        text: 他们不打算修复，只是等。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_MARKER_CHECKED
+        flagValue: true
 
+  # 通讯点（已通讯）
+  C1Z6_GULIN_COMMS_DONE:
+    id: C1Z6_GULIN_COMMS_DONE
+    lines:
+      - speaker: 岑回
+        text: 通讯点……顾临让我不要擅自行动。
+      - speaker: 岑回
+        text: 「你是来巡检的，不是来修复的。」
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_GULIN_CONTACTED
+        flagValue: true
+
+  # 碎片（已收集）
+  C1Z6_DEBRIS_DONE:
+    id: C1Z6_DEBRIS_DONE
+    lines:
+      - speaker: 岑回
+        text: 碎片……边缘很整齐。
+      - speaker: 岑回
+        text: 像是被切割的，不像是被震碎的。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z6_DEBRIS_COLLECTED
+        flagValue: true
 
 
 

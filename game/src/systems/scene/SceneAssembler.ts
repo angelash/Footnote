@@ -9,6 +9,7 @@ import type {
   IAssembledScene,
   ISceneAssemblerCallbacks,
   ISceneConfig,
+  ISceneObjectCondition,
   ISceneObjectConfig,
 } from '@/types/scene';
 import { TEXT_STYLES } from '@/config/game.config';
@@ -559,11 +560,106 @@ export class SceneAssembler {
     }
   }
 
-  private _getConditionRequiredTrueFlag(
-    condition: ISceneObjectConfig['condition']
-  ): string | undefined {
-    if (!condition) return undefined;
-    return condition.flagTrue ?? condition.flag ?? this._mapAbilityActiveToFlag(condition.abilityActive);
+  /**
+   * 评估单个条件的基本字段（flagTrue, flagFalse, abilityActive）
+   * 不包含 all/any 的递归评估
+   */
+  private _evaluateBaseCondition(condition: ISceneObjectCondition): boolean {
+    // 检查 flagTrue（包括兼容的 flag 字段）
+    const flagTrue = condition.flagTrue ?? condition.flag;
+    if (flagTrue && !worldState.getFlag(flagTrue)) {
+      return false;
+    }
+    // 检查 flagFalse：需要 flag 为 false
+    if (condition.flagFalse && worldState.getFlag(condition.flagFalse)) {
+      return false;
+    }
+    // 检查 abilityActive
+    if (condition.abilityActive) {
+      const abilityFlag = this._mapAbilityActiveToFlag(condition.abilityActive);
+      if (abilityFlag && !worldState.getFlag(abilityFlag)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * 递归评估条件（支持 all/any 深层嵌套）
+   * @param condition 条件对象
+   * @returns 条件是否满足
+   * 
+   * 评估逻辑：
+   * 1. 首先检查条件本身的基本字段（flagTrue, flagFalse, abilityActive）
+   * 2. 然后检查 all 数组：所有子条件都必须满足
+   * 3. 最后检查 any 数组：至少一个子条件满足
+   * 4. 只有 1、2、3 都通过才返回 true
+   */
+  private _evaluateCondition(condition: ISceneObjectCondition): boolean {
+    // 1. 检查基本条件字段
+    if (!this._evaluateBaseCondition(condition)) {
+      return false;
+    }
+
+    // 2. 检查 all 条件：所有子条件都必须满足（递归）
+    if (condition.all && condition.all.length > 0) {
+      for (const subCondition of condition.all) {
+        if (!this._evaluateCondition(subCondition)) {
+          return false;
+        }
+      }
+    }
+
+    // 3. 检查 any 条件：至少一个子条件满足（递归）
+    if (condition.any && condition.any.length > 0) {
+      let anyMatch = false;
+      for (const subCondition of condition.any) {
+        if (this._evaluateCondition(subCondition)) {
+          anyMatch = true;
+          break;
+        }
+      }
+      if (!anyMatch) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * 递归收集条件中所有需要监听的 flag 名称
+   * @param condition 条件对象
+   * @returns flag 名称数组（已去重）
+   */
+  private _collectConditionFlags(condition: ISceneObjectCondition): string[] {
+    const flags: string[] = [];
+
+    // 收集当前条件的基本 flags
+    if (condition.flagTrue) flags.push(condition.flagTrue);
+    if (condition.flag) flags.push(condition.flag);
+    if (condition.flagFalse) flags.push(condition.flagFalse);
+    if (condition.abilityActive) {
+      const abilityFlag = this._mapAbilityActiveToFlag(condition.abilityActive);
+      if (abilityFlag) flags.push(abilityFlag);
+    }
+
+    // 递归收集 all 子条件的 flags
+    if (condition.all) {
+      for (const subCondition of condition.all) {
+        flags.push(...this._collectConditionFlags(subCondition));
+      }
+    }
+
+    // 递归收集 any 子条件的 flags
+    if (condition.any) {
+      for (const subCondition of condition.any) {
+        flags.push(...this._collectConditionFlags(subCondition));
+      }
+    }
+
+    // 去重并过滤空值
+    return [...new Set(flags.filter(Boolean))];
   }
 
   private _installConditionWatcher(
@@ -584,11 +680,11 @@ export class SceneAssembler {
       return;
     }
 
-    const requiredTrueFlag = this._getConditionRequiredTrueFlag(condition);
-    const requiredFalseFlag = condition.flagFalse;
-    console.log(`[ConditionWatcher] ${obj.id}: requiredTrueFlag=${requiredTrueFlag}, requiredFalseFlag=${requiredFalseFlag}`);
+    // 收集所有需要监听的 flags（支持 all/any 嵌套）
+    const relevantFlags = this._collectConditionFlags(condition);
+    console.log(`[ConditionWatcher] ${obj.id}: 收集到的 flags: [${relevantFlags.join(', ')}]`);
     
-    if (!requiredTrueFlag && !requiredFalseFlag) {
+    if (relevantFlags.length === 0) {
       console.log(`[ConditionWatcher] ${obj.id}: 没有需要监听的 flag，跳过`);
       return;
     }
@@ -597,10 +693,9 @@ export class SceneAssembler {
     // 对于带 condition 的对象，alpha=0 通常表示“暂时隐藏等待条件”
     const enabledAlpha = configuredAlpha === 0 ? 1 : configuredAlpha;
 
+    // 使用新的递归评估方法（支持 all/any 组合）
     const checkSatisfied = (): boolean => {
-      if (requiredTrueFlag && !worldState.getFlag(requiredTrueFlag)) return false;
-      if (requiredFalseFlag && worldState.getFlag(requiredFalseFlag)) return false;
-      return true;
+      return this._evaluateCondition(condition);
     };
 
     const apply = (satisfied: boolean): void => {
@@ -644,7 +739,7 @@ export class SceneAssembler {
     };
 
     let last = checkSatisfied();
-    console.log(`[ConditionWatcher] ${obj.id}: 初始化 satisfied=${last}, trueFlag=${requiredTrueFlag}, falseFlag=${requiredFalseFlag}`);
+    console.log(`[ConditionWatcher] ${obj.id}: 初始化 satisfied=${last}, 监听flags=[${relevantFlags.join(', ')}]`);
     apply(last);
 
     // 检查对象是否仍然存活
@@ -656,7 +751,6 @@ export class SceneAssembler {
     };
 
     // 使用事件监听立即响应 flag 变化（不再依赖轮询延迟）
-    const relevantFlags = [requiredTrueFlag, requiredFalseFlag].filter(Boolean) as string[];
     console.log(`[ConditionWatcher] ${obj.id}: 监听 flags: [${relevantFlags.join(', ')}]`);
     
     const onFlagSet = (data: { flagName: string; value: boolean }): void => {

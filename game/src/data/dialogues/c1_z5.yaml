@@ -150,25 +150,6 @@ dialogues:
       - speaker: 岑回
         text: 「纸页不恨你，它只会承受不住。」
 
-  # 祷文抄本（未获取状态）
-  C1Z5_PRAYER_NOTE:
-    id: C1Z5_PRAYER_NOTE
-    lines:
-      - speaker: ""
-        text: 地上有一张散落的纸片。
-      - speaker: 岑回
-        text: 这是……抄本？
-      - speaker: ""
-        text: （拾起纸片）
-      - speaker: 岑回
-        text: 上面写满了祷文和警告。
-    onComplete:
-      - type: card
-        cardId: CARD_C1_PRAYER_01
-      - type: flag
-        flagName: FLAG_C1Z5_PRAYER_GOT
-        flagValue: true
-
   # 牧平（跟进对话）
   C1Z5_MUPING_FOLLOWUP:
     id: C1Z5_MUPING_FOLLOWUP

@@ -57,12 +57,19 @@ export interface IDialogueChoice {
 
 /**
  * 选项条件
+ * 支持单条件和组合条件（all/any）
  */
 export interface IChoiceCondition {
   hasCard?: string;
   hasAbility?: string;
   flagTrue?: string;
+  flagFalse?: string;
   rMin?: number;
+  rMax?: number;
+  /** 所有条件都满足 */
+  all?: IChoiceCondition[];
+  /** 任一条件满足 */
+  any?: IChoiceCondition[];
 }
 
 /**
@@ -524,17 +531,50 @@ class NarrativeEngine {
     return mapping[type] || type;
   }
 
+  /**
+   * 检查选项条件
+   * 支持单条件和组合条件（all/any）的递归检查
+   */
   private _checkChoiceCondition(condition: IChoiceCondition): boolean {
+    // 处理组合条件：all（所有条件都满足）
+    if (condition.all && condition.all.length > 0) {
+      const allPassed = condition.all.every((c) => this._checkChoiceCondition(c));
+      if (!allPassed) return false;
+    }
+
+    // 处理组合条件：any（任一条件满足）
+    if (condition.any && condition.any.length > 0) {
+      const anyPassed = condition.any.some((c) => this._checkChoiceCondition(c));
+      if (!anyPassed) return false;
+    }
+
+    // 检查单条件：hasCard
     if (condition.hasCard && !this.hasCard(condition.hasCard)) return false;
+
+    // 检查单条件：hasAbility
     if (condition.hasAbility) {
       const normalizedType = this._normalizeAbilityType(condition.hasAbility);
       if (!worldState.hasAbility(normalizedType as AbilityType)) return false;
     }
+
+    // 检查单条件：flagTrue（flag 必须为 true）
     if (condition.flagTrue && !worldState.getFlag(condition.flagTrue)) return false;
+
+    // 检查单条件：flagFalse（flag 必须为 false 或未设置）
+    if (condition.flagFalse && worldState.getFlag(condition.flagFalse)) return false;
+
+    // 检查单条件：rMin（R 值必须 >= rMin）
     if (condition.rMin !== undefined) {
       const { R } = worldState.getCounters();
       if (R < condition.rMin) return false;
     }
+
+    // 检查单条件：rMax（R 值必须 <= rMax）
+    if (condition.rMax !== undefined) {
+      const { R } = worldState.getCounters();
+      if (R > condition.rMax) return false;
+    }
+
     return true;
   }
 

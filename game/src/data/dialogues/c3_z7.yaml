@@ -45,7 +45,7 @@ dialogues:
           pDelta: 2
           setFlag:
             name: FLAG_EDGE_SCAR
-            value: 2
+            value: true
         nextDialogueId: C3Z7_DO_INTERVENTION
       - id: find_another_way
         text: 找别的路

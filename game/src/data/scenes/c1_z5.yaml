@@ -28,7 +28,9 @@ objects:
         type: dialogue
         dialogueId: C1Z5_PODIUM
 
-  # 祷文抄本位置（未获取）
+  # 祷文抄本位置（只在听完夜谈后出现）
+  # 注：抄本由牧平在 C1Z5_MUPING_FULL 对话中直接给予
+  # 此物件仅作为视觉提示，点击后显示已获取的抄本内容
   - id: prayer_note
     type: image
     texture: px_item_archive
@@ -39,32 +41,10 @@ objects:
     label: 抄本
     labelOffset: [0, 50]
     condition:
-      all:
-        - flagTrue: FLAG_C1Z5_STAYED
-        - flagFalse: FLAG_C1Z5_PRAYER_GOT
+      flagTrue: FLAG_C1Z5_STAYED
     interactive:
       cursor: true
       testid: prayer-note
-      action:
-        type: dialogue
-        dialogueId: C1Z5_PRAYER_NOTE
-
-  # 祷文抄本位置（已获取）
-  - id: prayer_note_done
-    type: image
-    texture: px_item_archive
-    x: 550
-    y: 480
-    scale: 0.4
-    depth: 8
-    label: 抄本
-    labelOffset: [0, 50]
-    alpha: 0.5
-    condition:
-      flagTrue: FLAG_C1Z5_PRAYER_GOT
-    interactive:
-      cursor: true
-      testid: prayer-note-done
       action:
         type: dialogue
         dialogueId: C1Z5_PRAYER_NOTE_EXAMINE

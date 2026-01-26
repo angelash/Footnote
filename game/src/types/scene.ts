@@ -110,22 +110,56 @@ export interface ISceneObjectAnimation {
   frameNumbers?: number[];
 }
 
-/** 场景对象显示条件 */
-export interface ISceneObjectCondition {
-  /**
-   * 需要的 flag 为 true 才显示/可交互（兼容旧字段）
-   * @deprecated 请使用 flagTrue
-   */
-  flag?: string;
-  /** 需要的 flag 为 true 才显示/可交互（推荐） */
+/** 单个条件项（用于 all/any 组合） */
+export interface IConditionItem {
+  /** 需要的 flag 为 true 才满足 */
   flagTrue?: string;
-  /** 需要的 flag 为 false 才显示/可交互 */
+  /** 需要的 flag 为 false 才满足 */
   flagFalse?: string;
   /**
    * 临时兼容：能力激活条件（将通过 flag 系统实现）
    * 当前仅保证 depthPerception 可用。
    */
   abilityActive?: string;
+}
+
+/** 场景对象显示条件（支持递归嵌套） */
+export interface ISceneObjectCondition extends IConditionItem {
+  /**
+   * 需要的 flag 为 true 才显示/可交互（兼容旧字段）
+   * @deprecated 请使用 flagTrue
+   */
+  flag?: string;
+  
+  /**
+   * 组合条件：所有子条件都满足时才满足
+   * 支持递归嵌套（子条件可以包含 all/any）
+   * @example
+   * # 简单组合
+   * all:
+   *   - flagTrue: FLAG_A
+   *   - flagFalse: FLAG_B
+   * 
+   * # 嵌套组合
+   * all:
+   *   - flagTrue: FLAG_MAIN
+   *   - any:
+   *       - flagTrue: FLAG_OPTION_A
+   *       - flagTrue: FLAG_OPTION_B
+   */
+  all?: ISceneObjectCondition[];
+  
+  /**
+   * 组合条件：任一子条件满足时即满足
+   * 支持递归嵌套（子条件可以包含 all/any）
+   * @example
+   * any:
+   *   - flagTrue: FLAG_A
+   *   - all:
+   *       - flagTrue: FLAG_B
+   *       - flagTrue: FLAG_C
+   */
+  any?: ISceneObjectCondition[];
 }
 
 export interface ISceneObjectConfig {

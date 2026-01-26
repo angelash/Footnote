@@ -127,7 +127,7 @@ objects:
 
   # ========== NPC角色 ==========
 
-  # 排队老人
+  # 排队老人（未交谈）- 用统一的 flag 控制
   - id: elderly_person
     type: image
     texture: placeholder_char
@@ -138,12 +138,34 @@ objects:
     tint: 0xAA9988
     label: 排队的老人
     labelOffset: [0, 80]
+    condition:
+      flagFalse: FLAG_C1Z1_ELDERLY_DONE
     interactive:
       cursor: true
       testid: elderly-person
       action:
         type: dialogue
         dialogueId: C1Z1_ELDERLY
+
+  # 排队老人（已交谈/已帮助）
+  - id: elderly_person_done
+    type: image
+    texture: placeholder_char
+    x: 280
+    y: 600
+    scale: 1.0
+    depth: 8
+    tint: 0xAA9988
+    label: 排队的老人
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C1Z1_ELDERLY_DONE
+    interactive:
+      cursor: true
+      testid: elderly-person-done
+      action:
+        type: dialogue
+        dialogueId: C1Z1_ELDERLY_DONE
 
   # 市政职员
   - id: clerk

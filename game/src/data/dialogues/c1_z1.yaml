@@ -70,23 +70,38 @@ dialogues:
       - speaker: 市政职员
         text: 下一位。表格和取号单。
     choices:
+      # 两个都完成了，显示提交选项
       - id: submit_form
-        text: 提交表格
+        text: 提交表格和取号单
         condition:
-          flagTrue:
-            - FLAG_C1Z1_FORM_FILLED
-            - FLAG_C1Z1_GOT_TICKET
+          all:
+            - flagTrue: FLAG_C1Z1_FORM_FILLED
+            - flagTrue: FLAG_C1Z1_GOT_TICKET
         nextDialogueId: C1Z1_SUBMIT
-      - id: no_ticket
-        text: 我还没取号
+      # 只填了表，没取号
+      - id: form_only
+        text: 我填好表了，但还没取号
         condition:
-          flagFalse: FLAG_C1Z1_GOT_TICKET
+          all:
+            - flagTrue: FLAG_C1Z1_FORM_FILLED
+            - flagFalse: FLAG_C1Z1_GOT_TICKET
         nextDialogueId: C1Z1_GO_TICKET
-      - id: no_form
-        text: 我还没填好
+      # 只取了号，没填表
+      - id: ticket_only
+        text: 我取了号，但还没填好表
         condition:
-          flagFalse: FLAG_C1Z1_FORM_FILLED
+          all:
+            - flagFalse: FLAG_C1Z1_FORM_FILLED
+            - flagTrue: FLAG_C1Z1_GOT_TICKET
         nextDialogueId: C1Z1_GO_FILL
+      # 两个都没做
+      - id: nothing_done
+        text: 我还没准备好
+        condition:
+          all:
+            - flagFalse: FLAG_C1Z1_FORM_FILLED
+            - flagFalse: FLAG_C1Z1_GOT_TICKET
+        nextDialogueId: C1Z1_GO_BOTH
 
   # 提交表格
   C1Z1_SUBMIT:
@@ -125,7 +140,16 @@ dialogues:
       - speaker: 市政职员
         text: 取号机在入口那边。先取号，再来排队。
 
-  # 老人
+  # 两个都没做
+  C1Z1_GO_BOTH:
+    id: C1Z1_GO_BOTH
+    lines:
+      - speaker: 市政职员
+        text: 你什么都没准备？
+      - speaker: 市政职员
+        text: 取号机和填表台都在那边。准备好了再来。
+
+  # 老人（首次对话）
   C1Z1_ELDERLY:
     id: C1Z1_ELDERLY
     lines:
@@ -138,9 +162,6 @@ dialogues:
         text: 帮他填表
         effects:
           rDelta: 1
-          setFlag:
-            name: FLAG_HELPED_ELDER
-            value: true
         nextDialogueId: C1Z1_HELP_ELDER
       - id: refuse_elder
         text: 抱歉，我赶时间
@@ -164,6 +185,10 @@ dialogues:
         text: 也许是我记错了吧。
       - speaker: 岑回
         text: （也许不是。）
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z1_ELDERLY_DONE
+        flagValue: true
 
   # 拒绝老人
   C1Z1_REFUSE_ELDER:
@@ -173,6 +198,19 @@ dialogues:
         text: 抱歉，我赶时间。
       - speaker: 老人
         text: 没关系……慢慢等就好。
+    onComplete:
+      - type: flag
+        flagName: FLAG_C1Z1_ELDERLY_DONE
+        flagValue: true
+
+  # 老人（已交谈后）
+  C1Z1_ELDERLY_DONE:
+    id: C1Z1_ELDERLY_DONE
+    lines:
+      - speaker: 老人
+        text: （老人正在填表……）
+      - speaker: 岑回
+        text: （不打扰他了。）
 
   # ========== 双态对话（已完成状态） ==========
 

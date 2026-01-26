@@ -79,7 +79,7 @@ dialogues:
           rDelta: 1
           setFlag:
             name: FLAG_HALL_SCAR
-            value: 1
+            value: true
         nextDialogueId: C3Z2_DO_INTERVENTION
       - id: cancel_intervention
         text: 取消

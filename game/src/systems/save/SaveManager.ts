@@ -164,7 +164,8 @@ function validateWorldState(data: unknown): void {
   const state = data as Record<string, unknown>;
 
   // 检查必需的 worldState 字段
-  const requiredFields = ['currentChapter', 'currentZone'];
+  // 注意：IWorldStateData 中字段名是 currentZoneId，不是 currentZone
+  const requiredFields = ['currentChapter', 'currentZoneId'];
   for (const field of requiredFields) {
     if (!(field in state)) {
       throw new SaveValidationError(

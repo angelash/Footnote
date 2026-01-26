@@ -9,16 +9,69 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 路灯
-  - id: street_lamp
-    type: image
-    texture: obj_lamp
-    x: 180
-    y: 350
-    scale: 0.7
-    depth: 10
+  # ========== 核心交互物 ==========
 
-  # 牧平
+  # 简易讲台
+  - id: podium
+    type: image
+    texture: px_item_archive
+    x: 400
+    y: 380
+    scale: 0.5
+    depth: 9
+    label: 讲台
+    labelOffset: [0, 60]
+    interactive:
+      cursor: true
+      testid: podium
+      action:
+        type: dialogue
+        dialogueId: C1Z5_PODIUM
+
+  # 祷文抄本位置（未获取）
+  - id: prayer_note
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 480
+    scale: 0.4
+    depth: 8
+    label: 抄本
+    labelOffset: [0, 50]
+    condition:
+      all:
+        - flagTrue: FLAG_C1Z5_STAYED
+        - flagFalse: FLAG_C1Z5_PRAYER_GOT
+    interactive:
+      cursor: true
+      testid: prayer-note
+      action:
+        type: dialogue
+        dialogueId: C1Z5_PRAYER_NOTE
+
+  # 祷文抄本位置（已获取）
+  - id: prayer_note_done
+    type: image
+    texture: px_item_archive
+    x: 550
+    y: 480
+    scale: 0.4
+    depth: 8
+    label: 抄本
+    labelOffset: [0, 50]
+    alpha: 0.5
+    condition:
+      flagTrue: FLAG_C1Z5_PRAYER_GOT
+    interactive:
+      cursor: true
+      testid: prayer-note-done
+      action:
+        type: dialogue
+        dialogueId: C1Z5_PRAYER_NOTE_EXAMINE
+
+  # ========== NPC角色 ==========
+
+  # 牧平（首次对话前）
   - id: muping
     type: image
     texture: portrait_muping_neutral
@@ -28,6 +81,8 @@ objects:
     depth: 12
     label: 牧平
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C1Z5_MUPING_TALKED
     interactive:
       cursor: true
       testid: muping
@@ -35,7 +90,26 @@ objects:
         type: dialogue
         dialogueId: C1Z5_MUPING_TALK
 
-  # 聚会人群（远景）
+  # 牧平（对话后）
+  - id: muping_talked
+    type: image
+    texture: portrait_muping_neutral
+    x: 400
+    y: 450
+    scale: 0.45
+    depth: 12
+    label: 牧平
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C1Z5_MUPING_TALKED
+    interactive:
+      cursor: true
+      testid: muping-talked
+      action:
+        type: dialogue
+        dialogueId: C1Z5_MUPING_FOLLOWUP
+
+  # 聚会人群1
   - id: crowd_1
     type: image
     texture: placeholder_char
@@ -46,6 +120,7 @@ objects:
     alpha: 0.6
     tint: 0x666688
 
+  # 聚会人群2
   - id: crowd_2
     type: image
     texture: placeholder_char
@@ -56,6 +131,7 @@ objects:
     alpha: 0.5
     tint: 0x668866
 
+  # 聚会人群3
   - id: crowd_3
     type: image
     texture: placeholder_char
@@ -65,6 +141,17 @@ objects:
     depth: 6
     alpha: 0.55
     tint: 0x886666
+
+  # ========== 装饰物和场景设施 ==========
+
+  # 路灯
+  - id: street_lamp
+    type: image
+    texture: obj_lamp
+    x: 180
+    y: 350
+    scale: 0.7
+    depth: 10
 
   # 礼堂建筑（远景）
   - id: hall_building
@@ -77,15 +164,6 @@ objects:
     alpha: 0.7
     tint: 0x445566
 
-  # 简易讲台
-  - id: podium
-    type: image
-    texture: px_item_archive
-    x: 400
-    y: 380
-    scale: 0.5
-    depth: 9
-
   # 夜空装饰（星光效果）
   - id: night_sky
     type: image
@@ -96,23 +174,7 @@ objects:
     depth: 1
     alpha: 0.3
 
-  # 祷文抄本位置（已通过对话获取，此处仅作为视觉提示）
-  - id: prayer_note
-    type: image
-    texture: px_item_archive
-    x: 550
-    y: 480
-    scale: 0.4
-    depth: 8
-    label: 抄本
-    labelOffset: [0, 50]
-    condition:
-      flag: FLAG_C1Z5_STAYED
-    interactive:
-      cursor: true
-      action:
-        type: dialogue
-        dialogueId: C1Z5_PRAYER_NOTE_EXAMINE
+  # ========== 出口和导航 ==========
 
   # 出口 - 前往边缘断口
   - id: exit_forward
@@ -141,12 +203,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C1-Z4
-
-
-
-
-
-
-
-
-

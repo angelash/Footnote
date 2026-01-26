@@ -9,7 +9,9 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 门牌A - 17B（实际是储物间）
+  # ========== 核心交互物：三扇门 ==========
+
+  # 门牌A - 17B（实际是储物间）- 未检查
   - id: door_17b
     type: image
     texture: px_item_door
@@ -19,6 +21,8 @@ objects:
     depth: 10
     label: 门牌 17B
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C1Z2_DOOR_17B_CHECKED
     interactive:
       cursor: true
       testid: door-17b
@@ -26,7 +30,26 @@ objects:
         type: dialogue
         dialogueId: C1Z2_DOOR_17B
 
-  # 门牌B - 19A（脚印指向这里）
+  # 门牌A - 17B（已检查）
+  - id: door_17b_done
+    type: image
+    texture: px_item_door
+    x: 180
+    y: 400
+    scale: 0.7
+    depth: 10
+    label: 门牌 17B
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C1Z2_DOOR_17B_CHECKED
+    interactive:
+      cursor: true
+      testid: door-17b-done
+      action:
+        type: dialogue
+        dialogueId: C1Z2_DOOR_17B_DONE
+
+  # 门牌B - 19A（脚印指向这里）- 未检查
   - id: door_19a
     type: image
     texture: px_item_door
@@ -36,6 +59,8 @@ objects:
     depth: 10
     label: 门牌 19A
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C1Z2_DOOR_19A_CHECKED
     interactive:
       cursor: true
       testid: door-19a
@@ -43,7 +68,26 @@ objects:
         type: dialogue
         dialogueId: C1Z2_DOOR_19A
 
-  # 门牌C - 15C（声音传出）
+  # 门牌B - 19A（已检查）
+  - id: door_19a_done
+    type: image
+    texture: px_item_door
+    x: 375
+    y: 380
+    scale: 0.7
+    depth: 10
+    label: 门牌 19A
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C1Z2_DOOR_19A_CHECKED
+    interactive:
+      cursor: true
+      testid: door-19a-done
+      action:
+        type: dialogue
+        dialogueId: C1Z2_DOOR_19A_DONE
+
+  # 门牌C - 15C（声音传出）- 未检查
   - id: door_15c
     type: image
     texture: px_item_door
@@ -53,6 +97,8 @@ objects:
     depth: 10
     label: 门牌 15C
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C1Z2_DOOR_15C_CHECKED
     interactive:
       cursor: true
       testid: door-15c
@@ -60,7 +106,28 @@ objects:
         type: dialogue
         dialogueId: C1Z2_DOOR_15C
 
-  # 地面脚印
+  # 门牌C - 15C（已检查）
+  - id: door_15c_done
+    type: image
+    texture: px_item_door
+    x: 570
+    y: 420
+    scale: 0.7
+    depth: 10
+    label: 门牌 15C
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C1Z2_DOOR_15C_CHECKED
+    interactive:
+      cursor: true
+      testid: door-15c-done
+      action:
+        type: dialogue
+        dialogueId: C1Z2_DOOR_15C_DONE
+
+  # ========== 线索物品 ==========
+
+  # 地面脚印（未检查）
   - id: footprints
     type: image
     texture: px_fx_scar
@@ -71,12 +138,34 @@ objects:
     alpha: 0.7
     label: 脚印
     labelOffset: [0, 60]
+    condition:
+      flagFalse: FLAG_C1Z2_FOOTPRINTS_CHECKED
     interactive:
       cursor: true
       testid: footprints
       action:
         type: dialogue
         dialogueId: C1Z2_FOOTPRINTS
+
+  # 地面脚印（已检查）
+  - id: footprints_done
+    type: image
+    texture: px_fx_scar
+    x: 300
+    y: 550
+    scale: 0.6
+    depth: 5
+    alpha: 0.4
+    label: 脚印
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C1Z2_FOOTPRINTS_CHECKED
+    interactive:
+      cursor: true
+      testid: footprints-done
+      action:
+        type: dialogue
+        dialogueId: C1Z2_FOOTPRINTS_DONE
 
   # 通风口
   - id: vent
@@ -95,6 +184,8 @@ objects:
         type: dialogue
         dialogueId: C1Z2_VENT
 
+  # ========== NPC角色 ==========
+
   # 住户NPC
   - id: resident
     type: image
@@ -108,11 +199,14 @@ objects:
     labelOffset: [0, 70]
     interactive:
       cursor: true
+      testid: resident
       action:
         type: dialogue
         dialogueId: C1Z2_RESIDENT
 
-  # 走廊装饰
+  # ========== 装饰物 ==========
+
+  # 走廊灯光
   - id: corridor_light
     type: image
     texture: px_item_archive
@@ -121,6 +215,8 @@ objects:
     scale: 0.4
     depth: 3
     alpha: 0.6
+
+  # ========== 出口和导航 ==========
 
   # 出口 - 前往地图摊
   - id: exit_forward
@@ -151,12 +247,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C1-Z1
-
-
-
-
-
-
-
-
-

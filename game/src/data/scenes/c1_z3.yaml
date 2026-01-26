@@ -9,7 +9,9 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 地图摊
+  # ========== 核心交互物 ==========
+
+  # 地图摊（未交互）
   - id: map_stall
     type: image
     texture: px_item_archive
@@ -19,6 +21,8 @@ objects:
     depth: 10
     label: 地图摊
     labelOffset: [0, 100]
+    condition:
+      flagFalse: FLAG_C1Z3_MAP_EXAMINED
     interactive:
       cursor: true
       testid: map-stall
@@ -26,24 +30,26 @@ objects:
         type: dialogue
         dialogueId: C1Z3_MAP_STALL
 
-  # 宋岚
-  - id: songlan
+  # 地图摊（已交互）
+  - id: map_stall_done
     type: image
-    texture: portrait_songlan_neutral
-    x: 400
-    y: 380
-    scale: 0.4
-    depth: 12
-    label: 宋岚
-    labelOffset: [0, 80]
+    texture: px_item_archive
+    x: 375
+    y: 450
+    scale: 0.9
+    depth: 10
+    label: 地图摊
+    labelOffset: [0, 100]
+    condition:
+      flagTrue: FLAG_C1Z3_MAP_EXAMINED
     interactive:
       cursor: true
-      testid: songlan
+      testid: map-stall-done
       action:
         type: dialogue
-        dialogueId: C1Z3_SONGLAN_TALK
+        dialogueId: C1Z3_MAP_STALL_DONE
 
-  # 旧地图堆
+  # 旧地图堆（未检查）
   - id: old_maps
     type: image
     texture: px_item_archive
@@ -53,13 +59,35 @@ objects:
     depth: 8
     label: 旧地图
     labelOffset: [0, 70]
+    condition:
+      flagFalse: FLAG_C1Z3_OLD_MAPS_CHECKED
     interactive:
       cursor: true
+      testid: old-maps
       action:
         type: dialogue
         dialogueId: C1Z3_OLD_MAPS
 
-  # 记录本
+  # 旧地图堆（已检查）
+  - id: old_maps_done
+    type: image
+    texture: px_item_archive
+    x: 250
+    y: 520
+    scale: 0.6
+    depth: 8
+    label: 旧地图
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_C1Z3_OLD_MAPS_CHECKED
+    interactive:
+      cursor: true
+      testid: old-maps-done
+      action:
+        type: dialogue
+        dialogueId: C1Z3_OLD_MAPS_DONE
+
+  # 记录本（未检查）
   - id: notebook
     type: image
     texture: px_item_archive
@@ -69,23 +97,75 @@ objects:
     depth: 9
     label: 记录本
     labelOffset: [0, 60]
+    condition:
+      flagFalse: FLAG_C1Z3_NOTEBOOK_CHECKED
     interactive:
       cursor: true
+      testid: notebook
       action:
         type: dialogue
         dialogueId: C1Z3_NOTEBOOK
 
-  # 巷口装饰
-  - id: alley_sign
+  # 记录本（已检查）
+  - id: notebook_done
     type: image
-    texture: px_item_sign
-    x: 150
-    y: 350
+    texture: px_item_archive
+    x: 500
+    y: 500
     scale: 0.5
-    depth: 6
-    rotation: -0.1
+    depth: 9
+    label: 记录本
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C1Z3_NOTEBOOK_CHECKED
+    interactive:
+      cursor: true
+      testid: notebook-done
+      action:
+        type: dialogue
+        dialogueId: C1Z3_NOTEBOOK_DONE
 
-  # 路人
+  # ========== NPC角色 ==========
+
+  # 宋岚（首次对话前）
+  - id: songlan
+    type: image
+    texture: portrait_songlan_neutral
+    x: 400
+    y: 380
+    scale: 0.4
+    depth: 12
+    label: 宋岚
+    labelOffset: [0, 80]
+    condition:
+      flagFalse: FLAG_C1Z3_SONGLAN_TALKED
+    interactive:
+      cursor: true
+      testid: songlan
+      action:
+        type: dialogue
+        dialogueId: C1Z3_SONGLAN_TALK
+
+  # 宋岚（对话后）
+  - id: songlan_talked
+    type: image
+    texture: portrait_songlan_neutral
+    x: 400
+    y: 380
+    scale: 0.4
+    depth: 12
+    label: 宋岚
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C1Z3_SONGLAN_TALKED
+    interactive:
+      cursor: true
+      testid: songlan-talked
+      action:
+        type: dialogue
+        dialogueId: C1Z3_SONGLAN_FOLLOWUP
+
+  # 路人剪影
   - id: passerby
     type: image
     texture: placeholder_char
@@ -95,6 +175,20 @@ objects:
     depth: 5
     alpha: 0.5
     tint: 0x666666
+
+  # ========== 装饰物 ==========
+
+  # 巷口路标
+  - id: alley_sign
+    type: image
+    texture: px_item_sign
+    x: 150
+    y: 350
+    scale: 0.5
+    depth: 6
+    rotation: -0.1
+
+  # ========== 出口和导航 ==========
 
   # 出口 - 前往诊疗台
   - id: exit_to_clinic
@@ -123,12 +217,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C1-Z2
-
-
-
-
-
-
-
-
-

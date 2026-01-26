@@ -9,7 +9,9 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 坍塌区域
+  # ========== 核心交互物 ==========
+
+  # 坍塌区域（未检查）
   - id: collapse_zone
     type: image
     texture: obj_crack
@@ -19,6 +21,8 @@ objects:
     depth: 10
     label: 坍塌区域
     labelOffset: [0, 120]
+    condition:
+      flagFalse: FLAG_C1Z6_COLLAPSE_INSPECTED
     interactive:
       cursor: true
       testid: collapse-zone
@@ -26,24 +30,24 @@ objects:
         type: dialogue
         dialogueId: C1Z6_COLLAPSE_INSPECT
 
-  # 封锁线
-  - id: barrier_1
+  # 坍塌区域（已检查）
+  - id: collapse_zone_done
     type: image
-    texture: obj_barrier
-    x: 200
-    y: 500
-    scale: 0.6
-    depth: 12
-    rotation: 0.1
-
-  - id: barrier_2
-    type: image
-    texture: obj_barrier
-    x: 550
-    y: 480
-    scale: 0.6
-    depth: 12
-    rotation: -0.1
+    texture: obj_crack
+    x: 375
+    y: 400
+    scale: 1.5
+    depth: 10
+    label: 坍塌区域
+    labelOffset: [0, 120]
+    condition:
+      flagTrue: FLAG_C1Z6_COLLAPSE_INSPECTED
+    interactive:
+      cursor: true
+      testid: collapse-zone-done
+      action:
+        type: dialogue
+        dialogueId: C1Z6_COLLAPSE_INSPECT_DONE
 
   # 警告标志
   - id: warning_sign
@@ -57,21 +61,129 @@ objects:
     labelOffset: [0, 60]
     interactive:
       cursor: true
+      testid: warning-sign
       action:
         type: dialogue
         dialogueId: C1Z6_WARNING_SIGN
 
-  # 裂缝边缘
-  - id: crack_edge
+  # 维修局标记（未检查）
+  - id: bureau_marker
     type: image
-    texture: obj_crack
-    x: 450
-    y: 350
-    scale: 0.8
-    depth: 8
-    alpha: 0.8
+    texture: px_fx_system_correct
+    x: 320
+    y: 420
+    scale: 0.6
+    depth: 15
+    label: 维修局标记
+    labelOffset: [0, 60]
+    condition:
+      flagFalse: FLAG_C1Z6_MARKER_CHECKED
+    interactive:
+      cursor: true
+      testid: bureau-marker
+      action:
+        type: dialogue
+        dialogueId: C1Z6_BUREAU_MARKER
 
-  # 住户NPC
+  # 维修局标记（已检查）
+  - id: bureau_marker_done
+    type: image
+    texture: px_fx_system_correct
+    x: 320
+    y: 420
+    scale: 0.6
+    depth: 15
+    label: 维修局标记
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C1Z6_MARKER_CHECKED
+    interactive:
+      cursor: true
+      testid: bureau-marker-done
+      action:
+        type: dialogue
+        dialogueId: C1Z6_BUREAU_MARKER_DONE
+
+  # 顾临远程通讯点（未通讯）
+  - id: comms_point
+    type: image
+    texture: px_item_archive
+    x: 250
+    y: 300
+    scale: 0.5
+    depth: 10
+    label: 通讯点
+    labelOffset: [0, 55]
+    condition:
+      flagFalse: FLAG_C1Z6_GULIN_CONTACTED
+    interactive:
+      cursor: true
+      testid: comms-point
+      action:
+        type: dialogue
+        dialogueId: C1Z6_GULIN_COMMS
+
+  # 顾临远程通讯点（已通讯）
+  - id: comms_point_done
+    type: image
+    texture: px_item_archive
+    x: 250
+    y: 300
+    scale: 0.5
+    depth: 10
+    label: 通讯点
+    labelOffset: [0, 55]
+    condition:
+      flagTrue: FLAG_C1Z6_GULIN_CONTACTED
+    interactive:
+      cursor: true
+      testid: comms-point-done
+      action:
+        type: dialogue
+        dialogueId: C1Z6_GULIN_COMMS_DONE
+
+  # 碎片收集点（未收集）
+  - id: debris
+    type: image
+    texture: px_fx_scar
+    x: 480
+    y: 480
+    scale: 0.5
+    depth: 7
+    label: 碎片
+    labelOffset: [0, 50]
+    condition:
+      flagFalse: FLAG_C1Z6_DEBRIS_COLLECTED
+    interactive:
+      cursor: true
+      testid: debris
+      action:
+        type: dialogue
+        dialogueId: C1Z6_DEBRIS
+
+  # 碎片收集点（已收集）
+  - id: debris_done
+    type: image
+    texture: px_fx_scar
+    x: 480
+    y: 480
+    scale: 0.5
+    depth: 7
+    alpha: 0.4
+    label: 碎片
+    labelOffset: [0, 50]
+    condition:
+      flagTrue: FLAG_C1Z6_DEBRIS_COLLECTED
+    interactive:
+      cursor: true
+      testid: debris-done
+      action:
+        type: dialogue
+        dialogueId: C1Z6_DEBRIS_DONE
+
+  # ========== NPC角色 ==========
+
+  # 受灾住户
   - id: affected_resident
     type: image
     texture: placeholder_char
@@ -84,60 +196,14 @@ objects:
     labelOffset: [0, 70]
     interactive:
       cursor: true
+      testid: affected-resident
       action:
         type: dialogue
         dialogueId: C1Z6_RESIDENT
 
-  # 维修局标记
-  - id: bureau_marker
-    type: image
-    texture: px_fx_system_correct
-    x: 320
-    y: 420
-    scale: 0.6
-    depth: 15
-    label: 维修局标记
-    labelOffset: [0, 60]
-    interactive:
-      cursor: true
-      action:
-        type: dialogue
-        dialogueId: C1Z6_BUREAU_MARKER
+  # ========== 深度感知触发（高维能力） ==========
 
-  # 顾临远程通讯点
-  - id: comms_point
-    type: image
-    texture: px_item_archive
-    x: 250
-    y: 300
-    scale: 0.5
-    depth: 10
-    label: 通讯点
-    labelOffset: [0, 55]
-    interactive:
-      cursor: true
-      testid: comms-point
-      action:
-        type: dialogue
-        dialogueId: C1Z6_GULIN_COMMS
-
-  # 碎片收集点
-  - id: debris
-    type: image
-    texture: px_fx_scar
-    x: 480
-    y: 480
-    scale: 0.5
-    depth: 7
-    label: 碎片
-    labelOffset: [0, 50]
-    interactive:
-      cursor: true
-      action:
-        type: dialogue
-        dialogueId: C1Z6_DEBRIS
-
-  # 深度感知触发点（隐藏的裂缝内部）
+  # 隐藏的裂缝内部（需深度感知激活）
   - id: hidden_crack
     type: zone
     x: 375
@@ -145,15 +211,51 @@ objects:
     width: 100
     height: 100
     depth: 20
+    label: 裂缝深处
     condition:
       abilityActive: depthPerception
     interactive:
       cursor: true
+      testid: hidden-crack
       action:
         type: dialogue
         dialogueId: C1Z6_HIDDEN_STRUCTURE
 
-  # 返回
+  # ========== 装饰物和场景设施 ==========
+
+  # 封锁线1
+  - id: barrier_1
+    type: image
+    texture: obj_barrier
+    x: 200
+    y: 500
+    scale: 0.6
+    depth: 12
+    rotation: 0.1
+
+  # 封锁线2
+  - id: barrier_2
+    type: image
+    texture: obj_barrier
+    x: 550
+    y: 480
+    scale: 0.6
+    depth: 12
+    rotation: -0.1
+
+  # 裂缝边缘
+  - id: crack_edge
+    type: image
+    texture: obj_crack
+    x: 450
+    y: 350
+    scale: 0.8
+    depth: 8
+    alpha: 0.8
+
+  # ========== 出口和导航 ==========
+
+  # 返回礼堂街
   - id: exit_back
     type: zone
     x: 375
@@ -182,12 +284,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C2-Z1
-
-
-
-
-
-
-
-
-

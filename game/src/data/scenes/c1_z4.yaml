@@ -9,24 +9,9 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 候诊椅
-  - id: waiting_chairs
-    type: image
-    texture: obj_chair
-    x: 200
-    y: 500
-    scale: 0.8
-    depth: 8
+  # ========== 核心交互物 ==========
 
-  - id: waiting_chairs_2
-    type: image
-    texture: obj_chair
-    x: 350
-    y: 520
-    scale: 0.8
-    depth: 8
-
-  # 问卷台
+  # 问卷台（未填写问卷）
   - id: questionnaire_desk
     type: image
     texture: px_item_archive
@@ -36,6 +21,8 @@ objects:
     depth: 10
     label: 问卷台
     labelOffset: [0, 100]
+    condition:
+      flagFalse: FLAG_C1Z4_QUESTIONNAIRE_DONE
     interactive:
       cursor: true
       testid: questionnaire-desk
@@ -43,7 +30,104 @@ objects:
         type: dialogue
         dialogueId: C1Z4_QUESTIONNAIRE
 
-  # 许澄
+  # 问卷台（已填写问卷）
+  - id: questionnaire_desk_done
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 380
+    scale: 0.9
+    depth: 10
+    label: 问卷台
+    labelOffset: [0, 100]
+    condition:
+      flagTrue: FLAG_C1Z4_QUESTIONNAIRE_DONE
+    interactive:
+      cursor: true
+      testid: questionnaire-desk-done
+      action:
+        type: dialogue
+        dialogueId: C1Z4_QUESTIONNAIRE_DONE
+
+  # 公告板（未查看）
+  - id: notice_board
+    type: image
+    texture: px_item_archive
+    x: 150
+    y: 350
+    scale: 0.5
+    depth: 9
+    label: 公告板
+    labelOffset: [0, 60]
+    condition:
+      flagFalse: FLAG_C1Z4_NOTICE_CHECKED
+    interactive:
+      cursor: true
+      testid: notice-board
+      action:
+        type: dialogue
+        dialogueId: C1Z4_NOTICE_BOARD
+
+  # 公告板（已查看）
+  - id: notice_board_done
+    type: image
+    texture: px_item_archive
+    x: 150
+    y: 350
+    scale: 0.5
+    depth: 9
+    label: 公告板
+    labelOffset: [0, 60]
+    condition:
+      flagTrue: FLAG_C1Z4_NOTICE_CHECKED
+    interactive:
+      cursor: true
+      testid: notice-board-done
+      action:
+        type: dialogue
+        dialogueId: C1Z4_NOTICE_BOARD_DONE
+
+  # 诊疗室门（未进入）
+  - id: clinic_door
+    type: image
+    texture: px_item_door
+    x: 600
+    y: 280
+    scale: 0.6
+    depth: 11
+    label: 诊疗室
+    labelOffset: [0, 70]
+    condition:
+      flagFalse: FLAG_C1Z4_CLINIC_VISITED
+    interactive:
+      cursor: true
+      testid: clinic-door
+      action:
+        type: dialogue
+        dialogueId: C1Z4_CLINIC_DOOR
+
+  # 诊疗室门（已进入）
+  - id: clinic_door_done
+    type: image
+    texture: px_item_door
+    x: 600
+    y: 280
+    scale: 0.6
+    depth: 11
+    label: 诊疗室
+    labelOffset: [0, 70]
+    condition:
+      flagTrue: FLAG_C1Z4_CLINIC_VISITED
+    interactive:
+      cursor: true
+      testid: clinic-door-done
+      action:
+        type: dialogue
+        dialogueId: C1Z4_CLINIC_DOOR_DONE
+
+  # ========== NPC角色 ==========
+
+  # 许澄（首次对话前）
   - id: xucheng
     type: image
     texture: portrait_xucheng_neutral
@@ -53,6 +137,8 @@ objects:
     depth: 12
     label: 许澄
     labelOffset: [0, 80]
+    condition:
+      flagFalse: FLAG_C1Z4_XUCHENG_TALKED
     interactive:
       cursor: true
       testid: xucheng
@@ -60,7 +146,26 @@ objects:
         type: dialogue
         dialogueId: C1Z4_XUCHENG_TALK
 
-  # 阿棠（远景）
+  # 许澄（对话后）
+  - id: xucheng_talked
+    type: image
+    texture: portrait_xucheng_neutral
+    x: 550
+    y: 350
+    scale: 0.4
+    depth: 12
+    label: 许澄
+    labelOffset: [0, 80]
+    condition:
+      flagTrue: FLAG_C1Z4_XUCHENG_TALKED
+    interactive:
+      cursor: true
+      testid: xucheng-talked
+      action:
+        type: dialogue
+        dialogueId: C1Z4_XUCHENG_FOLLOWUP
+
+  # 阿棠（远景）- 可交互
   - id: atang_distant
     type: image
     texture: portrait_atang_neutral
@@ -73,11 +178,12 @@ objects:
     labelOffset: [0, 50]
     interactive:
       cursor: true
+      testid: atang-distant
       action:
         type: dialogue
         dialogueId: C1Z4_ATANG_BRIEF
 
-  # 候诊患者
+  # 候诊患者1
   - id: patient_1
     type: image
     texture: placeholder_char
@@ -88,6 +194,7 @@ objects:
     alpha: 0.8
     tint: 0x888899
 
+  # 候诊患者2
   - id: patient_2
     type: image
     texture: placeholder_char
@@ -98,32 +205,27 @@ objects:
     alpha: 0.8
     tint: 0x889988
 
-  # 诊疗室门
-  - id: clinic_door
-    type: image
-    texture: px_item_door
-    x: 600
-    y: 280
-    scale: 0.6
-    depth: 11
-    label: 诊疗室
-    labelOffset: [0, 70]
+  # ========== 装饰物 ==========
 
-  # 公告板
-  - id: notice_board
+  # 候诊椅1
+  - id: waiting_chairs
     type: image
-    texture: px_item_archive
-    x: 150
-    y: 350
-    scale: 0.5
-    depth: 9
-    label: 公告板
-    labelOffset: [0, 60]
-    interactive:
-      cursor: true
-      action:
-        type: dialogue
-        dialogueId: C1Z4_NOTICE_BOARD
+    texture: obj_chair
+    x: 200
+    y: 500
+    scale: 0.8
+    depth: 8
+
+  # 候诊椅2
+  - id: waiting_chairs_2
+    type: image
+    texture: obj_chair
+    x: 350
+    y: 520
+    scale: 0.8
+    depth: 8
+
+  # ========== 出口和导航 ==========
 
   # 出口 - 前往礼堂街
   - id: exit_forward
@@ -154,12 +256,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C1-Z3
-
-
-
-
-
-
-
-
-

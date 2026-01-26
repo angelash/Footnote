@@ -2,6 +2,9 @@
 # 格式与更正第一次更显眼
 id: C1-Z1
 title: 市政办事厅
+# 进入第一章时的开场
+onEnter:
+  dialogue: C1Z1_INTRO
 background:
   texture: px_bg_placeholder
   x: 0
@@ -9,7 +12,9 @@ background:
   origin: [0, 0]
   displaySize: [750, 1334]
 objects:
-  # 取号机
+  # ========== 核心交互物 ==========
+
+  # 取号机（未取号）
   - id: ticket_machine
     type: image
     texture: px_item_archive
@@ -19,6 +24,8 @@ objects:
     depth: 10
     label: 取号机
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C1Z1_GOT_TICKET
     interactive:
       cursor: true
       testid: ticket-machine
@@ -26,7 +33,26 @@ objects:
         type: dialogue
         dialogueId: C1Z1_TICKET_MACHINE
 
-  # 填表台
+  # 取号机（已取号）
+  - id: ticket_machine_done
+    type: image
+    texture: px_item_archive
+    x: 150
+    y: 400
+    scale: 0.7
+    depth: 10
+    label: 取号机
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C1Z1_GOT_TICKET
+    interactive:
+      cursor: true
+      testid: ticket-machine-done
+      action:
+        type: dialogue
+        dialogueId: C1Z1_TICKET_MACHINE_DONE
+
+  # 填表台（未填表）
   - id: form_desk
     type: image
     texture: px_item_archive
@@ -36,6 +62,8 @@ objects:
     depth: 10
     label: 填表台
     labelOffset: [0, 100]
+    condition:
+      flagFalse: FLAG_C1Z1_FORM_FILLED
     interactive:
       cursor: true
       testid: form-desk
@@ -43,7 +71,26 @@ objects:
         type: dialogue
         dialogueId: C1Z1_FORM_DESK
 
-  # 窗口
+  # 填表台（已填表）
+  - id: form_desk_done
+    type: image
+    texture: px_item_archive
+    x: 375
+    y: 500
+    scale: 0.8
+    depth: 10
+    label: 填表台
+    labelOffset: [0, 100]
+    condition:
+      flagTrue: FLAG_C1Z1_FORM_FILLED
+    interactive:
+      cursor: true
+      testid: form-desk-done
+      action:
+        type: dialogue
+        dialogueId: C1Z1_FORM_DESK_DONE
+
+  # 服务窗口（未办理）
   - id: service_window
     type: image
     texture: px_item_archive
@@ -53,12 +100,35 @@ objects:
     depth: 12
     label: 服务窗口
     labelOffset: [0, 90]
+    condition:
+      flagFalse: FLAG_C1Z1_PERMIT_OBTAINED
     interactive:
       cursor: true
       testid: service-window
       action:
         type: dialogue
         dialogueId: C1Z1_WINDOW
+
+  # 服务窗口（已办理）
+  - id: service_window_done
+    type: image
+    texture: px_item_archive
+    x: 600
+    y: 350
+    scale: 0.75
+    depth: 12
+    label: 服务窗口
+    labelOffset: [0, 90]
+    condition:
+      flagTrue: FLAG_C1Z1_PERMIT_OBTAINED
+    interactive:
+      cursor: true
+      testid: service-window-done
+      action:
+        type: dialogue
+        dialogueId: C1Z1_WINDOW_DONE
+
+  # ========== NPC角色 ==========
 
   # 排队老人
   - id: elderly_person
@@ -88,7 +158,9 @@ objects:
     depth: 11
     tint: 0x88AA88
 
-  # 排队民众
+  # ========== 装饰物和背景角色 ==========
+
+  # 排队民众1
   - id: citizen_1
     type: image
     texture: placeholder_char
@@ -99,6 +171,7 @@ objects:
     alpha: 0.7
     tint: 0x888888
 
+  # 排队民众2
   - id: citizen_2
     type: image
     texture: placeholder_char
@@ -108,6 +181,8 @@ objects:
     depth: 7
     alpha: 0.7
     tint: 0x888888
+
+  # ========== 出口和导航 ==========
 
   # 出口 - 前往错门走廊
   - id: exit_to_corridor
@@ -138,12 +213,3 @@ objects:
       action:
         type: gotoZone
         zoneId: C0-Z4
-
-
-
-
-
-
-
-
-

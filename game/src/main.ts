@@ -18,6 +18,15 @@ if (import.meta.env.PROD) {
   configureLogger({ level: LogLevel.WARN });
 }
 
+// 确保在严格模式下的环境安全检查
+try {
+  if (typeof window === 'undefined') {
+    console.error('Footnote game requires a browser environment.');
+  }
+} catch (e) {
+  // 忽略非浏览器环境下的检查错误
+}
+
 const logger = createLogger('Main');
 
 // 扩展 Window 接口以支持调试变量

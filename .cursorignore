@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+
+# Version Control
+.git/
+.svn/
+
+# IDE/Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Testing & Logs
+coverage/
+**/coverage/
+playwright-report/
+**/playwright-report/
+test-results/
+**/test-results/
+logs/
+**/logs/
+*.log
+
+# Large Assets
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.mp4
+**/*.mov
+**/*.wav
+**/*.mp3
+**/*.svg
+**/*.zip
+**/*.tar.gz
+
+# Lock files (often too large/noisy for context)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb

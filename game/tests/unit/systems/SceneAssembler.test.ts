@@ -436,8 +436,9 @@ describe('SceneAssembler', () => {
       expect(resolvedObject.setData).toHaveBeenCalledWith('action', interactiveObject.interactive!.action);
     });
 
-    // TODO: 交互物件的点击响应已移至 InteractionSystem 统一处理，此测试需要重新设计
-    it.skip('点击时应该触发回调', () => {
+    it('交互物件的 action 数据应该被正确设置（供 InteractionSystem 使用）', () => {
+      // 交互物件的点击响应已移至 InteractionSystem 统一处理
+      // SceneAssembler 只负责设置 action 数据，由 InteractionSystem 读取并处理点击
       const configWithInteractive: ISceneConfig = {
         ...mockSceneConfig,
         objects: [interactiveObject],
@@ -447,19 +448,12 @@ describe('SceneAssembler', () => {
 
       const resolvedObject = mockAssetResolver.resolveObject.mock.results[0].value.gameObject;
 
-      // 获取pointerdown回调
-      const pointerdownCall = resolvedObject.on.mock.calls.find(
-        (call) => call[0] === 'pointerdown'
-      );
-      expect(pointerdownCall).toBeDefined();
-
-      // 模拟点击
-      pointerdownCall[1]();
-
-      expect(mockCallbacks.onAction).toHaveBeenCalledWith(
-        interactiveObject.interactive!.action,
-        interactiveObject.id
-      );
+      // 验证 action 数据被设置（InteractionSystem 会读取这个数据）
+      expect(resolvedObject.setData).toHaveBeenCalledWith('action', interactiveObject.interactive!.action);
+      
+      // 验证 testid 被设置（用于测试和识别）
+      // 注意: interactiveObject.id 是 'test_interactive'
+      expect(resolvedObject.setData).toHaveBeenCalledWith('testid', 'test_interactive');
     });
 
     it('action.type为none时不应设置点击回调', () => {

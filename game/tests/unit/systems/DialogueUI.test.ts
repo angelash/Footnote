@@ -541,4 +541,33 @@ describe('DialogueUI', () => {
       expect(mockTweenAdd).toHaveBeenCalled();
     });
   });
+
+  describe('销毁', () => {
+    it('destroy 应清理资源', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      
+      // 不应抛错
+      expect(() => dialogueUI.destroy()).not.toThrow();
+      
+      // 验证容器被销毁
+      expect(mockContainer.destroy).toHaveBeenCalled();
+    });
+
+    it('destroy 后 isVisible 应返回 false', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      dialogueUI.destroy();
+      
+      expect(dialogueUI.isVisible()).toBe(false);
+    });
+  });
+
+  describe('焦点管理', () => {
+    it('getCurrentFocusIndex 应返回当前焦点索引', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      
+      const index = dialogueUI.getCurrentFocusIndex();
+      expect(typeof index).toBe('number');
+      expect(index).toBeGreaterThanOrEqual(-1);
+    });
+  });
 });

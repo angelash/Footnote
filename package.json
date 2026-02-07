@@ -1,0 +1,61 @@
+{
+  "name": "footnote",
+  "version": "0.1.0",
+  "description": "《备注 / Footnote》- 叙事驱动的2D系统策略冒险H5游戏",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:preview": "vite --config vite.preview.config.ts",
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "build:preview": "vite build --config vite.preview.config.ts",
+    "serve": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "typecheck": "tsc -p tsconfig.build.json",
+    "convert:design": "tsx scripts/convert-design.ts",
+    "generate:assets": "tsx scripts/generate-assets.ts",
+    "generate:pixel-assets": "python scripts/generate_pixel_assets.py",
+    "generate:pixel-assets:128": "python scripts/generate_pixel_assets.py --out-dir assets/images/pixel --scale 8 --max-colors 24 --with-sequences --sequence-frames 12"
+  },
+  "dependencies": {
+    "idb": "^8.0.0",
+    "phaser": "^3.70.0",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vitest/coverage-istanbul": "^1.6.1",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "jsdom": "^27.3.0",
+    "prettier": "^3.1.0",
+    "terser": "^5.44.1",
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.4",
+    "vitest": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "browserslist": [
+    "iOS >= 12",
+    "Android >= 8",
+    "Chrome >= 80",
+    "Safari >= 12"
+  ],
+  "author": "Footnote Team",
+  "license": "UNLICENSED",
+  "private": true
+}

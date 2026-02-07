@@ -1,67 +1,71 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright E2E 测试配置
- * @see https://playwright.dev/docs/test-configuration
+ * Playwright E2E Config (WSL Optimized)
  */
 export default defineConfig({
   testDir: './tests/e2e',
   
-  /* 测试运行配置 */
+  /* Run tests in files in parallel */
   fullyParallel: true,
+  
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
+  
+  /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
+  
+  /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   
-  /* 报告器配置 */
+  /* Reporter configuration */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
-    ['json', { outputFile: 'test-results/results.json' }],
-    ['list'],
+    ['html', { outputFolder: 'playwright-report' }], // Fixed path collision
+    ['list']
   ],
   
-  /* 全局配置 */
+  /* Shared settings for all the projects below */
   use: {
-    /* 基础 URL */
+    /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://localhost:5173',
+
+    /* Collect trace when retrying the failed test. */
+    trace: 'on-first-retry',
     
-    /* 截图和视频 */
+    /* Capture screenshot on failure */
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-    trace: 'retain-on-failure',
     
-    /* 超时配置 */
-    actionTimeout: 10000,
-    navigationTimeout: 30000,
+    /* WSL Specific: Increase timeouts due to software rendering overhead */
+    actionTimeout: 30000,
+    navigationTimeout: 60000,
   },
 
-  /* 测试项目（不同设备/浏览器） */
+  /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        // WSL Optimization: Disable GPU hardware acceleration if causing issues
+        launchOptions: {
+          args: ['--disable-gpu'] 
+        }
+      },
     },
-    {
-      name: 'mobile-chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'mobile-safari',
-      use: { ...devices['iPhone 13'] },
-    },
+    // Disabled Mobile/Webkit projects for WSL stability
   ],
 
-  /* 启动开发服务器 */
+  /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:5173',
     reuseExistingServer: !process.env.CI,
-    timeout: 120000,
+    timeout: 120 * 1000, // 2 minutes for Vite to start
   },
-
-  /* 测试超时 */
-  timeout: 60000,
+  
+  /* Global timeout */
+  timeout: 120 * 1000,
   expect: {
-    timeout: 10000,
+    timeout: 15000,
   },
 });

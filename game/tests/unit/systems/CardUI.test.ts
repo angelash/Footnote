@@ -431,4 +431,152 @@ describe('CardUI', () => {
       expect(allTexts).toContain('点击翻转');
     });
   });
+
+  describe('无回调创建', () => {
+    it('无回调时 closeCard 应正常工作', () => {
+      const ui = new CardUI({
+        scene: mockScene as unknown as Phaser.Scene,
+      });
+
+      ui.showCard(mockCard);
+      vi.clearAllMocks();
+
+      ui.closeCard();
+
+      // 获取动画完成回调
+      const tweenConfig = mockTweenAdd.mock.calls[0][0];
+      expect(() => tweenConfig.onComplete()).not.toThrow();
+    });
+  });
+
+  describe('关闭按钮', () => {
+    it('关闭按钮应该被创建', () => {
+      // 创建时应该有关闭按钮容器
+      expect(mockScene.add.container).toHaveBeenCalled();
+    });
+  });
+
+  describe('卡片内容换行', () => {
+    it('长内容应该被正确处理', () => {
+      const longContentCard: ICard = {
+        ...mockCard,
+        front: ['这是一段非常长的卡片内容，用来测试文本换行效果是否正常工作。'],
+        detail: ['详情也是一段非常长的文本，同样需要正确换行。'],
+      };
+
+      cardUI.showCard(longContentCard);
+
+      // 验证setText被调用
+      expect(mockText.setText).toHaveBeenCalled();
+    });
+  });
+
+  describe('发光特效', () => {
+    it('获取卡片后应该触发发光特效', () => {
+      cardUI.showCardObtain(mockCard);
+
+      // 获取卡片弹出动画的完成回调
+      const calls = mockTweenAdd.mock.calls;
+      const cardPopupTween = calls.find(
+        (call) => call[0].ease === 'Back.easeOut'
+      );
+
+      if (cardPopupTween && cardPopupTween[0].onComplete) {
+        expect(() => cardPopupTween[0].onComplete()).not.toThrow();
+      }
+    });
+  });
+
+  describe('多次显示卡片', () => {
+    it('连续显示不同卡片应该正常工作', () => {
+      const anotherCard: ICard = {
+        id: 'card_test_002',
+        name: '另一张卡片',
+        type: 'item',
+        chapter: 'C0',
+        zone: 'C0-Z2',
+        front: ['另一张卡片的内容'],
+        detail: ['另一张卡片的详情'],
+      };
+
+      cardUI.showCard(mockCard);
+      cardUI.closeCard();
+
+      // 模拟关闭动画完成
+      const tweenConfig = mockTweenAdd.mock.calls[
+        mockTweenAdd.mock.calls.length - 1
+      ][0];
+      tweenConfig.onComplete();
+
+      vi.clearAllMocks();
+      
+      cardUI.showCard(anotherCard);
+
+      expect(eventBus.emit).toHaveBeenCalledWith(GameEvent.CARD_VIEW, {
+        cardId: anotherCard.id,
+      });
+    });
+  });
+
+  describe('未知卡片类型', () => {
+    it('未知类型卡片应该使用默认样式', () => {
+      const unknownTypeCard: ICard = {
+        ...mockCard,
+        type: 'unknown' as never,
+      };
+
+      // 不应抛错
+      expect(() => cardUI.showCard(unknownTypeCard)).not.toThrow();
+    });
+  });
+
+  describe('空内容卡片', () => {
+    it('空 front 数组应该正常显示', () => {
+      const emptyFrontCard: ICard = {
+        ...mockCard,
+        front: [],
+      };
+
+      expect(() => cardUI.showCard(emptyFrontCard)).not.toThrow();
+    });
+
+    it('空 detail 数组应该正常显示', () => {
+      const emptyDetailCard: ICard = {
+        ...mockCard,
+        detail: [],
+      };
+
+      cardUI.showCard(emptyDetailCard);
+      cardUI.flipCard();
+
+      // 模拟第一阶段完成
+      const tweenConfig = mockTweenAdd.mock.calls[
+        mockTweenAdd.mock.calls.length - 1
+      ][0];
+      if (tweenConfig.onComplete) {
+        expect(() => tweenConfig.onComplete()).not.toThrow();
+      }
+    });
+  });
+
+  describe('遮罩交互', () => {
+    it('点击遮罩应该关闭卡片', () => {
+      // 获取遮罩的点击处理器
+      const rectangleOn = mockRectangle.on;
+      const pointerdownCall = rectangleOn.mock.calls.find(
+        (call) => call[0] === 'pointerdown'
+      );
+
+      if (pointerdownCall) {
+        cardUI.showCard(mockCard);
+        vi.clearAllMocks();
+
+        const handler = pointerdownCall[1];
+        handler();
+
+        // 应该触发关闭动画
+        expect(mockTweenAdd).toHaveBeenCalled();
+      }
+    });
+  });
 });

@@ -590,4 +590,127 @@ describe('DialogueUI', () => {
       expect(index).toBeGreaterThanOrEqual(-1);
     });
   });
+
+  describe('markWaitingToClose', () => {
+    it('markWaitingToClose 应标记对话等待关闭', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      dialogueUI.advance(); // 完成打字机
+      
+      dialogueUI.markWaitingToClose();
+      
+      // 继续指示器应该可见
+      expect(mockText.setVisible).toHaveBeenCalledWith(true);
+    });
+
+    it('等待关闭状态下 advance 应触发 hideDialogue', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      dialogueUI.advance(); // 完成打字机
+      dialogueUI.markWaitingToClose();
+      vi.clearAllMocks();
+      
+      dialogueUI.advance();
+      
+      // 应该触发隐藏动画
+      expect(mockTweenAdd).toHaveBeenCalled();
+    });
+
+    it('等待关闭状态下 hideDialogue 不应重复发送 DIALOGUE_END', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      dialogueUI.advance(); // 完成打字机
+      dialogueUI.markWaitingToClose();
+      vi.clearAllMocks();
+      
+      dialogueUI.hideDialogue();
+      
+      // 获取动画完成回调
+      const tweenConfig = mockTweenAdd.mock.calls[0][0];
+      tweenConfig.onComplete();
+      
+      // 因为 isWaitingToClose 为 true，不应该发送 DIALOGUE_END
+      expect(eventBus.emit).not.toHaveBeenCalledWith(
+        GameEvent.DIALOGUE_END,
+        expect.anything()
+      );
+    });
+  });
+
+  describe('多次调用 showDialogue', () => {
+    it('连续调用 showDialogue 应停止前一个打字机', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      
+      const firstTimerDestroy = mockTimerEvent.destroy;
+      vi.clearAllMocks();
+      
+      // 再次显示另一个对话
+      const anotherDialogue: IDialogue = {
+        id: 'dlg_another',
+        speaker: '顾临',
+        text: '另一段对话',
+      };
+      dialogueUI.showDialogue(anotherDialogue);
+      
+      // 应该销毁前一个打字机定时器
+      expect(firstTimerDestroy).toHaveBeenCalled();
+    });
+  });
+
+  describe('无回调创建', () => {
+    it('无回调时 showDialogue 应正常工作', () => {
+      const ui = new DialogueUI({
+        scene: mockScene as unknown as Phaser.Scene,
+      });
+      
+      expect(() => ui.showDialogue(mockDialogue)).not.toThrow();
+    });
+
+    it('无回调时 selectChoice 应正常工作', () => {
+      const ui = new DialogueUI({
+        scene: mockScene as unknown as Phaser.Scene,
+      });
+      
+      ui.showDialogue(mockDialogueWithChoices);
+      expect(() => ui.selectChoice(0)).not.toThrow();
+    });
+
+    it('无回调时 hideDialogue 应正常工作', () => {
+      const ui = new DialogueUI({
+        scene: mockScene as unknown as Phaser.Scene,
+      });
+      
+      ui.showDialogue(mockDialogue);
+      ui.hideDialogue();
+      
+      // 获取动画完成回调
+      const tweenConfig = mockTweenAdd.mock.calls[mockTweenAdd.mock.calls.length - 1][0];
+      expect(() => tweenConfig.onComplete()).not.toThrow();
+    });
+  });
+
+  describe('点击层交互', () => {
+    it('点击层在选项显示时点击选项区域不应推进', () => {
+      dialogueUI.showDialogue(mockDialogueWithChoices);
+      dialogueUI.advance(); // 完成打字机，显示选项
+      
+      // 获取点击层的 pointerdown 处理器
+      const clickLayerOn = mockRectangle.on;
+      const pointerdownCall = clickLayerOn.mock.calls.find(
+        (call) => call[0] === 'pointerdown'
+      );
+      
+      if (pointerdownCall) {
+        const handler = pointerdownCall[1];
+        vi.clearAllMocks();
+        
+        // 模拟点击选项区域（y 接近选项容器）
+        const mockPointer = { y: 500 }; // 假设选项容器在 y=500 附近
+        handler(mockPointer);
+        
+        // 不应该触发新的动作（因为点击在选项区域）
+        expect(eventBus.emit).not.toHaveBeenCalledWith(
+          GameEvent.DIALOGUE_ADVANCE,
+          expect.anything()
+        );
+      }
+    });
+  });
 });

@@ -1734,4 +1734,218 @@ describe('NarrativeEngine', () => {
       expect(() => engine.obtainCard('missing_param_card')).not.toThrow();
     });
   });
+
+  describe('canTriggerForeshadow', () => {
+    it('canTriggerForeshadow 对不存在的伏笔返回 false', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      const result = engine.canTriggerForeshadow('nonexistent', 'plant');
+      expect(result).toBe(false);
+    });
+
+    it('canTriggerForeshadow deepen 需要先 plant', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerForeshadow({
+        id: 'fs_deepen_test',
+        name: '测试伏笔',
+        plant: { zone: 'C0-Z1', description: '投放' },
+        deepen: { zone: 'C0-Z2', description: '加深' },
+        reveal: { zone: 'C0-Z3', description: '回收' },
+      });
+
+      // 未 plant 时不能 deepen
+      expect(engine.canTriggerForeshadow('fs_deepen_test', 'deepen')).toBe(false);
+
+      // plant 后可以 deepen
+      engine.triggerForeshadow('fs_deepen_test', 'plant');
+      expect(engine.canTriggerForeshadow('fs_deepen_test', 'deepen')).toBe(true);
+    });
+
+    it('canTriggerForeshadow 对无效阶段返回 false', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerForeshadow({
+        id: 'fs_invalid_stage',
+        name: '测试伏笔',
+        plant: { zone: 'C0-Z1', description: '投放' },
+        reveal: { zone: 'C0-Z2', description: '回收' },
+      });
+
+      engine.triggerForeshadow('fs_invalid_stage', 'plant');
+
+      // 无效阶段应返回 false
+      expect(engine.canTriggerForeshadow('fs_invalid_stage', 'unknown_stage' as any)).toBe(false);
+    });
+  });
+
+  describe('伏笔 deepen 阶段', () => {
+    it('deepen 阶段应在 plant 后可触发', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerForeshadow({
+        id: 'fs_deepen',
+        name: '加深伏笔',
+        plant: { zone: 'C0-Z1', description: '投放' },
+        deepen: { zone: 'C0-Z2', description: '加深' },
+        reveal: { zone: 'C0-Z3', description: '回收' },
+      });
+
+      // 先 plant
+      engine.triggerForeshadow('fs_deepen', 'plant');
+
+      // 然后 deepen
+      const result = engine.triggerForeshadow('fs_deepen', 'deepen');
+      expect(result).toBe(true);
+    });
+
+    it('deepen 后仍可 reveal', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerForeshadow({
+        id: 'fs_deepen_reveal',
+        name: '加深后回收',
+        plant: { zone: 'C0-Z1', description: '投放' },
+        deepen: { zone: 'C0-Z2', description: '加深' },
+        reveal: { zone: 'C0-Z3', description: '回收' },
+      });
+
+      engine.triggerForeshadow('fs_deepen_reveal', 'plant');
+      engine.triggerForeshadow('fs_deepen_reveal', 'deepen');
+      const result = engine.triggerForeshadow('fs_deepen_reveal', 'reveal');
+
+      expect(result).toBe(true);
+      expect(engine.isForeshadowCollected('fs_deepen_reveal')).toBe(true);
+    });
+
+    it('已 deepen 的伏笔不能再次 deepen', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerForeshadow({
+        id: 'fs_double_deepen',
+        name: '重复加深',
+        plant: { zone: 'C0-Z1', description: '投放' },
+        deepen: { zone: 'C0-Z2', description: '加深' },
+        reveal: { zone: 'C0-Z3', description: '回收' },
+      });
+
+      engine.triggerForeshadow('fs_double_deepen', 'plant');
+      engine.triggerForeshadow('fs_double_deepen', 'deepen');
+
+      // 重复 deepen 应返回 false
+      const result = engine.triggerForeshadow('fs_double_deepen', 'deepen');
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('getForeshadowState', () => {
+    it('getForeshadowState 应返回正确的阶段', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerForeshadow({
+        id: 'fs_state_test',
+        name: '状态测试',
+        plant: { zone: 'C0-Z1', description: '投放' },
+        deepen: { zone: 'C0-Z2', description: '加深' },
+        reveal: { zone: 'C0-Z3', description: '回收' },
+      });
+
+      // 初始状态
+      expect(engine.getForeshadowState('fs_state_test')).toBeNull();
+
+      // plant 后
+      engine.triggerForeshadow('fs_state_test', 'plant');
+      expect(engine.getForeshadowState('fs_state_test')).toBe('plant');
+
+      // deepen 后
+      engine.triggerForeshadow('fs_state_test', 'deepen');
+      expect(engine.getForeshadowState('fs_state_test')).toBe('deepen');
+
+      // reveal 后
+      engine.triggerForeshadow('fs_state_test', 'reveal');
+      expect(engine.getForeshadowState('fs_state_test')).toBe('reveal');
+    });
+
+    it('getForeshadowState 对不存在的伏笔返回 null', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      expect(engine.getForeshadowState('nonexistent')).toBeNull();
+    });
+  });
+
+  describe('giveCard gameplay 效果', () => {
+    it('giveCard 效果应赠送另一张卡片', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      // 注册被赠送的卡片
+      engine.registerCard({
+        id: 'gift_target_card',
+        name: '被赠送的卡片',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+      });
+
+      // 注册触发卡片
+      engine.registerCard({
+        id: 'gift_trigger_card',
+        name: '触发卡片',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'giveCard' as const, cardId: 'gift_target_card' },
+            ],
+          },
+        ],
+      });
+
+      // 获得触发卡片时应该同时获得目标卡片
+      engine.obtainCard('gift_trigger_card');
+
+      expect(engine.hasCard('gift_trigger_card')).toBe(true);
+      expect(engine.hasCard('gift_target_card')).toBe(true);
+    });
+  });
+
+  describe('isCardViewed', () => {
+    it('isCardViewed 应正确判断卡片是否已查看', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerCard({
+        id: 'view_test_card',
+        name: '查看测试卡片',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+      });
+
+      // 获得卡片
+      engine.obtainCard('view_test_card');
+      expect(engine.isCardViewed('view_test_card')).toBe(false);
+
+      // 查看卡片
+      engine.viewCard('view_test_card');
+      expect(engine.isCardViewed('view_test_card')).toBe(true);
+    });
+  });
 });

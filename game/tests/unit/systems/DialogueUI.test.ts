@@ -74,9 +74,15 @@ const mockContainer = {
   destroy: vi.fn(),
   visible: false,
   y: 500,
-  // For button.list[0] and button.list[1] access
+  // For button.list[0] (graphics) and button.list[1] (text) access
   list: [
-    { clear: vi.fn().mockReturnThis(), fillStyle: vi.fn().mockReturnThis(), fillRoundedRect: vi.fn().mockReturnThis() },
+    { 
+      clear: vi.fn().mockReturnThis(), 
+      fillStyle: vi.fn().mockReturnThis(), 
+      fillRoundedRect: vi.fn().mockReturnThis(),
+      lineStyle: vi.fn().mockReturnThis(),
+      strokeRoundedRect: vi.fn().mockReturnThis(),
+    },
     { setColor: vi.fn().mockReturnThis() },
   ],
 };
@@ -311,21 +317,17 @@ describe('DialogueUI', () => {
       expect(mockTimerEvent.destroy).toHaveBeenCalled();
     });
 
-    // TODO: 此测试需要更复杂的Phaser容器mock，暂时跳过
-    it.skip('有选项时不应自动推进', () => {
+    it('有选项时不应自动推进', () => {
       dialogueUI.showDialogue(mockDialogueWithChoices);
 
-      // 模拟打字完成
-      const timerConfig = mockScene.time.addEvent.mock.calls[0][0];
-      // 多次调用callback直到完成
-      for (let i = 0; i < mockDialogueWithChoices.text.length; i++) {
-        timerConfig.callback();
-      }
-
+      // 第一次 advance 完成打字机效果
+      dialogueUI.advance();
       vi.clearAllMocks();
+
+      // 第二次 advance：由于有选项，不应发送 DIALOGUE_ADVANCE 事件
       dialogueUI.advance();
 
-      // 不应该发送DIALOGUE_ADVANCE事件
+      // 不应该发送DIALOGUE_ADVANCE事件（因为有选项需要用户选择）
       expect(eventBus.emit).not.toHaveBeenCalledWith(
         GameEvent.DIALOGUE_ADVANCE,
         expect.anything()
@@ -347,19 +349,22 @@ describe('DialogueUI', () => {
       });
     });
 
-    // TODO: 此测试的hideDialogue行为已变更，需要更新mock
-    it.skip('没有next时应该结束对话', () => {
+    it('没有next时应该发送DIALOGUE_ADVANCE事件（由外部处理结束）', () => {
+      // 使用没有 next 的对话
       dialogueUI.showDialogue(mockDialogue);
 
-      // 第一次advance完成打字
+      // 第一次 advance 完成打字机
       dialogueUI.advance();
       vi.clearAllMocks();
 
-      // 第二次advance应该结束对话
+      // 第二次 advance：即使没有 next，也会发送 DIALOGUE_ADVANCE 事件
+      // 让外部（NarrativeEngine）决定是否结束对话
       dialogueUI.advance();
 
-      // 应该触发隐藏动画
-      expect(mockTweenAdd).toHaveBeenCalled();
+      expect(eventBus.emit).toHaveBeenCalledWith(GameEvent.DIALOGUE_ADVANCE, {
+        dialogueId: mockDialogue.id,
+        lineIndex: 0,
+      });
     });
   });
 
@@ -477,15 +482,18 @@ describe('DialogueUI', () => {
   });
 
   describe('选项渲染', () => {
-    // TODO: 此测试需要更复杂的Phaser容器list数组mock
-    it.skip('应该为每个选项创建按钮', () => {
+    it('打字机完成后应创建选项按钮容器', () => {
+      // 清除初始化时的调用
+      const initialContainerCalls = mockScene.add.container.mock.calls.length;
+      
       dialogueUI.showDialogue(mockDialogueWithChoices);
 
-      // 模拟打字完成
+      // advance() 会触发 _completeTypewriter()，然后调用 _showChoices()
       dialogueUI.advance();
 
-      // 验证container被创建（用于选项按钮）
-      expect(mockScene.add.container).toHaveBeenCalled();
+      // 打字机完成后，选项按钮会被创建（每个选项一个 container）
+      // 3 个选项 = 3 个额外的 container 调用
+      expect(mockScene.add.container.mock.calls.length).toBeGreaterThan(initialContainerCalls);
     });
   });
 

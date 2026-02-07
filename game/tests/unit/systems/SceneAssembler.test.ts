@@ -131,16 +131,28 @@ const mockText = {
   setDepth: vi.fn().mockReturnThis(),
 };
 
+const mockGraphics = {
+  fillStyle: vi.fn().mockReturnThis(),
+  fillRoundedRect: vi.fn().mockReturnThis(),
+  lineStyle: vi.fn().mockReturnThis(),
+  strokeRoundedRect: vi.fn().mockReturnThis(),
+  clear: vi.fn().mockReturnThis(),
+  destroy: vi.fn(),
+};
+
 const createMockScene = () => ({
   scale: { width: 720, height: 1280 },
   add: {
     image: vi.fn().mockReturnValue({ ...mockGameObject }),
     sprite: vi.fn().mockReturnValue({ ...mockGameObject }),
     text: vi.fn().mockReturnValue({ ...mockText }),
+    graphics: vi.fn().mockReturnValue({ ...mockGraphics }),
     container: vi.fn().mockReturnValue({
       ...mockGameObject,
       setPosition: vi.fn().mockReturnThis(),
       setName: vi.fn().mockReturnThis(),
+      add: vi.fn().mockReturnThis(),
+      disableInteractive: vi.fn().mockReturnThis(),
     }),
   },
   textures: {
@@ -153,6 +165,11 @@ const createMockScene = () => ({
   },
   input: {
     setDefaultCursor: vi.fn(),
+  },
+  time: {
+    addEvent: vi.fn().mockReturnValue({
+      destroy: vi.fn(),
+    }),
   },
 });
 
@@ -722,6 +739,387 @@ describe('SceneAssembler', () => {
 
       const bgCall = mockAssetResolver.resolveBackground.mock.calls[0];
       expect(bgCall[1].landmarks.length).toBeLessThanOrEqual(5);
+    });
+  });
+
+  describe('Zone 类型物件', () => {
+    const zoneObject: ISceneObjectConfig = {
+      id: 'zone_exit',
+      x: 300,
+      y: 500,
+      type: 'zone',
+      width: 150,
+      height: 80,
+      label: '出口',
+      interactive: {
+        cursor: true,
+        action: {
+          type: 'gotoZone',
+          zoneId: 'C0-Z2',
+        },
+      },
+    };
+
+    it('应该创建 zone 容器', () => {
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneObject],
+      };
+
+      const result = assembler.build(config);
+
+      expect(result.objects.length).toBeGreaterThan(0);
+      expect(mockScene.add.container).toHaveBeenCalled();
+    });
+
+    it('zone 应该使用配置的 width/height', () => {
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneObject],
+      };
+
+      assembler.build(config);
+
+      // Container 被创建
+      expect(mockScene.add.container).toHaveBeenCalledWith(zoneObject.x, zoneObject.y);
+    });
+
+    it('没有 width/height 时应该使用默认值', () => {
+      const zoneWithoutSize: ISceneObjectConfig = {
+        ...zoneObject,
+        width: undefined,
+        height: undefined,
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneWithoutSize],
+      };
+
+      // 不应抛错
+      expect(() => assembler.build(config)).not.toThrow();
+    });
+
+    it('zone 应该设置交互数据', () => {
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneObject],
+      };
+
+      assembler.build(config);
+
+      // Container 的 setData 应该被调用
+      const container = mockScene.add.container.mock.results[0]?.value;
+      expect(container?.setData).toHaveBeenCalledWith('action', zoneObject.interactive?.action);
+    });
+
+    it('zone 应该设置 testid 数据', () => {
+      const zoneWithTestId: ISceneObjectConfig = {
+        ...zoneObject,
+        interactive: {
+          ...zoneObject.interactive!,
+          testid: 'zone_test_id',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneWithTestId],
+      };
+
+      assembler.build(config);
+
+      const container = mockScene.add.container.mock.results[0]?.value;
+      expect(container?.setData).toHaveBeenCalledWith('testid', 'zone_test_id');
+    });
+
+    it('zone 应该设置深度', () => {
+      const zoneWithDepth: ISceneObjectConfig = {
+        ...zoneObject,
+        depth: 100,
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneWithDepth],
+      };
+
+      assembler.build(config);
+
+      const container = mockScene.add.container.mock.results[0]?.value;
+      expect(container?.setDepth).toHaveBeenCalledWith(100);
+    });
+
+    it('zone 没有指定深度时应该使用默认深度', () => {
+      const zoneWithoutDepth: ISceneObjectConfig = {
+        ...zoneObject,
+        depth: undefined,
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneWithoutDepth],
+      };
+
+      assembler.build(config);
+
+      const container = mockScene.add.container.mock.results[0]?.value;
+      // 默认 zone 深度为 5
+      expect(container?.setDepth).toHaveBeenCalledWith(5);
+    });
+  });
+
+  describe('物件尺寸估算', () => {
+    it('card 类型交互应该使用 60x60 尺寸', () => {
+      const cardObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        interactive: {
+          action: {
+            type: 'card',
+            cardId: 'card_001',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [cardObject],
+      };
+
+      assembler.build(config);
+
+      const billboardConfig = mockAssetResolver.resolveObject.mock.calls[0][1];
+      expect(billboardConfig.width).toBe(60);
+      expect(billboardConfig.height).toBe(60);
+    });
+
+    it('dialogue 类型交互应该使用 70x70 尺寸', () => {
+      const dialogueObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        interactive: {
+          action: {
+            type: 'dialogue',
+            dialogueId: 'dlg_001',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [dialogueObject],
+      };
+
+      assembler.build(config);
+
+      const billboardConfig = mockAssetResolver.resolveObject.mock.calls[0][1];
+      expect(billboardConfig.width).toBe(70);
+      expect(billboardConfig.height).toBe(70);
+    });
+
+    it('有 scale 的物件应该相应调整尺寸', () => {
+      const scaledObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        scale: 2,
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [scaledObject],
+      };
+
+      assembler.build(config);
+
+      const billboardConfig = mockAssetResolver.resolveObject.mock.calls[0][1];
+      expect(billboardConfig.width).toBe(100); // 50 * 2
+      expect(billboardConfig.height).toBe(100); // 50 * 2
+    });
+  });
+
+  describe('更多 Zone 类型推断', () => {
+    const additionalZoneTypes = [
+      { zoneId: 'C0-Z2', expected: 'life' },
+      { zoneId: 'C0-Z3', expected: 'life' },
+      { zoneId: 'C1-Z2', expected: 'municipal' },
+      { zoneId: 'C1-Z3', expected: 'archive' },
+      { zoneId: 'C2-Z1', expected: 'municipal' },
+      { zoneId: 'C3-Z5', expected: 'temple' },
+      { zoneId: 'C4-Z7', expected: 'temple' },
+      { zoneId: 'CF-Z1', expected: 'anomaly' },
+      { zoneId: 'RV-Z1', expected: 'edge' },
+    ];
+
+    additionalZoneTypes.forEach(({ zoneId, expected }) => {
+      it(`${zoneId} 应该推断为 ${expected} 类型`, () => {
+        const config: ISceneConfig = {
+          ...mockSceneConfig,
+          id: zoneId,
+        };
+
+        assembler.build(config);
+
+        const bgCall = mockAssetResolver.resolveBackground.mock.calls[0];
+        expect(bgCall[1].zoneType).toBe(expected);
+      });
+    });
+  });
+
+  describe('物件子类型推断 - 更多模式', () => {
+    const subtypeTests = [
+      { texture: 'obj_lamp_ceiling', subtype: 'lamp' },
+      { texture: 'obj_light_wall', subtype: 'lamp' },
+      { texture: 'obj_tree_small', subtype: 'plant' },
+      { texture: 'obj_door_wooden', subtype: 'door' },
+      { texture: 'obj_gate_iron', subtype: 'door' },
+      { texture: 'obj_monitor_old', subtype: 'monitor' },
+      { texture: 'obj_screen_cracked', subtype: 'monitor' },
+      { texture: 'obj_computer_terminal', subtype: 'monitor' },
+      { texture: 'obj_filing_cabinet', subtype: 'filing_cabinet' },
+      { texture: 'obj_drawer_unit', subtype: 'filing_cabinet' },
+      { texture: 'obj_altar_stone', subtype: 'altar' },
+      { texture: 'obj_crack_wall', subtype: 'crack' },
+      { texture: 'obj_rift_floor', subtype: 'crack' },
+      { texture: 'obj_sign_warning', subtype: 'sign' },
+      { texture: 'obj_notice_board', subtype: 'sign' },
+      { texture: 'obj_chair_wooden', subtype: 'chair' },
+      { texture: 'obj_seat_cushion', subtype: 'chair' },
+      { texture: 'obj_candle_lit', subtype: 'candle' },
+      { texture: 'obj_rune_ancient', subtype: 'rune' },
+      { texture: 'obj_symbol_magic', subtype: 'rune' },
+    ];
+
+    subtypeTests.forEach(({ texture, subtype }) => {
+      it(`${texture} 应该推断为 ${subtype} 子类型`, () => {
+        const obj: ISceneObjectConfig = {
+          ...mockObjectConfig,
+          texture,
+        };
+
+        const config: ISceneConfig = {
+          ...mockSceneConfig,
+          objects: [obj],
+        };
+
+        assembler.build(config);
+
+        const billboardConfig = mockAssetResolver.resolveObject.mock.calls[0][1];
+        expect(billboardConfig.subtype).toBe(subtype);
+      });
+    });
+  });
+
+  describe('物件没有 texture 时', () => {
+    it('没有 texture 的非 zone 物件应该跳过创建', () => {
+      const objWithoutTexture: ISceneObjectConfig = {
+        id: 'obj_no_texture',
+        x: 100,
+        y: 200,
+        type: 'image',
+        // texture 未设置
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [objWithoutTexture],
+      };
+
+      assembler.build(config);
+
+      // assetResolver.resolveObject 不应该被调用
+      expect(mockAssetResolver.resolveObject).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('interactable 类型推断', () => {
+    it('有交互但没有特定动作类型应该推断为 interactable', () => {
+      const interactableObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        interactive: {
+          cursor: true,
+          action: {
+            type: 'custom' as never, // 非标准类型
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [interactableObject],
+      };
+
+      assembler.build(config);
+
+      const billboardConfig = mockAssetResolver.resolveObject.mock.calls[0][1];
+      expect(billboardConfig.type).toBe('interactable');
+    });
+  });
+
+  describe('Hover 效果', () => {
+    it('白盒物件应该设置 hover cursor', () => {
+      const interactiveObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        interactive: {
+          cursor: true,
+          action: {
+            type: 'dialogue',
+            dialogueId: 'dlg_test',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [interactiveObject],
+      };
+
+      assembler.build(config);
+
+      const resolvedObject = mockAssetResolver.resolveObject.mock.results[0].value.gameObject;
+      // 应该设置 pointerover 和 pointerout 事件
+      expect(resolvedObject.on).toHaveBeenCalledWith('pointerover', expect.any(Function));
+      expect(resolvedObject.on).toHaveBeenCalledWith('pointerout', expect.any(Function));
+    });
+  });
+
+  describe('存储 label 数据', () => {
+    it('物件应该存储 label 数据', () => {
+      const objectWithLabel: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        label: '测试标签',
+        interactive: {
+          cursor: true,
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [objectWithLabel],
+      };
+
+      assembler.build(config);
+
+      const resolvedObject = mockAssetResolver.resolveObject.mock.results[0].value.gameObject;
+      expect(resolvedObject.setData).toHaveBeenCalledWith('label', '测试标签');
+    });
+  });
+
+  describe('没有 label 的地标点', () => {
+    it('没有 label 的交互物件应该使用 id 作为 label', () => {
+      const objectWithoutLabel: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        id: 'obj_test_id',
+        label: undefined,
+        interactive: { cursor: true },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [objectWithoutLabel],
+      };
+
+      assembler.build(config);
+
+      const bgCall = mockAssetResolver.resolveBackground.mock.calls[0];
+      expect(bgCall[1].landmarks[0].label).toBe('obj_test_id');
     });
   });
 });

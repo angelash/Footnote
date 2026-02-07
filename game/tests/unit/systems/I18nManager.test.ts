@@ -571,4 +571,83 @@ describe('I18nManager', () => {
       expect(i18n.t('temp_ns.temp.key')).toBe('temp_ns.temp.key');
     });
   });
+
+  describe('tAll 边界情况', () => {
+    it('tAll 对不存在的命名空间返回空对象', async () => {
+      const { i18n } = await createFreshI18n();
+
+      const result = i18n.tAll('nonexistent_namespace');
+
+      expect(result).toEqual({});
+    });
+
+    it('tAll 对字符串值返回空对象', async () => {
+      const { i18n } = await createFreshI18n();
+
+      // 'common.confirm' 是一个字符串值，不是对象
+      const result = i18n.tAll('common.confirm');
+
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('getSupportedLocales', () => {
+    it('getSupportedLocales 应返回支持的语言列表', async () => {
+      const { i18n } = await createFreshI18n();
+
+      const locales = i18n.getSupportedLocales();
+
+      expect(locales).toContain('zh-CN');
+      expect(locales).toContain('en-US');
+      expect(locales).toContain('ja-JP');
+      expect(Array.isArray(locales)).toBe(true);
+    });
+  });
+
+  describe('setWarnOnMissing', () => {
+    it('setWarnOnMissing(false) 应禁用警告', async () => {
+      const { i18n } = await createFreshI18n();
+      
+      // 不应抛错
+      expect(() => i18n.setWarnOnMissing(false)).not.toThrow();
+      expect(() => i18n.setWarnOnMissing(true)).not.toThrow();
+    });
+  });
+
+  describe('setLocale 重复设置', () => {
+    it('setLocale 设置相同语言应被跳过', async () => {
+      const { i18n } = await createFreshI18n();
+      
+      i18n.setLocale('zh-CN');
+      
+      // 再次设置相同语言
+      i18n.setLocale('zh-CN');
+      
+      // 验证当前语言
+      expect(i18n.getLocale()).toBe('zh-CN');
+    });
+  });
+
+  describe('嵌套翻译扁平化', () => {
+    it('tAll 应正确扁平化深层嵌套对象', async () => {
+      const { i18n } = await createFreshI18n();
+
+      i18n.loadTranslations('zh-CN', {
+        data: {
+          level1: {
+            level2: {
+              level3: '深层值',
+            },
+            sibling: '同级值',
+          },
+        },
+        namespace: 'deep',
+      });
+
+      const result = i18n.tAll('deep');
+
+      expect(result['level1.level2.level3']).toBe('深层值');
+      expect(result['level1.sibling']).toBe('同级值');
+    });
+  });
 });

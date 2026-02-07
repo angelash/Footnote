@@ -578,6 +578,29 @@ describe('NarrativeEngine', () => {
       expect(result).toBe(false);
     });
 
+    it('无效的伏笔阶段应被规范化为 plant', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerForeshadow({
+        id: 'invalid_stage_test',
+        name: '测试',
+        description: '测试',
+        stages: {
+          plant: { zone: 'Z1', trigger: 't', description: 'd' },
+          deepen: { zone: 'Z2', trigger: 't', description: 'd' },
+          reveal: { zone: 'Z3', trigger: 't', description: 'd' },
+        },
+      });
+
+      // 无效的 stage 会被规范化为 plant，未 plant 时可以触发
+      expect(engine.canTriggerForeshadow('invalid_stage_test', 'invalid_stage' as any)).toBe(true);
+      
+      // plant 后无效 stage（被规范化为 plant）不能再触发
+      engine.triggerForeshadow('invalid_stage_test', 'plant');
+      expect(engine.canTriggerForeshadow('invalid_stage_test', 'invalid_stage' as any)).toBe(false);
+    });
+
     it('getAllForeshadowStates应返回所有伏笔状态', async () => {
       const engine = await createFreshNarrativeEngine();
       engine.reset();
@@ -1533,6 +1556,122 @@ describe('NarrativeEngine', () => {
       expect(ws.hasAbility('DEPTH_INTERVENTION')).toBe(false);
       engine.obtainCard('ability_card');
       expect(ws.hasAbility('DEPTH_INTERVENTION')).toBe(true);
+    });
+  });
+
+  describe('卡片 gameplay 效果 - setFlag', () => {
+    it('gameplayFx setFlag 应设置标记', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      const { worldState: ws } = await import('@/systems/world');
+
+      engine.registerCard({
+        id: 'flag_card',
+        name: '标记卡',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'setFlag' as const, flagName: 'CARD_FLAG', flagValue: true },
+            ],
+          },
+        ],
+      });
+
+      expect(ws.getFlag('CARD_FLAG')).toBe(false);
+      engine.obtainCard('flag_card');
+      expect(ws.getFlag('CARD_FLAG')).toBe(true);
+    });
+
+    it('gameplayFx setFlag 默认值应为 true', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      const { worldState: ws } = await import('@/systems/world');
+
+      engine.registerCard({
+        id: 'flag_default_card',
+        name: '默认标记卡',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'setFlag' as const, flagName: 'DEFAULT_FLAG' },
+            ],
+          },
+        ],
+      });
+
+      expect(ws.getFlag('DEFAULT_FLAG')).toBe(false);
+      engine.obtainCard('flag_default_card');
+      expect(ws.getFlag('DEFAULT_FLAG')).toBe(true);
+    });
+  });
+
+  describe('卡片 gameplay 效果边界情况', () => {
+    it('无效的效果类型应返回 false', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerCard({
+        id: 'invalid_fx_card',
+        name: '无效效果卡',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'invalid_type' as any },
+            ],
+          },
+        ],
+      });
+
+      // 不应抛错
+      expect(() => engine.obtainCard('invalid_fx_card')).not.toThrow();
+    });
+
+    it('缺少必要参数的效果应被跳过', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      engine.registerCard({
+        id: 'missing_param_card',
+        name: '缺参数卡',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'giveCard' as const }, // 缺少 cardId
+              { type: 'unlockAbility' as const }, // 缺少 abilityType
+              { type: 'setFlag' as const }, // 缺少 flagName
+            ],
+          },
+        ],
+      });
+
+      // 不应抛错
+      expect(() => engine.obtainCard('missing_param_card')).not.toThrow();
     });
   });
 });

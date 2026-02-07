@@ -295,4 +295,32 @@ describe('AssetManager', () => {
       await expect(assetManager.loadChapterAssets('C99')).resolves.not.toThrow();
     });
   });
+
+  describe('preloadNextChapter - 预加载下一章', () => {
+    it('应该预加载下一章资源', async () => {
+      assetManager.setScene(mockScene as unknown as Phaser.Scene);
+
+      // 使用 setTimeout 后备（不依赖 requestIdleCallback）
+      assetManager.preloadNextChapter('C0');
+
+      // 由于是异步后台加载，使用 setTimeout 等待
+      await new Promise(resolve => setTimeout(resolve, 1100));
+
+      // C1 应该被预加载
+      expect(assetManager.isGroupLoaded(AssetGroup.CHAPTER_1)).toBe(true);
+    });
+
+    it('最后一章没有下一章应该安全处理', () => {
+      assetManager.setScene(mockScene as unknown as Phaser.Scene);
+
+      // CF 是最后一章，没有下一章
+      expect(() => assetManager.preloadNextChapter('CF')).not.toThrow();
+    });
+
+    it('无效章节应该安全处理', () => {
+      assetManager.setScene(mockScene as unknown as Phaser.Scene);
+
+      expect(() => assetManager.preloadNextChapter('INVALID')).not.toThrow();
+    });
+  });
 });

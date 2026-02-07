@@ -713,4 +713,44 @@ describe('DialogueUI', () => {
       }
     });
   });
+
+  describe('全局键盘事件', () => {
+    // 注意：DialogueUI 内部使用 window.addEventListener，这在 jsdom 环境中可能不完全工作
+    // 这些测试主要验证键盘处理逻辑的存在和基本结构
+
+    it('showDialogue 应该设置键盘导航', () => {
+      // 通过 Phaser 的键盘事件验证
+      dialogueUI.showDialogue(mockDialogue);
+
+      // 验证 Phaser 键盘事件监听
+      expect(mockScene.input.keyboard?.on).toHaveBeenCalledWith(
+        'keydown-SPACE',
+        expect.any(Function)
+      );
+    });
+
+    it('空格键监听器应该被设置', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      
+      // 获取空格键处理器
+      const spaceCall = mockScene.input.keyboard?.on.mock.calls.find(
+        (call) => call[0] === 'keydown-SPACE'
+      );
+
+      expect(spaceCall).toBeDefined();
+
+      if (spaceCall) {
+        const handler = spaceCall[1];
+        
+        // 调用处理器不应抛错
+        expect(() => handler()).not.toThrow();
+      }
+    });
+
+    it('键盘处理器应该存在于 DialogueUI', () => {
+      // 验证 DialogueUI 有处理键盘的能力
+      expect(typeof dialogueUI.advance).toBe('function');
+      expect(typeof dialogueUI.selectChoice).toBe('function');
+    });
+  });
 });

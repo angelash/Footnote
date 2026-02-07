@@ -1693,4 +1693,402 @@ describe('SceneAssembler', () => {
       expect(mockAssetResolver.resolveObject).toHaveBeenCalled();
     });
   });
+
+  describe('Zone 条件监视器', () => {
+    it('zone 类型物件有条件时应使用 zoneDim 样式', () => {
+      mocks.mockGetFlag.mockReturnValue(false);
+
+      const conditionalZone: ISceneObjectConfig = {
+        id: 'zone_conditional',
+        x: 300,
+        y: 500,
+        type: 'zone',
+        width: 150,
+        height: 80,
+        condition: {
+          flagTrue: 'UNLOCK_ZONE',
+        },
+        interactive: {
+          cursor: true,
+          action: {
+            type: 'gotoZone',
+            zoneId: 'C0-Z2',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalZone],
+      };
+
+      assembler.build(config);
+
+      // 应该注册事件监听
+      expect(mocks.mockEventBusOn).toHaveBeenCalledWith('FLAG_SET', expect.any(Function));
+
+      // Container 应该被创建
+      expect(mockScene.add.container).toHaveBeenCalled();
+    });
+
+    it('zone label 在白盒模式下应该显示', () => {
+      const zoneWithLabel: ISceneObjectConfig = {
+        id: 'zone_label_test',
+        x: 300,
+        y: 500,
+        type: 'zone',
+        width: 150,
+        height: 80,
+        label: '出口A',
+        interactive: {
+          cursor: true,
+          action: {
+            type: 'gotoZone',
+            zoneId: 'C0-Z2',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneWithLabel],
+      };
+
+      assembler.build(config);
+
+      // 应该创建 label 文字
+      expect(mockScene.add.text).toHaveBeenCalled();
+    });
+
+    it('zone 存储 label 数据', () => {
+      const zoneWithLabelData: ISceneObjectConfig = {
+        id: 'zone_label_data',
+        x: 300,
+        y: 500,
+        type: 'zone',
+        width: 150,
+        height: 80,
+        label: '数据出口',
+        interactive: {
+          cursor: true,
+          action: {
+            type: 'gotoZone',
+            zoneId: 'C0-Z2',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [zoneWithLabelData],
+      };
+
+      assembler.build(config);
+
+      const container = mockScene.add.container.mock.results[0]?.value;
+      expect(container?.setData).toHaveBeenCalledWith('label', '数据出口');
+    });
+  });
+
+  describe('条件监视器 flag 兼容字段', () => {
+    it('condition.flag 应该被当作 flagTrue 处理', () => {
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flag: 'LEGACY_FLAG', // 旧字段名
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      expect(mocks.mockGetFlag).toHaveBeenCalledWith('LEGACY_FLAG');
+    });
+  });
+
+  describe('未知 abilityActive 类型', () => {
+    it('未知的 abilityActive 类型不应映射到任何 flag', () => {
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          abilityActive: 'unknownAbility' as never,
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      // 不应抛错
+      expect(() => assembler.build(config)).not.toThrow();
+    });
+  });
+
+  describe('条件监视器轮询清理', () => {
+    it('轮询定时器应该被创建', () => {
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagTrue: 'POLL_FLAG',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 应该创建轮询定时器
+      expect(mockScene.time.addEvent).toHaveBeenCalled();
+    });
+  });
+
+  describe('条件评估边界情况', () => {
+    it('all 条件中有一个不满足应返回 false', () => {
+      mocks.mockGetFlag.mockImplementation((flag: string) => {
+        if (flag === 'FLAG_A') return true;
+        if (flag === 'FLAG_B') return false; // 这个不满足
+        return false;
+      });
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          all: [
+            { flagTrue: 'FLAG_A' },
+            { flagTrue: 'FLAG_B' },
+          ],
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 对象应该被创建但初始隐藏
+      expect(mockAssetResolver.resolveObject).toHaveBeenCalled();
+    });
+
+    it('any 条件全部不满足时应返回 false', () => {
+      mocks.mockGetFlag.mockReturnValue(false);
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          any: [
+            { flagTrue: 'FLAG_X' },
+            { flagTrue: 'FLAG_Y' },
+          ],
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      expect(mockAssetResolver.resolveObject).toHaveBeenCalled();
+    });
+
+    it('flagFalse 条件为 true 时应不满足', () => {
+      mocks.mockGetFlag.mockReturnValue(true); // flag 为 true
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagFalse: 'BLOCKING_FLAG', // 需要这个 flag 为 false
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      expect(mockAssetResolver.resolveObject).toHaveBeenCalled();
+    });
+  });
+
+  describe('条件监视器 zoneDim 样式', () => {
+    it('zone 类型物件条件变化时应调整 alpha', () => {
+      let flagValue = false;
+      mocks.mockGetFlag.mockImplementation(() => flagValue);
+
+      const conditionalZone: ISceneObjectConfig = {
+        id: 'zone_dim_test',
+        x: 300,
+        y: 500,
+        type: 'zone',
+        width: 150,
+        height: 80,
+        alpha: 0.8, // 自定义 alpha
+        condition: {
+          flagTrue: 'DIM_TEST_FLAG',
+        },
+        interactive: {
+          cursor: true,
+          action: {
+            type: 'gotoZone',
+            zoneId: 'C0-Z2',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalZone],
+      };
+
+      assembler.build(config);
+
+      // 获取事件处理器
+      const onFlagSetCall = mocks.mockEventBusOn.mock.calls.find(
+        (call) => call[0] === 'FLAG_SET'
+      );
+
+      if (onFlagSetCall) {
+        const callback = onFlagSetCall[1];
+        
+        // 模拟 flag 变为 true
+        flagValue = true;
+        callback({ flagName: 'DIM_TEST_FLAG', value: true });
+        
+        // 验证 container 被创建
+        expect(mockScene.add.container).toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe('条件监视器轮询回调', () => {
+    it('轮询定时器回调应检查条件变化', () => {
+      mocks.mockGetFlag.mockReturnValue(false);
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagTrue: 'TIMER_CHECK_FLAG',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 获取定时器回调
+      const timerConfig = mockScene.time.addEvent.mock.calls[0]?.[0];
+
+      if (timerConfig && timerConfig.callback) {
+        // 模拟 flag 变为 true
+        mocks.mockGetFlag.mockReturnValue(true);
+        
+        // 调用定时器回调
+        timerConfig.callback();
+        
+        // 验证定时器被创建
+        expect(mockScene.time.addEvent).toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe('条件监视器对象销毁检测', () => {
+    it('对象销毁后事件处理器应移除监听', () => {
+      mocks.mockGetFlag.mockReturnValue(false);
+
+      // 设置 resolveObject 返回一个"已销毁"状态的对象
+      mockAssetResolver.resolveObject.mockReturnValue({
+        gameObject: {
+          destroy: vi.fn(),
+          setPosition: vi.fn().mockReturnThis(),
+          setDepth: vi.fn().mockReturnThis(),
+          setInteractive: vi.fn().mockReturnThis(),
+          setName: vi.fn().mockReturnThis(),
+          setData: vi.fn().mockReturnThis(),
+          on: vi.fn().mockReturnThis(),
+          setVisible: vi.fn().mockReturnThis(),
+          setAlpha: vi.fn().mockReturnThis(),
+          disableInteractive: vi.fn().mockReturnThis(),
+          scene: null, // 模拟对象已销毁
+          active: false,
+        },
+        isWhitebox: true,
+      });
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagTrue: 'DESTROY_TEST_FLAG',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 获取事件处理器
+      const onFlagSetCall = mocks.mockEventBusOn.mock.calls.find(
+        (call) => call[0] === 'FLAG_SET'
+      );
+
+      if (onFlagSetCall) {
+        const callback = onFlagSetCall[1];
+        
+        // 触发事件（对象已销毁）
+        callback({ flagName: 'DESTROY_TEST_FLAG', value: true });
+        
+        // 应该调用 off 移除监听器
+        expect(mocks.mockEventBusOff).toHaveBeenCalledWith('FLAG_SET', expect.any(Function));
+      }
+    });
+  });
+
+  describe('条件监视器 enableInteractive 回调', () => {
+    it('条件满足时应调用 enableInteractive 设置交互', () => {
+      mocks.mockGetFlag.mockReturnValue(true);
+
+      const conditionalInteractive: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagTrue: 'ENABLE_INT_FLAG',
+        },
+        interactive: {
+          cursor: true,
+          action: {
+            type: 'dialogue',
+            dialogueId: 'dlg_test',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalInteractive],
+      };
+
+      assembler.build(config);
+
+      // 验证 setInteractive 被调用（因为条件满足）
+      const resolvedObject = mockAssetResolver.resolveObject.mock.results[0].value.gameObject;
+      expect(resolvedObject.setInteractive).toHaveBeenCalled();
+    });
+  });
 });

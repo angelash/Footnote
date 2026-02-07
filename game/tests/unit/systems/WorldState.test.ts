@@ -399,6 +399,11 @@ describe('WorldState', () => {
       expect(worldState.checkCondition({ hasCard: 'CARD_002' })).toBe(false);
     });
 
+    // 注意：由于 WorldState 是单例且 reset 不清除 cardChecker，
+    // 我们无法直接测试 "没有 cardChecker 时 hasCard 返回 false" 的分支。
+    // 该分支的覆盖率问题需要在生产代码中通过修改 reset 方法来解决，
+    // 或者接受这是一个防御性代码路径（实际运行时 NarrativeEngine 总会注册 checker）。
+
     it('checkCondition：flagFalse 检查应正确工作', () => {
       // flagFalse 且 flag 为 false → 通过
       expect(worldState.checkCondition({ flagFalse: 'SOME_FLAG' })).toBe(true);
@@ -612,6 +617,46 @@ describe('WorldState', () => {
 
       // 标记 Zone 完成（需要通过其他方式，这里简化测试）
       // Zone 完成状态通常在游戏逻辑中设置
+    });
+  });
+
+  describe('交互记录', () => {
+    it('markInteractionDone：应记录交互完成', () => {
+      worldState.markInteractionDone('interaction_001');
+
+      const records = worldState.getCompletedInteractions();
+      expect(records.length).toBe(1);
+      expect(records[0].id).toBe('interaction_001');
+    });
+
+    it('markInteractionDone：重复标记应被忽略', () => {
+      worldState.markInteractionDone('interaction_002');
+      worldState.markInteractionDone('interaction_002'); // 重复
+
+      const records = worldState.getCompletedInteractions();
+      expect(records.filter(r => r.id === 'interaction_002').length).toBe(1);
+    });
+
+    it('markInteractionDone：应包含时间戳和当前 Zone', () => {
+      worldState.setCurrentZone('C1-Z3');
+      worldState.markInteractionDone('interaction_003', { extra: 'data' });
+
+      const records = worldState.getCompletedInteractions();
+      const record = records.find(r => r.id === 'interaction_003');
+
+      expect(record).toBeDefined();
+      expect(record?.zoneId).toBe('C1-Z3');
+      expect(record?.timestamp).toBeDefined();
+      expect(record?.meta).toEqual({ extra: 'data' });
+    });
+
+    it('getCompletedInteractions：应返回所有交互记录', () => {
+      worldState.markInteractionDone('int_a');
+      worldState.markInteractionDone('int_b');
+      worldState.markInteractionDone('int_c');
+
+      const records = worldState.getCompletedInteractions();
+      expect(records.length).toBe(3);
     });
   });
 });

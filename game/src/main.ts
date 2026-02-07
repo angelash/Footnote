@@ -34,6 +34,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   interface Window {
     __GAME__?: Phaser.Game;
+    game?: Phaser.Game; // 简化访问，兼容旧测试
     __DEBUG_STATE__?: unknown;
   }
 }
@@ -109,6 +110,7 @@ const config: Phaser.Types.Core.GameConfig = {
       // 开发模式下暴露游戏实例
       if (import.meta.env.DEV) {
         window.__GAME__ = game;
+        window.game = game; // Test hook
         window.__DEBUG_STATE__ = null; // 将由WorldState设置
       }
     },

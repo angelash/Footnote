@@ -116,15 +116,15 @@ export class GameScene extends Phaser.Scene {
 
   // 事件监听器引用（用于精确清理）
   private _boundEventHandlers: {
-    onCounterRChanged?: (payload: { newValue: number }) => void;
-    onCounterPChanged?: (payload: { newValue: number }) => void;
-    onCounterWChanged?: (payload: { newValue: number }) => void;
+    onCounterRChanged?: (payload: { oldValue: number; newValue: number; delta: number }) => void;
+    onCounterPChanged?: (payload: { oldValue: number; newValue: number; delta: number }) => void;
+    onCounterWChanged?: (payload: { oldValue: number; newValue: number }) => void;
     onCardObtained?: (payload: { cardId: string; card?: { title?: string } }) => void;
     onAbilityUnlocked?: (payload: { abilityType: string }) => void;
     onZoneTransition?: (payload: { targetZone: string }) => void;
     onPlaySfx?: (payload: { key: string }) => void;
     onDialogueEnd?: (payload: { dialogueId: string }) => void;
-    onDialogueAdvance?: (payload: { dialogueId: string }) => void;
+    onDialogueAdvance?: (payload: { dialogueId: string; lineIndex: number }) => void;
     onDialogueChoice?: (payload: { dialogueId: string; choiceIndex: number; choiceText: string }) => void;
     onFlagSet?: (data: { flagName: string; value: boolean }) => void;
   } = {};
@@ -382,7 +382,7 @@ export class GameScene extends Phaser.Scene {
       }
 
       // 检查 P 值是否过高
-      const currentP = worldState.getP();
+      const currentP = worldState.getCounters().P;
       const pMax = 20; // CONFIG.P_MAX
       const pThreshold = pMax * 0.9; // 18
       if (currentP >= pThreshold) {

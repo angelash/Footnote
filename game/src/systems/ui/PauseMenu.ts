@@ -74,7 +74,6 @@ export class PauseMenu {
   private _keyDownHandler: ((event: KeyboardEvent) => void) | null = null;
   private _mainMenuButtons: Phaser.GameObjects.Container[] = [];
   private _currentFocusIndex: number = -1;
-  private _isInSettings: boolean = false;
 
   constructor(config: IPauseMenuConfig) {
     this._scene = config.scene;
@@ -119,7 +118,6 @@ export class PauseMenu {
     // 显示主菜单，隐藏设置面板
     this._mainMenuContainer.setVisible(true);
     this._settingsContainer.setVisible(false);
-    this._isInSettings = false;
 
     this._container.setVisible(true);
     this._container.setAlpha(0);
@@ -985,7 +983,6 @@ export class PauseMenu {
     this._mainMenuContainer.setVisible(false);
     this._settingsContainer.setVisible(true);
     this._helpContainer.setVisible(false);
-    this._isInSettings = true;
 
     // 切换焦点组
     a11yManager.destroyFocusGroup(FOCUS_GROUP_MAIN_MENU);
@@ -999,7 +996,6 @@ export class PauseMenu {
   private _hideSettings(): void {
     this._settingsContainer.setVisible(false);
     this._mainMenuContainer.setVisible(true);
-    this._isInSettings = false;
 
     // 切换焦点组
     a11yManager.destroyFocusGroup(FOCUS_GROUP_SETTINGS);
@@ -1013,7 +1009,6 @@ export class PauseMenu {
     this._mainMenuContainer.setVisible(false);
     this._settingsContainer.setVisible(false);
     this._helpContainer.setVisible(true);
-    this._isInSettings = true; // 复用这个标志表示不在主菜单
 
     // 切换焦点组
     a11yManager.destroyFocusGroup(FOCUS_GROUP_MAIN_MENU);
@@ -1026,7 +1021,6 @@ export class PauseMenu {
   private _hideHelp(): void {
     this._helpContainer.setVisible(false);
     this._mainMenuContainer.setVisible(true);
-    this._isInSettings = false;
 
     // 切换焦点组
     a11yManager.destroyFocusGroup(FOCUS_GROUP_HELP);

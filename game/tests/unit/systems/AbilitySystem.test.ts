@@ -14,6 +14,10 @@ const mockWorldState = {
   addScar: vi.fn(),
   getCurrentZone: vi.fn().mockReturnValue('C0-Z1'),
   addContamination: vi.fn(),
+  setFlag: vi.fn(),
+  getFlag: vi.fn().mockReturnValue(false),
+  addP: vi.fn(),
+  addR: vi.fn(),
 };
 
 vi.mock('@/systems/world', () => ({
@@ -81,6 +85,10 @@ const createMockScene = () => ({
       on: vi.fn().mockReturnThis(),
       destroy: vi.fn(),
     }),
+  },
+  input: {
+    on: vi.fn().mockReturnThis(),
+    off: vi.fn().mockReturnThis(),
   },
   time: {
     delayedCall: vi.fn().mockReturnValue({

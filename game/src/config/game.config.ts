@@ -15,8 +15,8 @@ export const GAME_CONFIG: Partial<Phaser.Types.Core.GameConfig> = {
     deltaHistory: 10,
     smoothStep: true,
   },
-  // 失去焦点时自动暂停游戏循环，防止后台运行导致状态异常
-  pauseOnBlur: true,
+  // 注意：pauseOnBlur 是 SoundManager 的属性，需要在音频配置中设置
+  // 游戏暂停逻辑通过 visibilitychange 事件在 main.ts 中处理
 };
 
 // 场景键名

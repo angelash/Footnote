@@ -182,3 +182,18 @@ beforeEach(() => {
 (globalThis as any).__DEV__ = true;
 (globalThis as any).__VERSION__ = '0.1.0';
 
+// Mock window.matchMedia for A11yManager
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+

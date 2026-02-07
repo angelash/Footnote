@@ -15,9 +15,8 @@ import type {
   IZoneExit,
   IROpportunity,
   IDialogueCondition,
-  ForeshadowStage,
 } from '@/types';
-import type { ChapterID, ZoneType } from '@/config/game.config';
+import type { ChapterID } from '@/config/game.config';
 
 const logger = createLogger('ZoneManager');
 

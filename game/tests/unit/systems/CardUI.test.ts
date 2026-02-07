@@ -54,7 +54,10 @@ const mockText = {
 const mockRectangle = {
   setAlpha: vi.fn().mockReturnThis(),
   setInteractive: vi.fn().mockReturnThis(),
+  setDepth: vi.fn().mockReturnThis(),
+  setVisible: vi.fn().mockReturnThis(),
   on: vi.fn().mockReturnThis(),
+  destroy: vi.fn(),
 };
 
 const mockContainer = {
@@ -128,10 +131,17 @@ vi.mock('@/config/ui.config', () => ({
     CARD: {
       NORMAL: { WIDTH: 320, HEIGHT: 480 },
     },
-    RADIUS: { XL: 16 },
+    BUTTON: {
+      MIN_TOUCH_SIZE: 44,
+    },
+    RADIUS: { XL: 16, M: 8, S: 4 },
     ANIMATION: { EFFECT: 500, NORMAL: 300 },
-    SPACING: { XL: 32 },
+    SPACING: { XL: 32, L: 24, M: 16, S: 8 },
     LINE_SPACING: { LOOSE: 8 },
+    DEPTHS: {
+      CARD: 1000,
+      OVERLAY: 900,
+    },
   },
   UI_FONT_SIZE: {
     ICON: '24px',

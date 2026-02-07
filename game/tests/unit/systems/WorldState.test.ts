@@ -46,7 +46,8 @@ describe('WorldState', () => {
 
     it('addR：R 值不应超过上限', () => {
       worldState.addR(150);
-      expect(worldState.getCounters().R).toBe(100);
+      // R_MAX 配置为 15 (见 world.config.ts)
+      expect(worldState.getCounters().R).toBe(15);
     });
 
     it('addR：负值应减少 R 但不低于 0', () => {
@@ -70,7 +71,8 @@ describe('WorldState', () => {
 
     it('addP：P 值不应超过上限', () => {
       worldState.addP(150);
-      expect(worldState.getCounters().P).toBe(100);
+      // P_MAX 配置为 20 (见 world.config.ts)
+      expect(worldState.getCounters().P).toBe(20);
     });
 
     it('addP：负值应减少 P 但不低于 0', () => {
@@ -79,12 +81,14 @@ describe('WorldState', () => {
       expect(worldState.getCounters().P).toBe(0);
     });
 
-    it('decayP：应降低 P 且不低于 0', () => {
+    it('decayP：根据设计文档 P 不应自动衰减', () => {
       worldState.addP(10);
+      // 根据设计文档要求，P值不应自动衰减
+      // decayP 方法保留以兼容旧代码，但不执行任何操作
       worldState.decayP(1000);
-      expect(worldState.getCounters().P).toBeLessThan(10);
+      expect(worldState.getCounters().P).toBe(10);
       worldState.decayP(99999999);
-      expect(worldState.getCounters().P).toBeGreaterThanOrEqual(0);
+      expect(worldState.getCounters().P).toBe(10);
     });
 
     it('decayP：P 为 0 时不应变化', () => {
@@ -143,14 +147,16 @@ describe('WorldState', () => {
         type: 'minor',
         description: 'test scar',
       });
-      expect(worldState.getCounters().W).toBe(95);
+      // W = 100 - (scar_count * SCAR_PENALTY) = 100 - (1 * 2) = 98
+      expect(worldState.getCounters().W).toBe(98);
 
       worldState.addContamination({
         sourceZoneId: 'C0-Z1',
         affectedZoneIds: ['C0-Z2'],
         type: 'timeline_fracture',
       });
-      expect(worldState.getCounters().W).toBe(85);
+      // W = 100 - (1 * 2) - (1 * 5) = 93
+      expect(worldState.getCounters().W).toBe(93);
 
       for (let i = 0; i < 20; i++) {
         worldState.addContamination({
@@ -336,6 +342,7 @@ describe('WorldState', () => {
     it('checkCondition：计数器范围检查', () => {
       worldState.addR(5);
       worldState.addP(10);
+      // W = 100 - (5 * 3) - (10 * 2) = 100 - 15 - 20 = 65
 
       // rMin
       expect(worldState.checkCondition({ rMin: 5 })).toBe(true);
@@ -353,13 +360,13 @@ describe('WorldState', () => {
       expect(worldState.checkCondition({ pMax: 10 })).toBe(true);
       expect(worldState.checkCondition({ pMax: 9 })).toBe(false);
 
-      // wMin
-      expect(worldState.checkCondition({ wMin: 100 })).toBe(true);
-      expect(worldState.checkCondition({ wMin: 101 })).toBe(false);
+      // wMin (W = 65)
+      expect(worldState.checkCondition({ wMin: 65 })).toBe(true);
+      expect(worldState.checkCondition({ wMin: 66 })).toBe(false);
 
-      // wMax
-      expect(worldState.checkCondition({ wMax: 100 })).toBe(true);
-      expect(worldState.checkCondition({ wMax: 99 })).toBe(false);
+      // wMax (W = 65)
+      expect(worldState.checkCondition({ wMax: 65 })).toBe(true);
+      expect(worldState.checkCondition({ wMax: 64 })).toBe(false);
     });
 
     it('checkCondition：hasCard 无检查器时应返回 false', () => {

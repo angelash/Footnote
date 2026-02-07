@@ -29,7 +29,7 @@ export default defineConfig({
         'src/systems/assets/AssetManager.ts',
         'src/systems/audio/AudioManager.ts',
         'src/systems/scene/SceneAssembler.ts',
-        'src/systems/input/InteractionSystem.ts',
+        'src/systems/interaction/InteractionSystem.ts',
         // UI 组件 (需要 Phaser mock)
         'src/systems/ui/CardUI.ts',
         'src/systems/ui/DialogueUI.ts',

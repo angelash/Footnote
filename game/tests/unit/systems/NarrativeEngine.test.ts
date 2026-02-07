@@ -1733,6 +1733,68 @@ describe('NarrativeEngine', () => {
       // 不应抛错
       expect(() => engine.obtainCard('missing_param_card')).not.toThrow();
     });
+
+    it('counterDelta 缺少 counter 参数应被跳过', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      const { worldState: ws } = await import('@/systems/world');
+      const initialR = ws.getCounters().R;
+
+      engine.registerCard({
+        id: 'counter_no_counter',
+        name: '无 counter 参数',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'counterDelta' as const, delta: 5 }, // 缺少 counter
+            ],
+          },
+        ],
+      });
+
+      engine.obtainCard('counter_no_counter');
+
+      // R 值应该没有变化
+      expect(ws.getCounters().R).toBe(initialR);
+    });
+
+    it('counterDelta 缺少 delta 参数应被跳过', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      const { worldState: ws } = await import('@/systems/world');
+      const initialP = ws.getCounters().P;
+
+      engine.registerCard({
+        id: 'counter_no_delta',
+        name: '无 delta 参数',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'counterDelta' as const, counter: 'P' }, // 缺少 delta
+            ],
+          },
+        ],
+      });
+
+      engine.obtainCard('counter_no_delta');
+
+      // P 值应该没有变化
+      expect(ws.getCounters().P).toBe(initialP);
+    });
   });
 
   describe('canTriggerForeshadow', () => {

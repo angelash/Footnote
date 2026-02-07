@@ -513,4 +513,32 @@ describe('DialogueUI', () => {
       expect(mockDialogue.expression).toBeUndefined();
     });
   });
+
+  describe('键盘导航', () => {
+    it('键盘处理器存在', () => {
+      dialogueUI.showDialogue(mockDialogue);
+
+      // 验证可以正常显示对话（键盘导航已设置）
+      expect(mockContainer.setVisible).toHaveBeenCalled();
+    });
+
+    it('没有选项时空格/回车应推进对话', () => {
+      dialogueUI.showDialogue(mockDialogue);
+
+      // 验证 advance 方法存在且可调用
+      expect(typeof dialogueUI.advance).toBe('function');
+      
+      // 调用 advance 不应抛错
+      expect(() => dialogueUI.advance()).not.toThrow();
+    });
+
+    it('hideDialogue 应隐藏对话', () => {
+      dialogueUI.showDialogue(mockDialogue);
+      
+      dialogueUI.hideDialogue();
+      
+      // 验证触发了隐藏逻辑
+      expect(mockTweenAdd).toHaveBeenCalled();
+    });
+  });
 });

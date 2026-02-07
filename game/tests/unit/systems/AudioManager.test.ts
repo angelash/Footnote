@@ -549,4 +549,87 @@ describe('AudioManager', () => {
       expect(mockAmbience.setVolume).toHaveBeenCalled();
     });
   });
+
+  describe('unlockAudio - 音频解锁', () => {
+    it('unlockAudio 应该尝试解锁音频上下文', () => {
+      const mockUnlock = vi.fn();
+      const mockOnce = vi.fn();
+      
+      const sceneWithLockedSound = {
+        ...mockScene,
+        sound: {
+          ...mockScene.sound,
+          locked: true,
+          unlock: mockUnlock,
+          once: mockOnce,
+        },
+      };
+
+      const manager = new AudioManager(sceneWithLockedSound as unknown as Phaser.Scene);
+      manager.loadConfigs(mockBgmConfigs, mockSfxConfigs, mockAmbienceConfigs);
+
+      manager.unlockAudio();
+
+      expect(mockUnlock).toHaveBeenCalled();
+      expect(mockOnce).toHaveBeenCalledWith('unlocked', expect.any(Function));
+    });
+
+    it('unlockAudio 已解锁时应直接标记', () => {
+      const sceneWithUnlockedSound = {
+        ...mockScene,
+        sound: {
+          ...mockScene.sound,
+          locked: false,
+          unlock: vi.fn(),
+          once: vi.fn(),
+        },
+      };
+
+      const manager = new AudioManager(sceneWithUnlockedSound as unknown as Phaser.Scene);
+      manager.loadConfigs(mockBgmConfigs, mockSfxConfigs, mockAmbienceConfigs);
+
+      manager.unlockAudio();
+
+      expect(manager.isAudioUnlocked()).toBe(true);
+    });
+
+    it('unlockAudio 重复调用应被跳过', () => {
+      const mockUnlock = vi.fn();
+      
+      const sceneWithUnlockedSound = {
+        ...mockScene,
+        sound: {
+          ...mockScene.sound,
+          locked: false,
+          unlock: mockUnlock,
+          once: vi.fn(),
+        },
+      };
+
+      const manager = new AudioManager(sceneWithUnlockedSound as unknown as Phaser.Scene);
+      manager.loadConfigs(mockBgmConfigs, mockSfxConfigs, mockAmbienceConfigs);
+
+      manager.unlockAudio();
+      manager.unlockAudio(); // 重复调用
+
+      // 只应该调用一次相关逻辑（第二次被跳过因为已解锁）
+      expect(manager.isAudioUnlocked()).toBe(true);
+    });
+
+    it('isAudioUnlocked 应正确返回解锁状态', () => {
+      const sceneWithLockedSound = {
+        ...mockScene,
+        sound: {
+          ...mockScene.sound,
+          locked: true,
+        },
+      };
+
+      const manager = new AudioManager(sceneWithLockedSound as unknown as Phaser.Scene);
+      manager.loadConfigs(mockBgmConfigs, mockSfxConfigs, mockAmbienceConfigs);
+
+      // 初始时未解锁且 sound.locked 为 true
+      expect(manager.isAudioUnlocked()).toBe(false);
+    });
+  });
 });

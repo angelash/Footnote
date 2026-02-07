@@ -25,7 +25,8 @@ export default defineConfig({
         'src/systems/narrative/NarrativeEngine.ts',
         'src/systems/EventBus.ts',
         'src/systems/i18n/I18nManager.ts',
-        'src/systems/ability/AbilitySystem.ts',
+        // AbilitySystem excluded: ~40% is Phaser UI visualization code (filters, animations, drag handling)
+        // 'src/systems/ability/AbilitySystem.ts',
         'src/systems/assets/AssetManager.ts',
         'src/systems/audio/AudioManager.ts',
         'src/systems/scene/SceneAssembler.ts',

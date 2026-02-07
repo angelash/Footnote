@@ -474,4 +474,101 @@ describe('I18nManager', () => {
       expect(resultMany).toContain('5');
     });
   });
+
+  describe('URL加载翻译', () => {
+    it('loadTranslationsFromUrl应从URL加载翻译', async () => {
+      const { i18n } = await createFreshI18n();
+
+      // Mock fetch
+      const mockTranslations = {
+        test: { greeting: 'Hello from URL' },
+      };
+      
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: () => Promise.resolve(mockTranslations),
+      });
+
+      await i18n.loadTranslationsFromUrl('en', '/test/translations.json');
+      
+      // 切换到 en 语言
+      i18n.setLocale('en');
+
+      expect(i18n.t('test.greeting')).toBe('Hello from URL');
+      expect(globalThis.fetch).toHaveBeenCalledWith('/test/translations.json');
+    });
+
+    it('loadTranslationsFromUrl失败时应抛出错误', async () => {
+      const { i18n } = await createFreshI18n();
+
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        statusText: 'Not Found',
+      });
+
+      await expect(
+        i18n.loadTranslationsFromUrl('en', '/invalid/url.json')
+      ).rejects.toThrow('Failed to load translations');
+    });
+
+    it('loadTranslationsFromUrl网络错误应抛出异常', async () => {
+      const { i18n } = await createFreshI18n();
+
+      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+
+      await expect(
+        i18n.loadTranslationsFromUrl('en', '/error/url.json')
+      ).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('缺失翻译记录', () => {
+    it('应记录缺失的翻译', async () => {
+      const { i18n } = await createFreshI18n();
+      
+      // 关闭警告避免日志输出
+      i18n.setWarnOnMissing(false);
+      
+      // 访问不存在的键
+      i18n.t('nonexistent.key');
+      i18n.t('another.missing.key');
+
+      const missing = i18n.getMissingTranslations();
+      expect(missing.length).toBeGreaterThan(0);
+    });
+
+    it('clearMissingTranslations应清空记录', async () => {
+      const { i18n } = await createFreshI18n();
+      
+      i18n.setWarnOnMissing(false);
+      i18n.t('missing.key');
+      
+      expect(i18n.getMissingTranslations().length).toBeGreaterThan(0);
+      
+      i18n.clearMissingTranslations();
+      expect(i18n.getMissingTranslations().length).toBe(0);
+    });
+  });
+
+  describe('命名空间卸载', () => {
+    it('unloadTranslations应卸载指定命名空间', async () => {
+      const { i18n } = await createFreshI18n();
+
+      // 先设置语言
+      i18n.setLocale('zh-CN');
+      
+      i18n.loadTranslations('zh-CN', {
+        data: { temp: { key: '临时翻译' } },
+        namespace: 'temp_ns',
+      });
+
+      // 命名空间通过点号访问
+      expect(i18n.t('temp_ns.temp.key')).toBe('临时翻译');
+
+      i18n.unloadTranslations('temp_ns');
+      
+      // 卸载后应返回 key 本身
+      expect(i18n.t('temp_ns.temp.key')).toBe('temp_ns.temp.key');
+    });
+  });
 });

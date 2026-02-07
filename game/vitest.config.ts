@@ -25,7 +25,8 @@ export default defineConfig({
         'src/systems/narrative/NarrativeEngine.ts',
         'src/systems/EventBus.ts',
         'src/systems/i18n/I18nManager.ts',
-        'src/scenes/GameScene.ts',
+        // GameScene.ts 移除: 作为 Phaser Scene 类，需要完整的游戏运行时环境
+        // 适合 E2E 测试而非单元测试
       ],
       exclude: [
         'node_modules/',
@@ -34,6 +35,8 @@ export default defineConfig({
         '**/*.d.ts',
         // SaveManager excluded: requires IndexedDB which can't be unit tested
         'src/systems/save/SaveManager.ts',
+        // GameScene excluded: Phaser Scene class, requires full game runtime
+        'src/scenes/GameScene.ts',
       ],
       thresholds: {
         statements: 80,

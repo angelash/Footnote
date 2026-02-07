@@ -210,6 +210,26 @@ describe('WorldState', () => {
       expect(worldState.isZoneContaminated('C0-Z3')).toBe(true);
       expect(worldState.isZoneContaminated('C0-Z4')).toBe(false);
     });
+
+    it('getContaminations：应返回所有污染的副本', () => {
+      worldState.addContamination({
+        sourceZoneId: 'C0-Z1',
+        affectedZoneIds: ['C0-Z2'],
+        type: 'timeline_fracture',
+      });
+      worldState.addContamination({
+        sourceZoneId: 'C1-Z1',
+        affectedZoneIds: ['C1-Z2'],
+        type: 'paradox',
+      });
+
+      const contaminations = worldState.getContaminations();
+      expect(contaminations.length).toBe(2);
+      
+      // 验证是副本，修改不影响原数据
+      contaminations.pop();
+      expect(worldState.getContaminations().length).toBe(2);
+    });
   });
 
   describe('Zone 状态管理', () => {
@@ -369,11 +389,23 @@ describe('WorldState', () => {
       expect(worldState.checkCondition({ wMax: 64 })).toBe(false);
     });
 
-    it('checkCondition：hasCard 无检查器时应返回 false', () => {
-      // 注意：需要确保 cardChecker 未注册或重置
-      // 由于 WorldState 是单例，这个测试可能需要特殊处理
-      // 在实际代码中，如果没有 cardChecker，会打印警告并返回 false
-      // 这里我们假设测试环境中没有注册 cardChecker
+    it('checkCondition：hasCard 有检查器时应正确检查', () => {
+      // 注册卡片检查器
+      worldState.registerCardChecker((cardId: string) => cardId === 'CARD_001');
+      
+      // 有这张卡
+      expect(worldState.checkCondition({ hasCard: 'CARD_001' })).toBe(true);
+      // 没有这张卡
+      expect(worldState.checkCondition({ hasCard: 'CARD_002' })).toBe(false);
+    });
+
+    it('checkCondition：flagFalse 检查应正确工作', () => {
+      // flagFalse 且 flag 为 false → 通过
+      expect(worldState.checkCondition({ flagFalse: 'SOME_FLAG' })).toBe(true);
+      
+      // flagFalse 且 flag 为 true → 不通过
+      worldState.setFlag('SOME_FLAG', true);
+      expect(worldState.checkCondition({ flagFalse: 'SOME_FLAG' })).toBe(false);
     });
 
     it('checkCondition：空条件应返回 true', () => {
@@ -433,6 +465,41 @@ describe('WorldState', () => {
 
       expect(worldState.getCounters().R).toBe(3);
       expect(worldState.getCounters().P).toBe(5);
+    });
+
+    it('restore：应正确恢复交互记录', () => {
+      const interactionRecord = {
+        id: 'interaction_001',
+        timestamp: Date.now(),
+        zoneId: 'C0-Z1',
+      };
+      
+      worldState.restore({
+        completedInteractions: [interactionRecord],
+      });
+
+      expect(worldState.hasInteraction('interaction_001')).toBe(true);
+      expect(worldState.hasInteraction('interaction_002')).toBe(false);
+    });
+
+    it('restore：应正确恢复已消耗的卡片', () => {
+      worldState.restore({
+        consumedCards: ['CARD_CONSUMED_001', 'CARD_CONSUMED_002'],
+      });
+
+      expect(worldState.isCardConsumed('CARD_CONSUMED_001')).toBe(true);
+      expect(worldState.isCardConsumed('CARD_CONSUMED_002')).toBe(true);
+      expect(worldState.isCardConsumed('CARD_NOT_CONSUMED')).toBe(false);
+    });
+
+    it('restore：应正确恢复当前章节', () => {
+      worldState.restore({
+        currentChapter: 'C3',
+      });
+
+      // 通过 serialize 验证章节被正确恢复
+      const data = worldState.serialize();
+      expect(data.currentChapter).toBe('C3');
     });
 
     it('getState：应等价于 serialize()', () => {

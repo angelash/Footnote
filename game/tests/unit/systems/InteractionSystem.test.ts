@@ -17,6 +17,8 @@ const {
   mockMarkDirty,
   mockHasCard,
   mockObtainCard,
+  mockUnlockAbility,
+  mockTriggerForeshadow,
 } = vi.hoisted(() => ({
   mockEmit: vi.fn(),
   mockEmitTyped: vi.fn(),
@@ -28,6 +30,8 @@ const {
   mockMarkDirty: vi.fn(),
   mockHasCard: vi.fn(),
   mockObtainCard: vi.fn(),
+  mockUnlockAbility: vi.fn(),
+  mockTriggerForeshadow: vi.fn(),
 }));
 
 // Mock 依赖模块
@@ -50,6 +54,8 @@ vi.mock('@/systems/EventBus', () => ({
     INTERACTION_COMMIT: 'interaction:commit',
     ITEM_COLLECT: 'item:collect',
     PLAY_SFX: 'play:sfx',
+    BGM_PLAY: 'bgm:play',
+    ABILITY_UNLOCK: 'ability:unlock',
   },
 }));
 
@@ -61,6 +67,7 @@ vi.mock('@/systems/world', () => ({
     setFlag: mockSetFlag,
     addR: mockAddR,
     addP: mockAddP,
+    unlockAbility: mockUnlockAbility,
   },
 }));
 
@@ -76,6 +83,7 @@ vi.mock('@/systems/narrative', () => ({
   narrativeEngine: {
     hasCard: mockHasCard,
     obtainCard: mockObtainCard,
+    triggerForeshadow: mockTriggerForeshadow,
   },
 }));
 
@@ -341,6 +349,79 @@ describe('InteractionSystem', () => {
 
       expect(result.sfxToPlay).toContain('sfx_test');
       expect(mockConfig.onPlaySfx).toHaveBeenCalledWith('sfx_test');
+    });
+
+    it('正确应用 sound 效果 (使用 audioKey)', () => {
+      const action: ISceneAction = {
+        type: 'dialogue',
+        dialogueId: 'TEST_DIALOGUE',
+        effects: [{ type: 'sound', audioKey: 'sfx_click' }],
+      };
+      const context = createContext();
+
+      const result = interactionSystem.execute(action, context);
+
+      expect(result.sfxToPlay).toContain('sfx_click');
+    });
+
+    it('正确应用 ability 效果', () => {
+      const action: ISceneAction = {
+        type: 'dialogue',
+        dialogueId: 'TEST_DIALOGUE',
+        effects: [{ type: 'ability', abilityType: 'DEPTH_PERCEPTION' }],
+      };
+      const context = createContext();
+
+      interactionSystem.execute(action, context);
+
+      expect(mockUnlockAbility).toHaveBeenCalledWith('DEPTH_PERCEPTION');
+      // ABILITY_UNLOCK 使用 eventBus.emit
+      expect(mockEmit).toHaveBeenCalledWith(
+        expect.anything(), // GameEvent.ABILITY_UNLOCK
+        expect.objectContaining({ ability: 'DEPTH_PERCEPTION' })
+      );
+    });
+
+    it('正确应用 foreshadow 效果', () => {
+      const action: ISceneAction = {
+        type: 'dialogue',
+        dialogueId: 'TEST_DIALOGUE',
+        effects: [{ type: 'foreshadow', foreshadowId: 'fs_test', foreshadowStage: 'plant' }],
+      };
+      const context = createContext();
+
+      interactionSystem.execute(action, context);
+
+      expect(mockTriggerForeshadow).toHaveBeenCalledWith('fs_test', 'plant');
+    });
+
+    it('正确应用 bgm 效果', () => {
+      const action: ISceneAction = {
+        type: 'dialogue',
+        dialogueId: 'TEST_DIALOGUE',
+        effects: [{ type: 'bgm', audioKey: 'bgm_battle' }],
+      };
+      const context = createContext();
+
+      interactionSystem.execute(action, context);
+
+      // BGM 使用 eventBus.emit (而非 emitTyped)，事件是 GameEvent.BGM_PLAY
+      expect(mockEmit).toHaveBeenCalledWith(
+        expect.anything(), // GameEvent.BGM_PLAY
+        expect.objectContaining({ key: 'bgm_battle' })
+      );
+    });
+
+    it('正确处理 goto 效果', () => {
+      const action: ISceneAction = {
+        type: 'dialogue',
+        dialogueId: 'TEST_DIALOGUE',
+        effects: [{ type: 'goto', targetZoneId: 'C0-Z2' }],
+      };
+      const context = createContext();
+
+      // goto 效果在 _triggerFeedback 中处理，这里只验证不抛错
+      expect(() => interactionSystem.execute(action, context)).not.toThrow();
     });
   });
 

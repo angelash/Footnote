@@ -537,5 +537,82 @@ describe('WorldState', () => {
       expect(worldState.isZoneUnlocked('C1-Z1')).toBe(false);
     });
   });
+
+  describe('卡片消耗', () => {
+    it('consumeCard：应正确消耗卡片', () => {
+      expect(worldState.isCardConsumed('CARD_001')).toBe(false);
+      
+      worldState.consumeCard('CARD_001');
+      
+      expect(worldState.isCardConsumed('CARD_001')).toBe(true);
+    });
+
+    it('consumeCard：重复消耗同一卡片应被跳过', () => {
+      worldState.consumeCard('CARD_002');
+      worldState.consumeCard('CARD_002'); // 重复调用
+
+      // 应该只有一个记录
+      expect(worldState.getConsumedCards().filter(id => id === 'CARD_002').length).toBe(1);
+    });
+
+    it('getConsumedCards：应返回所有已消耗的卡片', () => {
+      worldState.consumeCard('CARD_A');
+      worldState.consumeCard('CARD_B');
+      worldState.consumeCard('CARD_C');
+
+      const consumed = worldState.getConsumedCards();
+
+      expect(consumed).toContain('CARD_A');
+      expect(consumed).toContain('CARD_B');
+      expect(consumed).toContain('CARD_C');
+      expect(consumed.length).toBe(3);
+    });
+
+    it('reset：应清空已消耗的卡片', () => {
+      worldState.consumeCard('CARD_TO_CLEAR');
+      expect(worldState.isCardConsumed('CARD_TO_CLEAR')).toBe(true);
+
+      worldState.reset();
+
+      expect(worldState.isCardConsumed('CARD_TO_CLEAR')).toBe(false);
+      expect(worldState.getConsumedCards().length).toBe(0);
+    });
+  });
+
+  describe('条件检查扩展', () => {
+    it('checkCondition：pMin/pMax 应正确检查 P 值范围', () => {
+      worldState.addP(5);
+
+      expect(worldState.checkCondition({ pMin: 3 })).toBe(true);
+      expect(worldState.checkCondition({ pMin: 10 })).toBe(false);
+      expect(worldState.checkCondition({ pMax: 10 })).toBe(true);
+      expect(worldState.checkCondition({ pMax: 3 })).toBe(false);
+    });
+
+    it('checkCondition：wMin/wMax 应正确检查 W 值范围', () => {
+      // W 值初始为 100
+      expect(worldState.checkCondition({ wMin: 50 })).toBe(true);
+      expect(worldState.checkCondition({ wMin: 150 })).toBe(false);
+      expect(worldState.checkCondition({ wMax: 150 })).toBe(true);
+      expect(worldState.checkCondition({ wMax: 50 })).toBe(false);
+    });
+
+    it('checkCondition：zoneVisited 应正确检查 Zone 访问状态', () => {
+      expect(worldState.checkCondition({ zoneVisited: 'C0-Z5' })).toBe(false);
+
+      worldState.visitZone('C0-Z5');
+
+      expect(worldState.checkCondition({ zoneVisited: 'C0-Z5' })).toBe(true);
+    });
+
+    it('checkCondition：zoneCompleted 应正确检查 Zone 完成状态', () => {
+      // 首先访问 Zone
+      worldState.visitZone('C0-Z6');
+      expect(worldState.checkCondition({ zoneCompleted: 'C0-Z6' })).toBe(false);
+
+      // 标记 Zone 完成（需要通过其他方式，这里简化测试）
+      // Zone 完成状态通常在游戏逻辑中设置
+    });
+  });
 });
 

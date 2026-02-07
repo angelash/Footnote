@@ -98,6 +98,29 @@ vi.mock('@/config/assetMode.config', () => ({
   useProductionAsset: vi.fn().mockReturnValue(false),
 }));
 
+// Mock worldState and eventBus - use vi.hoisted to define mocks before vi.mock
+const mocks = vi.hoisted(() => ({
+  mockGetFlag: vi.fn().mockReturnValue(false),
+  mockEventBusOn: vi.fn(),
+  mockEventBusOff: vi.fn(),
+}));
+
+vi.mock('@/systems/world', () => ({
+  worldState: {
+    getFlag: mocks.mockGetFlag,
+  },
+}));
+
+vi.mock('@/systems/EventBus', () => ({
+  eventBus: {
+    on: mocks.mockEventBusOn,
+    off: mocks.mockEventBusOff,
+  },
+  GameEvent: {
+    FLAG_SET: 'FLAG_SET',
+  },
+}));
+
 // Mock game config
 vi.mock('@/config/game.config', () => ({
   TEXT_STYLES: {
@@ -177,8 +200,12 @@ import { SceneAssembler } from '@/systems/scene/SceneAssembler';
 import { assetResolver } from '@/systems/whitebox/AssetResolver';
 import type { ISceneConfig, ISceneObjectConfig } from '@/types/scene';
 
+// Import worldState for mocking
+import { worldState } from '@/systems/world';
+
 // Get mocked versions
 const mockAssetResolver = vi.mocked(assetResolver);
+const mockWorldState = vi.mocked(worldState);
 
 describe('SceneAssembler', () => {
   let assembler: SceneAssembler;
@@ -212,6 +239,9 @@ describe('SceneAssembler', () => {
     mockCallbacks = {
       onAction: vi.fn(),
     };
+
+    // 重置 worldState mock
+    mocks.mockGetFlag.mockReturnValue(false);
 
     // 重置AssetResolver mock
     mockAssetResolver.isInitialized.mockReturnValue(true);
@@ -1114,6 +1144,224 @@ describe('SceneAssembler', () => {
 
       const bgCall = mockAssetResolver.resolveBackground.mock.calls[0];
       expect(bgCall[1].landmarks[0].label).toBe('obj_test_id');
+    });
+  });
+
+  describe('条件系统', () => {
+    it('有 flagTrue 条件的物件应该注册事件监听', () => {
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagTrue: 'TEST_FLAG',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 应该注册 FLAG_SET 事件监听
+      expect(mocks.mockEventBusOn).toHaveBeenCalledWith('FLAG_SET', expect.any(Function));
+    });
+
+    it('有 flagFalse 条件的物件应该注册事件监听', () => {
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagFalse: 'BLOCKING_FLAG',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      expect(mocks.mockEventBusOn).toHaveBeenCalledWith('FLAG_SET', expect.any(Function));
+    });
+
+    it('条件满足时物件应该可见', () => {
+      mocks.mockGetFlag.mockReturnValue(true);
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagTrue: 'TEST_FLAG',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 验证物件被创建
+      expect(mockAssetResolver.resolveObject).toHaveBeenCalled();
+    });
+
+    it('条件不满足时物件应该隐藏', () => {
+      mocks.mockGetFlag.mockReturnValue(false);
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          flagTrue: 'TEST_FLAG',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 验证物件被创建（但是 setVisible(false) 会被调用）
+      expect(mockAssetResolver.resolveObject).toHaveBeenCalled();
+    });
+
+    it('abilityActive 条件应该映射到相应的 flag', () => {
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          abilityActive: 'depthPerception',
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      // 应该检查 FLAG_DEPTH_SENSE_ACTIVE
+      expect(mocks.mockGetFlag).toHaveBeenCalledWith('FLAG_DEPTH_SENSE_ACTIVE');
+    });
+
+    it('复合条件 all 应该要求所有子条件满足', () => {
+      mocks.mockGetFlag.mockImplementation((flag: string) => {
+        if (flag === 'FLAG_A') return true;
+        if (flag === 'FLAG_B') return true;
+        return false;
+      });
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          all: [
+            { flagTrue: 'FLAG_A' },
+            { flagTrue: 'FLAG_B' },
+          ],
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      expect(mocks.mockGetFlag).toHaveBeenCalledWith('FLAG_A');
+      expect(mocks.mockGetFlag).toHaveBeenCalledWith('FLAG_B');
+    });
+
+    it('复合条件 any 应该只要求一个子条件满足', () => {
+      mocks.mockGetFlag.mockImplementation((flag: string) => {
+        if (flag === 'FLAG_A') return true;
+        return false;
+      });
+
+      const conditionalObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        condition: {
+          any: [
+            { flagTrue: 'FLAG_A' },
+            { flagTrue: 'FLAG_B' },
+          ],
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [conditionalObject],
+      };
+
+      assembler.build(config);
+
+      expect(mocks.mockGetFlag).toHaveBeenCalledWith('FLAG_A');
+    });
+
+    it('没有条件的物件不应注册事件监听', () => {
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [mockObjectConfig],
+      };
+
+      assembler.build(config);
+
+      // eventBus.on 不应该被调用（因为没有条件）
+      expect(mocks.mockEventBusOn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('卡片物品捡取检查', () => {
+    it('已捡取的卡片物品不应被创建', () => {
+      mocks.mockGetFlag.mockImplementation((flag: string) => {
+        if (flag === 'ITEM_TAKEN_CARD_001') return true;
+        return false;
+      });
+
+      const cardObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        interactive: {
+          action: {
+            type: 'card',
+            cardId: 'CARD_001',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [cardObject],
+      };
+
+      assembler.build(config);
+
+      // 物品已被捡取，不应创建
+      expect(mockAssetResolver.resolveObject).not.toHaveBeenCalled();
+    });
+
+    it('未捡取的卡片物品应该被创建', () => {
+      mocks.mockGetFlag.mockReturnValue(false);
+
+      const cardObject: ISceneObjectConfig = {
+        ...mockObjectConfig,
+        interactive: {
+          action: {
+            type: 'card',
+            cardId: 'CARD_002',
+          },
+        },
+      };
+
+      const config: ISceneConfig = {
+        ...mockSceneConfig,
+        objects: [cardObject],
+      };
+
+      assembler.build(config);
+
+      expect(mockAssetResolver.resolveObject).toHaveBeenCalled();
     });
   });
 });

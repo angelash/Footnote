@@ -63,7 +63,8 @@ const mockRectangle = {
   destroy: vi.fn(),
 };
 
-const mockContainer = {
+// Factory function to create a new mock container with independent list array
+const createMockContainer = () => ({
   add: vi.fn().mockReturnThis(),
   setDepth: vi.fn().mockReturnThis(),
   setVisible: vi.fn().mockReturnThis(),
@@ -74,6 +75,7 @@ const mockContainer = {
   destroy: vi.fn(),
   visible: false,
   y: 500,
+  // Each container has its own independent list array
   // For button.list[0] (graphics) and button.list[1] (text) access
   list: [
     { 
@@ -85,12 +87,16 @@ const mockContainer = {
     },
     { setColor: vi.fn().mockReturnThis() },
   ],
-};
+});
+
+// Default container for backward compatibility
+const mockContainer = createMockContainer();
 
 const createMockScene = () => ({
   scale: { width: 720, height: 1280 },
   add: {
-    container: vi.fn().mockReturnValue({ ...mockContainer }),
+    // Each call returns a new independent container with its own list array
+    container: vi.fn().mockImplementation(() => createMockContainer()),
     graphics: vi.fn().mockReturnValue({ ...mockGraphics }),
     text: vi.fn().mockReturnValue({ ...mockText }),
     rectangle: vi.fn().mockReturnValue({ ...mockRectangle }),
@@ -317,8 +323,7 @@ describe('DialogueUI', () => {
       expect(mockTimerEvent.destroy).toHaveBeenCalled();
     });
 
-    // TODO: 此测试需要更复杂的 Phaser mock（每个 button 需要独立的 list 数组），暂时跳过
-    it.skip('有选项时不应自动推进', () => {
+    it('有选项时不应自动推进', () => {
       dialogueUI.showDialogue(mockDialogueWithChoices);
 
       // 第一次 advance 完成打字机效果
@@ -483,8 +488,7 @@ describe('DialogueUI', () => {
   });
 
   describe('选项渲染', () => {
-    // TODO: 此测试需要更复杂的 Phaser mock（每个 button container 需要独立的 list 数组用于 _highlightChoice），暂时跳过
-    it.skip('打字机完成后应创建选项按钮容器', () => {
+    it('打字机完成后应创建选项按钮容器', () => {
       // 清除初始化时的调用
       const initialContainerCalls = mockScene.add.container.mock.calls.length;
       
@@ -528,8 +532,11 @@ describe('DialogueUI', () => {
     it('键盘处理器存在', () => {
       dialogueUI.showDialogue(mockDialogue);
 
-      // 验证可以正常显示对话（键盘导航已设置）
-      expect(mockContainer.setVisible).toHaveBeenCalled();
+      // 验证空格键监听器已设置
+      expect(mockScene.input.keyboard?.on).toHaveBeenCalledWith(
+        'keydown-SPACE',
+        expect.any(Function)
+      );
     });
 
     it('没有选项时空格/回车应推进对话', () => {
@@ -556,11 +563,14 @@ describe('DialogueUI', () => {
     it('destroy 应清理资源', () => {
       dialogueUI.showDialogue(mockDialogue);
       
+      // 获取创建的容器（DialogueUI 创建的第一个 container 是主容器）
+      const createdContainer = mockScene.add.container.mock.results[0].value;
+      
       // 不应抛错
       expect(() => dialogueUI.destroy()).not.toThrow();
       
       // 验证容器被销毁
-      expect(mockContainer.destroy).toHaveBeenCalled();
+      expect(createdContainer.destroy).toHaveBeenCalled();
     });
 
     it('destroy 后 isVisible 应返回 false', () => {

@@ -520,5 +520,33 @@ describe('AudioManager', () => {
       // 应该乘以dialogueVolumeMultiplier
       expect(tweenConfig.volume).toBeLessThan(0.8 * 0.7 * 1.0);
     });
+
+    it('播放 BGM 后调整音量应该更新 sound 对象', () => {
+      const mockBgm = createMockSound();
+      mockScene.sound.add.mockReturnValueOnce(mockBgm);
+
+      audioManager.playBgm('bgm_test');
+      vi.clearAllMocks();
+
+      // 修改主音量
+      audioManager.setMasterVolume(0.5);
+
+      // setVolume 应该被调用（通过 _updateBgmVolume）
+      expect(mockBgm.setVolume).toHaveBeenCalled();
+    });
+
+    it('播放 Ambience 后调整音量应该更新 sound 对象', () => {
+      const mockAmbience = createMockSound();
+      mockScene.sound.add.mockReturnValueOnce(mockAmbience);
+
+      audioManager.playAmbience('amb_office');
+      vi.clearAllMocks();
+
+      // 修改环境音音量
+      audioManager.setAmbienceVolume(0.3);
+
+      // setVolume 应该被调用（通过 _updateAmbienceVolume）
+      expect(mockAmbience.setVolume).toHaveBeenCalled();
+    });
   });
 });

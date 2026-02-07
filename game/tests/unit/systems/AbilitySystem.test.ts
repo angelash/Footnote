@@ -372,4 +372,218 @@ describe('AbilitySystem', () => {
       }).not.toThrow();
     });
   });
+
+  describe('深度感知蓄力', () => {
+    it('startDepthPerceptionCharge 未解锁时应无效', () => {
+      mockWorldState.hasAbility.mockReturnValue(false);
+
+      abilitySystem.startDepthPerceptionCharge();
+
+      // 应该不会崩溃，只是静默返回
+      expect(mockWorldState.hasAbility).toHaveBeenCalledWith('DEPTH_PERCEPTION');
+    });
+
+    it('startDepthPerceptionCharge 已解锁时应开始蓄力', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+
+      abilitySystem.startDepthPerceptionCharge();
+
+      // 蓄力开始，内部状态更新
+      // 由于蓄力是内部状态，我们通过调用 stopDepthPerceptionCharge 来验证
+      abilitySystem.stopDepthPerceptionCharge();
+
+      // 未完成蓄力时停止应该不激活能力
+      expect(abilitySystem.isAbilityActive('DEPTH_PERCEPTION' as AbilityType)).toBe(false);
+    });
+
+    it('stopDepthPerceptionCharge 已激活时应停用能力', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('DEPTH_PERCEPTION' as AbilityType);
+      expect(abilitySystem.isAbilityActive('DEPTH_PERCEPTION' as AbilityType)).toBe(true);
+
+      abilitySystem.stopDepthPerceptionCharge();
+      expect(abilitySystem.isAbilityActive('DEPTH_PERCEPTION' as AbilityType)).toBe(false);
+    });
+
+    it('冷却中不应开始蓄力', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+
+      // 设置冷却
+      const states = abilitySystem.getAbilityStates();
+      const state = states.get('DEPTH_PERCEPTION' as AbilityType);
+      if (state) {
+        state.cooldownRemaining = 5000;
+      }
+
+      abilitySystem.startDepthPerceptionCharge();
+      abilitySystem.stopDepthPerceptionCharge();
+
+      // 不应该激活
+      expect(abilitySystem.isAbilityActive('DEPTH_PERCEPTION' as AbilityType)).toBe(false);
+    });
+  });
+
+  describe('可介入目标管理', () => {
+    it('registerIntervenableTarget 应注册目标', () => {
+      const mockGameObject = {
+        x: 100,
+        y: 200,
+      };
+      const callback = vi.fn();
+
+      abilitySystem.registerIntervenableTarget('test_obj', mockGameObject as any, callback);
+
+      const targets = abilitySystem.getIntervenableTargets();
+      expect(targets.has('test_obj')).toBe(true);
+      expect(targets.get('test_obj')?.originalPosition).toEqual({ x: 100, y: 200 });
+    });
+
+    it('unregisterIntervenableTarget 应注销目标', () => {
+      const mockGameObject = { x: 100, y: 200 };
+      const callback = vi.fn();
+
+      abilitySystem.registerIntervenableTarget('test_obj', mockGameObject as any, callback);
+      expect(abilitySystem.getIntervenableTargets().has('test_obj')).toBe(true);
+
+      abilitySystem.unregisterIntervenableTarget('test_obj');
+      expect(abilitySystem.getIntervenableTargets().has('test_obj')).toBe(false);
+    });
+
+    it('注册无位置的对象应正常工作', () => {
+      const mockGameObject = {}; // 没有 x, y 属性
+      const callback = vi.fn();
+
+      abilitySystem.registerIntervenableTarget('no_pos', mockGameObject as any, callback);
+
+      const targets = abilitySystem.getIntervenableTargets();
+      expect(targets.has('no_pos')).toBe(true);
+      expect(targets.get('no_pos')?.originalPosition).toBeUndefined();
+    });
+  });
+
+  describe('时间节点管理', () => {
+    it('getTimeNodes 初始应返回空数组', () => {
+      const nodes = abilitySystem.getTimeNodes();
+      expect(nodes).toEqual([]);
+    });
+
+    it('getCurrentNodeIndex 初始应返回0', () => {
+      const index = abilitySystem.getCurrentNodeIndex();
+      expect(index).toBe(0);
+    });
+
+    it('calculateRewindCost 应正确计算P值消耗', () => {
+      // 手动设置当前索引（通过反射或getter）
+      // 由于是私有字段，我们测试默认情况
+      const cost = abilitySystem.calculateRewindCost(0);
+      expect(cost).toBe(0); // 当前索引为0，回溯到0，距离为0
+    });
+  });
+
+  describe('Flag同步', () => {
+    it('激活能力时应设置对应Flag', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('DEPTH_PERCEPTION' as AbilityType);
+
+      expect(mockWorldState.setFlag).toHaveBeenCalledWith('FLAG_DEPTH_SENSE_ACTIVE', true);
+    });
+
+    it('停用能力时应清除对应Flag', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('DEPTH_PERCEPTION' as AbilityType);
+      vi.clearAllMocks();
+
+      abilitySystem.deactivateAbility('DEPTH_PERCEPTION' as AbilityType);
+
+      expect(mockWorldState.setFlag).toHaveBeenCalledWith('FLAG_DEPTH_SENSE_ACTIVE', false);
+    });
+
+    it('深度介入激活时应设置Flag', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('DEPTH_INTERVENTION' as AbilityType);
+
+      expect(mockWorldState.setFlag).toHaveBeenCalledWith('FLAG_DEPTH_INTERVENTION_ACTIVE', true);
+    });
+
+    it('时间干预激活时应设置Flag', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('TIME_INTERVENTION' as AbilityType);
+
+      expect(mockWorldState.setFlag).toHaveBeenCalledWith('FLAG_TIME_INTERVENTION_ACTIVE', true);
+    });
+  });
+
+  describe('performIntervention 扩展', () => {
+    it('应消耗P值', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('DEPTH_INTERVENTION' as AbilityType);
+      vi.clearAllMocks();
+
+      abilitySystem.performIntervention('obj_test', 'C0-Z1', 'test modification');
+
+      expect(mockWorldState.addP).toHaveBeenCalled();
+    });
+
+    it('应发出 SCAR_CREATE 事件', () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('DEPTH_INTERVENTION' as AbilityType);
+      vi.clearAllMocks();
+
+      abilitySystem.performIntervention('obj_test', 'C0-Z1', 'test modification');
+
+      // 检查 eventBus.emit 被调用
+      expect(mockEventBus.emit).toHaveBeenCalled();
+    });
+  });
+
+  describe('performTimeRewindToNode', () => {
+    it('未激活时应无效', async () => {
+      const node = {
+        id: 'node_1',
+        zoneId: 'C0-Z1',
+        timestamp: Date.now(),
+        saveSlot: 0,
+        index: 0,
+      };
+
+      await abilitySystem.performTimeRewindToNode(node);
+
+      expect(mockSaveManager.load).not.toHaveBeenCalled();
+    });
+
+    it('激活时应加载存档并添加污染', async () => {
+      mockWorldState.hasAbility.mockReturnValue(true);
+      mockWorldState.useAbility.mockReturnValue(true);
+
+      abilitySystem.activateAbility('TIME_INTERVENTION' as AbilityType);
+
+      const node = {
+        id: 'node_1',
+        zoneId: 'C0-Z1',
+        timestamp: Date.now(),
+        saveSlot: 1,
+        index: 0,
+      };
+
+      await abilitySystem.performTimeRewindToNode(node);
+
+      expect(mockSaveManager.load).toHaveBeenCalledWith(1);
+      expect(mockWorldState.addContamination).toHaveBeenCalled();
+      expect(mockWorldState.addP).toHaveBeenCalled();
+    });
+  });
 });

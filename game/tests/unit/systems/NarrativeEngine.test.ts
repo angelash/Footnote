@@ -1619,6 +1619,66 @@ describe('NarrativeEngine', () => {
     });
   });
 
+  describe('卡片 gameplay 效果 - counterDelta', () => {
+    it('gameplayFx counterDelta 应修改 R 值', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      const { worldState: ws } = await import('@/systems/world');
+
+      engine.registerCard({
+        id: 'r_delta_card',
+        name: 'R值卡',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'counterDelta' as const, counter: 'R', delta: 3 },
+            ],
+          },
+        ],
+      });
+
+      expect(ws.getCounters().R).toBe(0);
+      engine.obtainCard('r_delta_card');
+      expect(ws.getCounters().R).toBe(3);
+    });
+
+    it('gameplayFx counterDelta 应修改 P 值', async () => {
+      const engine = await createFreshNarrativeEngine();
+      engine.reset();
+
+      const { worldState: ws } = await import('@/systems/world');
+
+      engine.registerCard({
+        id: 'p_delta_card',
+        name: 'P值卡',
+        type: 'item' as const,
+        front: ['正面'],
+        detail: ['内容'],
+        chapter: 'C0' as const,
+        zone: 'C0-Z1',
+        gameplayFx: [
+          {
+            trigger: 'obtain' as const,
+            effects: [
+              { type: 'counterDelta' as const, counter: 'P', delta: 5 },
+            ],
+          },
+        ],
+      });
+
+      expect(ws.getCounters().P).toBe(0);
+      engine.obtainCard('p_delta_card');
+      expect(ws.getCounters().P).toBe(5);
+    });
+  });
+
   describe('卡片 gameplay 效果边界情况', () => {
     it('无效的效果类型应返回 false', async () => {
       const engine = await createFreshNarrativeEngine();
